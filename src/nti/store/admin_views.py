@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Store pyramid views.
-
 .. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
@@ -36,7 +34,7 @@ from . import purchasable
 from . import content_roles
 from . import purchase_history
 from . import interfaces as store_interfaces
-from .payments import pyramid_views as pyramid_payment
+from .payments import views as payment_views
 
 _PostView = utils.AbstractPostView
 raise_field_error = utils.raise_field_error
@@ -247,4 +245,4 @@ class GetUsersPurchaseHistoryView(object):
 		result = result if not as_csv else self._to_csv(request, result)
 		return result
 
-GeneratePurchaseInvoice = pyramid_payment.GeneratePurchaseInvoiceWitStripe  # rexport
+GeneratePurchaseInvoice = payment_views.GeneratePurchaseInvoiceWitStripeView  # rexport
