@@ -6,29 +6,25 @@
 	<include package="zope.component" file="meta.zcml" />
 	<include package="zope.security" file="meta.zcml" />
 	<include package="zope.component" />
-
-	<!-- generations -->
-
+	
+	<!-- Generations -->
+			 
 	<utility factory=".generations.install._StoreSchemaManager"
 			 name="nti.dataserver-store"
 			 provides="zope.generations.interfaces.IInstallableSchemaManager"/>
-			 
-	<include package=".payments" file="configure.zcml" />
 
+	<include package=".payments" file="configure.zcml" />
+				 
+	<!-- Adapters -->
+	
 	<adapter factory=".purchase_history._PurchaseHistoryFactory"
 			 for="nti.dataserver.interfaces.IUser"
 			 provides=".interfaces.IPurchaseHistory" />
 
-	<subscriber handler=".subscribers._purchase_attempt_started" />
-	<subscriber handler=".subscribers._purchase_attempt_successful" />
-	<subscriber handler=".subscribers._purchase_attempt_failed" />
-	<subscriber handler=".subscribers._purchase_attempt_refunded" />
-	<subscriber handler=".subscribers._purchase_attempt_synced" />
-	<subscriber handler=".subscribers._purchase_attempt_disputed" />
-	<subscriber handler=".subscribers._purchase_invitation_accepted" />
-	<subscriber handler=".subscribers._enrollment_attempt_successful" />
-	<subscriber handler=".subscribers._unenrollment_attempt_successful" />
-
+	<adapter factory=".purchase_error.nti_store_exception_adpater"
+			 provides=".interfaces.IPurchaseError"
+			 for=".interfaces.INTIStoreException" />
+			 
 	<adapter factory=".externalization.PriceableExternal" />
 	<adapter factory=".externalization.PricedItemExternal" />
 	<adapter factory=".externalization.PurchasableExternal" />
@@ -40,10 +36,20 @@
 	<adapter factory=".externalization.RedeemedPurchaseAttemptExternal" />
 	<adapter factory=".externalization.InvitationPurchaseAttemptExternal" />
 
-	<adapter factory=".purchase_error.nti_store_exception_adpater"
-			 provides=".interfaces.IPurchaseError"
-			 for=".interfaces.INTIStoreException" />
-
+	<!-- Subscribers -->
+	
+	<subscriber handler=".subscribers._purchase_attempt_started" />
+	<subscriber handler=".subscribers._purchase_attempt_successful" />
+	<subscriber handler=".subscribers._purchase_attempt_failed" />
+	<subscriber handler=".subscribers._purchase_attempt_refunded" />
+	<subscriber handler=".subscribers._purchase_attempt_synced" />
+	<subscriber handler=".subscribers._purchase_attempt_disputed" />
+	<subscriber handler=".subscribers._purchase_invitation_accepted" />
+	<subscriber handler=".subscribers._enrollment_attempt_successful" />
+	<subscriber handler=".subscribers._unenrollment_attempt_successful" />
+	
+	<!-- Decorators -->
+	
 	<subscriber factory=".decorators.PurchasableDecorator"
 				for=".interfaces.IPurchasable"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
@@ -60,6 +66,8 @@
 				for=".interfaces.IPricedItem"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
 
+	<!-- Utilities -->
+	
 	<utility factory=".purchasable.ZcmlPurchasableStore" />
 
 	<utility component=".purchasable.PurchasableTokenVocabulary"
@@ -68,12 +76,12 @@
 
 	<utility factory=".pricing.DefaultPurchasablePricer" />
 
-	<utility factory=".purchasable._PurchasableResolver" name="purchasable" />
 	<utility factory=".course._CourseResolver" name="course" />
+	<utility factory=".purchasable._PurchasableResolver" name="purchasable" />
 
-	<!--
-		The purchasables included in here are only for test purposes
-	-->
-	<include file="_sample.zcml" zcml:condition="have devmode"/>
+	<configure zcml:condition="have devmode">
+		<!-- Test purchasables -->
+		<include file="_sample.zcml" zcml:condition="have devmode"/>
+	</configure>
 
 </configure>
