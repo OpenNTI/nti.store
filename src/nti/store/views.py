@@ -39,7 +39,7 @@ from . import purchasable
 from . import purchase_history
 from . import InvalidPurchasable
 from . import interfaces as store_interfaces
-from .payments import pyramid_views as pyramid_payment
+from .payments import views as payment_views
 
 # bwc
 is_valid_pve_int = utils.is_valid_pve_int
@@ -295,9 +295,10 @@ class UnenrollCourseView(_PostView):
 		result = self.unenroll()
 		return result
 
-# aliases
-StripePaymentView = pyramid_payment.StripePaymentView
-CreateStripeTokenView = pyramid_payment.CreateStripeTokenView
-GetStripeConnectKeyView = pyramid_payment.GetStripeConnectKeyView
-StripeRefundPaymentView = pyramid_payment.StripeRefundPaymentView
-PricePurchasableWithStripeCouponView = pyramid_payment.PricePurchasableWithStripeCouponView
+# alias
+
+StripePaymentView = payment_views.StripePaymentView
+CreateStripeTokenView = payment_views.CreateStripeTokenView
+GetStripeConnectKeyView = payment_views.GetStripeConnectKeyView
+StripeRefundPaymentView = payment_views.StripeRefundPaymentView
+PricePurchasableWithStripeCouponView = payment_views.PricePurchasableWithStripeCouponView

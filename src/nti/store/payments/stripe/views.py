@@ -26,18 +26,19 @@ from nti.externalization.interfaces import LocatedExternalDict
 
 from nti.ntiids import ntiids
 
-from nti.store import invitations
-from nti.store.utils import to_boolean
-from nti.store import purchase_history
-from nti.store import NTIStoreException
-from nti.store import InvalidPurchasable
-from nti.store import purchasable as source
-from nti.store.utils import is_valid_amount
-from nti.store.utils import is_valid_pve_int
-from nti.store.utils import is_valid_boolean
-from nti.store.utils import raise_field_error
-from nti.store.utils.pyramid import AbstractPostView
-from nti.store import interfaces as store_interfaces
+from ...utils import to_boolean
+from ...utils import is_valid_amount
+from ...utils import is_valid_pve_int
+from ...utils import is_valid_boolean
+from ...utils import raise_field_error
+from ...utils.pyramid import AbstractPostView
+
+from ... import invitations
+from ... import purchase_history
+from ... import NTIStoreException
+from ... import InvalidPurchasable
+from ... import purchasable as source
+from ... import interfaces as store_interfaces
 
 from . import stripe_purchase
 from . import NoSuchStripeCoupon
@@ -274,7 +275,7 @@ class StripeRefundPaymentView(_PostStripeView):
 		return LocatedExternalDict({'Items':[purchase],
 									'Last Modified':purchase.lastModified})
 
-class GeneratePurchaseInvoiceWitStripe(_PostStripeView):
+class GeneratePurchaseInvoiceWitStripeView(_PostStripeView):
 
 	def _get_purchase(self, key):
 		try:
