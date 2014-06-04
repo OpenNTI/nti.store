@@ -23,7 +23,8 @@
 			 for="...interfaces.IPurchaseAttempt"
 			 provides=".interfaces.IStripePurchaseAttempt" />
 
-	<utility factory=".stripe_pricing.StripePurchasablePricer" name="stripe" />
+	<utility factory=".stripe_pricing.StripePurchasablePricer"
+			 name="stripe" />
 	
 	<utility factory=".stripe_processor.StripePaymentProcessor"
 			 provides=".interfaces.IStripePaymentProcessor"
@@ -31,8 +32,8 @@
 
 	<adapter factory=".externalization.StripeCouponExternalizer" />
 	<adapter factory=".externalization.StripeConnectKeyExternal" />
-	<adapter factory=".externalization.StripePurchaseErrorExternal" />
 	<adapter factory=".externalization.StripePricedItemExternal" />
+	<adapter factory=".externalization.StripePurchaseErrorExternal" />
 	
 	<subscriber factory=".decorators.PurchasableDecorator"
 				for="...interfaces.IPurchasable"
@@ -46,9 +47,9 @@
 			 provides=".interfaces.IStripePurchaseError"
 			 for="basestring" />
 			 
-	<!--
-		The keys included in here are only for test purposes
-	-->
-	<include file="stripe_keys.zcml" zcml:condition="have devmode"/>
+	<configure zcml:condition="have devmode">
+		<!-- The keys included in here are only for test purposes -->
+		<include file="stripe_keys.zcml" />
+	</configure>
 
 </configure>
