@@ -157,14 +157,6 @@ class TestStoreExternal(unittest.TestCase):
 		assert_that(ext, has_entry('PurchasePrice', 200))
 		assert_that(ext, has_entry('Quantity', 10))
 
-	def test_fill_in_lib(self):
-		pe = purchasable.create_purchasable(ntiid='tag:nextthought.com,2011-10:MN-HTML-MiladyCosmetology.cosmetology',
-									  		provider='MLC',
-									  		amount=100)
-		ext = to_external_object(pe)
-		assert_that(ext, has_entry('Title', u'COSMETOLOGY'))
-		assert_that(ext, has_entry('Description', u'COSMETOLOGY'))
-
 	def test_course(self):
 		cs = purchasable.get_purchasable('tag:nextthought.com,2011-10:OU-course-CLC3403LawAndJustice')
 		ext = to_external_object(cs)
