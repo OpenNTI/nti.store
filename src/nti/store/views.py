@@ -29,7 +29,6 @@ from nti.externalization.interfaces import LocatedExternalDict
 
 from . import utils
 from . import priceable
-from . import enrollment
 from . import invitations
 from . import purchasable
 from . import purchase_history
@@ -235,44 +234,5 @@ class PricePurchasableView(_PostView):
 		result = self.price_purchasable()
 		return result
 
-class EnrollCourseView(_PostView):
 
-	def enroll(self, values=None):
-		values = values or self.readInput()
-		username = self.request.authenticated_userid
-		course_id = values.get('courseID', u'')
-		description = values.get('description', u'')
-		try:
-			enrollment.enroll_course(username, course_id, description, self.request)
-		except enrollment.CourseNotFoundException:
-			raise_field_error(self.request, 'courseID', _('Course not found'))
-
-		return hexc.HTTPNoContent()
-
-	def __call__(self):
-		result = self.enroll()
-		return result
-
-class UnenrollCourseView(_PostView):
-
-	def unenroll(self, values=None):
-		values = values or self.readInput()
-		username = self.request.authenticated_userid
-		course_id = values.get('courseID', u'')
-		try:
-			enrollment.unenroll_course(username, course_id, self.request)
-		except enrollment.CourseNotFoundException:
-			logger.error("Course %s not found" % course_id)
-			raise_field_error(self.request, 'courseID', _('Course not found'))
-		except enrollment.UserNotEnrolledException:
-			logger.error("User %s not enrolled in %s" % (username, course_id))
-			raise_field_error(self.request, 'username', _('User not enrolled'))
-		except enrollment.InvalidEnrollmentAttemptException:
-			raise_field_error(self.request, 'courseID', _('Invalid enrollment attempt'))
-
-		return hexc.HTTPNoContent()
-
-	def __call__(self):
-		result = self.unenroll()
-		return result
 
