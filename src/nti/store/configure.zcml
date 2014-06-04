@@ -50,14 +50,6 @@
 	
 	<!-- Decorators -->
 	
-	<subscriber factory=".decorators.PurchasableDecorator"
-				for=".interfaces.IPurchasable"
-				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
-
-	<subscriber factory=".decorators.CourseDecorator"
-				for=".interfaces.ICourse"
-				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
-
 	<subscriber factory=".decorators.PurchaseAttemptDecorator"
 				for=".interfaces.IPurchaseAttempt"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
