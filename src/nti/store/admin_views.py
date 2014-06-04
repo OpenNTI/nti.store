@@ -54,14 +54,6 @@ class _BasePostPurchaseAttemptView(_PostView):
 
 		return purchase
 
-class DeletePurchaseAttemptView(_BasePostPurchaseAttemptView):
-
-	def __call__(self):
-		purchase = super(DeletePurchaseAttemptView, self).__call__()
-		purchase_history.remove_purchase_attempt(purchase, purchase.creator)
-		logger.info("Purchase attempt '%s' has been deleted")
-		return hexc.HTTPNoContent()
-
 class DeletePurchaseHistoryView(_PostView):
 
 	def __call__(self):
