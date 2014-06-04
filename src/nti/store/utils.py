@@ -14,12 +14,6 @@ import six
 
 from nti.mimetype.mimetype import nti_mimetype_with_class
 
-from .pyramid import AbstractPostView
-from .pyramid import raise_json_error
-from .pyramid import raise_field_error
-
-# item/array functions
-
 def from_delimited(value, delim=' '):
 	result = value.split(delim)
 	result = re.findall("[^\s]+", value) if len(result) <= 1 else result
@@ -42,50 +36,6 @@ def to_list(items=None, delim=' '):
 
 def to_frozenset(items=None, delim=' '):
 	return to_collection(items, frozenset, delim)
-
-def is_valid_timestamp(ts):
-	try:
-		ts = float(ts)
-		return ts >= 0
-	except (TypeError, ValueError):
-		return False
-
-def is_valid_amount(amount):
-	try:
-		amount = float(amount)
-		return amount >= 0
-	except (TypeError, ValueError):
-		return False
-
-def is_valid_pve_int(value):
-	try:
-		value = float(value)
-		return value > 0
-	except (TypeError, ValueError):
-		return False
-
-true_values = ('1', 'y', 'yes', 't', 'true')
-false_values = ('0', 'n', 'no', 'f', 'false')
-
-def is_valid_boolean(value):
-	if isinstance(value, bool):
-		return True
-	elif isinstance(value, six.string_types):
-		v = value.lower()
-		return v in true_values or v in false_values
-	else:
-		return False
-
-def to_boolean(value):
-	if isinstance(value, bool):
-		return value
-	v = value.lower() if isinstance(value, six.string_types) else value
-	if v in true_values:
-		return True
-	elif v in false_values:
-		return False
-	else:
-		return None
 
 # meta classes
 

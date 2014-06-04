@@ -9,9 +9,6 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-from ..utils import is_valid_amount
-from ..utils import is_valid_pve_int
-
 class _BasePaymentProcessor(object):
 
     def validate_coupon(self, coupon):

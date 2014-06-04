@@ -15,11 +15,7 @@ import unittest
 
 from nti.store.utils import from_delimited
 
-from nti.store.tests import SharedConfiguringTestLayer
-
 class TestUtils(unittest.TestCase):
-
-	layer = SharedConfiguringTestLayer
 
 	def test_from_delimited(self):
 		a = ['tag:nextthought.com,2011-10:CMU-HTML-04630_main.04_630:_computer_science_for_practicing_engineers',
