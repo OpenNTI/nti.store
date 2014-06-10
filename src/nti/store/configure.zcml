@@ -59,12 +59,6 @@
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
 
 	<!-- Utilities -->
-	
-	<utility factory=".purchasable.ZcmlPurchasableStore" />
-
-	<utility component=".purchasable.PurchasableTokenVocabulary"
-			 provides="zope.schema.interfaces.IVocabularyFactory"
-			 name="nti.store.purchasable.vocabulary" />
 
 	<utility factory=".pricing.DefaultPurchasablePricer" />
 

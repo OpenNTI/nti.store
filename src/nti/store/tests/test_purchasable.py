@@ -14,11 +14,8 @@ from hamcrest import is_not
 from hamcrest import has_key
 from hamcrest import has_length
 from hamcrest import assert_that
-from hamcrest import greater_than_or_equal_to
 
 import unittest
-
-from zope import component
 
 from nti.dataserver.users import User
 
@@ -42,13 +39,9 @@ class TestPurchasable(unittest.TestCase):
 		return usr
 
 	def test_zmcl(self):
-		util = component.queryUtility(store_interfaces.IPurchasableStore)
-		assert_that(util, is_not(none()))
-		assert_that(util, has_length(greater_than_or_equal_to(4)))
+		assert_that(purchasable.get_purchasable('iid_0'), is_not(none()))
 
-		assert_that(util.get_purchasable('iid_0'), is_not(none()))
-
-		ps = util.get_purchasable('iid_3')
+		ps = purchasable.get_purchasable('iid_3')
 		assert_that(ps.NTIID, is_("iid_3"))
 		assert_that(ps.Title, is_("Risk Course"))
 		assert_that(ps.Description, is_("Intro to Risk"))

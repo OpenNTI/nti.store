@@ -45,28 +45,6 @@ PAYMENT_PROCESSORS = ('stripe',)
 PAYMENT_PROCESSORS_VOCABULARY = \
 	vocabulary.SimpleVocabulary([vocabulary.SimpleTerm(_x) for _x in PAYMENT_PROCESSORS])
 
-class IPurchasableStore(interface.Interface):
-
-	def get_purchasable(pid):
-		"""
-		Return purchasable with the specified id
-		"""
-
-	def get_all_purchasables():
-		"""
-		Return an iterable with purchasable items
-		"""
-
-	def get_purchasable_ids():
-		"""
-		Return an iterable with purchasable ids
-		"""
-
-	def __len__():
-		"""
-		Return the number of items in this store
-		"""
-
 class IContentBundle(interface.Interface):
 	NTIID = schema.ValidTextLine(title='Content bundle NTTID', required=True)
 	Title = schema.ValidTextLine(title='Content bundle title', required=False)

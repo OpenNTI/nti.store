@@ -81,5 +81,5 @@ class _CourseResolver(object):
 		return purchasable.get_purchasable(ntiid_string)
 
 def get_course(course_id, registry=component):
-	result = purchasable.get_purchasable(course_id, registry)
+	result = purchasable.get_purchasable(course_id, registry=registry)
 	return result

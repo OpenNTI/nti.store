@@ -15,11 +15,7 @@ import six
 from zope import component
 from zope import interface
 from zope.cachedescriptors.property import Lazy
-from zope.schema import interfaces as sch_interfaces
 from zope.mimetype import interfaces as zmime_interfaces
-
-from zope.componentvocabulary.vocabulary import UtilityNames
-from zope.componentvocabulary.vocabulary import UtilityVocabulary
 
 from nti.dataserver.users import User
 from nti.dataserver import authorization
@@ -38,18 +34,6 @@ from nti.utils.schema import createDirectFieldProperties
 from . import utils
 from . import content_bundle
 from . import interfaces as store_interfaces
-
-@interface.provider(sch_interfaces.IVocabularyFactory)  # Provider or implementer?
-class PurchasableTokenVocabulary(object, UtilityNames):
-
-	def __init__(self, context=None):
-		UtilityNames.__init__(self, store_interfaces.IPurchasable)
-
-class PurchasableUtilityVocabulary(UtilityVocabulary):
-	interface = store_interfaces.IPurchasable
-
-class PurchasableNameVocabulary(PurchasableUtilityVocabulary):
-	nameOnly = True
 
 @interface.implementer(store_interfaces.IPurchasable,
 					   nti_interfaces.IACLProvider,
@@ -94,66 +78,42 @@ def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=No
 						 Icon=icon, Thumbnail=thumbnail)
 	return result
 
-@interface.implementer(store_interfaces.IPurchasableStore)
-class ZcmlPurchasableStore(object):
-
-	@property
-	def vocabulary(self):
-		result = PurchasableUtilityVocabulary(None)
-		return result
-
-	def get_purchasable(self, pid):
-		try:
-			result = self.vocabulary.getTermByToken(pid) if pid else None
-		except (LookupError, KeyError):
-			result = None
-		return result.value if result is not None else None
-
-	def get_all_purchasables(self):
-		for p in self.vocabulary:
-			yield p.value
-
-	def get_purchasable_ids(self):
-		for p in self.vocabulary:
-			yield p.value.NTIID
-
-	def __len__(self):
-		return len(self.vocabulary)
-
-DefaultPurchasableStore = ZcmlPurchasableStore
-
-def get_purchasable_store():
-	return DefaultPurchasableStore()
-
 def get_purchasable(pid, registry=component):
-	result = get_purchasable_store().get_purchasable(pid)
+	result = registry.queryUtility(store_interfaces.IPurchasable, pid)
 	return result
 
 def get_all_purchasables(registry=component):
-	store = get_purchasable_store()
-	result = LocatedExternalList(store.get_all_purchasables())
+	result = LocatedExternalList()
+	for _, purchasable in component.getUtilitiesFor(store_interfaces.IPurchasable):
+		result.append(purchasable)
+	return result
+
+def get_purchasable_ids(registry=component):
+	result = LocatedExternalList()
+	for pid, _ in component.getUtilitiesFor(store_interfaces.IPurchasable):
+		result.append(pid)
 	return result
 
 def get_available_items(user, registry=component):
 	"""
 	Return all item that can be purchased
 	"""
-	util = registry.queryUtility(store_interfaces.IPurchasableStore)
-	all_ids = set(util.get_purchasable_ids()) if util else ()
+	all_ids = set(get_purchasable_ids(registry=registry))
 	if not all_ids:
 		return {}
 
 	# get purchase history
 	purchased = set()
-	user = User.get_user(str(user))\
-		   if not nti_interfaces.IUser.providedBy(user) else user
+	user = User.get_user(str(user)) if not nti_interfaces.IUser.providedBy(user) else user
+	
 	history = store_interfaces.IPurchaseHistory(user)
 	for p in history:
 		if p.has_succeeded() or p.is_pending():
 			purchased.update(p.Items)
 
 	available = all_ids - purchased
-	result = LocatedExternalDict({k:util.get_purchasable(k) for k in available})
+	result = LocatedExternalDict(
+				{key:get_purchasable(key, registry=registry) for key in available})
 	return result
 
 def get_content_items(purchased_items, registry=component):
@@ -164,9 +124,8 @@ def get_content_items(purchased_items, registry=component):
 		purchased_items = utils.to_collection(purchased_items)
 
 	result = set()
-	store = get_purchasable_store()
 	for item in purchased_items:
-		p = store.get_purchasable(item)
+		p = get_purchasable(item, registry=registry)
 		if p is not None:
 			result.update(p.Items)
 	return result

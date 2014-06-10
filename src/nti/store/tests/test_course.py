@@ -18,12 +18,10 @@ from hamcrest import greater_than_or_equal_to
 
 import unittest
 
-from zope import component
-
 from nti.dataserver.users import User
 
 from nti.store import purchasable
-from nti.store import interfaces as store_interfaces
+from nti.store.purchasable import get_purchasable
 
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
@@ -38,13 +36,9 @@ class TestCourse(unittest.TestCase):
 		return usr
 
 	def test_zmcl(self):
-		util = component.queryUtility(store_interfaces.IPurchasableStore)
-		assert_that(util, is_not(none()))
-		assert_that(util, has_length(greater_than_or_equal_to(1)))
+		assert_that(get_purchasable('tag:nextthought.com,2011-10:OU-course-CLC3403LawAndJustice'), is_not(none()))
 
-		assert_that(util.get_purchasable('tag:nextthought.com,2011-10:OU-course-CLC3403LawAndJustice'), is_not(none()))
-
-		ps = util.get_purchasable('tag:nextthought.com,2011-10:OU-course-CLC3403LawAndJustice')
+		ps = get_purchasable('tag:nextthought.com,2011-10:OU-course-CLC3403LawAndJustice')
 		assert_that(ps, has_property('NTIID', "tag:nextthought.com,2011-10:OU-course-CLC3403LawAndJustice"))
 		assert_that(ps, has_property('Title', "CLC 3403 Law and Justice"))
 		assert_that(ps, has_property('Description', has_length(greater_than_or_equal_to(140))))
