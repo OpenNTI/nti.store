@@ -3,7 +3,7 @@
 """
 Stripe Payment interfaces
 
-$Id$
+.. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
@@ -164,5 +164,3 @@ class IStripePurchaseOrder(store_interfaces.IPurchaseOrder):
 
 class IStripePricedItem(store_interfaces.IPricedItem):
 	Coupon = schema.Object(interface.Interface, title='the coupon', required=False)
-
-

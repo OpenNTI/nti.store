@@ -3,7 +3,7 @@
 """
 Stripe purchase coupon functionality.
 
-$Id$
+.. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
@@ -13,9 +13,9 @@ logger = __import__('logging').getLogger(__name__)
 import six
 import time
 
-from nti.store.payments import _BasePaymentProcessor
-from nti.store.payments.stripe import InvalidStripeCoupon
-from nti.store.payments.stripe.processor.base import BaseProcessor
+from ....payments import _BasePaymentProcessor
+from ....payments.stripe import InvalidStripeCoupon
+from ....payments.stripe.processor.base import BaseProcessor
 
 class CouponProcessor(_BasePaymentProcessor, BaseProcessor):
 

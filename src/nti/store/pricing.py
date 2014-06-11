@@ -10,6 +10,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from . import MessageFactory as _
+
 from zope import interface
 from zope.mimetype import interfaces as zmime_interfaces
 
@@ -24,7 +26,8 @@ from . import PricingException
 from . import InvalidPurchasable
 from . import interfaces as store_interfaces
 
-@interface.implementer(store_interfaces.IPricedItem, zmime_interfaces.IContentTypeAware)
+@interface.implementer(store_interfaces.IPricedItem,
+					   zmime_interfaces.IContentTypeAware)
 class PricedItem(priceable.Priceable):
 
 	__metaclass__ = utils.MetaStoreObject
@@ -44,8 +47,8 @@ class PricedItem(priceable.Priceable):
 		xhash ^= hash(self.NTIID)
 		return xhash
 
-def create_priced_item(ntiid, purchase_price, purchase_fee=None, non_discounted_price=None,
-					   quantity=1, currency='USD'):
+def create_priced_item(ntiid, purchase_price, purchase_fee=None,
+					   non_discounted_price=None, quantity=1, currency='USD'):
 	quantity = 1 if quantity is None else int(quantity)
 	purchase_fee = float(purchase_fee) if purchase_fee is not None else None
 	non_discounted_price = float(non_discounted_price) \
@@ -92,7 +95,8 @@ class DefaultPurchasablePricer(object):
 		quantity = priceable.Quantity or 1
 		purchasable = priceable.purchasable
 		if purchasable is None:
-			raise InvalidPurchasable("'%s' is an invalid purchasable NTIID" % priceable.NTIID)
+			raise InvalidPurchasable("'%s' is an invalid purchasable NTIID" %
+									priceable.NTIID)
 
 		amount = purchasable.Amount
 		new_amount = amount * quantity
@@ -116,7 +120,7 @@ class DefaultPurchasablePricer(object):
 			result.TotalPurchasePrice += priced.PurchasePrice
 
 		if len(currencies) != 1:
-			raise PricingException("Multi-Currency pricing is not supported")
+			raise PricingException(_("Multi-Currency pricing is not supported"))
 
 		result.Currency = currencies.pop()
 		return result

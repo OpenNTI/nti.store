@@ -3,7 +3,7 @@
 """
 Stripe utilities.
 
-$Id$
+.. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
@@ -18,11 +18,12 @@ from zope import component
 from . import NoSuchStripeCoupon
 from . import InvalidStripeCoupon
 from . import interfaces as stripe_interfaces
-from ... import interfaces as store_interfaces
-from .stripe_purchase import StripePricedPurchasable
 
-from nti.store import PricingException
-from nti.store.pricing import create_pricing_results, DefaultPurchasablePricer
+from ... import PricingException
+from ... import interfaces as store_interfaces
+
+from .stripe_purchase import StripePricedPurchasable
+from ...pricing import create_pricing_results, DefaultPurchasablePricer
 
 class StripePurchasablePricer(DefaultPurchasablePricer):
 

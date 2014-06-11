@@ -9,6 +9,7 @@ from __future__ import print_function, unicode_literals, absolute_import, divisi
 __docformat__ = "restructuredtext en"
 
 from zope import interface
+from zope.schema import vocabulary
 from zope.interface.common import sequence
 from zope.location.interfaces import IContained
 from zope.interface.interfaces import ObjectEvent, IObjectEvent
@@ -18,7 +19,6 @@ from dolmen.builtins import IIterable
 from nti.contentfragments.schema import HTMLContentFragment
 
 from nti.utils import schema
-from zope.schema import vocabulary
 
 # : A :class:`zope.schema.interfaces.IVocabularyTokenized` vocabulary
 # : will be available as a registered vocabulary under this name

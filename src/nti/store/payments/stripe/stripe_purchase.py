@@ -3,7 +3,7 @@
 """
 Defines stripe payment object.
 
-$Id: purchasable.py 18394 2013-04-18 19:27:11Z carlos.sanchez $
+.. $Id: purchasable.py 18394 2013-04-18 19:27:11Z carlos.sanchez $
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
@@ -16,6 +16,7 @@ from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 from ... import pricing
 from ... import priceable
 from ... import purchase_order
+
 from . import interfaces as stripe_interfaces
 
 @interface.implementer(stripe_interfaces.IStripePriceable)

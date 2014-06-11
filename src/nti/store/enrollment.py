@@ -55,7 +55,7 @@ def enroll_course(user, course_id, description=None, request=None, registry=comp
 	return do_enrollment(user, course_id, description, request, registry=registry)
 
 def unenroll_course(user, course_id, request=None, registry=component):
-	if course.get_course(course_id, registry) is None:
+	if course.get_course(course_id, registry=registry) is None:
 		raise CourseNotFoundException()
 
 	enrollment = get_enrollment(user, course_id)

@@ -3,7 +3,7 @@
 """
 Stripe purchase adapters.
 
-$Id$
+.. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
@@ -24,6 +24,7 @@ from nti.dataserver import interfaces as nti_interfaces
 from nti.utils.property import alias
 
 from .utils import makenone
+
 from . import StripePurchaseError
 from . import interfaces as stripe_interfaces
 from ... import interfaces as store_interfaces

@@ -22,8 +22,9 @@ from nti.ntiids import interfaces as nid_interfaces
 from nti.utils.schema import AdaptingFieldProperty
 from nti.utils.schema import createDirectFieldProperties
 
-from . import purchasable
 from .utils import to_frozenset
+
+from . import purchasable
 from . import interfaces as store_interfaces
 
 from nti.externalization.externalization import make_repr

@@ -15,6 +15,9 @@ from zope import interface
 
 from pyramid.threadlocal import get_current_request
 
+from nti.dataserver.users import User
+from nti.dataserver import interfaces as nti_interfaces
+
 from . import interfaces as store_interfaces
 
 @interface.implementer(store_interfaces.INTIStoreException)
@@ -26,6 +29,13 @@ class InvalidPurchasable(NTIStoreException):
 
 class PricingException(NTIStoreException):
     pass
+
+def get_user(user):
+    if user is not None:
+        result = User.get_user(str(user)) \
+                 if not nti_interfaces.IUser.providedBy(user) else user
+        return result
+    return None
 
 def get_possible_site_names(request=None, include_default=True):
     request = request or get_current_request()

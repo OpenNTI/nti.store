@@ -3,7 +3,7 @@
 """
 Directives to be used in ZCML: registering static keys.
 
-$Id$
+.. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
@@ -14,8 +14,9 @@ from zope import interface
 from zope.configuration import fields
 from zope.component.zcml import utility
 
-from .stripe_key import StripeConnectKey
 from . import interfaces as stripe_interfaces
+
+from .stripe_key import StripeConnectKey
 
 class IRegisterStripeKeyDirective(interface.Interface):
 	"""

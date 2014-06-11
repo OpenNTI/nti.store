@@ -3,7 +3,7 @@
 """
 Stripe purchase functionalilty.
 
-$Id$
+.. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
@@ -24,15 +24,16 @@ from pyramid.threadlocal import get_current_request
 
 from nti.dataserver import interfaces as nti_interfaces
 
-from nti.store import purchase_history
-from nti.store import NTIStoreException
-from nti.store.payments.stripe import utils
-from nti.store import get_possible_site_names
-from nti.store import interfaces as store_interfaces
-from nti.store.payments.stripe import stripe_customer
-from nti.store.payments.stripe import interfaces as stripe_interfaces
-from nti.store.payments.stripe.processor.coupon import CouponProcessor
-from nti.store.payments.stripe.processor.pricing import PricingProcessor
+from .... import purchase_history
+from .... import NTIStoreException
+from .... import get_possible_site_names
+from .... import interfaces as store_interfaces
+
+from ....payments.stripe import utils
+from ....payments.stripe import stripe_customer
+from ....payments.stripe import interfaces as stripe_interfaces
+from ....payments.stripe.processor.coupon import CouponProcessor
+from ....payments.stripe.processor.pricing import PricingProcessor
 
 class PurchaseProcessor(stripe_customer.StripeCustomer,
 						CouponProcessor,

@@ -3,7 +3,7 @@
 """
 Stripe purchase pricing functionalilty.
 
-$Id$
+.. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
@@ -12,8 +12,8 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import component
 
-from nti.store import purchase_history
-from nti.store import interfaces as store_interfaces
+from .... import purchase_history
+from .... import interfaces as store_interfaces
 
 from .base import BaseProcessor
 

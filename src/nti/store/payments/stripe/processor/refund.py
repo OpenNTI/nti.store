@@ -3,7 +3,7 @@
 """
 Stripe refund functionalilty.
 
-$Id$
+.. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
@@ -14,17 +14,17 @@ import time
 from datetime import date
 
 import zope.intid
+
 from zope import component
 from zope.event import notify
 
-from nti.store import NTIStoreException
-from nti.store import interfaces as store_interfaces
-
 from nti.externalization import integer_strings
 
-from .. import interfaces as stripe_interfaces
+from .... import NTIStoreException
+from .... import interfaces as store_interfaces
 
 from .base import BaseProcessor
+from .. import interfaces as stripe_interfaces
 
 class RefundProcessor(BaseProcessor):
 

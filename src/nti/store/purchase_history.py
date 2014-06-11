@@ -14,6 +14,7 @@ import BTrees
 from BTrees.Length import Length
 
 import zope.intid
+
 from zope import component
 from zope import interface
 from zope import lifecycleevent
@@ -24,7 +25,6 @@ from zope.container import contained as zcontained
 
 from persistent import Persistent
 
-from nti.dataserver.users import User
 from nti.dataserver import interfaces as nti_interfaces
 
 from nti.externalization.interfaces import LocatedExternalList
@@ -34,6 +34,7 @@ from nti.ntiids import ntiids
 from nti.zodb.containers import time_to_64bit_int
 
 from . import utils
+from . import get_user
 from . import purchase_attempt
 from . import interfaces as store_interfaces
 
@@ -253,71 +254,65 @@ class PurchaseHistory(zcontained.Contained, Persistent):
 
 _PurchaseHistoryFactory = an_factory(PurchaseHistory)
 
-def _get_user(user):
-	if user is not None:
-		user = User.get_user(str(user)) \
-		if not nti_interfaces.IUser.providedBy(user) else user
-	return user
-
 def activate_items(user, items):
-	user = _get_user(user)
+	user = get_user(user)
 	hist = store_interfaces.IPurchaseHistory(user)
 	hist.activate_items(items)
 
 def deactivate_items(user, items):
-	user = _get_user(user)
+	user = get_user(user)
 	hist = store_interfaces.IPurchaseHistory(user)
 	return hist.deactivate_items(items)
 
 def is_item_activated(user, item):
-	user = _get_user(user)
+	user = get_user(user)
 	hist = store_interfaces.IPurchaseHistory(user)
 	return hist.is_item_activated(item)
 
 def get_purchase_attempt(purchase_id, user=None):
-	user = _get_user(user)
+	user = get_user(user)
 	result = PurchaseHistory.get_purchase(purchase_id) if purchase_id else None
 	if result is not None and user is not None:  # validate
 		result = None if result.creator != user else result
 	return result
 
 def remove_purchase_attempt(purchase, user=None):
-	user = _get_user(user) or purchase.creator
+	user = get_user(user) or purchase.creator
 	hist = store_interfaces.IPurchaseHistory(user)
 	return hist.remove_purchase(purchase)
 
 def get_pending_purchases(user):
-	user = _get_user(user)
+	user = get_user(user)
 	hist = store_interfaces.IPurchaseHistory(user)
 	result = LocatedExternalList(hist.get_pending_purchases())
 	return result
 
 def get_purchase_history(user, start_time=None, end_time=None):
-	user = _get_user(user)
+	user = get_user(user)
 	hist = store_interfaces.IPurchaseHistory(user)
 	result = LocatedExternalList(hist.get_purchase_history(start_time, end_time))
 	return result
 
 def has_history_by_item(user, purchasable_id):
-	user = _get_user(user)
+	user = get_user(user)
 	hist = store_interfaces.IPurchaseHistory(user)
 	result = hist.has_history_by_item(purchasable_id)
 	return result
 
 def get_purchase_history_by_item(user, purchasable_id):
-	user = _get_user(user)
+	user = get_user(user)
 	hist = store_interfaces.IPurchaseHistory(user)
 	result = LocatedExternalList(hist.get_purchase_history_by_item(purchasable_id))
 	return result
 
 def get_pending_purchase_for(user, items):
-	user = _get_user(user)
+	user = get_user(user)
 	hist = store_interfaces.IPurchaseHistory(user)
 	result = hist.get_pending_purchase_for(items)
 	return result
 
 def register_purchase_attempt(purchase, user):
-	user = _get_user(user)
+	user = get_user(user)
 	hist = store_interfaces.IPurchaseHistory(user)
 	hist.register_purchase(purchase)
 	return purchase.id

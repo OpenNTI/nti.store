@@ -3,7 +3,7 @@
 """
 Stripe event functionalilty.
 
-$Id$
+.. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
@@ -17,8 +17,8 @@ from zope.event import notify
 
 from pyramid.threadlocal import get_current_request
 
-from nti.store import purchase_history
-from nti.store import interfaces as store_interfaces
+from .... import purchase_history
+from .... import interfaces as store_interfaces
 
 from .. import utils
 

@@ -16,18 +16,13 @@ from zope import component
 
 from nti.contentlibrary import interfaces as lib_interfaces
 
-from nti.dataserver.users import User
 from nti.dataserver import authorization as nauth
 from nti.dataserver import interfaces as nti_interfaces
 
 from nti.ntiids import ntiids
 
+from . import get_user
 from . import content_utils
-
-def get_user(user):
-	user = 	User.get_user(str(user)) \
-			if not nti_interfaces.IUser.providedBy(user) else user
-	return user
 
 def get_descendants(unit):
 	yield unit

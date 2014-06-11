@@ -3,7 +3,7 @@
 """
 Stripe utilities.
 
-$Id$
+.. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
@@ -14,9 +14,9 @@ import six
 import time
 import simplejson as json
 
-from nti.store import payment_charge
-from nti.store import NTIStoreException
-from nti.store import interfaces as store_interfaces
+from ... import payment_charge
+from ... import NTIStoreException
+from ... import interfaces as store_interfaces
 
 from . import interfaces as stripe_interfaces
 

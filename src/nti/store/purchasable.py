@@ -17,7 +17,6 @@ from zope import interface
 from zope.cachedescriptors.property import Lazy
 from zope.mimetype import interfaces as zmime_interfaces
 
-from nti.dataserver.users import User
 from nti.dataserver import authorization
 from nti.dataserver import authorization_acl as a_acl
 from nti.dataserver import interfaces as nti_interfaces
@@ -32,6 +31,7 @@ from nti.utils.schema import AdaptingFieldProperty
 from nti.utils.schema import createDirectFieldProperties
 
 from . import utils
+from . import get_user
 from . import content_bundle
 from . import interfaces as store_interfaces
 
@@ -84,13 +84,13 @@ def get_purchasable(pid, registry=component):
 
 def get_all_purchasables(registry=component):
 	result = LocatedExternalList()
-	for _, purchasable in component.getUtilitiesFor(store_interfaces.IPurchasable):
+	for _, purchasable in registry.getUtilitiesFor(store_interfaces.IPurchasable):
 		result.append(purchasable)
 	return result
 
 def get_purchasable_ids(registry=component):
 	result = LocatedExternalList()
-	for pid, _ in component.getUtilitiesFor(store_interfaces.IPurchasable):
+	for pid, _ in registry.getUtilitiesFor(store_interfaces.IPurchasable):
 		result.append(pid)
 	return result
 
@@ -104,7 +104,7 @@ def get_available_items(user, registry=component):
 
 	# get purchase history
 	purchased = set()
-	user = User.get_user(str(user)) if not nti_interfaces.IUser.providedBy(user) else user
+	user = get_user(user)
 	
 	history = store_interfaces.IPurchaseHistory(user)
 	for p in history:
