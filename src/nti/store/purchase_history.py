@@ -31,6 +31,8 @@ from nti.externalization.interfaces import LocatedExternalList
 
 from nti.ntiids import ntiids
 
+from nti.utils.property import Lazy
+
 from nti.zodb.containers import time_to_64bit_int
 
 from . import utils
@@ -48,8 +50,12 @@ class _PurchaseIndex(Persistent):
 		self.time_index = self.family.II.LLBTree()
 		self.purchases = self.family.II.LLTreeSet()
 
+	@Lazy
+	def intids(self):
+		return component.getUtility(zope.intid.IIntIds)
+
 	def add(self, purchase):
-		iid = component.getUtility(zope.intid.IIntIds).getId(purchase)
+		iid = self.intids.getId(purchase)
 		# main index
 		self.purchases.add(iid)
 		self.__len.change(1)
@@ -64,7 +70,7 @@ class _PurchaseIndex(Persistent):
 			item_set.add(iid)
 
 	def remove(self, purchase):
-		iid = component.getUtility(zope.intid.IIntIds).getId(purchase)
+		iid = self.intids.getId(purchase)
 		if iid in self.purchases:
 			self.__len.change(-1)
 			self.purchases.remove(iid)
@@ -82,11 +88,9 @@ class _PurchaseIndex(Persistent):
 		return len(items) > 0
 
 	def get_history_by_item(self, purchasable_id):
-		zope_iids = component.getUtility(zope.intid.IIntIds)
 		item_set = self.item_index.get(purchasable_id) or ()
-
 		for uid in item_set:
-			p = zope_iids.queryObject(uid)
+			p = self.intids.queryObject(uid)
 			if store_interfaces.IPurchaseAttempt.providedBy(p):
 				# NOTE: There seem to be some attempts that are inconsistent;
 				# they exist in the backward index so that queryObject works,
@@ -95,7 +99,7 @@ class _PurchaseIndex(Persistent):
 				# those cases that allow removal (courses). We think (hope) this is a
 				# rare problem, so we pretend it doesn't exist, only logging loudly.
 				# This could also be a corruption in our internal indexes.
-				queried = zope_iids.queryId(p)
+				queried = self.intids.queryId(p)
 				if queried != uid:
 					try:
 						p._p_activate()
@@ -115,13 +119,13 @@ class _PurchaseIndex(Persistent):
 		start_time = time_to_64bit_int(start_time) if start_time is not None else None
 		end_time = time_to_64bit_int(end_time) if end_time is not None else None
 		for _, iid in self.time_index.iteritems(start_time, end_time):
-			p = component.getUtility(zope.intid.IIntIds).queryObject(iid)
+			p = self.intids.queryObject(iid)
 			if store_interfaces.IPurchaseAttempt.providedBy(p):
 				yield p
 
 	def values(self):
 		for iid in self.purchases:
-			p = component.getUtility(zope.intid.IIntIds).queryObject(iid)
+			p = self.intids.queryObject(iid)
 			if store_interfaces.IPurchaseAttempt.providedBy(p):
 				yield p
 
@@ -161,6 +165,10 @@ class PurchaseHistory(zcontained.Contained, Persistent):
 	@property
 	def user(self):
 		return self.__parent__
+
+	@Lazy
+	def intids(self):
+		return component.getUtility(zope.intid.IIntIds)
 
 	def activate_items(self, items):
 		"""
@@ -244,9 +252,8 @@ class PurchaseHistory(zcontained.Contained, Persistent):
 		return len(self._index)
 
 	def sublocations(self):
-		zope_iids = component.getUtility(zope.intid.IIntIds)
 		for iid in self._index.purchases:
-			purchase = zope_iids.queryObject(iid)
+			purchase = self.intids.queryObject(iid)
 			if getattr(purchase, '__parent__',None) is self:
 				yield purchase
 
