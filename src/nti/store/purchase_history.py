@@ -155,6 +155,10 @@ class PurchaseHistory(zcontained.Contained, Persistent):
 		self._items_activated = self.family.OO.OOTreeSet()
 
 	@property
+	def index(self):
+		return self._index
+
+	@property
 	def user(self):
 		return self.__parent__
 
