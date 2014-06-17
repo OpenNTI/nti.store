@@ -7,19 +7,19 @@ Payment interfaces
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
 
-from zope import schema
 from zope import interface
 
-from nti.utils import schema as nti_schema
+from nti.schema.field import Object
+from nti.schema.field import ValidTextLine
 
 from .. import interfaces as store_interfaces
 
 class ICouponPriceable(store_interfaces.IPriceable):
-	Coupon = nti_schema.ValidTextLine(title="The coupon", required=False)
+	Coupon = ValidTextLine(title="The coupon", required=False)
 
 class IRegisterPurchaseData(interface.Interface):
-	object = schema.Object(store_interfaces.IPurchaseAttempt, title="The purchase",
-						   required=True)
+	object = Object(store_interfaces.IPurchaseAttempt, title="The purchase",
+				    required=True)
 
 class RegisterPurchaseData(object):
 
