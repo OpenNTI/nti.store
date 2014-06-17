@@ -27,8 +27,8 @@ from nti.externalization.interfaces import LocatedExternalList
 
 from nti.ntiids import interfaces as nid_interfaces
 
-from nti.utils.schema import AdaptingFieldProperty
-from nti.utils.schema import createDirectFieldProperties
+from nti.schema.fieldproperty import AdaptingFieldProperty
+from nti.schema.fieldproperty import createDirectFieldProperties
 
 from . import utils
 from . import get_user

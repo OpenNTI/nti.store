@@ -19,7 +19,7 @@ from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from nti.externalization.externalization import make_repr
 
-from nti.utils.schema import SchemaConfigured
+from nti.schema.field import SchemaConfigured
 
 from . import utils
 from . import priceable

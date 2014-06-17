@@ -26,8 +26,8 @@ from nti.dataserver.datastructures import ModDateTrackingObject
 from nti.externalization.oids import to_external_ntiid_oid
 from nti.externalization.externalization import make_repr
 
-from nti.utils.schema import SchemaConfigured
-from nti.utils.schema import createDirectFieldProperties
+from nti.schema.field import SchemaConfigured
+from nti.schema.fieldproperty import createDirectFieldProperties
 
 from nti.zodb import minmax
 from nti.zodb.persistentproperty import PersistentPropertyHolder
