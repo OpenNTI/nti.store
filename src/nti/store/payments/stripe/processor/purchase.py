@@ -20,13 +20,10 @@ import stripe
 from zope import component
 from zope.event import notify
 
-from pyramid.threadlocal import get_current_request
-
 from nti.dataserver import interfaces as nti_interfaces
 
 from .... import purchase_history
 from .... import NTIStoreException
-from .... import get_possible_site_names
 from .... import interfaces as store_interfaces
 
 from ....payments.stripe import utils
@@ -40,15 +37,13 @@ class PurchaseProcessor(stripe_customer.StripeCustomer,
 						PricingProcessor):
 
 	def process_purchase(self, purchase_id, username, token, expected_amount=None,
-						 api_key=None, request=None):
+						 api_key=None, request=None, site_names=None):
 		"""
 		Executes the process purchase.
 		This function may be called in a greenlet
 		(which cannot be run within a transaction runner);
 		the request should be established when it is called.
 		"""
-		request = request or get_current_request()
-		site_names = get_possible_site_names(request, include_default=True)
 
 		# prepare transaction runner
 		transactionRunner = \

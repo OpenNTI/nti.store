@@ -15,8 +15,6 @@ from datetime import date
 
 from zope.event import notify
 
-from pyramid.threadlocal import get_current_request
-
 from nti.dataserver.users import User
 
 from nti.store import purchase_history
@@ -29,7 +27,7 @@ from .base import BaseProcessor
 
 class SyncProcessor(BaseProcessor):
 
-	def sync_purchase(self, purchase_id, username, api_key=None):
+	def sync_purchase(self, purchase_id, username, api_key=None, request=None):
 		"""
 		Attempts to synchronize a purchase attempt with the information collected in
 		stripe.com and/or local db.
@@ -95,7 +93,6 @@ class SyncProcessor(BaseProcessor):
 			do_synch = True
 			if charge.paid and not purchase.has_succeeded():
 				pc = utils.create_payment_charge(charge)
-				request = get_current_request()
 				notify(store_interfaces.PurchaseAttemptSuccessful(purchase, pc, request))
 			elif charge.failure_message and not purchase.has_failed():
 				notify(store_interfaces.PurchaseAttemptFailed(

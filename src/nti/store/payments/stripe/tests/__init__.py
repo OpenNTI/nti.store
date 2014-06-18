@@ -13,7 +13,11 @@ from hamcrest import assert_that
 
 import uuid
 
+from pyramid.threadlocal import get_current_request
+
 from nti.dataserver.users import User
+
+from nti.app.store import get_possible_site_names
 
 from nti.store import purchase_history
 from nti.store.payments.stripe import stripe_purchase
@@ -82,7 +86,9 @@ def create_purchase(self, item=None, amount=100, coupon=None, manager=None,
                                          country="USA")
 
     cid = manager.process_purchase(username=username, token=tid,
-                                   purchase_id=purchase_id, expected_amount=amount)
+                                   purchase_id=purchase_id, expected_amount=amount,
+                                   request=get_current_request(),
+                                   site_names=get_possible_site_names())
 
     assert_that(tid, is_not(none()))
     assert_that(cid, is_not(none()))

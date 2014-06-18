@@ -15,8 +15,6 @@ import simplejson as json
 
 from zope.event import notify
 
-from pyramid.threadlocal import get_current_request
-
 from .... import purchase_history
 from .... import interfaces as store_interfaces
 
@@ -29,7 +27,7 @@ class EventProcessor(BaseProcessor):
 	events = ("charge.succeeded", "charge.refunded", "charge.failed",
 			  "charge.dispute.created", "charge.dispute.updated")
 
-	def _process(self, request, event):
+	def _process(self, event, request=None):
 		etype = event.get('type', None)
 		data = event.get('data', {})
 		if etype in self.events:
@@ -60,11 +58,10 @@ class EventProcessor(BaseProcessor):
 		else:
 			logger.debug('Unhandled event type (%s)' % etype)
 
-	def process_event(self, body):
-		request = get_current_request()
+	def process_event(self, body, request=None):
 		try:
 			event = json.loads(body) if isinstance(body, six.string_types) else body
-			self._process(request, event)
+			self._process(event, request)
 			return True
 		except Exception:
 			logger.exception('Error processing stripe event (webhook)')
