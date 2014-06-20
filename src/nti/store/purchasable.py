@@ -21,12 +21,14 @@ from nti.dataserver import authorization
 from nti.dataserver import authorization_acl as a_acl
 from nti.dataserver import interfaces as nti_interfaces
 
-from nti.externalization.externalization import make_repr
+from nti.externalization.persistence import NoPickle
+from nti.externalization.externalization import WithRepr
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import LocatedExternalList
 
 from nti.ntiids import interfaces as nid_interfaces
 
+from nti.schema.schema import EqHash
 from nti.schema.fieldproperty import AdaptingFieldProperty
 from nti.schema.fieldproperty import createDirectFieldProperties
 
@@ -38,6 +40,9 @@ from . import interfaces as store_interfaces
 @interface.implementer(store_interfaces.IPurchasable,
 					   nti_interfaces.IACLProvider,
 					   zmime_interfaces.IContentTypeAware)
+@WithRepr
+@NoPickle
+@EqHash('NTIID',)
 class Purchasable(content_bundle.ContentBundle):
 
 	__metaclass__ = utils.MetaStoreObject
@@ -47,17 +52,6 @@ class Purchasable(content_bundle.ContentBundle):
 
 	# Override Description to adapt to a content fragment
 	Description = AdaptingFieldProperty(store_interfaces.IPurchasable['Description'])
-
-	__repr__ = make_repr()
-
-	def __eq__(self, other):
-		try:
-			return self is other or self.NTIID == other.NTIID
-		except AttributeError:
-			return NotImplemented
-
-	def __reduce__(self):
-		raise TypeError()
 
 	@Lazy
 	def __acl__(self):

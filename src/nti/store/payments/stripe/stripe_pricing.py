@@ -23,6 +23,7 @@ from ... import PricingException
 from ... import interfaces as store_interfaces
 
 from .stripe_purchase import StripePricedPurchasable
+
 from ...pricing import create_pricing_results, DefaultPurchasablePricer
 
 class StripePurchasablePricer(DefaultPurchasablePricer):

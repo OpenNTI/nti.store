@@ -17,8 +17,11 @@ import dateutil.parser
 from zope import component
 from zope import interface
 
+from nti.externalization.externalization import WithRepr
+
 from nti.ntiids import interfaces as nid_interfaces
 
+from nti.schema.schema import EqHash
 from nti.schema.fieldproperty import AdaptingFieldProperty
 from nti.schema.fieldproperty import createDirectFieldProperties
 
@@ -27,21 +30,13 @@ from .utils import to_frozenset
 from . import purchasable
 from . import interfaces as store_interfaces
 
-from nti.externalization.externalization import make_repr
-
 @interface.implementer(store_interfaces.ICourse)
+@WithRepr
+@EqHash('NTIID',)
 class Course(purchasable.Purchasable):
 
 	createDirectFieldProperties(store_interfaces.ICourse)
 	Description = AdaptingFieldProperty(store_interfaces.IPurchasable['Description'])
-
-	__repr__ = make_repr()
-
-	def __eq__(self, other):
-		try:
-			return self is other or self.NTIID == other.NTIID
-		except AttributeError:
-			return NotImplemented
 
 def create_course(ntiid, name=None, provider=None, amount=None, currency=None, items=(),
 				  fee=None, title=None, license_=None, author=None, description=None,

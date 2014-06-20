@@ -13,6 +13,8 @@ logger = __import__('logging').getLogger(__name__)
 from zope import interface
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
+from nti.schema.schema import EqHash
+
 from ... import pricing
 from ... import priceable
 from ... import purchase_order
@@ -20,6 +22,7 @@ from ... import purchase_order
 from . import interfaces as stripe_interfaces
 
 @interface.implementer(stripe_interfaces.IStripePriceable)
+@EqHash('Coupon', 'NTIID', 'Quantity')
 class StripePriceable(priceable.Priceable):
 
 	Coupon = FP(stripe_interfaces.IStripePriceable['Coupon'])
@@ -29,24 +32,13 @@ class StripePriceable(priceable.Priceable):
 		result.Coupon = self.Coupon
 		return result
 
-	def __eq__(self, other):
-		try:
-			return 	super(StripePriceable, self).__eq__(other) and \
-					self.Coupon == other.Coupon
-		except AttributeError:
-			return NotImplemented
-
-	def __hash__(self):
-		xhash = super(StripePriceable, self).__hash__()
-		xhash ^= hash(self.Coupon)
-		return xhash
-
 def create_stripe_priceable(ntiid, quantity=None, coupon=None):
 	quantity = 1 if quantity is None else int(quantity)
 	result = StripePriceable(NTIID=unicode(ntiid), Quantity=quantity, Coupon=coupon)
 	return result
 
 @interface.implementer(stripe_interfaces.IStripePricedItem)
+@EqHash('Coupon', 'NTIID')
 class StripePricedItem(pricing.PricedItem):
 
 	Coupon = FP(stripe_interfaces.IStripePricedItem['Coupon'])
@@ -60,18 +52,6 @@ class StripePricedItem(pricing.PricedItem):
 					 NonDiscountedPrice=priced.NonDiscountedPrice)
 		result.Coupon = getattr(priced, 'Coupon', None)
 		return result
-
-	def __eq__(self, other):
-		try:
-			return 	super(StripePricedItem, self).__eq__(other) and \
-					self.Coupon == other.Coupon
-		except AttributeError:
-			return NotImplemented
-
-	def __hash__(self):
-		xhash = super(StripePricedItem, self).__hash__()
-		xhash ^= hash(self.Coupon)
-		return xhash
 
 # alias bwc
 class StripePricedPurchasable(StripePricedItem):

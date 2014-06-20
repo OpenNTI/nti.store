@@ -17,8 +17,9 @@ from zope.cachedescriptors.property import Lazy
 from zope.annotation import interfaces as an_interfaces
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
-from nti.externalization.externalization import make_repr
+from nti.externalization.externalization import WithRepr
 
+from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 
 from . import utils
@@ -37,6 +38,8 @@ def create_purchase_item(ntiid, quantity=1, cls=PurchaseItem):
 
 @interface.implementer(store_interfaces.IPurchaseOrder,
 					   an_interfaces.IAttributeAnnotatable)
+@WithRepr
+@EqHash('Items', 'Quantity')
 class PurchaseOrder(SchemaConfigured):
 
 	__metaclass__ = utils.MetaStoreObject
@@ -56,26 +59,11 @@ class PurchaseOrder(SchemaConfigured):
 	def __str__(self):
 		return "(%s,%s)" % (self.Items, self.Quantity)
 
-	__repr__ = make_repr()
-
 	def __getitem__(self, index):
 		return self.Items[index]
 
 	def __iter__(self):
 		return iter(self.Items)
-
-	def __eq__(self, other):
-		try:
-			return self is other or (self.Items == other.Items
-									 and self.Quantity == other.Quantity)
-		except AttributeError:
-			return NotImplemented
-
-	def __hash__(self):
-		xhash = 47
-		xhash ^= hash(self.Items)
-		xhash ^= hash(self.Quantity)
-		return xhash
 
 def get_purchasables(order):
 	"""

@@ -16,8 +16,9 @@ from zope import interface
 from zope.mimetype import interfaces as zmime_interfaces
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
-from nti.externalization.externalization import make_repr
+from nti.externalization.externalization import WithRepr
 
+from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 
 from . import utils
@@ -25,6 +26,8 @@ from . import interfaces as store_interfaces
 
 @interface.implementer(store_interfaces.IUserAddress,
 					   zmime_interfaces.IContentTypeAware)
+@WithRepr
+@EqHash('Zip', 'City', 'State', 'Street', 'Country')
 class UserAddress(SchemaConfigured):
 
 	__metaclass__ = utils.MetaStoreObject
@@ -41,26 +44,6 @@ class UserAddress(SchemaConfigured):
 									 self.State,
 									 self.Zip,
 									 self.Country)
-	__repr__ = make_repr()
-
-	def __eq__(self, other):
-		try:
-			return self is other or (self.Zip == other.Zip
-									 and self.City == other.City
-									 and self.State == other.State
-									 and self.Street == other.Street
-									 and self.Country == other.Country)
-		except AttributeError:
-			return NotImplemented
-
-	def __hash__(self):
-		xhash = 47
-		xhash ^= hash(self.Zip)
-		xhash ^= hash(self.City)
-		xhash ^= hash(self.State)
-		xhash ^= hash(self.Street)
-		xhash ^= hash(self.Country)
-		return xhash
 
 	@classmethod
 	def create(cls, address_line1, address_line2=None, city=None, state=None,
@@ -76,6 +59,8 @@ class UserAddress(SchemaConfigured):
 @functools.total_ordering
 @interface.implementer(store_interfaces.IPaymentCharge,
 					   zmime_interfaces.IContentTypeAware)
+@WithRepr
+@EqHash('Name', 'Amount', 'Created', 'Currency')
 class PaymentCharge(SchemaConfigured):
 
 	__metaclass__ = utils.MetaStoreObject
@@ -90,17 +75,6 @@ class PaymentCharge(SchemaConfigured):
 	def __str__(self):
 		return "%s:%s" % (self.Currency, self.Amount)
 
-	__repr__ = make_repr()
-
-	def __eq__(self, other):
-		try:
-			return self is other or (self.Name == other.Name
-									 and self.Amount == other.Amount
-									 and self.Created == other.Created
-									 and self.Currency == other.Currency)
-		except AttributeError:
-			return NotImplemented
-
 	def __lt__(self, other):
 		try:
 			return self.Created < other.Created
@@ -113,10 +87,3 @@ class PaymentCharge(SchemaConfigured):
 		except AttributeError:
 			return NotImplemented
 
-	def __hash__(self):
-		xhash = 47
-		xhash ^= hash(self.Amount)
-		xhash ^= hash(self.Created)
-		xhash ^= hash(self.Currency)
-		xhash ^= hash(self.Name)
-		return xhash

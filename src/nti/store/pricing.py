@@ -15,8 +15,9 @@ from . import MessageFactory as _
 from zope import interface
 from zope.mimetype import interfaces as zmime_interfaces
 
-from nti.externalization.externalization import make_repr
+from nti.externalization.externalization import WithRepr
 
+from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
 
@@ -28,24 +29,12 @@ from . import interfaces as store_interfaces
 
 @interface.implementer(store_interfaces.IPricedItem,
 					   zmime_interfaces.IContentTypeAware)
+@WithRepr
+@EqHash('NTIID',)
 class PricedItem(priceable.Priceable):
-
 	__metaclass__ = utils.MetaStoreObject
-
 	createDirectFieldProperties(store_interfaces.IPricedItem)
 
-	__repr__ = make_repr()
-
-	def __eq__(self, other):
-		try:
-			return self is other or self.NTIID == other.NTIID
-		except AttributeError:
-			return NotImplemented
-
-	def __hash__(self):
-		xhash = 47
-		xhash ^= hash(self.NTIID)
-		return xhash
 
 def create_priced_item(ntiid, purchase_price, purchase_fee=None,
 					   non_discounted_price=None, quantity=1, currency='USD'):
@@ -60,13 +49,11 @@ def create_priced_item(ntiid, purchase_price, purchase_fee=None,
 
 @interface.implementer(store_interfaces.IPricingResults,
 					   zmime_interfaces.IContentTypeAware)
+@WithRepr
 class PricingResults(SchemaConfigured):
-
 	__metaclass__ = utils.MetaStoreObject
-
 	createDirectFieldProperties(store_interfaces.IPricingResults)
 
-	__repr__ = make_repr()
 
 def create_pricing_results(items=None, purchase_price=0.0, purchase_fee=0.0,
 						   non_discounted_price=None, currency='USD'):
