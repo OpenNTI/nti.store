@@ -69,6 +69,7 @@ class _StorePurchaseInvitation(JoinEntitiesInvitation):
 def get_invitation_code(purchase, registry=component):
 	if purchase is not None:
 		iid = registry.getUtility(zc_intid.IIntIds).getId(purchase)
+		__traceback_info__ = purchase, iid
 		result = integer_strings.to_external_string(iid)
 		return result
 	return None
@@ -76,6 +77,7 @@ def get_invitation_code(purchase, registry=component):
 def get_purchase_by_code(code, registry=component):
 	if code is not None:
 		iid = integer_strings.from_external_string(code)
+		__traceback_info__ = code, iid
 		result = registry.getUtility(zc_intid.IIntIds).queryObject(iid)
 		return result
 	return None
