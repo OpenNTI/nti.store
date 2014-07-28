@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Store module
-
-$Id$
+.. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
+
+logger = __import__('logging').getLogger(__name__)
 
 import zope.i18nmessageid
 MessageFactory = zope.i18nmessageid.MessageFactory('nti.dataserver')
@@ -14,11 +14,11 @@ MessageFactory = zope.i18nmessageid.MessageFactory('nti.dataserver')
 from zope import interface
 
 from nti.dataserver.users import User
-from nti.dataserver import interfaces as nti_interfaces
+from nti.dataserver.interfaces import IUser
 
-from . import interfaces as store_interfaces
+from .interfaces import INTIStoreException
 
-@interface.implementer(store_interfaces.INTIStoreException)
+@interface.implementer(INTIStoreException)
 class NTIStoreException(Exception):
     pass
 
@@ -30,7 +30,6 @@ class PricingException(NTIStoreException):
 
 def get_user(user):
     if user is not None:
-        result = User.get_user(str(user)) \
-                 if not nti_interfaces.IUser.providedBy(user) else user
+        result = User.get_user(str(user)) if not IUser.providedBy(user) else user
         return result
     return None

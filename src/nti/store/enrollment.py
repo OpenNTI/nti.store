@@ -10,6 +10,9 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import zope.deprecation
+zope.deprecation.deprecated("nti.store.enrollment", "no longer for course enrolling")
+
 from zope import component
 from zope.event import notify
 
