@@ -27,16 +27,18 @@ from nti.schema.fieldproperty import createDirectFieldProperties
 
 from .utils import to_frozenset
 
-from . import purchasable
-from . import interfaces as store_interfaces
+from .purchasable import Purchasable
+from .purchasable import get_purchasable
 
-@interface.implementer(store_interfaces.ICourse)
+from .interfaces import ICourse
+from .interfaces import IPurchasable
+
+@interface.implementer(ICourse)
 @WithRepr
 @EqHash('NTIID',)
-class Course(purchasable.Purchasable):
-
-	createDirectFieldProperties(store_interfaces.ICourse)
-	Description = AdaptingFieldProperty(store_interfaces.IPurchasable['Description'])
+class Course(Purchasable):
+	createDirectFieldProperties(ICourse)
+	Description = AdaptingFieldProperty(IPurchasable['Description'])
 
 def create_course(ntiid, name=None, provider=None, amount=None, currency=None, 
 				  items=(), fee=None, title=None, license_=None, author=None, 
@@ -74,8 +76,8 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency=None,
 class _CourseResolver(object):
 
 	def resolve(self, ntiid_string):
-		return purchasable.get_purchasable(ntiid_string)
+		return get_purchasable(ntiid_string)
 
 def get_course(course_id, registry=component):
-	result = purchasable.get_purchasable(course_id, registry=registry)
+	result = get_purchasable(course_id, registry=registry)
 	return result

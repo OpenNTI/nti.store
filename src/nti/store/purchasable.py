@@ -15,13 +15,14 @@ import six
 from zope import component
 from zope import interface
 from zope.cachedescriptors.property import Lazy
-from zope.mimetype import interfaces as zmime_interfaces
+from zope.mimetype.interfaces import IContentTypeAware
 
 from nti.dataserver import authorization
 from nti.dataserver import authorization_acl as a_acl
-from nti.dataserver import interfaces as nti_interfaces
 
-from nti.externalization.persistence import NoPickle
+from nti.dataserver.interfaces import IACLProvider
+from nti.dataserver.interfaces import EVERYONE_USER_NAME
+
 from nti.externalization.externalization import WithRepr
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import LocatedExternalList
@@ -32,31 +33,30 @@ from nti.schema.schema import EqHash
 from nti.schema.fieldproperty import AdaptingFieldProperty
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from . import utils
 from . import get_user
-from . import content_bundle
-from . import interfaces as store_interfaces
 
-@interface.implementer(store_interfaces.IPurchasable,
-					   nti_interfaces.IACLProvider,
-					   zmime_interfaces.IContentTypeAware)
+from .interfaces import IPurchasable
+from .interfaces import IPurchaseHistory
+
+from .content_bundle import ContentBundle
+
+from .utils import to_frozenset
+from .utils import to_collection
+from .utils import MetaStoreObject
+
+@interface.implementer(IPurchasable, IACLProvider, IContentTypeAware)
 @WithRepr
-@NoPickle
 @EqHash('NTIID',)
-class Purchasable(content_bundle.ContentBundle):
+class Purchasable(ContentBundle):
 
-	__metaclass__ = utils.MetaStoreObject
+	__metaclass__ = MetaStoreObject
 
-	# create all interface fields
-	createDirectFieldProperties(store_interfaces.IPurchasable)
-
-	# Override Description to adapt to a content fragment
-	Description = AdaptingFieldProperty(store_interfaces.IPurchasable['Description'])
+	createDirectFieldProperties(IPurchasable)
+	Description = AdaptingFieldProperty(IPurchasable['Description'])
 
 	@Lazy
 	def __acl__(self):
-		return (a_acl.ace_allowing(nti_interfaces.EVERYONE_USER_NAME,
-								   authorization.ACT_READ, self),)
+		return (a_acl.ace_allowing(EVERYONE_USER_NAME, authorization.ACT_READ, self),)
 
 def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=None,
 					   title=None, license_=None, author=None, description=None,
@@ -64,7 +64,7 @@ def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=No
 					   bulk_purchase=True, public=True):
 	fee = float(fee) if fee is not None else None
 	amount = float(amount) if amount is not None else amount
-	items = utils.to_frozenset(items) if items else frozenset((ntiid,))
+	items = to_frozenset(items) if items else frozenset((ntiid,))
 	result = Purchasable(NTIID=ntiid, Provider=provider, Title=title, Author=author,
 						 Items=items, Description=description, Amount=amount,
 						 Currency=currency, Fee=fee, License=license_,
@@ -73,18 +73,18 @@ def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=No
 	return result
 
 def get_purchasable(pid, registry=component):
-	result = registry.queryUtility(store_interfaces.IPurchasable, pid)
+	result = registry.queryUtility(IPurchasable, pid)
 	return result
 
 def get_all_purchasables(registry=component):
 	result = LocatedExternalList()
-	for _, purchasable in registry.getUtilitiesFor(store_interfaces.IPurchasable):
+	for _, purchasable in registry.getUtilitiesFor(IPurchasable):
 		result.append(purchasable)
 	return result
 
 def get_purchasable_ids(registry=component):
 	result = LocatedExternalList()
-	for pid, _ in registry.getUtilitiesFor(store_interfaces.IPurchasable):
+	for pid, _ in registry.getUtilitiesFor(IPurchasable):
 		result.append(pid)
 	return result
 
@@ -100,7 +100,7 @@ def get_available_items(user, registry=component):
 	purchased = set()
 	user = get_user(user)
 	
-	history = store_interfaces.IPurchaseHistory(user)
+	history = IPurchaseHistory(user)
 	for p in history:
 		if p.has_succeeded() or p.is_pending():
 			purchased.update(p.Items)
@@ -115,7 +115,7 @@ def get_content_items(purchased_items, registry=component):
 	return the nttids of the library items that were purchased
 	"""
 	if isinstance(purchased_items, six.string_types):
-		purchased_items = utils.to_collection(purchased_items)
+		purchased_items = to_collection(purchased_items)
 
 	result = set()
 	for item in purchased_items:

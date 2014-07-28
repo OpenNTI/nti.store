@@ -11,9 +11,8 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
-from zope.annotation import interfaces as an_interfaces
+from zope.annotation.interfaces import IAttributeAnnotatable
 
-from nti.externalization.persistence import NoPickle
 from nti.externalization.externalization import WithRepr
 
 from nti.schema.schema import EqHash
@@ -21,17 +20,15 @@ from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import AdaptingFieldProperty
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from . import interfaces as store_interfaces
+from .interfaces import IContentBundle
 
-@interface.implementer(store_interfaces.IContentBundle,
-					   an_interfaces.IAttributeAnnotatable)
+@interface.implementer(IContentBundle, IAttributeAnnotatable)
 @WithRepr
-@NoPickle
-@EqHash('NTIID')
+@EqHash('NTIID',)
 class ContentBundle(SchemaConfigured):
 
-	createDirectFieldProperties(store_interfaces.IContentBundle)
-	Description = AdaptingFieldProperty(store_interfaces.IContentBundle['Description'])
+	createDirectFieldProperties(IContentBundle)
+	Description = AdaptingFieldProperty(IContentBundle['Description'])
 
 	@property
 	def id(self):
@@ -39,4 +36,3 @@ class ContentBundle(SchemaConfigured):
 
 	def __str__(self):
 		return self.NTIID
-

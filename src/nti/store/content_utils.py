@@ -10,10 +10,10 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import component
 
-from nti.contentlibrary import interfaces as lib_interfaces
+from nti.contentlibrary.interfaces import IContentPackageLibrary
 
 def get_paths(ntiid, library=None, registry=component):
-    library = registry.queryUtility(lib_interfaces.IContentPackageLibrary) \
+    library = registry.queryUtility(IContentPackageLibrary) \
               if library is None else library
     paths = library.pathToNTIID(ntiid) if library and ntiid else ()
     return paths or ()
