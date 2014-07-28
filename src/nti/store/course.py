@@ -38,11 +38,11 @@ class Course(purchasable.Purchasable):
 	createDirectFieldProperties(store_interfaces.ICourse)
 	Description = AdaptingFieldProperty(store_interfaces.IPurchasable['Description'])
 
-def create_course(ntiid, name=None, provider=None, amount=None, currency=None, items=(),
-				  fee=None, title=None, license_=None, author=None, description=None,
-				  icon=None, thumbnail=None, discountable=False, bulk_purchase=False,
-				  communities=(), featured=False, preview=False, department=None,
-				  signature=None, startdate=None, **kwargs):
+def create_course(ntiid, name=None, provider=None, amount=None, currency=None, 
+				  items=(), fee=None, title=None, license_=None, author=None, 
+				  description=None, icon=None, thumbnail=None, discountable=False, 
+				  bulk_purchase=False, communities=(), featured=False, preview=False,
+				  department=None, signature=None, startdate=None, **kwargs):
 
 	if amount and not provider:
 		raise AssertionError("Must specfify a provider")

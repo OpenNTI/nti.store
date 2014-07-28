@@ -23,6 +23,7 @@
 		discountable="False"
 		bulk_purchase="True"
 		license="1 Year License"
+		public="True"
 		items="tag:nextthought.com,2011-10:NextThought-HTML-NextThoughtHelpCenter.nextthought_help_center" />
 	
 </configure>

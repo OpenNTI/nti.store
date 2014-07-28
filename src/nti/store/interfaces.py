@@ -74,6 +74,7 @@ class IPurchasable(IContentBundle):
 	Thumbnail = ValidTextLine(title='Thumbnail URL', required=False)
 	Provider = ValidTextLine(title='Purchasable item provider', required=True)
 	License = ValidTextLine(title='Purchasable license', required=False)
+	Public = Bool(title="Public flag", required=False, default=False)
 
 class ICourse(IPurchasable):
 	Name = ValidTextLine(title='Course Name', required=False)

@@ -13,24 +13,25 @@ logger = __import__('logging').getLogger(__name__)
 from zope import interface
 from zope.annotation import interfaces as an_interfaces
 
+from nti.externalization.persistence import NoPickle
+from nti.externalization.externalization import WithRepr
+
+from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import AdaptingFieldProperty
 from nti.schema.fieldproperty import createDirectFieldProperties
 
 from . import interfaces as store_interfaces
 
-from nti.externalization.externalization import make_repr
-
 @interface.implementer(store_interfaces.IContentBundle,
 					   an_interfaces.IAttributeAnnotatable)
+@WithRepr
+@NoPickle
+@EqHash('NTIID')
 class ContentBundle(SchemaConfigured):
 
 	createDirectFieldProperties(store_interfaces.IContentBundle)
 	Description = AdaptingFieldProperty(store_interfaces.IContentBundle['Description'])
-
-	def __reduce__(self):
-		# Not persistent!
-		raise TypeError()
 
 	@property
 	def id(self):
@@ -39,15 +40,3 @@ class ContentBundle(SchemaConfigured):
 	def __str__(self):
 		return self.NTIID
 
-	__repr__ = make_repr()
-
-	def __eq__(self, other):
-		try:
-			return self is other or self.NTIID == other.NTIID
-		except AttributeError:
-			return NotImplemented
-
-	def __hash__(self):
-		xhash = 47
-		xhash ^= hash(self.NTIID)
-		return xhash
