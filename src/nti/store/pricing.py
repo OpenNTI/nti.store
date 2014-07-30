@@ -13,7 +13,7 @@ logger = __import__('logging').getLogger(__name__)
 from . import MessageFactory as _
 
 from zope import interface
-from zope.mimetype import interfaces as zmime_interfaces
+from zope.mimetype.interfaces import IContentTypeAware
 
 from nti.externalization.externalization import WithRepr
 
@@ -21,19 +21,23 @@ from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from . import utils
-from . import priceable
+from .utils import MetaStoreObject
+
 from . import PricingException
 from . import InvalidPurchasable
-from . import interfaces as store_interfaces
 
-@interface.implementer(store_interfaces.IPricedItem,
-					   zmime_interfaces.IContentTypeAware)
+from .priceable import Priceable
+
+from .interfaces import IPricedItem
+from .interfaces import IPricingResults
+from .interfaces import IPurchasablePricer
+
+@interface.implementer(IPricedItem, IContentTypeAware)
 @WithRepr
 @EqHash('NTIID',)
-class PricedItem(priceable.Priceable):
-	__metaclass__ = utils.MetaStoreObject
-	createDirectFieldProperties(store_interfaces.IPricedItem)
+class PricedItem(Priceable):
+	__metaclass__ = MetaStoreObject
+	createDirectFieldProperties(IPricedItem)
 
 
 def create_priced_item(ntiid, purchase_price, purchase_fee=None,
@@ -47,12 +51,11 @@ def create_priced_item(ntiid, purchase_price, purchase_fee=None,
 						Quantity=quantity, Currency=currency)
 	return result
 
-@interface.implementer(store_interfaces.IPricingResults,
-					   zmime_interfaces.IContentTypeAware)
+@interface.implementer(IPricingResults, IContentTypeAware)
 @WithRepr
 class PricingResults(SchemaConfigured):
-	__metaclass__ = utils.MetaStoreObject
-	createDirectFieldProperties(store_interfaces.IPricingResults)
+	__metaclass__ = MetaStoreObject
+	createDirectFieldProperties(IPricingResults)
 
 
 def create_pricing_results(items=None, purchase_price=0.0, purchase_fee=0.0,
@@ -67,7 +70,7 @@ def create_pricing_results(items=None, purchase_price=0.0, purchase_fee=0.0,
 							Currency=currency)
 	return result
 
-@interface.implementer(store_interfaces.IPurchasablePricer)
+@interface.implementer(IPurchasablePricer)
 class DefaultPurchasablePricer(object):
 
 	def calc_fee(self, amount, fee):

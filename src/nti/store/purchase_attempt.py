@@ -12,44 +12,66 @@ logger = __import__('logging').getLogger(__name__)
 
 import time
 import BTrees
-import functools
+from functools import total_ordering
 
 from zope import interface
-from zope.container import contained as zcontained
-from zope.annotation import interfaces as an_interfaces
-from zope.mimetype import interfaces as zmime_interfaces
+from zope.container.contained import Contained
+from zope.mimetype.interfaces import IContentTypeAware
+from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
-from nti.dataserver import interfaces as nti_interfaces
+from nti.dataserver.interfaces import ICreated
 from nti.dataserver.datastructures import ModDateTrackingObject
 
+from nti.externalization.externalization import WithRepr
 from nti.externalization.oids import to_external_ntiid_oid
-from nti.externalization.externalization import make_repr
 
+from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
 
 from nti.zodb import minmax
 from nti.zodb.persistentproperty import PersistentPropertyHolder
 
-from . import utils
-from . import purchase_order
-from . import interfaces as store_interfaces
+from .utils import MetaStoreObject
 
-@functools.total_ordering
-@interface.implementer(nti_interfaces.ICreated,
-					   store_interfaces.IPurchaseAttempt,
-					   an_interfaces.IAttributeAnnotatable,
-					   zmime_interfaces.IContentTypeAware)
+from .purchase_order import get_providers
+from .purchase_order import get_currencies
+from .purchase_order import get_purchasables
+from .purchase_order import replace_quantity
+
+from .interfaces import PA_STATE_FAILED
+from .interfaces import PA_STATE_FAILURE
+from .interfaces import PA_STATE_SUCCESS
+from .interfaces import PA_STATE_UNKNOWN
+from .interfaces import PA_STATE_STARTED
+from .interfaces import PA_STATE_PENDING
+from .interfaces import PA_STATE_RESERVED
+from .interfaces import PA_STATE_DISPUTED
+from .interfaces import PA_STATE_REFUNDED
+from .interfaces import PA_STATE_CANCELED
+
+from .interfaces import IPurchaseAttempt
+from .interfaces import IRedeemedPurchaseAttempt
+from .interfaces import IEnrollmentPurchaseAttempt
+from .interfaces import IInvitationPurchaseAttempt
+
+@total_ordering
+@interface.implementer(ICreated,
+					   IPurchaseAttempt,
+					   IAttributeAnnotatable,
+					   IContentTypeAware)
+@WithRepr
+@EqHash("Order", "StartTime", "Processor")
 class PurchaseAttempt(ModDateTrackingObject,
 					  SchemaConfigured,
-					  zcontained.Contained,
+					  Contained,
 					  PersistentPropertyHolder):
 
 	__external_class_name__ = "PurchaseAttempt"
-	__metaclass__ = utils.MetaStoreObject
+	__metaclass__ = MetaStoreObject
 
-	createDirectFieldProperties(store_interfaces.IPurchaseAttempt)
+	createDirectFieldProperties(IPurchaseAttempt)
 
 	@property
 	def Items(self):
@@ -71,16 +93,6 @@ class PurchaseAttempt(ModDateTrackingObject,
 	def __str__(self):
 		return "%s,%s" % (self.Items, self.State)
 
-	__repr__ = make_repr()
-
-	def __eq__(self, other):
-		try:
-			return self is other or (self.Order == other.Order
-									 and self.StartTime == other.StartTime
-									 and self.Processor == other.Processor)
-		except AttributeError:
-			return NotImplemented
-
 	def __lt__(self, other):
 		try:
 			return self.StartTime < other.StartTime
@@ -93,39 +105,29 @@ class PurchaseAttempt(ModDateTrackingObject,
 		except AttributeError:
 			return NotImplemented
 
-	def __hash__(self):
-		xhash = 47
-		xhash ^= hash(self.Order)
-		xhash ^= hash(self.Processor)
-		xhash ^= hash(self.StartTime)
-		return xhash
-
 	def has_failed(self):
-		return self.State in (store_interfaces.PA_STATE_FAILED,
-							  store_interfaces.PA_STATE_FAILURE,
-							  store_interfaces.PA_STATE_CANCELED)
+		return self.State in (PA_STATE_FAILED, PA_STATE_FAILURE, PA_STATE_CANCELED)
 
 	def has_succeeded(self):
-		return self.State == store_interfaces.PA_STATE_SUCCESS
+		return self.State == PA_STATE_SUCCESS
 
 	def is_unknown(self):
-		return self.State == store_interfaces.PA_STATE_UNKNOWN
+		return self.State == PA_STATE_UNKNOWN
 
 	def is_pending(self):
-		return self.State in (store_interfaces.PA_STATE_STARTED,
-							  store_interfaces.PA_STATE_PENDING)
+		return self.State in (PA_STATE_STARTED, PA_STATE_PENDING)
 
 	def is_refunded(self):
-		return self.State == store_interfaces.PA_STATE_REFUNDED
+		return self.State == PA_STATE_REFUNDED
 
 	def is_disputed(self):
-		return self.State == store_interfaces.PA_STATE_DISPUTED
+		return self.State == PA_STATE_DISPUTED
 
 	def is_reserved(self):
-		return self.State == store_interfaces.PA_STATE_RESERVED
+		return self.State == PA_STATE_RESERVED
 
 	def is_canceled(self):
-		return self.State == store_interfaces.PA_STATE_CANCELED
+		return self.State == PA_STATE_CANCELED
 
 	def has_completed(self):
 		return not (self.is_pending() or self.is_reserved() or self.is_disputed())
@@ -133,7 +135,7 @@ class PurchaseAttempt(ModDateTrackingObject,
 	def is_synced(self):
 		return self.Synced
 
-@interface.implementer(store_interfaces.IInvitationPurchaseAttempt)
+@interface.implementer(IInvitationPurchaseAttempt)
 class InvitationPurchaseAttempt(PurchaseAttempt):
 
 	def __init__(self, *args, **kwargs):
@@ -173,27 +175,27 @@ class InvitationPurchaseAttempt(PurchaseAttempt):
 	def __str__(self):
 		return self.id
 
-@interface.implementer(store_interfaces.IRedeemedPurchaseAttempt)
+@interface.implementer(IRedeemedPurchaseAttempt)
 class RedeemedPurchaseAttempt(PurchaseAttempt):
-	RedemptionCode = FP(store_interfaces.IRedeemedPurchaseAttempt['RedemptionCode'])
-	RedemptionTime = FP(store_interfaces.IRedeemedPurchaseAttempt['RedemptionTime'])
+	RedemptionCode = FP(IRedeemedPurchaseAttempt['RedemptionCode'])
+	RedemptionTime = FP(IRedeemedPurchaseAttempt['RedemptionTime'])
 
-@interface.implementer(store_interfaces.IEnrollmentPurchaseAttempt)
+@interface.implementer(IEnrollmentPurchaseAttempt)
 class EnrollmentPurchaseAttempt(PurchaseAttempt):
-	Processor = FP(store_interfaces.IEnrollmentPurchaseAttempt['Processor'])
+	Processor = FP(IEnrollmentPurchaseAttempt['Processor'])
 
 def get_purchasables(purchase):
-	return purchase_order.get_purchasables(purchase.Order)
+	return get_purchasables(purchase.Order)
 
 def get_providers(purchase):
-	return purchase_order.get_providers(purchase.Order)
+	return get_providers(purchase.Order)
 
 def get_currencies(purchase):
-	return purchase_order.get_currencies(purchase.Order)
+	return get_currencies(purchase.Order)
 
-def create_purchase_attempt(order, processor, state=None, description=None,
+def create_purchase_attempt(order, processor, state=None, description=None, 
 							start_time=None):
-	state = state or store_interfaces.PA_STATE_UNKNOWN
+	state = state or PA_STATE_UNKNOWN
 	start_time = start_time if start_time else time.time()
 	cls = PurchaseAttempt if not order.Quantity else InvitationPurchaseAttempt
 	result = cls(Order=order, Processor=processor, Description=description,
@@ -207,7 +209,7 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, redemption_time=
 	# copy with order quantity none and item quantity to 1
 	new_order = purchase.Order.copy()
 	new_order.Quantity = None
-	purchase_order.replace_quantity(new_order, 1)
+	replace_quantity(new_order, 1)
 
 	result = RedeemedPurchaseAttempt(
 				Order=new_order, Processor=purchase.Processor,
@@ -219,7 +221,7 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, redemption_time=
 	return result
 
 def create_enrollment_attempt(order, processor=None, description=None, start_time=None):
-	state = store_interfaces.PA_STATE_SUCCESS
+	state = PA_STATE_SUCCESS
 	start_time = start_time if start_time else time.time()
 	result = EnrollmentPurchaseAttempt(Order=order, Processor=processor,
 									   Description=description, State=state,

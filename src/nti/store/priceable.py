@@ -11,7 +11,7 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
-from zope.mimetype import interfaces as zmime_interfaces
+from zope.mimetype.interfaces import IContentTypeAware
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from nti.externalization.externalization import WithRepr
@@ -19,19 +19,19 @@ from nti.externalization.externalization import WithRepr
 from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 
-from . import utils
-from . import purchasable
-from . import interfaces as store_interfaces
+from .utils import MetaStoreObject
+from .interfaces import IPriceable
+from .purchasable import get_purchasable
 
-@interface.implementer(store_interfaces.IPriceable, zmime_interfaces.IContentTypeAware)
+@interface.implementer(IPriceable, IContentTypeAware)
 @WithRepr
 @EqHash('NTIID', 'Quantity')
 class Priceable(SchemaConfigured):
 
-	__metaclass__ = utils.MetaStoreObject
+	__metaclass__ = MetaStoreObject
 
-	NTIID = FP(store_interfaces.IPriceable['NTIID'])
-	Quantity = FP(store_interfaces.IPriceable['Quantity'])
+	NTIID = FP(IPriceable['NTIID'])
+	Quantity = FP(IPriceable['Quantity'])
 
 	def copy(self):
 		result = self.__class__(NTIID=self.NTIID, Quantity=self.Quantity)
@@ -39,7 +39,7 @@ class Priceable(SchemaConfigured):
 
 	@property
 	def purchasable(self):
-		result = purchasable.get_purchasable(self.NTIID)
+		result = get_purchasable(self.NTIID)
 		return result
 
 	@property
