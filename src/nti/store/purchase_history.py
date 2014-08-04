@@ -19,13 +19,13 @@ from zope import component
 from zope import interface
 from zope import lifecycleevent
 from zope.location import locate
+from zope.container.contained import Contained
 from zope.annotation import factory as an_factory
 from zope.location.interfaces import ISublocations
-from zope.container import contained as zcontained
 
 from persistent import Persistent
 
-from nti.dataserver import interfaces as nti_interfaces
+from nti.dataserver.interfaces import IUser
 
 from nti.externalization.interfaces import LocatedExternalList
 
@@ -35,10 +35,15 @@ from nti.utils.property import Lazy
 
 from nti.zodb.containers import time_to_64bit_int
 
-from . import utils
 from . import get_user
-from . import purchase_attempt
-from . import interfaces as store_interfaces
+
+from .utils import to_frozenset
+
+from .interfaces import IPurchaseAttempt
+from .interfaces import IPurchaseHistory
+
+from .purchase_attempt import create_purchase_attempt
+create_purchase_attempt = create_purchase_attempt # rexport
 
 class _PurchaseIndex(Persistent):
 
@@ -91,7 +96,7 @@ class _PurchaseIndex(Persistent):
 		item_set = self.item_index.get(purchasable_id) or ()
 		for uid in item_set:
 			p = self.intids.queryObject(uid)
-			if store_interfaces.IPurchaseAttempt.providedBy(p):
+			if IPurchaseAttempt.providedBy(p):
 				# NOTE: There seem to be some attempts that are inconsistent;
 				# they exist in the backward index so that queryObject works,
 				# but they do not actually have an intid that matches
@@ -120,13 +125,13 @@ class _PurchaseIndex(Persistent):
 		end_time = time_to_64bit_int(end_time) if end_time is not None else None
 		for _, iid in self.time_index.iteritems(start_time, end_time):
 			p = self.intids.queryObject(iid)
-			if store_interfaces.IPurchaseAttempt.providedBy(p):
+			if IPurchaseAttempt.providedBy(p):
 				yield p
 
 	def values(self):
 		for iid in self.purchases:
 			p = self.intids.queryObject(iid)
-			if store_interfaces.IPurchaseAttempt.providedBy(p):
+			if IPurchaseAttempt.providedBy(p):
 				yield p
 
 	def __iter__(self):
@@ -148,9 +153,9 @@ class _PurchaseIndex(Persistent):
 		BTrees.check.check(self.item_index)
 		BTrees.check.check(self.time_index)
 
-@component.adapter(nti_interfaces.IUser)
-@interface.implementer(store_interfaces.IPurchaseHistory, ISublocations)
-class PurchaseHistory(zcontained.Contained, Persistent):
+@component.adapter(IUser)
+@interface.implementer(IPurchaseHistory, ISublocations)
+class PurchaseHistory(Contained, Persistent):
 
 	family = BTrees.family64
 
@@ -174,7 +179,7 @@ class PurchaseHistory(zcontained.Contained, Persistent):
 		"""
 		register/activates the purchasables (NTIIDs)
 		"""
-		items = utils.to_frozenset(items)
+		items = to_frozenset(items)
 		self._items_activated.update(items)
 
 	def deactivate_items(self, items):
@@ -182,7 +187,7 @@ class PurchaseHistory(zcontained.Contained, Persistent):
 		unregister the purchasables (NTIIDs)
 		"""
 		count = 0
-		items = utils.to_frozenset(items)
+		items = to_frozenset(items)
 		for item in items:
 			if item in self._items_activated:
 				count += 1
@@ -227,7 +232,7 @@ class PurchaseHistory(zcontained.Contained, Persistent):
 				yield p
 
 	def get_pending_purchase_for(self, items):
-		items = utils.to_frozenset(items)
+		items = to_frozenset(items)
 		for p in self.values():
 			if (p.is_pending() or p.is_unknown()) and p.Items.intersection(items):
 				return p
@@ -267,17 +272,17 @@ _PurchaseHistoryFactory = an_factory(PurchaseHistory)
 
 def activate_items(user, items):
 	user = get_user(user)
-	hist = store_interfaces.IPurchaseHistory(user)
+	hist = IPurchaseHistory(user)
 	hist.activate_items(items)
 
 def deactivate_items(user, items):
 	user = get_user(user)
-	hist = store_interfaces.IPurchaseHistory(user)
+	hist = IPurchaseHistory(user)
 	return hist.deactivate_items(items)
 
 def is_item_activated(user, item):
 	user = get_user(user)
-	hist = store_interfaces.IPurchaseHistory(user)
+	hist = IPurchaseHistory(user)
 	return hist.is_item_activated(item)
 
 def get_purchase_attempt(purchase_id, user=None):
@@ -289,43 +294,41 @@ def get_purchase_attempt(purchase_id, user=None):
 
 def remove_purchase_attempt(purchase, user=None):
 	user = get_user(user) or purchase.creator
-	hist = store_interfaces.IPurchaseHistory(user)
+	hist = IPurchaseHistory(user)
 	return hist.remove_purchase(purchase)
 
 def get_pending_purchases(user):
 	user = get_user(user)
-	hist = store_interfaces.IPurchaseHistory(user)
+	hist = IPurchaseHistory(user)
 	result = LocatedExternalList(hist.get_pending_purchases())
 	return result
 
 def get_purchase_history(user, start_time=None, end_time=None):
 	user = get_user(user)
-	hist = store_interfaces.IPurchaseHistory(user)
+	hist = IPurchaseHistory(user)
 	result = LocatedExternalList(hist.get_purchase_history(start_time, end_time))
 	return result
 
 def has_history_by_item(user, purchasable_id):
 	user = get_user(user)
-	hist = store_interfaces.IPurchaseHistory(user)
+	hist = IPurchaseHistory(user)
 	result = hist.has_history_by_item(purchasable_id)
 	return result
 
 def get_purchase_history_by_item(user, purchasable_id):
 	user = get_user(user)
-	hist = store_interfaces.IPurchaseHistory(user)
+	hist = IPurchaseHistory(user)
 	result = LocatedExternalList(hist.get_purchase_history_by_item(purchasable_id))
 	return result
 
 def get_pending_purchase_for(user, items):
 	user = get_user(user)
-	hist = store_interfaces.IPurchaseHistory(user)
+	hist = IPurchaseHistory(user)
 	result = hist.get_pending_purchase_for(items)
 	return result
 
 def register_purchase_attempt(purchase, user):
 	user = get_user(user)
-	hist = store_interfaces.IPurchaseHistory(user)
+	hist = IPurchaseHistory(user)
 	hist.register_purchase(purchase)
 	return purchase.id
-
-create_purchase_attempt = purchase_attempt.create_purchase_attempt

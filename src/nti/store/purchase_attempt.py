@@ -26,6 +26,8 @@ from nti.dataserver.datastructures import ModDateTrackingObject
 from nti.externalization.externalization import WithRepr
 from nti.externalization.oids import to_external_ntiid_oid
 
+from nti.mimetype.mimetype import MIME_BASE
+
 from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
@@ -36,9 +38,9 @@ from nti.zodb.persistentproperty import PersistentPropertyHolder
 from .utils import MetaStoreObject
 
 from .purchase_order import replace_quantity
-from .purchase_order import get_providers as order_providers
-from .purchase_order import get_currencies as order_currencies
-from .purchase_order import get_purchasables as order_purchasables
+from .purchase_order import get_providers as get_providers_from_order
+from .purchase_order import get_currencies as get_currencies_from_order
+from .purchase_order import get_purchasables as get_purchasables_from_order
 
 from .interfaces import PA_STATE_FAILED
 from .interfaces import PA_STATE_FAILURE
@@ -68,9 +70,10 @@ class PurchaseAttempt(ModDateTrackingObject,
 					  Contained,
 					  PersistentPropertyHolder):
 
-	__external_class_name__ = "PurchaseAttempt"
 	__metaclass__ = MetaStoreObject
-
+	__external_class_name__ = "PurchaseAttempt"
+	mime_type = mimeType = MIME_BASE + b'purchaseattempt'
+		
 	createDirectFieldProperties(IPurchaseAttempt)
 
 	@property
@@ -138,6 +141,8 @@ class PurchaseAttempt(ModDateTrackingObject,
 @interface.implementer(IInvitationPurchaseAttempt)
 class InvitationPurchaseAttempt(PurchaseAttempt):
 
+	mime_type = mimeType = MIME_BASE + b'invitationpurchaseattempt'
+	
 	def __init__(self, *args, **kwargs):
 		super(PurchaseAttempt, self).__init__(*args, **kwargs)
 		self._consumers = BTrees.OOBTree.OOBTree()
@@ -176,22 +181,20 @@ class InvitationPurchaseAttempt(PurchaseAttempt):
 		return self.id
 
 @interface.implementer(IRedeemedPurchaseAttempt)
-class RedeemedPurchaseAttempt(PurchaseAttempt):
+class RedeemedPurchaseAttempt(PurchaseAttempt):	
+	mime_type = mimeType = MIME_BASE + b'redeemedpurchaseattempt'
+		
 	RedemptionCode = FP(IRedeemedPurchaseAttempt['RedemptionCode'])
 	RedemptionTime = FP(IRedeemedPurchaseAttempt['RedemptionTime'])
 
-@interface.implementer(IEnrollmentPurchaseAttempt)
-class EnrollmentPurchaseAttempt(PurchaseAttempt):
-	Processor = FP(IEnrollmentPurchaseAttempt['Processor'])
-
 def get_providers(purchase):
-	return order_providers(purchase.Order)
+	return get_providers_from_order(purchase.Order)
 
 def get_currencies(purchase):
-	return order_currencies(purchase.Order)
+	return get_currencies_from_order(purchase.Order)
 
 def get_purchasables(purchase):
-	return order_purchasables(purchase.Order)
+	return get_purchasables_from_order(purchase.Order)
 
 def create_purchase_attempt(order, processor, state=None, description=None, 
 							start_time=None):
@@ -220,6 +223,15 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, redemption_time=
 				RedemptionCode=unicode(redemption_code))
 	return result
 
+from zope.deprecation import deprecated
+
+deprecated("EnrollmentPurchaseAttempt", "use proper course enrollment")
+@interface.implementer(IEnrollmentPurchaseAttempt)
+class EnrollmentPurchaseAttempt(PurchaseAttempt):	
+	mime_type = mimeType = MIME_BASE + b'enrollmentpurchaseattempt'
+	Processor = FP(IEnrollmentPurchaseAttempt['Processor'])
+
+deprecated("create_enrollment_attempt", "no longer used")
 def create_enrollment_attempt(order, processor=None, description=None, start_time=None):
 	state = PA_STATE_SUCCESS
 	start_time = start_time if start_time else time.time()

@@ -286,13 +286,15 @@ class IPurchaseAttempt(IContained):
 class IInvitationPurchaseAttempt(IPurchaseAttempt):
 	pass
 
-class IEnrollmentAttempt(IPurchaseAttempt):
-	pass
-
 class IRedeemedPurchaseAttempt(IPurchaseAttempt):
 	RedemptionTime = Number(title='Redemption time', required=True)
 	RedemptionCode = ValidTextLine(title='Redemption Code', required=True)
+	
+deprecated('IEnrollmentAttempt', 'Use new course enrollment')
+class IEnrollmentAttempt(IPurchaseAttempt):
+	pass
 
+deprecated('IEnrollmentPurchaseAttempt', 'Use new course enrollment')
 class IEnrollmentPurchaseAttempt(IEnrollmentAttempt):
 	Processor = ValidTextLine(title='Enrollment institution', required=False)
 
@@ -326,16 +328,6 @@ class IPurchaseAttemptReserved(IPurchaseAttemptStateEvent):
 
 class IPurchaseAttemptFailed(IPurchaseAttemptStateEvent):
 	error = interface.Attribute('Failure error')
-
-
-class IEnrollmentAttemptEvent(IPurchaseAttemptEvent):
-	object = Object(IEnrollmentAttempt, title="The enrollment")
-
-class IEnrollmentAttemptSuccessful(IEnrollmentAttemptEvent):
-	request = interface.Attribute('Pyramid request')
-
-class IUnenrollmentAttemptSuccessful(IEnrollmentAttemptEvent):
-	request = interface.Attribute('Pyramid request')
 
 @interface.implementer(IPurchaseAttemptEvent)
 class PurchaseAttemptEvent(ObjectEvent):
@@ -386,24 +378,6 @@ class PurchaseAttemptFailed(PurchaseAttemptEvent):
 		super(PurchaseAttemptFailed, self).__init__(purchase)
 		self.error = error
 
-@interface.implementer(IEnrollmentAttemptEvent)
-class EnrollmentAttemptEvent(PurchaseAttemptEvent):
-	pass
-
-@interface.implementer(IEnrollmentAttemptSuccessful)
-class EnrollmentAttemptSuccessful(EnrollmentAttemptEvent):
-
-	def __init__(self, purchase, request=None):
-		super(EnrollmentAttemptSuccessful, self).__init__(purchase)
-		self.request = request
-
-@interface.implementer(IUnenrollmentAttemptSuccessful)
-class UnenrollmentAttemptSuccessful(EnrollmentAttemptEvent):
-
-	def __init__(self, purchase, request=None):
-		super(UnenrollmentAttemptSuccessful, self).__init__(purchase)
-		self.request = request
-
 class IPurchaseHistory(IIterable):
 
 	def add_purchase(purchase):
@@ -427,3 +401,36 @@ class IPurchaseHistory(IIterable):
 		"""
 class IStorePurchaseInvitation(interface.Interface):
 	pass
+
+deprecated('IEnrollmentAttemptEvent', 'Use enrollment record life cycle events')
+class IEnrollmentAttemptEvent(IPurchaseAttemptEvent):
+	object = Object(IEnrollmentAttempt, title="The enrollment")
+
+deprecated('IEnrollmentAttemptSuccessful', 'Use enrollment record life cycle events')
+class IEnrollmentAttemptSuccessful(IEnrollmentAttemptEvent):
+	request = interface.Attribute('Pyramid request')
+
+deprecated('IUnenrollmentAttemptSuccessful', 'Use enrollment record life cycle events')
+class IUnenrollmentAttemptSuccessful(IEnrollmentAttemptEvent):
+	request = interface.Attribute('Pyramid request')
+
+deprecated('IEnrollmentAttemptEvent', 'Use enrollment record life cycle events')
+@interface.implementer(IEnrollmentAttemptEvent)
+class EnrollmentAttemptEvent(PurchaseAttemptEvent):
+	pass
+
+deprecated('EnrollmentAttemptSuccessful', 'Use enrollment record life cycle events')
+@interface.implementer(IEnrollmentAttemptSuccessful)
+class EnrollmentAttemptSuccessful(EnrollmentAttemptEvent):
+
+	def __init__(self, purchase, request=None):
+		super(EnrollmentAttemptSuccessful, self).__init__(purchase)
+		self.request = request
+
+deprecated('UnenrollmentAttemptSuccessful', 'Use enrollment record life cycle events')
+@interface.implementer(IUnenrollmentAttemptSuccessful)
+class UnenrollmentAttemptSuccessful(EnrollmentAttemptEvent):
+
+	def __init__(self, purchase, request=None):
+		super(UnenrollmentAttemptSuccessful, self).__init__(purchase)
+		self.request = request

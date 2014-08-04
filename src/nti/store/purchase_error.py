@@ -19,15 +19,16 @@ from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from . import utils
-from . import interfaces as store_interfaces
+from .utils import MetaStoreObject
+from .interfaces import IPurchaseError
+from .interfaces import INTIStoreException
 
-@interface.implementer(store_interfaces.IPurchaseError)
+@interface.implementer(IPurchaseError)
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
 class PurchaseError(SchemaConfigured):
-	__metaclass__ = utils.MetaStoreObject
-	createDirectFieldProperties(store_interfaces.IPurchaseError)
+	__metaclass__ = MetaStoreObject
+	createDirectFieldProperties(IPurchaseError)
 
 	def __str__(self):
 		return self.Message
@@ -36,8 +37,8 @@ def create_purchase_error(message, type_=None, code=None):
 	result = PurchaseError(Message=message, Type=type_, Code=code)
 	return result
 
-@component.adapter(store_interfaces.INTIStoreException)
-@interface.implementer(store_interfaces.IPurchaseError)
+@component.adapter(INTIStoreException)
+@interface.implementer(IPurchaseError)
 def nti_store_exception_adpater(error):
 	result = PurchaseError(Type=u"NTIException")
 	args = getattr(error, 'args', ())

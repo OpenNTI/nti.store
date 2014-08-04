@@ -31,7 +31,7 @@ from .interfaces import IPurchaseItem
 from .interfaces import IPurchaseOrder
 
 from .purchasable import get_purchasable
-from .purchasable import get_providers as purchasable_providers
+from .purchasable import get_providers as get_providers_from_purchasables
 
 @interface.implementer(IPurchaseItem)
 class PurchaseItem(Priceable):
@@ -86,7 +86,7 @@ def get_providers(order):
 	return all providers for the associated purchase
 	"""
 	purchasables = get_purchasables(order)
-	result = purchasable_providers(purchasables)
+	result = get_providers_from_purchasables(purchasables)
 	return result
 
 def get_currencies(order):

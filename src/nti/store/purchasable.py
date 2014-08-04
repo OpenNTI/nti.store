@@ -19,16 +19,18 @@ from zope.cachedescriptors.property import Lazy
 from zope.mimetype.interfaces import IContentTypeAware
 
 from nti.dataserver import authorization
-from nti.dataserver import authorization_acl as a_acl
-
-from nti.dataserver.datastructures import PersistentCreatedModDateTrackingObject
+from nti.dataserver.authorization_acl import ace_allowing
 
 from nti.dataserver.interfaces import IACLProvider
 from nti.dataserver.interfaces import EVERYONE_USER_NAME
 
+from nti.dataserver.datastructures import PersistentCreatedModDateTrackingObject
+
 from nti.externalization.externalization import WithRepr
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import LocatedExternalList
+
+from nti.mimetype.mimetype import MIME_BASE
 
 from nti.ntiids import interfaces as nid_interfaces
 
@@ -53,13 +55,14 @@ from .utils import MetaStoreObject
 class Purchasable(ContentBundle):
 
 	__metaclass__ = MetaStoreObject
-
+	mime_type = mimeType = MIME_BASE + b'purchasable'
+	
 	createDirectFieldProperties(IPurchasable)
 	Description = AdaptingFieldProperty(IPurchasable['Description'])
 
 	@Lazy
 	def __acl__(self):
-		return (a_acl.ace_allowing(EVERYONE_USER_NAME, authorization.ACT_READ, self),)
+		return (ace_allowing(EVERYONE_USER_NAME, authorization.ACT_READ, self),)
 
 class PesistentPurchasable(Contained, 
 						   Purchasable,
