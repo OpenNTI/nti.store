@@ -12,26 +12,27 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import component
 
-from nti.store import purchase_attempt
+from ..stripe_io import StripeIO
 
-from .. import stripe_io
-from .. import interfaces as stripe_interfaces
+from ..interfaces import IStripeConnectKey
 
-class BaseProcessor(stripe_io.StripeIO):
+from ....purchase_attempt import get_providers
+
+class BaseProcessor(StripeIO):
 
 	name = 'stripe'
 
 	def get_api_key(self, purchase):
-		providers = purchase_attempt.get_providers(purchase)
+		providers = get_providers(purchase)
 		provider = providers[0] if providers else u''  # pick first provider
-		stripe_key = component.queryUtility(stripe_interfaces.IStripeConnectKey,
-											provider)
+		stripe_key = component.queryUtility(IStripeConnectKey, provider)
 		return stripe_key.PrivateKey if stripe_key else None
 
 	def get_charges(self, purchase_id=None, username=None, customer=None,
                     start_time=None, end_time=None, api_key=None):
 		result = []
-		for c in self.get_stripe_charges(start_time=start_time, end_time=end_time,
+		for c in self.get_stripe_charges(start_time=start_time,
+										 end_time=end_time,
 										 api_key=api_key):
 			desc = c.description
 			if  (purchase_id and purchase_id in desc) or \
@@ -42,7 +43,7 @@ class BaseProcessor(stripe_io.StripeIO):
 
 	def create_card_token(self, customer_id=None, number=None, exp_month=None,
                           exp_year=None, cvc=None, api_key=None, **kwargs):
+
 		token = self.create_stripe_token(customer_id, number, exp_month, exp_year,
                                          cvc, api_key, **kwargs)
 		return token.id
-

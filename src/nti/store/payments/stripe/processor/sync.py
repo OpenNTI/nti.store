@@ -17,11 +17,18 @@ from zope.event import notify
 
 from nti.dataserver.users import User
 
-from nti.store import purchase_history
-from nti.store import interfaces as store_interfaces
+from ....interfaces import PurchaseAttemptFailed
+from ....interfaces import PurchaseAttemptSynced
+from ....interfaces import PurchaseAttemptRefunded
+from ....interfaces import PurchaseAttemptSuccessful
 
-from .. import utils
-from .. import interfaces as stripe_interfaces
+from ....purchase_history import get_purchase_attempt
+
+from ..utils import adapt_to_error
+from ..utils import create_payment_charge
+
+from ..interfaces import RegisterStripeCharge
+from ..interfaces import IStripePurchaseAttempt
 
 from .base import BaseProcessor
 
@@ -33,7 +40,7 @@ class SyncProcessor(BaseProcessor):
 		stripe.com and/or local db.
 		"""
 		user = User.get_user(username)
-		purchase = purchase_history.get_purchase_attempt(purchase_id, username)
+		purchase = get_purchase_attempt(purchase_id, username)
 		if purchase is None:
 			logger.error('Purchase %r for user %s could not be found in dB',
 						  purchase_id, username)
@@ -47,7 +54,7 @@ class SyncProcessor(BaseProcessor):
 		charge = None
 		message = None
 		do_synch = False
-		sp = stripe_interfaces.IStripePurchaseAttempt(purchase)
+		sp = IStripePurchaseAttempt(purchase)
 		if sp.ChargeID:
 			charge = self.get_stripe_charge(sp.ChargeID, api_key=api_key)
 			if charge is None:
@@ -62,7 +69,7 @@ class SyncProcessor(BaseProcessor):
 									   api_key=api_key)
 			if charges:
 				charge = charges[0]
-				notify(stripe_interfaces.RegisterStripeCharge(purchase, charge.id))
+				notify(RegisterStripeCharge(purchase, charge.id))
 			elif sp.TokenID:
 				token = self.get_stripe_token(sp.TokenID, api_key=api_key)
 				if token is None:
@@ -73,18 +80,14 @@ class SyncProcessor(BaseProcessor):
 								sp.TokenID, purchase_id, username)
 					if not purchase.has_completed():
 						do_synch = True
-						notify(store_interfaces.PurchaseAttemptFailed(
-													purchase,
-													utils.adapt_to_error(message)))
+						notify(PurchaseAttemptFailed(purchase, adapt_to_error(message)))
 				elif token.used:
 					tid = sp.TokenID
 					message = "Token %s has been used and no charge was found" % tid
 					logger.warn(message)
 					if not purchase.has_completed():
 						do_synch = True
-						notify(store_interfaces.PurchaseAttemptFailed(
-													purchase,
-													utils.adapt_to_error(message)))
+						notify(PurchaseAttemptFailed(purchase, adapt_to_error(message)))
 				elif not purchase.is_pending():  # no charge and unused token
 					logger.warn('No charge and unused token. Incorrect status for ' +
 								'purchase %r/%s', purchase_id, username)
@@ -92,22 +95,19 @@ class SyncProcessor(BaseProcessor):
 		if charge:
 			do_synch = True
 			if charge.paid and not purchase.has_succeeded():
-				pc = utils.create_payment_charge(charge)
-				notify(store_interfaces.PurchaseAttemptSuccessful(purchase, pc, request))
+				pc = create_payment_charge(charge)
+				notify(PurchaseAttemptSuccessful(purchase, pc, request))
 			elif charge.failure_message and not purchase.has_failed():
-				notify(store_interfaces.PurchaseAttemptFailed(
-										purchase,
-										utils.adapt_to_error(charge.failure_message)))
+				message = charge.failure_message
+				notify(PurchaseAttemptFailed(purchase, adapt_to_error(message)))
 			elif charge.refunded and not purchase.is_refunded():
-				notify(store_interfaces.PurchaseAttemptRefunded(purchase))
+				notify(PurchaseAttemptRefunded(purchase))
 
 		elif time.time() - purchase.StartTime >= 180 and not purchase.has_completed():
 			do_synch = True
 			message = message or "Failed purchase after expiration time"
-			notify(store_interfaces.PurchaseAttemptFailed(
-										purchase,
-										utils.adapt_to_error(message)))
+			notify(PurchaseAttemptFailed(purchase, adapt_to_error(message)))
 
 		if do_synch:
-			notify(store_interfaces.PurchaseAttemptSynced(purchase))
+			notify(PurchaseAttemptSynced(purchase))
 		return charge
