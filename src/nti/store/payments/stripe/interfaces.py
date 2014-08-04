@@ -95,11 +95,16 @@ class RegisterStripeCharge(pay_interfaces.RegisterPurchaseData):
 
 class IStripeConnectKey(interface.Interface):
 	Alias = ValidTextLine(title='Key name or alias', required=True)
-	PrivateKey = ValidTextLine(title="The private key", required=True)
 	LiveMode = Bool(title="Live mode flag", required=False)
-	StripeUserID = ValidTextLine(title="String user id", required=False)
+	
+	PrivateKey = ValidTextLine(title="The private key", required=True)
+	PrivateKey.setTaggedValue('_ext_excluded_out', True)
+	
 	RefreshToken = ValidTextLine(title="Refresh token", required=False)
+	RefreshToken.setTaggedValue('_ext_excluded_out', True)
+	
 	PublicKey = ValidTextLine(title="The private key", required=False)
+	StripeUserID = ValidTextLine(title="String user id", required=False)
 
 class IStripePurchaseError(store_interfaces.IPurchaseError):
 	HttpStatus = Int(title='HTTP Status', required=False)

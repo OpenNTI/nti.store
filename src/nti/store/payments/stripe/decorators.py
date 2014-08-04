@@ -21,22 +21,26 @@ from pyramid.threadlocal import get_current_request
 from nti.dataserver.links import Link
 
 from nti.externalization.singleton import SingletonDecorator
-from nti.externalization import interfaces as ext_interfaces
 from nti.externalization.externalization import toExternalObject
+from nti.externalization.interfaces import StandardExternalFields
+from nti.externalization.interfaces import IExternalObjectDecorator
 
-from . import interfaces as stripe_interfaces
 from ...decorators import PricedItemDecorator
-from ... import interfaces as store_interfaces
 
-LINKS = ext_interfaces.StandardExternalFields.LINKS
+from ...interfaces import IPurchasable
 
-@component.adapter(stripe_interfaces.IStripePricedItem)
-@interface.implementer(ext_interfaces.IExternalObjectDecorator)
+from .interfaces import IStripeConnectKey
+from .interfaces import IStripePricedItem
+
+LINKS = StandardExternalFields.LINKS
+
+@component.adapter(IStripePricedItem)
+@interface.implementer(IExternalObjectDecorator)
 class StripePricedItemDecorator(PricedItemDecorator):
 	pass
 
-@component.adapter(store_interfaces.IPurchasable)
-@interface.implementer(ext_interfaces.IExternalObjectDecorator)
+@component.adapter(IPurchasable)
+@interface.implementer(IExternalObjectDecorator)
 class PurchasableDecorator(object):
 
 	__metaclass__ = SingletonDecorator
@@ -52,7 +56,7 @@ class PurchasableDecorator(object):
 
 	def decorateExternalObject(self, original, external):
 		keyname = original.Provider
-		result = component.queryUtility(stripe_interfaces.IStripeConnectKey, keyname)
+		result = component.queryUtility(IStripeConnectKey, keyname)
 		if result:
 			external['StripeConnectKey'] = toExternalObject(result)
 		self.set_links(original, external)

@@ -14,9 +14,9 @@ from zope import interface
 from zope.configuration import fields
 from zope.component.zcml import utility
 
-from . import interfaces as stripe_interfaces
-
 from .stripe_key import StripeConnectKey
+
+from .interfaces import IStripeConnectKey 
 
 class IRegisterStripeKeyDirective(interface.Interface):
 	"""
@@ -36,9 +36,8 @@ def registerStripeKey(_context, alias, private_key, live_mode=None, stripe_user_
 	"""
 	Register a stripe key with the given alias
 	"""
-	sk = StripeConnectKey(alias, private_key, live_mode=live_mode,
-						  stripe_user_id=stripe_user_id,
-						  refresh_token=refresh_token, public_key=public_key)
-	utility(_context, provides=stripe_interfaces.IStripeConnectKey, component=sk,
-			name=alias)
+	sk = StripeConnectKey(Alias=alias, PrivateKey=private_key, LiveMode=live_mode,
+						  StripeUserID=stripe_user_id, RefreshToken=refresh_token,
+						  PublicKey=public_key)
+	utility(_context, provides=IStripeConnectKey, component=sk, name=alias)
 	logger.debug("Stripe key %s has been registered", alias)

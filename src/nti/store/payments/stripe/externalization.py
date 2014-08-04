@@ -27,12 +27,6 @@ def _makenone(s):
 		s = None
 	return s
 
-@interface.implementer(IInternalObjectIO)
-@component.adapter(stripe_interfaces.IStripeConnectKey)
-class StripeConnectKeyExternal(InterfaceObjectIO):
-	_ext_iface_upper_bound = stripe_interfaces.IStripeConnectKey
-	_excluded_out_ivars_ = InterfaceObjectIO._excluded_out_ivars_ | { 'PrivateKey', 'RefreshToken' }
-
 @interface.implementer(ext_interfaces.IExternalObject)
 @component.adapter(stripe_interfaces.IStripeCoupon)
 class StripeCouponExternalizer(object):

@@ -30,10 +30,6 @@
 	<utility factory=".stripe_processor.StripePaymentProcessor"
 			 provides=".interfaces.IStripePaymentProcessor"
 			 name="stripe" />
-
-	<adapter factory=".externalization.StripeCouponExternalizer" />
-	<adapter factory=".externalization.StripeConnectKeyExternal" />
-	<adapter factory=".externalization.StripePurchaseErrorExternal" />
 	
 	<subscriber factory=".decorators.PurchasableDecorator"
 				for="...interfaces.IPurchasable"
@@ -49,13 +45,17 @@
 			 
 	<!-- Externalization -->
 	
+	<adapter factory=".externalization.StripeCouponExternalizer" />
+		
 	<include package="nti.externalization" file="meta.zcml" />
 	<include package="nti.externalization" />
 
 	<ext:registerAutoPackageIO
 		root_interfaces=".interfaces.IStripePriceable
-						 .interfaces.IStripePricedItem"
-		modules=".stripe_purchase" />
+						 .interfaces.IStripePricedItem
+						 .interfaces.IStripeConnectKey
+						 .interfaces.IStripePurchaseError"
+		modules=".stripe_purchase .stripe_key .stripe_error" />
 
 	<configure zcml:condition="have devmode">
 		<!-- The keys included in here are only for test purposes -->

@@ -12,25 +12,29 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope.event import notify
 
-from nti.dataserver.users import interfaces as user_interfaces
+from nti.dataserver.users.interfaces import IUserProfile
 
-from . import stripe_io
 from ... import get_user
-from . import interfaces as stripe_interfaces
 
-class StripeCustomer(stripe_io.StripeIO):
+from .stripe_io import StripeIO
+
+from .interfaces import IStripeCustomer
+from .interfaces import StripeCustomerCreated
+from .interfaces import StripeCustomerDeleted
+
+class StripeCustomer(StripeIO):
 
 	@classmethod
 	def create_customer(cls, user, coupon=None, api_key=None):
 		user = get_user(user)
 
-		profile = user_interfaces.IUserProfile(user)
+		profile = IUserProfile(user)
 		email = getattr(profile, 'email', None)
 		description = getattr(profile, 'description', None)
 
 		customer = cls.create_stripe_customer(email=email, description=description,
 											  coupon=coupon, api_key=api_key)
-		notify(stripe_interfaces.StripeCustomerCreated(user, customer.id))
+		notify(StripeCustomerCreated(user, customer.id))
 
 		return customer
 
@@ -38,20 +42,20 @@ class StripeCustomer(stripe_io.StripeIO):
 	def delete_customer(cls, user, api_key=None):
 		result = False
 		user = get_user(user)
-		adapted = stripe_interfaces.IStripeCustomer(user)
+		adapted = IStripeCustomer(user)
 		if adapted.customer_id:
 			result = cls.delete_stripe_customer(customer_id=adapted.customer_id,
 												api_key=api_key)
-			notify(stripe_interfaces.StripeCustomerDeleted(user, adapted.customer_id))
+			notify(StripeCustomerDeleted(user, adapted.customer_id))
 		return result
 
 	@classmethod
 	def update_customer(cls, user, customer=None, coupon=None, api_key=None):
 		user = get_user(user)
-		profile = user_interfaces.IUserProfile(user)
+		profile = IUserProfile(user)
 		email = getattr(profile, 'email', None)
 		description = getattr(profile, 'description', None)
-		adapted = stripe_interfaces.IStripeCustomer(user)
+		adapted = IStripeCustomer(user)
 		if adapted.customer_id:
 			result = cls.update_stripe_customer(customer=customer or adapted.customer_id,
 												email=email,
@@ -65,7 +69,7 @@ class StripeCustomer(stripe_io.StripeIO):
 	@classmethod
 	def get_or_create_customer(cls, user, api_key=None):
 		user = get_user(user)
-		adapted = stripe_interfaces.IStripeCustomer(user)
+		adapted = IStripeCustomer(user)
 		if adapted.customer_id is None:
 			customer = cls.create_customer(user, api_key=api_key)
 			result = customer.id

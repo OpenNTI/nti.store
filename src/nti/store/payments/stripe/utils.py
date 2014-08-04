@@ -14,11 +14,14 @@ import six
 import time
 import simplejson as json
 
-from ... import payment_charge
 from ... import NTIStoreException
-from ... import interfaces as store_interfaces
 
-from . import interfaces as stripe_interfaces
+from ...payment_charge import UserAddress
+from ...payment_charge import PaymentCharge
+
+from ...interfaces import IPurchaseError
+
+from .interfaces  import IStripePurchaseError
 
 def makenone(s, default=None):
 	if isinstance(s, six.string_types):
@@ -49,14 +52,14 @@ def create_user_address(charge):
 	"""
 	card = getattr(charge, 'card', None)
 	if card is not None:
-		address = payment_charge.UserAddress.create(makenone(card.address_line1),
- 													makenone(card.address_line2),
- 													makenone(card.address_city),
- 													makenone(card.address_state),
- 													makenone(card.address_zip),
- 													makenone(card.address_country))
+		address = UserAddress.create(makenone(card.address_line1),
+ 									 makenone(card.address_line2),
+ 									 makenone(card.address_city),
+ 									 makenone(card.address_state),
+ 									 makenone(card.address_zip),
+ 									 makenone(card.address_country))
 		return address
-	return payment_charge.UserAddress()
+	return UserAddress()
 
 def get_card_info(charge):
 	"""
@@ -77,17 +80,16 @@ def create_payment_charge(charge):
 	last4, name = get_card_info(charge)
 	address = create_user_address(charge)
 	created = float(charge.created or time.time())
-	result = payment_charge.PaymentCharge(Amount=amount, Currency=currency,
-										  Created=created, CardLast4=last4,
-										  Address=address, Name=name)
+	result = PaymentCharge(Amount=amount, Currency=currency,
+						   Created=created, CardLast4=last4,
+						   Address=address, Name=name)
 	return result
 
 def adapt_to_error(e):
 	"""
 	adapts an exception to a IStripePurchaseError
 	"""
-	result = store_interfaces.IPurchaseError(e, None) or \
-			 stripe_interfaces.IStripePurchaseError(e, None)
+	result = IPurchaseError(e, None) or IStripePurchaseError(e, None)
 	if result is None and isinstance(e, Exception):
-		result = store_interfaces.IPurchaseError(NTIStoreException(e.args), None)
+		result = IPurchaseError(NTIStoreException(e.args), None)
 	return result

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Stripe utilities.
-
 .. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
@@ -20,19 +18,20 @@ from . import InvalidStripeCoupon
 from . import interfaces as stripe_interfaces
 
 from ... import PricingException
-from ... import interfaces as store_interfaces
+
+from ...interfaces import IPaymentProcessor
+
+from ...pricing import create_pricing_results
+from ...pricing import DefaultPurchasablePricer
 
 from .stripe_purchase import StripePricedPurchasable
-
-from ...pricing import create_pricing_results, DefaultPurchasablePricer
 
 class StripePurchasablePricer(DefaultPurchasablePricer):
 
 	processor = "stripe"
 
 	def get_coupon(self, coupon=None, api_key=None):
-		manager = component.getUtility(store_interfaces.IPaymentProcessor,
-									   name=self.processor)
+		manager = component.getUtility(IPaymentProcessor, name=self.processor)
 		if coupon is not None and api_key:
 			# stripe defines an 80 sec timeout for http requests
 			# at this moment we are to wait for coupon validation
@@ -54,8 +53,7 @@ class StripePurchasablePricer(DefaultPurchasablePricer):
 		priced = StripePricedPurchasable.copy(priced)
 		coupon = getattr(priceable, 'Coupon', None)
 
-		manager = component.getUtility(store_interfaces.IPaymentProcessor,
-									   name=self.processor)
+		manager = component.getUtility(IPaymentProcessor, name=self.processor)
 		stripe_key = component.queryUtility(stripe_interfaces.IStripeConnectKey,
 										    priced.Provider)
 
@@ -99,8 +97,7 @@ class StripePurchasablePricer(DefaultPurchasablePricer):
 												provider)
 			coupon = self.get_coupon(coupon, stripe_key.PrivateKey) \
 					 if stripe_key else None
-			manager = component.getUtility(store_interfaces.IPaymentProcessor,
-										   name=self.processor)
+			manager = component.getUtility(IPaymentProcessor, name=self.processor)
 			if coupon is not None:
 				result.NonDiscountedPrice = result.TotalPurchasePrice
 				purchase_price = manager.apply_coupon(result.TotalPurchasePrice, coupon)
