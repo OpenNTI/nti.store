@@ -21,7 +21,6 @@ from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.datastructures import InterfaceObjectIO
 
 from . import interfaces as stripe_interfaces
-from ...externalization import PricedItemExternal
 
 def _makenone(s):
 	if isinstance(s, six.string_types) and s == 'None':
@@ -68,6 +67,3 @@ class StripeCouponExternalizer(object):
 class StripePurchaseErrorExternal(InterfaceObjectIO):
 	_ext_iface_upper_bound = stripe_interfaces.IStripePurchaseError
 
-@component.adapter(stripe_interfaces.IStripePricedItem)
-class StripePricedItemExternal(PricedItemExternal):
-	_ext_iface_upper_bound = stripe_interfaces.IStripePricedItem

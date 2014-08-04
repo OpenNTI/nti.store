@@ -33,7 +33,6 @@
 
 	<adapter factory=".externalization.StripeCouponExternalizer" />
 	<adapter factory=".externalization.StripeConnectKeyExternal" />
-	<adapter factory=".externalization.StripePricedItemExternal" />
 	<adapter factory=".externalization.StripePurchaseErrorExternal" />
 	
 	<subscriber factory=".decorators.PurchasableDecorator"
@@ -54,7 +53,8 @@
 	<include package="nti.externalization" />
 
 	<ext:registerAutoPackageIO
-		root_interfaces=".interfaces.IStripePriceable"
+		root_interfaces=".interfaces.IStripePriceable
+						 .interfaces.IStripePricedItem"
 		modules=".stripe_purchase" />
 
 	<configure zcml:condition="have devmode">
