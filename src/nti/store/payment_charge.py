@@ -10,10 +10,10 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-import functools
+from functools import total_ordering
 
 from zope import interface
-from zope.mimetype import interfaces as zmime_interfaces
+from zope.mimetype.interfaces import IContentTypeAware
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from nti.externalization.externalization import WithRepr
@@ -21,22 +21,23 @@ from nti.externalization.externalization import WithRepr
 from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 
-from . import utils
-from . import interfaces as store_interfaces
+from .utils import MetaStoreObject
 
-@interface.implementer(store_interfaces.IUserAddress,
-					   zmime_interfaces.IContentTypeAware)
+from .interfaces import IUserAddress
+from .interfaces import IPaymentCharge
+
+@interface.implementer(IUserAddress, IContentTypeAware)
 @WithRepr
 @EqHash('Zip', 'City', 'State', 'Street', 'Country')
 class UserAddress(SchemaConfigured):
 
-	__metaclass__ = utils.MetaStoreObject
+	__metaclass__ = MetaStoreObject
 
-	Street = FP(store_interfaces.IUserAddress['Street'])
-	City = FP(store_interfaces.IUserAddress['City'])
-	State = FP(store_interfaces.IUserAddress['State'])
-	Zip = FP(store_interfaces.IUserAddress['Zip'])
-	Country = FP(store_interfaces.IUserAddress['Country'])
+	Street = FP(IUserAddress['Street'])
+	City = FP(IUserAddress['City'])
+	State = FP(IUserAddress['State'])
+	Zip = FP(IUserAddress['Zip'])
+	Country = FP(IUserAddress['Country'])
 
 	def __str__(self):
 		return "%s\n%s,%s %s\n%s" % (self.Street,
@@ -49,28 +50,27 @@ class UserAddress(SchemaConfigured):
 	def create(cls, address_line1, address_line2=None, city=None, state=None,
 			   zip_=None, country=None):
 		city = city or u''
-		zip_ = zip_ or store_interfaces.IUserAddress['Zip'].default
-		country = country or store_interfaces.IUserAddress['Country'].default
+		zip_ = zip_ or IUserAddress['Zip'].default
+		country = country or IUserAddress['Country'].default
 		street = "%s\n%s" % (address_line1, address_line2 or u'')
 		result = UserAddress(Street=street.strip(), City=city, State=state,
 							 Zip=zip_, Country=country)
 		return result
 
-@functools.total_ordering
-@interface.implementer(store_interfaces.IPaymentCharge,
-					   zmime_interfaces.IContentTypeAware)
+@total_ordering
+@interface.implementer(IPaymentCharge, IContentTypeAware)
 @WithRepr
 @EqHash('Name', 'Amount', 'Created', 'Currency')
 class PaymentCharge(SchemaConfigured):
 
-	__metaclass__ = utils.MetaStoreObject
+	__metaclass__ = MetaStoreObject
 
-	Amount = FP(store_interfaces.IPaymentCharge['Amount'])
-	Currency = FP(store_interfaces.IPaymentCharge['Currency'])
-	Created = FP(store_interfaces.IPaymentCharge['Created'])
-	CardLast4 = FP(store_interfaces.IPaymentCharge['CardLast4'])
-	Address = FP(store_interfaces.IPaymentCharge['Address'])
-	Name = FP(store_interfaces.IPaymentCharge['Name'])
+	Amount = FP(IPaymentCharge['Amount'])
+	Currency = FP(IPaymentCharge['Currency'])
+	Created = FP(IPaymentCharge['Created'])
+	CardLast4 = FP(IPaymentCharge['CardLast4'])
+	Address = FP(IPaymentCharge['Address'])
+	Name = FP(IPaymentCharge['Name'])
 
 	def __str__(self):
 		return "%s:%s" % (self.Currency, self.Amount)
