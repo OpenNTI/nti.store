@@ -13,7 +13,6 @@ import re
 import six
 
 from nti.mimetype.mimetype import MIME_BASE
-from nti.mimetype.mimetype import nti_mimetype_with_class
 
 STORE_MIME_BASE = MIME_BASE + b'.store'
 
@@ -48,7 +47,7 @@ class MetaStoreObject(type):
 		t = type.__new__(cls, name, bases, dct)
 		if not hasattr(cls, 'mimeType'):
 			clazzname = getattr(cls, '__external_class_name__', name)
-			# name = b'.' + clazzname.encode( 'ascii' )
-			t.mime_type = t.mimeType = nti_mimetype_with_class(clazzname)
+			clazzname = b'.' + clazzname.encode('ascii').lower()
+			t.mime_type = t.mimeType = STORE_MIME_BASE + clazzname
 		t.parameters = dict()
 		return t

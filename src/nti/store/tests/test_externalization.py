@@ -170,6 +170,6 @@ class TestStoreExternal(unittest.TestCase):
 		assert_that(ext, has_entry('Icon', is_("http://www.ou.edu/icon.gif")))
 		assert_that(ext, has_entry('Thumbnail', is_("http://www.ou.edu/thumbnail.gif")))
 		assert_that(ext, has_entry('ID', is_('tag:nextthought.com,2011-10:OU-course-CLC3403LawAndJustice')))
-		assert_that(ext, has_entry('MimeType', u'application/vnd.nextthought.course'))
+		assert_that(ext, has_entry('MimeType', u'application/vnd.nextthought.store.course'))
 		assert_that(ext, has_entry('Items', is_([u'tag:nextthought.com,2011-10:OU-HTML-CLC3403_LawAndJustice.clc_3403_law_and_justice'])))
 		assert_that(ext, has_entry('StartDate', is_('2013-05-11')))
