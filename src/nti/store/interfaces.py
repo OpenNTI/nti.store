@@ -8,6 +8,7 @@ __docformat__ = "restructuredtext en"
 
 from zope import interface
 from zope.schema import vocabulary
+from zope.deprecation import deprecated
 from zope.interface.common import sequence
 from zope.location.interfaces import IContained
 from zope.interface.interfaces import ObjectEvent, IObjectEvent
@@ -76,6 +77,7 @@ class IPurchasable(IContentBundle):
 	License = ValidTextLine(title='Purchasable license', required=False)
 	Public = Bool(title="Public flag", required=False, default=False)
 
+deprecated('ICourse', 'Use new course specification')
 class ICourse(IPurchasable):
 	Name = ValidTextLine(title='Course Name', required=False)
 	Featured = Bool(title='Featured flag', required=False, default=False)
@@ -120,6 +122,8 @@ class IPurchaseOrder(sequence.IMinimalSequence):
 
 class IPricedItem(IPriceable):
 	PurchaseFee = Float(title="Fee Amount", required=False)
+	PurchaseFee.setTaggedValue('_ext_excluded_out', True)
+	
 	PurchasePrice = Float(title="Cost amount", required=True)
 	NonDiscountedPrice = Float(title="Non discounted price", required=False)
 	Currency = ValidTextLine(title='Currency ISO code', required=True, default='USD')
@@ -127,7 +131,10 @@ class IPricedItem(IPriceable):
 class IPricingResults(interface.Interface):
 	Items = List(value_type=Object(IPricedItem), title='The priced items',
 				 required=True, min_length=0)
+	
 	TotalPurchaseFee = Float(title="Fee Amount", required=False)
+	TotalPurchaseFee.setTaggedValue('_ext_excluded_out', True)
+	
 	TotalPurchasePrice = Float(title="Cost amount", required=True)
 	TotalNonDiscountedPrice = Float(title="Non discounted price", required=False)
 	Currency = ValidTextLine(title='Currency ISO code', required=True, default='USD')

@@ -35,10 +35,10 @@ from nti.zodb.persistentproperty import PersistentPropertyHolder
 
 from .utils import MetaStoreObject
 
-from .purchase_order import get_providers
-from .purchase_order import get_currencies
-from .purchase_order import get_purchasables
 from .purchase_order import replace_quantity
+from .purchase_order import get_providers as order_providers
+from .purchase_order import get_currencies as order_currencies
+from .purchase_order import get_purchasables as order_purchasables
 
 from .interfaces import PA_STATE_FAILED
 from .interfaces import PA_STATE_FAILURE
@@ -184,14 +184,14 @@ class RedeemedPurchaseAttempt(PurchaseAttempt):
 class EnrollmentPurchaseAttempt(PurchaseAttempt):
 	Processor = FP(IEnrollmentPurchaseAttempt['Processor'])
 
-def get_purchasables(purchase):
-	return get_purchasables(purchase.Order)
-
 def get_providers(purchase):
-	return get_providers(purchase.Order)
+	return order_providers(purchase.Order)
 
 def get_currencies(purchase):
-	return get_currencies(purchase.Order)
+	return order_currencies(purchase.Order)
+
+def get_purchasables(purchase):
+	return order_purchasables(purchase.Order)
 
 def create_purchase_attempt(order, processor, state=None, description=None, 
 							start_time=None):

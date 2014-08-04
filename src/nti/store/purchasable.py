@@ -14,11 +14,14 @@ import six
 
 from zope import component
 from zope import interface
+from zope.container.contained import Contained
 from zope.cachedescriptors.property import Lazy
 from zope.mimetype.interfaces import IContentTypeAware
 
 from nti.dataserver import authorization
 from nti.dataserver import authorization_acl as a_acl
+
+from nti.dataserver.datastructures import PersistentCreatedModDateTrackingObject
 
 from nti.dataserver.interfaces import IACLProvider
 from nti.dataserver.interfaces import EVERYONE_USER_NAME
@@ -58,6 +61,11 @@ class Purchasable(ContentBundle):
 	def __acl__(self):
 		return (a_acl.ace_allowing(EVERYONE_USER_NAME, authorization.ACT_READ, self),)
 
+class PesistentPurchasable(Contained, 
+						   Purchasable,
+						   PersistentCreatedModDateTrackingObject):
+	pass
+	
 def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=None,
 					   title=None, license_=None, author=None, description=None,
 					   icon=None, thumbnail=None, discountable=False,
