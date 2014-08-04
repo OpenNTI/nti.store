@@ -44,9 +44,6 @@ class MetaStoreObject(type):
 	def __new__(cls, name, bases, dct):
 		t = type.__new__(cls, name, bases, dct)
 		clazzname = getattr(cls, '__external_class_name__', name)
-		t.mimeType = nti_mimetype_with_class(clazzname)
-		# legacy, deprecated
-		t.mime_type = t.mimeType
-		# IContentTypeAware
+		t.mime_type = t.mimeType = nti_mimetype_with_class(clazzname)
 		t.parameters = dict()
 		return t
