@@ -25,7 +25,6 @@ class StoreTestLayer(ZopeComponentLayer,
 					   'nti.store',
 					   ('configure_invitations.zcml', 'nti.appserver'),
 					   ('purchasables.zcml', 'nti.store.tests'),
-					   ('courses.zcml', 'nti.store.tests'),
 					   ('purchasables.zcml', 'nti.store.payments.stripe.tests'))
 
 	@classmethod

@@ -14,7 +14,6 @@ from hamcrest import has_key
 from hamcrest import has_entry
 from hamcrest import has_length
 from hamcrest import assert_that
-from hamcrest import greater_than_or_equal_to
 
 import os
 import unittest
@@ -97,7 +96,6 @@ class TestStoreExternal(unittest.TestCase):
 		assert_that(items[0], has_entry('NTIID', 'xyz-book'))
 		assert_that(items[0], has_entry('Quantity', 2))
 
-
 	@WithMockDSTrans
 	def test_purchase_order(self):
 		pi_1 = purchase_order.create_purchase_item("ichigo", 1)
@@ -156,20 +154,3 @@ class TestStoreExternal(unittest.TestCase):
 		assert_that(ext, has_entry('NonDiscountedPrice', 220))
 		assert_that(ext, has_entry('PurchasePrice', 200))
 		assert_that(ext, has_entry('Quantity', 10))
-
-	def test_course(self):
-		cs = purchasable.get_purchasable('tag:nextthought.com,2011-10:OU-course-CLC3403LawAndJustice')
-		ext = to_external_object(cs)
-		assert_that(ext, has_entry('Title', u'CLC 3403 Law and Justice'))
-		assert_that(ext, has_entry('Description', has_length(greater_than_or_equal_to(140))))
-		assert_that(ext, has_entry('Author', u'Kyle Harper'))
-		assert_that(ext, has_entry('Amount', is_(none())))
-		assert_that(ext, has_entry('Currency', is_(none())))
-		assert_that(ext, has_entry('Provider', is_(none())))
-		assert_that(ext, has_entry('Featured', is_(True)))
-		assert_that(ext, has_entry('Icon', is_("http://www.ou.edu/icon.gif")))
-		assert_that(ext, has_entry('Thumbnail', is_("http://www.ou.edu/thumbnail.gif")))
-		assert_that(ext, has_entry('ID', is_('tag:nextthought.com,2011-10:OU-course-CLC3403LawAndJustice')))
-		assert_that(ext, has_entry('MimeType', u'application/vnd.nextthought.store.course'))
-		assert_that(ext, has_entry('Items', is_([u'tag:nextthought.com,2011-10:OU-HTML-CLC3403_LawAndJustice.clc_3403_law_and_justice'])))
-		assert_that(ext, has_entry('StartDate', is_('2013-05-11')))
