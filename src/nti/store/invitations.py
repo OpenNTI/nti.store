@@ -17,18 +17,17 @@ import zc.intid as zc_intid
 from zope import component
 from zope import interface
 
-from nti.appserver.invitations import interfaces as invite_interfaces
+# TODO: remove dep from nti.appserver
+from nti.appserver.invitations.interfaces import IInvitation
 from nti.appserver.invitations.invitation import JoinEntitiesInvitation
-
-from nti.dataserver.users import User
-from nti.dataserver import interfaces as nti_interfaces
 
 from nti.externalization import integer_strings
 
-from . import interfaces as store_interfaces
+from . import get_user
 
-interface.alsoProvides(store_interfaces.IStorePurchaseInvitation,
-					   invite_interfaces.IInvitation)
+from .interfaces import IStorePurchaseInvitation
+
+interface.alsoProvides(IStorePurchaseInvitation, IInvitation)
 
 class InvitationCapacityExceeded(Exception):
 	"""
@@ -43,7 +42,7 @@ class InvitationAlreadyAccepted(Exception):
 	"""
 	i18n_message = _("Invitation already accepted")
 
-@interface.implementer(store_interfaces.IStorePurchaseInvitation)
+@interface.implementer(IStorePurchaseInvitation)
 class _StorePurchaseInvitation(JoinEntitiesInvitation):
 
 	def __init__(self, code, purchase):
@@ -62,8 +61,7 @@ class _StorePurchaseInvitation(JoinEntitiesInvitation):
 			raise InvitationCapacityExceeded()
 
 	def accept(self, user):
-		user = User.get_user(str(user)) \
-		if not nti_interfaces.IUser.providedBy(user) else user
+		user = get_user(user)
 		super(_StorePurchaseInvitation, self).accept(user)
 
 def get_invitation_code(purchase, registry=component):
@@ -76,8 +74,8 @@ def get_invitation_code(purchase, registry=component):
 
 def get_purchase_by_code(code, registry=component):
 	if code is not None:
+		__traceback_info__ = code
 		iid = integer_strings.from_external_string(code)
-		__traceback_info__ = code, iid
 		result = registry.getUtility(zc_intid.IIntIds).queryObject(iid)
 		return result
 	return None
