@@ -55,8 +55,12 @@ from .interfaces import PA_STATE_CANCELED
 
 from .interfaces import IPurchaseAttempt
 from .interfaces import IRedeemedPurchaseAttempt
-from .interfaces import IEnrollmentPurchaseAttempt
 from .interfaces import IInvitationPurchaseAttempt
+
+from nti.deprecated import hiding_warnings
+with hiding_warnings():
+	from .interfaces import IEnrollmentPurchaseAttempt
+
 
 @total_ordering
 @interface.implementer(ICreated,
@@ -73,7 +77,7 @@ class PurchaseAttempt(ModDateTrackingObject,
 	__metaclass__ = MetaStoreObject
 	__external_class_name__ = "PurchaseAttempt"
 	mime_type = mimeType = MIME_BASE + b'purchaseattempt'
-		
+
 	createDirectFieldProperties(IPurchaseAttempt)
 
 	@property
@@ -142,7 +146,7 @@ class PurchaseAttempt(ModDateTrackingObject,
 class InvitationPurchaseAttempt(PurchaseAttempt):
 
 	mime_type = mimeType = MIME_BASE + b'invitationpurchaseattempt'
-	
+
 	def __init__(self, *args, **kwargs):
 		super(PurchaseAttempt, self).__init__(*args, **kwargs)
 		self._consumers = BTrees.OOBTree.OOBTree()
@@ -181,9 +185,9 @@ class InvitationPurchaseAttempt(PurchaseAttempt):
 		return self.id
 
 @interface.implementer(IRedeemedPurchaseAttempt)
-class RedeemedPurchaseAttempt(PurchaseAttempt):	
+class RedeemedPurchaseAttempt(PurchaseAttempt):
 	mime_type = mimeType = MIME_BASE + b'redeemedpurchaseattempt'
-		
+
 	RedemptionCode = FP(IRedeemedPurchaseAttempt['RedemptionCode'])
 	RedemptionTime = FP(IRedeemedPurchaseAttempt['RedemptionTime'])
 
@@ -196,7 +200,7 @@ def get_currencies(purchase):
 def get_purchasables(purchase):
 	return get_purchasables_from_order(purchase.Order)
 
-def create_purchase_attempt(order, processor, state=None, description=None, 
+def create_purchase_attempt(order, processor, state=None, description=None,
 							start_time=None):
 	state = state or PA_STATE_UNKNOWN
 	start_time = start_time if start_time else time.time()
@@ -227,7 +231,7 @@ from zope.deprecation import deprecated
 
 deprecated("EnrollmentPurchaseAttempt", "use proper course enrollment")
 @interface.implementer(IEnrollmentPurchaseAttempt)
-class EnrollmentPurchaseAttempt(PurchaseAttempt):	
+class EnrollmentPurchaseAttempt(PurchaseAttempt):
 	mime_type = mimeType = MIME_BASE + b'enrollmentpurchaseattempt'
 	Processor = FP(IEnrollmentPurchaseAttempt['Processor'])
 

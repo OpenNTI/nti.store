@@ -21,15 +21,17 @@ from .course import get_course
 from .purchase_order import create_purchase_item
 from .purchase_order import create_purchase_order
 
-from .purchase_attempt import create_enrollment_attempt
-
 from .purchase_history import remove_purchase_attempt
 from .purchase_history import register_purchase_attempt
 from .purchase_history import get_purchase_history_by_item
 
-from .interfaces import IEnrollmentPurchaseAttempt
-from .interfaces import EnrollmentAttemptSuccessful
-from .interfaces import UnenrollmentAttemptSuccessful
+
+from nti.deprecated import hiding_warnings
+with hiding_warnings():
+	from .purchase_attempt import create_enrollment_attempt
+	from .interfaces import IEnrollmentPurchaseAttempt
+	from .interfaces import EnrollmentAttemptSuccessful
+	from .interfaces import UnenrollmentAttemptSuccessful
 
 class CourseNotFoundException(Exception):
 	pass

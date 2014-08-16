@@ -27,6 +27,12 @@ from . import purchase_attempt
 from . import purchase_history
 from . import interfaces as store_interfaces
 
+from nti.deprecated import hiding_warnings
+with hiding_warnings():
+	from .interfaces import IEnrollmentAttemptSuccessful
+	from .interfaces import IUnenrollmentAttemptSuccessful
+
+
 def _update_state(purchase, state):
 	if purchase is not None:
 		purchase.updateLastMod()
@@ -65,7 +71,7 @@ def _dynamic_memberships(purchase, join=True):
 				creator.stop_following(comm)
 	return names
 
-@component.adapter(store_interfaces.IEnrollmentAttemptSuccessful)
+@component.adapter(IEnrollmentAttemptSuccessful)
 def _enrollment_attempt_successful(event):
 	purchase = event.object
 	purchase.EndTime = time.time()
@@ -97,7 +103,7 @@ def _return_items(purchase, user=None, remove_roles=True):
 		lib_items = purchasable.get_content_items(purchase.Items)
 		content_roles.remove_users_content_roles(user, lib_items)
 
-@component.adapter(store_interfaces.IUnenrollmentAttemptSuccessful)
+@component.adapter(IUnenrollmentAttemptSuccessful)
 def _unenrollment_attempt_successful(event):
 	purchase = event.object
 	purchase.EndTime = time.time()

@@ -30,8 +30,12 @@ from .utils import to_frozenset
 from .purchasable import Purchasable
 from .purchasable import get_purchasable
 
-from .interfaces import ICourse
 from .interfaces import IPurchasable
+
+from nti.deprecated import hiding_warnings
+with hiding_warnings():
+	from .interfaces import ICourse
+
 
 @interface.implementer(ICourse)
 @WithRepr
@@ -40,9 +44,9 @@ class Course(Purchasable):
 	createDirectFieldProperties(ICourse)
 	Description = AdaptingFieldProperty(IPurchasable['Description'])
 
-def create_course(ntiid, name=None, provider=None, amount=None, currency=None, 
-				  items=(), fee=None, title=None, license_=None, author=None, 
-				  description=None, icon=None, thumbnail=None, discountable=False, 
+def create_course(ntiid, name=None, provider=None, amount=None, currency=None,
+				  items=(), fee=None, title=None, license_=None, author=None,
+				  description=None, icon=None, thumbnail=None, discountable=False,
 				  bulk_purchase=False, communities=(), featured=False, preview=False,
 				  department=None, signature=None, startdate=None, **kwargs):
 
