@@ -16,7 +16,7 @@ from zope import interface
 from zope.mimetype.interfaces import IContentTypeAware
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
-from nti.externalization.externalization import WithRepr
+from nti.externalization.representation import WithRepr
 
 from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured

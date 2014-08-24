@@ -17,7 +17,7 @@ import dateutil.parser
 from zope import component
 from zope import interface
 
-from nti.externalization.externalization import WithRepr
+from nti.externalization.representation import WithRepr
 
 from nti.ntiids import interfaces as nid_interfaces
 

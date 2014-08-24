@@ -23,7 +23,7 @@ from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 from nti.dataserver.interfaces import ICreated
 from nti.dataserver.datastructures import ModDateTrackingObject
 
-from nti.externalization.externalization import WithRepr
+from nti.externalization.representation import WithRepr
 from nti.externalization.oids import to_external_ntiid_oid
 
 from nti.mimetype.mimetype import MIME_BASE

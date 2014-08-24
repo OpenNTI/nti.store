@@ -26,7 +26,7 @@ from nti.dataserver.interfaces import EVERYONE_USER_NAME
 
 from nti.dataserver.datastructures import PersistentCreatedModDateTrackingObject
 
-from nti.externalization.externalization import WithRepr
+from nti.externalization.representation import WithRepr
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import LocatedExternalList
 

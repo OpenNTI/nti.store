@@ -16,7 +16,7 @@ from zope import interface
 from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
-from nti.externalization.externalization import WithRepr
+from nti.externalization.representation import WithRepr
 
 from nti.utils.property import Lazy
 
