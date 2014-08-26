@@ -38,7 +38,11 @@
 	<subscriber factory=".decorators.StripePricedItemDecorator"
 				for=".interfaces.IStripePricedItem"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
-				
+			
+	<subscriber factory=".decorators.PurchaseAttemptDecorator"
+				for="...interfaces.IPurchaseAttempt"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator" />
+	
 	<adapter factory=".stripe_adapters._string_purchase_error"
 			 provides=".interfaces.IStripePurchaseError"
 			 for="basestring" />

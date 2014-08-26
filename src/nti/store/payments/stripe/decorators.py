@@ -28,9 +28,11 @@ from nti.externalization.interfaces import IExternalObjectDecorator
 from ...decorators import PricedItemDecorator
 
 from ...interfaces import IPurchasable
+from ...interfaces import IPurchaseAttempt
 
 from .interfaces import IStripeConnectKey
 from .interfaces import IStripePricedItem
+from .interfaces import IStripePurchaseAttempt
 
 LINKS = StandardExternalFields.LINKS
 
@@ -60,3 +62,15 @@ class PurchasableDecorator(object):
 		if result:
 			external['StripeConnectKey'] = toExternalObject(result)
 		self.set_links(original, external)
+
+@component.adapter(IPurchaseAttempt)
+@interface.implementer(IExternalObjectDecorator)
+class PurchaseAttemptDecorator(object):
+
+	__metaclass__ = SingletonDecorator
+
+	def decorateExternalObject(self, original, external):
+		if original.Processor == 'stripe':
+			ps = IStripePurchaseAttempt(original)
+			external['TokenID'] = ps.token_id
+			external['ChargeID'] = ps.charge_id

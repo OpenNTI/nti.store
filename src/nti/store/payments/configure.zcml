@@ -6,11 +6,8 @@
 	<include package="zope.component" file="meta.zcml" />
 	<include package="zope.security" file="meta.zcml" />
 	<include package="zope.component" />
+	<include package="zope.security" />
 	
 	<include package=".stripe" file="configure.zcml" />
-	
-	<subscriber factory=".decorators.PurchaseAttemptDecorator"
-				for="..interfaces.IPurchaseAttempt"
-				provides="nti.externalization.interfaces.IExternalObjectDecorator" />
 
 </configure>
