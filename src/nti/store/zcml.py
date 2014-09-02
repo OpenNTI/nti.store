@@ -17,11 +17,9 @@ from zope import interface
 from zope.configuration import fields
 from zope.component.zcml import utility
 
-from .course import create_course
 from .purchasable import create_purchasable
 
 from .interfaces import IPurchasable
-from .interfaces import IPurchasableCourse
 
 class IRegisterPurchasableDirective(interface.Interface):
 	"""
@@ -80,27 +78,3 @@ def registerPurchasable(_context, ntiid, provider, title, description=None, amou
 	utility(_context, provides=IPurchasable, factory=factory, name=ntiid)
 	logger.debug("Purchasable '%s' has been registered", ntiid)
 
-
-def registerCourse(_context, ntiid, title, description=None, provider=None, amount=None,
-				   currency='USD', items=None, fee=None, author=None, icon=None, 
-				   thumbnail=None, license=None, discountable=False,
-				   bulk_purchase=False, name=None,
-				   # deprecated
-				   preview=False, communities=None, featured=False,
-				   department=None, signature=None, startdate=None):
-	"""
-	Register a course
-	"""
-	description = _context.info.text.strip() if description is None else description
-	factory = functools.partial(create_course, ntiid=ntiid, provider=provider, 
-								title=title, author=author, name=name, 
-								description=description, items=items, amount=amount, 
-								currency=currency, icon=icon, fee=fee, license_=license,
-								thumbnail=thumbnail, bulk_purchase=bulk_purchase,
-								# deprecated
-								preview=preview, communities=communities,
-								discountable=discountable, featured=featured, 
-								department=department, signature=signature,
-								startdate=startdate)
-	utility(_context, provides=IPurchasableCourse, factory=factory, name=ntiid)
-	logger.debug("Course '%s' has been registered", ntiid)
