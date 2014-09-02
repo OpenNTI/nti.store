@@ -93,10 +93,6 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 	elif isinstance(startdate, datetime.date):
 		startdate = startdate.isoformat()
 
-	# set defaults amount
-	amount = amount or 0.0
-	currency = currency or 'USD'
-	
 	result = PurchasableCourse(
 					NTIID=ntiid, Name=name, Provider=provider, Title=title,
 					Author=author, Items=items, Description=description, 

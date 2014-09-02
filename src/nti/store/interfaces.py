@@ -81,7 +81,7 @@ class IPurchasableCourse(IPurchasable):
 	Name = ValidTextLine(title='Course Name', required=False)
 
 	# overrides
-	Amount = Float(title="Cost amount", required=True, min=0.0, default=0.0)
+	Amount = Float(title="Cost amount", required=False, min=0.0, default=0.0)
 	Provider = ValidTextLine(title='Course provider', required=False)
 
 	# Deprecated fields

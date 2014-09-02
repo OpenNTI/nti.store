@@ -19,6 +19,7 @@ from .invitations import get_invitation_code
 
 from .interfaces import IPricedItem
 from .interfaces import IPurchaseAttempt
+from .interfaces import IPurchasableCourse
 from .interfaces import IInvitationPurchaseAttempt
 
 LINKS = StandardExternalFields.LINKS
@@ -48,3 +49,18 @@ class PricedItemDecorator(object):
 		external['Provider'] = original.Provider
 		external['Amount'] = original.Amount
 		external['Currency'] = original.Currency
+
+
+@component.adapter(IPurchasableCourse)
+@interface.implementer(IExternalObjectDecorator)
+class PurchasableCourseDecorator(object):
+
+	__metaclass__ = SingletonDecorator
+
+	def decorateExternalObject(self, original, external):
+		# remove deprecated
+		for name in ('Featured', 'Preview', 'StartDate', 'Department', 'Signature',
+					 'Communities', 'Duration', 'EndDate'):
+			value = external.get(name)
+			if value is None:
+				external.pop(name, None)
