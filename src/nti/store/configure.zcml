@@ -57,7 +57,7 @@
 	<utility factory=".pricing.DefaultPurchasablePricer" />
 
 	<utility factory=".course._CourseResolver" name="course" />
-	<utility factory=".course._CourseResolver" name="purchasable_course" />
+	<utility factory=".course._CourseResolver" name="purchasablecourse" />
 	<utility factory=".purchasable._PurchasableResolver" name="purchasable" />
 	
 	<!-- Externalization -->
