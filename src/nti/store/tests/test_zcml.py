@@ -17,7 +17,7 @@ from zope.component.hooks import site
 
 from nti.appserver.policies.sites import BASECOPPA
 
-from nti.dataserver.site import _TrivialSite
+from nti.site.transient import TrivialSite
 
 from nti.store.interfaces import IPurchasable
 
@@ -70,16 +70,17 @@ class TestZcml(nti.testing.base.ConfiguringTestBase):
 
 	def test_site_registration_and_complex_description(self):
 
+		name = "tag:nextthought.com,2011-10:PRMIA-purchasable-RiskCourse"
+		
 		self.configure_packages(('nti.contentfragments',))
+
 		self.configure_string(ZCML_STRING)
 		assert_that(BASECOPPA.__bases__, is_((component.globalSiteManager,)))
-
-		assert_that(component.queryUtility(IPurchasable,
-										   name="tag:nextthought.com,2011-10:PRMIA-purchasable-RiskCourse"),
+		assert_that(component.queryUtility(IPurchasable, name=name),
 				    is_(none()))
 
-		with site(_TrivialSite(BASECOPPA)):
-			pur = component.getUtility(IPurchasable, name="tag:nextthought.com,2011-10:PRMIA-purchasable-RiskCourse")
+		description = "also here is some text\n\t\t& some more text\n\t\t\n\t\t<p>html paragraph</p>\n\t\t<div class='foo'>html div</div>"
+		with site(TrivialSite(BASECOPPA)):
+			pur = component.getUtility(IPurchasable, name=name)
 			assert_that(pur, verifiably_provides(IPurchasable))
-			assert_that(pur, has_property('Description',
-										  "also here is some text\n\t\t& some more text\n\t\t\n\t\t<p>html paragraph</p>\n\t\t<div class='foo'>html div</div>"))
+			assert_that(pur, has_property('Description', description))

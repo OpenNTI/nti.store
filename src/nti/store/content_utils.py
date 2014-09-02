@@ -12,9 +12,13 @@ from zope import component
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
+def get_library(library=None, registry=component):
+    if library is None:
+        return registry.queryUtility(IContentPackageLibrary)
+    return library
+                     
 def get_paths(ntiid, library=None, registry=component):
-    library = registry.queryUtility(IContentPackageLibrary) \
-              if library is None else library
+    library = get_library(registry=registry)
     paths = library.pathToNTIID(ntiid) if library and ntiid else ()
     return paths or ()
 

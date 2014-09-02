@@ -11,28 +11,32 @@ logger = __import__('logging').getLogger(__name__)
 from zope import interface
 from zope import component
 
-from nti.externalization import interfaces as ext_interfaces
 from nti.externalization.singleton import SingletonDecorator
+from nti.externalization.interfaces import StandardExternalFields
+from nti.externalization.interfaces import IExternalObjectDecorator
 
-from . import invitations
-from . import interfaces as store_interfaces
+from .invitations import get_invitation_code
 
-LINKS = ext_interfaces.StandardExternalFields.LINKS
+from .interfaces import IPricedItem
+from .interfaces import IPurchaseAttempt
+from .interfaces import IInvitationPurchaseAttempt
 
-@component.adapter(store_interfaces.IPurchaseAttempt)
-@interface.implementer(ext_interfaces.IExternalObjectDecorator)
+LINKS = StandardExternalFields.LINKS
+
+@component.adapter(IPurchaseAttempt)
+@interface.implementer(IExternalObjectDecorator)
 class PurchaseAttemptDecorator(object):
 
 	__metaclass__ = SingletonDecorator
 
 	def decorateExternalObject(self, original, external):
-		if store_interfaces.IInvitationPurchaseAttempt.providedBy(original):
-			code = invitations.get_invitation_code(original)
+		if IInvitationPurchaseAttempt.providedBy(original):
+			code = get_invitation_code(original)
 			external['InvitationCode'] = code
 			external['RemainingInvitations'] = original.tokens
 
-@component.adapter(store_interfaces.IPricedItem)
-@interface.implementer(ext_interfaces.IExternalObjectDecorator)
+@component.adapter(IPricedItem)
+@interface.implementer(IExternalObjectDecorator)
 class PricedItemDecorator(object):
 
 	__metaclass__ = SingletonDecorator

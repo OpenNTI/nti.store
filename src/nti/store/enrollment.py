@@ -25,7 +25,6 @@ from .purchase_history import remove_purchase_attempt
 from .purchase_history import register_purchase_attempt
 from .purchase_history import get_purchase_history_by_item
 
-
 from nti.deprecated import hiding_warnings
 with hiding_warnings():
 	from .purchase_attempt import create_enrollment_attempt

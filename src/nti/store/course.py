@@ -16,6 +16,8 @@ import dateutil.parser
 
 from zope import component
 from zope import interface
+from zope.deprecation.deprecation import deprecated
+from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from nti.externalization.representation import WithRepr
 
@@ -30,30 +32,55 @@ from .utils import to_frozenset
 from .purchasable import Purchasable
 from .purchasable import get_purchasable
 
-from .interfaces import IPurchasable
+from .interfaces import IPurchasableCourse
 
-from nti.deprecated import hiding_warnings
-with hiding_warnings():
-	from .interfaces import ICourse
-
-
-@interface.implementer(ICourse)
+@interface.implementer(IPurchasableCourse)
 @WithRepr
 @EqHash('NTIID',)
-class Course(Purchasable):
-	createDirectFieldProperties(ICourse)
-	Description = AdaptingFieldProperty(IPurchasable['Description'])
+class PurchasableCourse(Purchasable):
+	createDirectFieldProperties(IPurchasableCourse)
+	Description = AdaptingFieldProperty(IPurchasableCourse['Description'])
 
-def create_course(ntiid, name=None, provider=None, amount=None, currency=None,
+	# deprecated properties
+	
+	Featured = FP(IPurchasableCourse['Featured'])
+	Featured = deprecated(Featured, 'Featured is not longer used in this context')
+	
+	Preview = FP(IPurchasableCourse['Preview'])
+	Preview = deprecated(Preview, 'Preview is not longer used in this context')
+		
+	Department = FP(IPurchasableCourse['Department'])
+	Department = deprecated(Department, 'Department is not longer used in this context')
+	
+	Signature = FP(IPurchasableCourse['Signature'])
+	Signature = deprecated(Signature, 'Signature is not longer used in this context')
+	
+	Communities = FP(IPurchasableCourse['Communities'])
+	Communities = deprecated(Communities, 'Communities is not longer used in this context')
+	
+	StartDate = FP(IPurchasableCourse['StartDate'])
+	StartDate = deprecated(StartDate, 'StartDate is not longer used in this context')
+	
+	Duration = FP(IPurchasableCourse['Duration'])
+	Duration = deprecated(Duration, 'Duration is not longer used in this context')
+	
+	EndDate = FP(IPurchasableCourse['EndDate'])
+	EndDate = deprecated(EndDate, 'EndDate is not longer used in this context')
+
+Course = PurchasableCourse # alias BWC
+
+def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 				  items=(), fee=None, title=None, license_=None, author=None,
 				  description=None, icon=None, thumbnail=None, discountable=False,
-				  bulk_purchase=False, communities=(), featured=False, preview=False,
+				  bulk_purchase=False, 
+				  # deprecated
+				  communities=None, featured=False, preview=False,
 				  department=None, signature=None, startdate=None, **kwargs):
 
-	if amount and not provider:
+	if amount is not None and not provider:
 		raise AssertionError("Must specfify a provider")
 
-	if amount and not currency:
+	if amount is not None and not currency:
 		raise AssertionError("Must specfify a currency")
 
 	fee = float(fee) if fee is not None else None
@@ -66,11 +93,18 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency=None,
 	elif isinstance(startdate, datetime.date):
 		startdate = startdate.isoformat()
 
-	result = Course(NTIID=ntiid, Name=name, Provider=provider, Title=title,
-					Author=author, Items=items, Description=description, Amount=amount,
-					Currency=currency, Preview=preview, Fee=fee, License=license_,
+	# set defaults amount
+	amount = amount or 0.0
+	currency = currency or 'USD'
+	
+	result = PurchasableCourse(
+					NTIID=ntiid, Name=name, Provider=provider, Title=title,
+					Author=author, Items=items, Description=description, 
+					Amount=amount, Currency=currency, Fee=fee, License=license_,
 					Discountable=discountable, BulkPurchase=bulk_purchase, Icon=icon,
-					Thumbnail=thumbnail, Communities=communities, Featured=featured,
+					Thumbnail=thumbnail, 
+					# deprecated
+					Preview=preview, Communities=communities, Featured=featured,
 					Department=department, Signature=signature, StartDate=startdate,
 					**kwargs)
 

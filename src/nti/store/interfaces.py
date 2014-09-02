@@ -77,28 +77,32 @@ class IPurchasable(IContentBundle):
 	License = ValidTextLine(title='Purchasable license', required=False)
 	Public = Bool(title="Public flag", required=False, default=False)
 
-deprecated('ICourse', 'Use new course specification')
-class ICourse(IPurchasable):
+class IPurchasableCourse(IPurchasable):
 	Name = ValidTextLine(title='Course Name', required=False)
+
+	# overrides
+	Amount = Float(title="Cost amount", required=True, min=0.0, default=0.0)
+	Provider = ValidTextLine(title='Course provider', required=False)
+
+	# Deprecated fields
 	Featured = Bool(title='Featured flag', required=False, default=False)
+		
 	Preview = Bool(title='Course preview flag', required=False)
 	StartDate = ValidTextLine(title="Course start date", required=False)
 	Department = ValidTextLine(title='Course Department', required=False)
+	
 	Signature = ValidText(title='Course/Professor Signature', required=False)
 	Communities = FrozenSet(value_type=ValidTextLine(title='The community identifier'),
-							title="Communities")
-	# overrides
-	Amount = Float(title="Cost amount", required=False, min=0.0)
-	Currency = ValidTextLine(title='Currency amount', required=False)
-	Provider = ValidTextLine(title='Course provider', required=False)
-
-	# Temporary BWC to match CourseCatalogEntry
+							title="Communities", required=False)
+	
 	Duration = Timedelta(title="The length of the course",
 						 description="Currently optional, may be None",
 						 required=False)
+	
 	EndDate = Datetime(title="The date on which the course ends",
-					   description="Currently optional; a missing value means the course has no defined end date.",
 					   required=False)
+
+ICourse = IPurchasableCourse # alias BWC
 
 class IPriceable(interface.Interface):
 	NTIID = ValidTextLine(title='Purchasable item NTTID', required=True)
