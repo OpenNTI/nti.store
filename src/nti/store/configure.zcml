@@ -57,8 +57,9 @@
 	<utility factory=".pricing.DefaultPurchasablePricer" />
 
 	<utility factory=".course._CourseResolver" name="course" />
+	<utility factory=".course._CourseResolver" name="purchasable_course" />
 	<utility factory=".purchasable._PurchasableResolver" name="purchasable" />
-
+	
 	<!-- Externalization -->
 	
 	<include package="nti.externalization" file="meta.zcml" />
