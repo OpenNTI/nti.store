@@ -98,6 +98,10 @@ def update_user_purchase_data(user, intids=None):
 			if _hard_removal(index, queried, intids):
 				removed_count += 1
 
+	history = IPurchaseHistory(user)
+	if len(history) == 0: # no history remove
+		del annotations[annotation_key]
+	
 	logger.debug("%s updated=%s, removed=%s", user, update_count, removed_count)
 	return (update_count, removed_count) 
 
