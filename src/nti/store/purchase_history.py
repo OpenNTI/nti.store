@@ -47,7 +47,7 @@ from .interfaces import IPurchaseHistory
 from .purchase_attempt import create_purchase_attempt
 create_purchase_attempt = create_purchase_attempt # rexport
 
-def _check_valid(p, uid, purchasable_id=None, intids=None):
+def _check_valid(p, uid, purchasable_id=None, intids=None, debug=True):
 	if not IPurchaseAttempt.providedBy(p):
 		return False
 
@@ -65,7 +65,10 @@ def _check_valid(p, uid, purchasable_id=None, intids=None):
 		except KeyError:
 			# It looks like queryId can hide the POSKeyError
 			# by generally catching KeyError
-			logger.exception("Broken object %r", p)
+			if debug:
+				logger.exception("Broken object %r", p)
+			else:
+				logger.error("Broken object %r", p)
 		logger.warn("Found inconsistent purchase attempt for " +
 					"purchasable %s, ignoring: %r (%s %s). ids (%s, %s)",
 					purchasable_id, p, getattr(p, '__class__', None),
