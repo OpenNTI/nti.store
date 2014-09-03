@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Stripe externalization
-
 .. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
@@ -15,20 +13,21 @@ import six
 from zope import interface
 from zope import component
 
-from nti.externalization import interfaces as ext_interfaces
+from nti.externalization .interfaces import IExternalObject
 from nti.externalization.interfaces import IInternalObjectIO
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.datastructures import InterfaceObjectIO
 
-from . import interfaces as stripe_interfaces
+from .interfaces import IStripeCoupon
+from . interfaces import IStripePurchaseError
 
 def _makenone(s):
 	if isinstance(s, six.string_types) and s == 'None':
 		s = None
 	return s
 
-@interface.implementer(ext_interfaces.IExternalObject)
-@component.adapter(stripe_interfaces.IStripeCoupon)
+@interface.implementer(IExternalObject)
+@component.adapter(IStripeCoupon)
 class StripeCouponExternalizer(object):
 
 	__slots__ = ('coupon',)
@@ -57,7 +56,7 @@ class StripeCouponExternalizer(object):
 		return result
 
 @interface.implementer(IInternalObjectIO)
-@component.adapter(stripe_interfaces.IStripePurchaseError)
+@component.adapter(IStripePurchaseError)
 class StripePurchaseErrorExternal(InterfaceObjectIO):
-	_ext_iface_upper_bound = stripe_interfaces.IStripePurchaseError
+	_ext_iface_upper_bound = IStripePurchaseError
 

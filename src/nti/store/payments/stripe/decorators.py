@@ -21,6 +21,8 @@ from ...decorators import PricedItemDecorator
 
 from ...interfaces import IPurchaseAttempt
 
+from . import STRIPE
+
 from .interfaces import IStripePricedItem
 from .interfaces import IStripePurchaseAttempt
 
@@ -38,7 +40,7 @@ class PurchaseAttemptDecorator(object):
 	__metaclass__ = SingletonDecorator
 
 	def decorateExternalObject(self, original, external):
-		if original.Processor == 'stripe':
+		if original.Processor == STRIPE:
 			ps = IStripePurchaseAttempt(original)
 			external['TokenID'] = ps.token_id
 			external['ChargeID'] = ps.charge_id

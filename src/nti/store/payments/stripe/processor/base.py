@@ -12,6 +12,8 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import component
 
+from .. import STRIPE
+
 from ..stripe_io import StripeIO
 
 from ..interfaces import IStripeConnectKey
@@ -20,7 +22,7 @@ from ....purchase_attempt import get_providers
 
 class BaseProcessor(StripeIO):
 
-	name = 'stripe'
+	name = STRIPE
 
 	def get_api_key(self, purchase):
 		providers = get_providers(purchase)

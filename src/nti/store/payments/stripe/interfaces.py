@@ -20,8 +20,15 @@ from nti.schema.field import ValidTextLine
 
 from nti.utils.property import alias as _alias
 
-from .. import interfaces as pay_interfaces
-from ... import interfaces as store_interfaces
+from ..interfaces import RegisterPurchaseData
+from ..interfaces import IRegisterPurchaseData
+
+from ...interfaces import IPriceable
+from ...interfaces import IPricedItem
+from ...interfaces import IPurchaseItem
+from ...interfaces import IPurchaseError
+from ...interfaces import IPurchaseOrder
+from ...interfaces import IPaymentProcessor
 
 # stripe marker interfaces
 
@@ -69,11 +76,11 @@ class IStripeCustomerDeleted(IStripeCustomerCreated):
 class StripeCustomerDeleted(StripeCustomerCreated):
 	pass
 
-class IRegisterStripeToken(pay_interfaces.IRegisterPurchaseData):
+class IRegisterStripeToken(IRegisterPurchaseData):
 	token = ValidTextLine(title="The token identifier")
 
 @interface.implementer(IRegisterStripeToken)
-class RegisterStripeToken(pay_interfaces.RegisterPurchaseData):
+class RegisterStripeToken(RegisterPurchaseData):
 
 	def __init__(self, purchase, token_id):
 		super(RegisterStripeToken, self).__init__(purchase)
@@ -81,11 +88,11 @@ class RegisterStripeToken(pay_interfaces.RegisterPurchaseData):
 
 	token = _alias('token_id')
 
-class IRegisterStripeCharge(pay_interfaces.IRegisterPurchaseData):
+class IRegisterStripeCharge(IRegisterPurchaseData):
 	charge_id = ValidTextLine(title="The charge identifier")
 
 @interface.implementer(IRegisterStripeCharge)
-class RegisterStripeCharge(pay_interfaces.RegisterPurchaseData):
+class RegisterStripeCharge(RegisterPurchaseData):
 
 	def __init__(self, purchase, charge_id):
 		super(RegisterStripeCharge, self).__init__(purchase)
@@ -106,7 +113,7 @@ class IStripeConnectKey(interface.Interface):
 	PublicKey = ValidTextLine(title="The private key", required=False)
 	StripeUserID = ValidTextLine(title="String user id", required=False)
 
-class IStripePurchaseError(store_interfaces.IPurchaseError):
+class IStripePurchaseError(IPurchaseError):
 	HttpStatus = Int(title='HTTP Status', required=False)
 	Param = ValidTextLine(title="Optional parameter", required=False)
 
@@ -119,7 +126,7 @@ class IStripeCustomer(interface.Interface):
 	Charges = Set(value_type=ValidTextLine(title='the charge id'),
 				  title='customer stripe charges')
 
-class IStripePaymentProcessor(store_interfaces.IPaymentProcessor):
+class IStripePaymentProcessor(IPaymentProcessor):
 
 	def create_token(customer_id=None, number=None, exp_month=None, exp_year=None,
 					 cvc=None, api_key=None, **kwargs):
@@ -162,14 +169,14 @@ class IStripePaymentProcessor(store_interfaces.IPaymentProcessor):
 		:trx_id Transaction id
 		"""
 		
-class IStripePriceable(store_interfaces.IPriceable):
+class IStripePriceable(IPriceable):
 	Coupon = ValidTextLine(title='the coupon', required=False)
 
-class IStripePurchaseItem(IStripePriceable, store_interfaces.IPurchaseItem):
+class IStripePurchaseItem(IStripePriceable, IPurchaseItem):
 	pass
 
-class IStripePurchaseOrder(store_interfaces.IPurchaseOrder):
+class IStripePurchaseOrder(IPurchaseOrder):
 	Coupon = ValidTextLine(title='the coupon', required=False)
 
-class IStripePricedItem(store_interfaces.IPricedItem):
+class IStripePricedItem(IPricedItem):
 	Coupon = Object(interface.Interface, title='the coupon', required=False)

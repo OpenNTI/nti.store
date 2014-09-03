@@ -15,8 +15,9 @@ from dolmen.builtins import IString, IUnicode
 from ... import MessageFactory
 
 from .interfaces import IStripeException
-
 from .stripe_error import StripePurchaseError # re-export
+
+STRIPE = u"stripe"
 
 @interface.implementer(IStripeException)
 class StripeException(Exception):
