@@ -24,13 +24,14 @@ from nti.dataserver.interfaces import ICreated
 from nti.dataserver.datastructures import ModDateTrackingObject
 
 from nti.externalization.representation import WithRepr
-from nti.externalization.oids import to_external_ntiid_oid
 
 from nti.mimetype.mimetype import MIME_BASE
 
 from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
+
+from nti.utils.property import alias
 
 from nti.zodb import minmax
 from nti.zodb.persistentproperty import PersistentPropertyHolder
@@ -57,11 +58,6 @@ from .interfaces import IPurchaseAttempt
 from .interfaces import IRedeemedPurchaseAttempt
 from .interfaces import IInvitationPurchaseAttempt
 
-from nti.deprecated import hiding_warnings
-with hiding_warnings():
-	from .interfaces import IEnrollmentPurchaseAttempt
-
-
 @total_ordering
 @interface.implementer(ICreated,
 					   IPurchaseAttempt,
@@ -80,6 +76,8 @@ class PurchaseAttempt(ModDateTrackingObject,
 
 	createDirectFieldProperties(IPurchaseAttempt)
 
+	id = alias('__name__')
+	
 	@property
 	def Items(self):
 		return self.Order.NTIIDs
@@ -87,10 +85,6 @@ class PurchaseAttempt(ModDateTrackingObject,
 	@property
 	def Quantity(self):
 		return self.Order.Quantity
-
-	@property
-	def id(self):
-		return unicode(to_external_ntiid_oid(self))
 
 	@property
 	def creator(self):
@@ -229,17 +223,12 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, redemption_time=
 
 from zope.deprecation import deprecated
 
+from nti.deprecated import hiding_warnings
+with hiding_warnings():
+	from .interfaces import IEnrollmentPurchaseAttempt
+
 deprecated("EnrollmentPurchaseAttempt", "use proper course enrollment")
 @interface.implementer(IEnrollmentPurchaseAttempt)
 class EnrollmentPurchaseAttempt(PurchaseAttempt):
 	mime_type = mimeType = MIME_BASE + b'enrollmentpurchaseattempt'
 	Processor = FP(IEnrollmentPurchaseAttempt['Processor'])
-
-deprecated("create_enrollment_attempt", "no longer used")
-def create_enrollment_attempt(order, processor=None, description=None, start_time=None):
-	state = PA_STATE_SUCCESS
-	start_time = start_time if start_time else time.time()
-	result = EnrollmentPurchaseAttempt(Order=order, Processor=processor,
-									   Description=description, State=state,
-									   StartTime=float(start_time))
-	return result

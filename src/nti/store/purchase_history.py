@@ -28,6 +28,7 @@ from persistent import Persistent
 
 from nti.dataserver.interfaces import IUser
 
+from nti.externalization.oids import to_external_ntiid_oid
 from nti.externalization.interfaces import LocatedExternalList
 
 from nti.ntiids import ntiids
@@ -123,9 +124,10 @@ class _PurchaseIndex(Persistent):
 	
 	def add(self, purchase):
 		iid = self._intids.getId(purchase)
-		self._addToIntIdIndex(iid)
+		result = self._addToIntIdIndex(iid)
 		self._addToItemIndex(purchase.Items, iid)
 		self._addToTimeIndex(purchase.StartTime, iid)
+		return result
 
 	# removal
 	
@@ -246,7 +248,7 @@ class PurchaseHistory(Contained, Persistent):
 	def register_purchase(self, purchase):
 		# locate before firing events
 		locate(purchase, self)
-		# add to connection b4 firing event
+		# add to connection before firing event
 		owner_jar = getattr(self, '_p_jar', None)
 		if owner_jar and getattr(purchase, '_p_jar', None) is None:
 			owner_jar.add(purchase)
@@ -254,8 +256,8 @@ class PurchaseHistory(Contained, Persistent):
 		lifecycleevent.created(purchase)
 		lifecycleevent.added(purchase)  # get an iid
 		self._index.add(purchase)
-		# set __name__
-		purchase.__name__ = purchase.id
+		# set id/__name__
+		purchase.id = unicode(to_external_ntiid_oid(purchase))
 
 	add_purchase = register_purchase
 

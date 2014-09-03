@@ -12,6 +12,10 @@ from hamcrest import none
 from hamcrest import not_none
 from hamcrest import has_length
 from hamcrest import assert_that
+from hamcrest import has_property
+
+import zope.intid
+from zope import component
 
 import time
 import unittest
@@ -64,15 +68,19 @@ class TestPurchaseHistory(unittest.TestCase):
 	@WithMockDSTrans
 	def test_purchase_simple_history(self):
 		user = self._create_user()
-		hist = IPurchaseHistory(user)
+		hist = IPurchaseHistory(user, None)
 		assert_that(hist, is_(not_none()))
+		assert_that(hist, has_property('__parent__', is_(user)))
 
 		pa_1 = self._create_purchase_attempt()
 		hist.add_purchase(pa_1)
 		assert_that(hist, has_length(1))
 
-		assert_that(pa_1.id, is_(not_none()))
-
+		oid = to_external_ntiid_oid(pa_1)
+		assert_that(pa_1, has_property('id', is_(oid)))
+		assert_that(pa_1, has_property('__name__', is_(pa_1.id)))
+		assert_that(pa_1, has_property('__parent__', is_(hist)))
+		
 		pa_2 = self._create_purchase_attempt('zky')
 		hist.add_purchase(pa_2)
 		assert_that(hist, has_length(2))
@@ -97,9 +105,23 @@ class TestPurchaseHistory(unittest.TestCase):
 		hist.add_purchase(pa_1)
 		assert_that(hist, has_length(1))
 
+		intids = component.getUtility(zope.intid.IIntIds)
+		iid = intids.queryId(pa_1)
+		assert_that(iid, is_(not_none()))
+		queried = intids.queryObject(iid)
+		assert_that(queried, is_(pa_1))
+		
 		r = hist.remove_purchase(pa_1)
 		assert_that(r, is_(True))
 		assert_that(hist, has_length(0))
+		
+		old_iid = intids.queryId(pa_1)
+		assert_that(old_iid, is_(none()))
+		queried = intids.queryObject(iid)
+		assert_that(queried, is_(none()))
+		
+		# chec after removal
+		hist._v_check()
 
 	@WithMockDSTrans
 	def test_purchase_has_history_by_item(self):
@@ -201,6 +223,10 @@ class TestPurchaseHistory(unittest.TestCase):
 			hist = _get_hist()
 			hist._v_check()
 
+			count = 0
+			for _ in hist:
+				count += 1
+			assert_that(count, is_(100))
 			assert_that(hist, has_length(100))
 
 			lst = list(hist.get_purchase_history())

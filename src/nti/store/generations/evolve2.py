@@ -18,6 +18,8 @@ from zope.annotation.interfaces import IAnnotations
 
 from nti.dataserver.interfaces import IUser
 
+from nti.externalization.oids import to_external_ntiid_oid
+
 from ..interfaces import IPurchaseHistory
 from ..interfaces import IEnrollmentAttempt
 from ..purchase_history import PurchaseHistory
@@ -39,7 +41,7 @@ def update_user_purchase_data(user, intids=None):
 			history.remove_purchase(p)	
 			removed_count +=1
 		else:
-			p.__name__ = p.id # set new name
+			p.id = to_external_ntiid_oid(p)
 			update_count += 1
 	
 	return (update_count, removed_count) 
