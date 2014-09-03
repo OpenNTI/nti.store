@@ -8,6 +8,7 @@
 	<include package="zope.component" file="meta.zcml" />
 	<include package="zope.security" file="meta.zcml" />
 	<include package="zope.component" />
+	<include package="zope.security" />
 
 	<include package="." file="stripe_objects.zcml" />
 	
@@ -61,8 +62,9 @@
 						 .interfaces.IStripePurchaseError"
 		modules=".stripe_purchase .stripe_key .stripe_error" />
 
+	<!-- Test keys -->
+
 	<configure zcml:condition="have devmode">
-		<!-- The keys included in here are only for test purposes -->
 		<include file="stripe_keys.zcml" />
 	</configure>
 

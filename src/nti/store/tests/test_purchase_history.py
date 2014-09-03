@@ -21,10 +21,20 @@ from zope.event import notify
 from nti.dataserver.users import User
 from nti.externalization.oids import to_external_ntiid_oid
 
-from nti.store import purchase_order
-from nti.store import purchase_attempt
-from nti.store import purchase_history
-from nti.store import interfaces as store_interfaces
+from nti.store.purchase_order import create_purchase_item
+from nti.store.purchase_order import create_purchase_order
+from nti.store.purchase_history import get_purchase_attempt
+from nti.store.purchase_attempt import create_purchase_attempt
+from nti.store.purchase_history import get_pending_purchase_for
+from nti.store.purchase_history import register_purchase_attempt
+
+from nti.store.interfaces import PA_STATE_STARTED
+from nti.store.interfaces import PA_STATE_SUCCESS
+from nti.store.interfaces import PA_STATE_UNKNOWN
+from nti.store.interfaces import PA_STATE_REFUNDED
+
+from nti.store.interfaces import IPurchaseHistory
+from nti.store.interfaces import PurchaseAttemptRefunded
 
 from nti.dataserver.tests import mock_dataserver
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
@@ -41,21 +51,20 @@ class TestPurchaseHistory(unittest.TestCase):
 		usr = User.create_user(self.ds, username=username, password=password)
 		return usr
 
-	def _create_purchase_attempt(self, item=u'xyz-book', quantity=None,
-								 state=store_interfaces.PA_STATE_UNKNOWN):
-		pi = purchase_order.create_purchase_item(item, 1)
+	def _create_purchase_attempt(self, item=u'xyz-book', quantity=None, state=None):
+		state = state or PA_STATE_UNKNOWN
+		pi = create_purchase_item(item, 1)
 		assert_that(hash(pi), is_(not_none()))
-		po = purchase_order.create_purchase_order(pi, quantity=quantity)
+		po = create_purchase_order(pi, quantity=quantity)
 		assert_that(hash(po), is_(not_none()))
-		pa = purchase_attempt.create_purchase_attempt(po, processor=self.processor,
-													  state=state)
+		pa = create_purchase_attempt(po, processor=self.processor, state=state)
 		assert_that(hash(pa), is_(not_none()))
 		return pa
 
 	@WithMockDSTrans
 	def test_purchase_simple_history(self):
 		user = self._create_user()
-		hist = store_interfaces.IPurchaseHistory(user, None)
+		hist = IPurchaseHistory(user)
 		assert_that(hist, is_(not_none()))
 
 		pa_1 = self._create_purchase_attempt()
@@ -83,7 +92,7 @@ class TestPurchaseHistory(unittest.TestCase):
 	@WithMockDSTrans
 	def test_purchase_remove(self):
 		user = self._create_user()
-		hist = store_interfaces.IPurchaseHistory(user, None)
+		hist = IPurchaseHistory(user)
 		pa_1 = self._create_purchase_attempt()
 		hist.add_purchase(pa_1)
 		assert_that(hist, has_length(1))
@@ -95,7 +104,7 @@ class TestPurchaseHistory(unittest.TestCase):
 	@WithMockDSTrans
 	def test_purchase_has_history_by_item(self):
 		user = self._create_user()
-		hist = store_interfaces.IPurchaseHistory(user)
+		hist = IPurchaseHistory(user)
 
 		pa_1 = self._create_purchase_attempt(quantity=5)
 		hist.add_purchase(pa_1)
@@ -121,14 +130,13 @@ class TestPurchaseHistory(unittest.TestCase):
 	@WithMockDSTrans
 	def test_pending_purchase(self):
 		user = self._create_user()
-		hist = store_interfaces.IPurchaseHistory(user, None)
+		hist = IPurchaseHistory(user, None)
 
 		item = u'xyz-book'
-		pending = self._create_purchase_attempt(item,
-												state=store_interfaces.PA_STATE_STARTED)
+		pending = self._create_purchase_attempt(item, state=PA_STATE_STARTED)
 		hist.add_purchase(pending)
 
-		pa = purchase_history.get_pending_purchase_for(user, item)
+		pa = get_pending_purchase_for(user, item)
 		assert_that(pa, is_(not_none()))
 		assert_that(pa, is_(pending))
 
@@ -136,18 +144,17 @@ class TestPurchaseHistory(unittest.TestCase):
 	def test_missing_purchase(self):
 		user = self._create_user()
 		purchase_id = u'tag:nextthought.com,2011-10:system-OID-0x06cdce28af3dc253:0000000073:XVq3tFG7T82'
-		pa = purchase_history.get_purchase_attempt(purchase_id, user)
+		pa = get_purchase_attempt(purchase_id, user)
 		assert_that(pa, is_(none()))
 
 	@WithMockDSTrans
 	def test_refund(self):
 		user = self._create_user()
 		book = 'tag:nextthought.com,2011-10:MN-HTML-MiladyCosmetology.cosmetology'
-		purchase = self._create_purchase_attempt(book,
-												 state=store_interfaces.PA_STATE_SUCCESS)
-		purchase_history.register_purchase_attempt(purchase, user)
-		notify(store_interfaces.PurchaseAttemptRefunded(purchase))
-		assert_that(purchase.State, is_(store_interfaces.PA_STATE_REFUNDED))
+		purchase = self._create_purchase_attempt(book, state=PA_STATE_SUCCESS)
+		register_purchase_attempt(purchase, user)
+		notify(PurchaseAttemptRefunded(purchase))
+		assert_that(purchase.State, is_(PA_STATE_REFUNDED))
 
 	@WithMockDSTrans
 	def test_refund_invitation_attempt(self):
@@ -155,19 +162,17 @@ class TestPurchaseHistory(unittest.TestCase):
 		user_2 = self._create_user(username='nt2@nti.com',)
 		book = 'tag:nextthought.com,2011-10:MN-HTML-MiladyCosmetology.cosmetology'
 
-		pa_1 = self._create_purchase_attempt(book, quantity=5,
-											 state=store_interfaces.PA_STATE_SUCCESS)
-		purchase_history.register_purchase_attempt(pa_1, user_1)
+		pa_1 = self._create_purchase_attempt(book, quantity=5, state=PA_STATE_SUCCESS)
+		register_purchase_attempt(pa_1, user_1)
 
-		pa_2 = self._create_purchase_attempt(book,
-											 state=store_interfaces.PA_STATE_SUCCESS)
-		purchase_history.register_purchase_attempt(pa_2, user_2)
+		pa_2 = self._create_purchase_attempt(book, state=PA_STATE_SUCCESS)
+		register_purchase_attempt(pa_2, user_2)
 
 		pa_1.register(user_2, pa_2.id)
 
-		notify(store_interfaces.PurchaseAttemptRefunded(pa_1))
-		assert_that(pa_1.State, is_(store_interfaces.PA_STATE_REFUNDED))
-		assert_that(pa_2.State, is_(store_interfaces.PA_STATE_REFUNDED))
+		notify(PurchaseAttemptRefunded(pa_1))
+		assert_that(pa_1.State, is_(PA_STATE_REFUNDED))
+		assert_that(pa_2.State, is_(PA_STATE_REFUNDED))
 
 	@mock_dataserver.WithMockDS
 	def test_purchase_history_check(self):
@@ -179,7 +184,7 @@ class TestPurchaseHistory(unittest.TestCase):
 
 		def _get_hist():
 			user = User.get_user(username)
-			hist = store_interfaces.IPurchaseHistory(user)
+			hist = IPurchaseHistory(user)
 			return hist
 
 		for i in range(0, 100):

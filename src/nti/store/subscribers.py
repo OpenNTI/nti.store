@@ -15,23 +15,29 @@ import time
 from zope import component
 from zope import lifecycleevent
 
-from nti.dataserver.users import Community
-from nti.dataserver import interfaces as nti_interfaces
-
-from nti.appserver.invitations import interfaces as invite_interfaces
+# TODO: break this dep
+from nti.appserver.invitations.interfaces import IInvitationAcceptedEvent
 
 from . import invitations
 from . import purchasable
 from . import content_roles
 from . import purchase_attempt
 from . import purchase_history
-from . import interfaces as store_interfaces
 
-from nti.deprecated import hiding_warnings
-with hiding_warnings():
-	from .interfaces import IEnrollmentAttemptSuccessful
-	from .interfaces import IUnenrollmentAttemptSuccessful
-
+from .interfaces import PA_STATE_FAILED
+from .interfaces import PA_STATE_STARTED
+from .interfaces import PA_STATE_SUCCESS
+from .interfaces import PA_STATE_DISPUTED
+from .interfaces import PA_STATE_REFUNDED
+from .interfaces import IPurchaseAttemptFailed
+from .interfaces import IPurchaseAttemptSynced
+from .interfaces import IPurchaseAttemptStarted
+from .interfaces import IPurchaseAttemptDisputed
+from .interfaces import IPurchaseAttemptRefunded
+from .interfaces import IRedeemedPurchaseAttempt
+from .interfaces import IStorePurchaseInvitation
+from .interfaces import IInvitationPurchaseAttempt
+from .interfaces import IPurchaseAttemptSuccessful
 
 def _update_state(purchase, state):
 	if purchase is not None:
@@ -39,10 +45,10 @@ def _update_state(purchase, state):
 		purchase.State = state
 		lifecycleevent.modified(purchase)
 
-@component.adapter(store_interfaces.IPurchaseAttemptStarted)
+@component.adapter(IPurchaseAttemptStarted)
 def _purchase_attempt_started(event):
 	purchase = event.object
-	_update_state(purchase, store_interfaces.PA_STATE_STARTED)
+	_update_state(purchase, PA_STATE_STARTED)
 	logger.info('%r started' % purchase)
 
 def _activate_items(purchase, user=None, add_roles=True):
@@ -52,46 +58,16 @@ def _activate_items(purchase, user=None, add_roles=True):
 		lib_items = purchasable.get_content_items(purchase.Items)
 		content_roles.add_users_content_roles(user, lib_items)
 
-def _dynamic_memberships(purchase, join=True):
-	names = set()
-	for course_id in purchase.Items:
-		course = purchasable.get_purchasable(course_id)
-		communities = getattr(course, 'Communities', ())
-		names.update(communities)
-
-	creator = purchase.creator
-	for name in names:
-		comm = Community.get_community(name)
-		if nti_interfaces.ICommunity.providedBy(comm):
-			if join:
-				creator.record_dynamic_membership(comm)
-				creator.follow(comm)
-			else:
-				creator.record_no_longer_dynamic_member(comm)
-				creator.stop_following(comm)
-	return names
-
-@component.adapter(IEnrollmentAttemptSuccessful)
-def _enrollment_attempt_successful(event):
-	purchase = event.object
-	purchase.EndTime = time.time()
-	_update_state(purchase, store_interfaces.PA_STATE_SUCCESS)
-	to_join = _dynamic_memberships(purchase)
-	_activate_items(purchase, add_roles=not to_join)
-	logger.info('%s has been enrolled in %s' % (purchase.creator, list(purchase.Items)))
-
-@component.adapter(store_interfaces.IPurchaseAttemptSuccessful)
+@component.adapter(IPurchaseAttemptSuccessful)
 def _purchase_attempt_successful(event):
 	purchase = event.object
 	purchase.EndTime = time.time()
-	_update_state(purchase, store_interfaces.PA_STATE_SUCCESS)
+	_update_state(purchase, PA_STATE_SUCCESS)
 
 	# if not register invitation
 	if not purchase.Quantity:
 		_activate_items(purchase)
-	if store_interfaces.IEnrollmentPurchaseAttempt.providedBy(purchase):
-		# legacy if block, ensure never hit
-		raise AssertionError("Should not be able to get here")
+	
 	logger.info('%r completed successfully', purchase.id)
 
 def _return_items(purchase, user=None, remove_roles=True):
@@ -103,60 +79,49 @@ def _return_items(purchase, user=None, remove_roles=True):
 		lib_items = purchasable.get_content_items(purchase.Items)
 		content_roles.remove_users_content_roles(user, lib_items)
 
-@component.adapter(IUnenrollmentAttemptSuccessful)
-def _unenrollment_attempt_successful(event):
-	purchase = event.object
-	purchase.EndTime = time.time()
-	to_exit = _dynamic_memberships(purchase, False)
-	_return_items(purchase, remove_roles=not to_exit)
-	logger.info('%s has been unenrolled from %s' % (purchase.creator, list(purchase.Items)))
-
-@component.adapter(store_interfaces.IPurchaseAttemptRefunded)
+@component.adapter(IPurchaseAttemptRefunded)
 def _purchase_attempt_refunded(event):
 	purchase = event.object
-	if store_interfaces.IEnrollmentPurchaseAttempt.providedBy(purchase):
-		# legacy if block, ensure never hit
-		raise AssertionError("Should not be able to get here")
 
 	purchase.EndTime = time.time()
-	_update_state(purchase, store_interfaces.PA_STATE_REFUNDED)
+	_update_state(purchase, PA_STATE_REFUNDED)
 
-	if store_interfaces.IInvitationPurchaseAttempt.providedBy(purchase):
+	if IInvitationPurchaseAttempt.providedBy(purchase):
 		# set all tokens to zero
 		purchase.reset()
 		# return all items from linked purchases (redemptions) and refund them
 		for username, pid in purchase.consumerMap().items():
 			p = purchase_history.get_purchase_attempt(pid)
 			_return_items(p, username)
-			_update_state(p, store_interfaces.PA_STATE_REFUNDED)
+			_update_state(p, PA_STATE_REFUNDED)
 
 	elif not purchase.Quantity:
 		_return_items(purchase, purchase.creator)
 
 	# return consumed token
-	if store_interfaces.IRedeemedPurchaseAttempt.providedBy(purchase):
+	if IRedeemedPurchaseAttempt.providedBy(purchase):
 		code = purchase.RedemptionCode
 		p = invitations.get_purchase_by_code(code)
-		if store_interfaces.IInvitationPurchaseAttempt.providedBy(p):
+		if IInvitationPurchaseAttempt.providedBy(p):
 			p.restore_token()
 
 	logger.info('%r has been refunded', purchase)
 
-@component.adapter(store_interfaces.IPurchaseAttemptDisputed)
+@component.adapter(IPurchaseAttemptDisputed)
 def _purchase_attempt_disputed(event):
 	purchase = event.object
-	_update_state(purchase, store_interfaces.PA_STATE_DISPUTED)
+	_update_state(purchase, PA_STATE_DISPUTED)
 	logger.info('%r has been disputed', purchase)
 
-@component.adapter(store_interfaces.IPurchaseAttemptFailed)
+@component.adapter(IPurchaseAttemptFailed)
 def _purchase_attempt_failed(event):
 	purchase = event.object
 	purchase.Error = event.error
 	purchase.EndTime = time.time()
-	_update_state(purchase, store_interfaces.PA_STATE_FAILED)
+	_update_state(purchase, PA_STATE_FAILED)
 	logger.info('%r failed. %s', purchase.id, purchase.Error)
 
-@component.adapter(store_interfaces.IPurchaseAttemptSynced)
+@component.adapter(IPurchaseAttemptSynced)
 def _purchase_attempt_synced(event):
 	purchase = event.object
 	purchase.Synced = True
@@ -164,11 +129,10 @@ def _purchase_attempt_synced(event):
 	lifecycleevent.modified(purchase)
 	logger.info('%r has been synched' % purchase)
 
-@component.adapter(store_interfaces.IStorePurchaseInvitation,
-				   invite_interfaces.IInvitationAcceptedEvent)
+@component.adapter(IStorePurchaseInvitation, IInvitationAcceptedEvent)
 def _purchase_invitation_accepted(invitation, event):
-	if 	store_interfaces.IStorePurchaseInvitation.providedBy(invitation) and \
-		store_interfaces.IInvitationPurchaseAttempt.providedBy(invitation.purchase):
+	if 	IStorePurchaseInvitation.providedBy(invitation) and \
+		IInvitationPurchaseAttempt.providedBy(invitation.purchase):
 
 		original = invitation.purchase
 

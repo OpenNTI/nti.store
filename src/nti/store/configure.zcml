@@ -7,6 +7,7 @@
 	<include package="zope.component" file="meta.zcml" />
 	<include package="zope.security" file="meta.zcml" />
 	<include package="zope.component" />
+	<include package="zope.security" />
 	
 	<!-- Generations -->
 			 
@@ -35,8 +36,6 @@
 	<subscriber handler=".subscribers._purchase_attempt_disputed" />
 	<subscriber handler=".subscribers._purchase_attempt_successful" />
 	<subscriber handler=".subscribers._purchase_invitation_accepted" />
-	<subscriber handler=".subscribers._enrollment_attempt_successful" />
-	<subscriber handler=".subscribers._unenrollment_attempt_successful" />
 	
 	<!-- Decorators -->
 	
@@ -79,9 +78,10 @@
 		modules=".purchase_order .purchase_error .purchase_attempt 
 				 .purchasable .priceable .pricing" />
 
+	<!-- Test purchasables -->
+			
 	<configure zcml:condition="have devmode">
-		<!-- Test purchasables -->
-		<include file="_sample.zcml" zcml:condition="have devmode"/>
+		<include file="_sample.zcml" />
 	</configure>
 
 </configure>

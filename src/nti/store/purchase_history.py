@@ -56,11 +56,11 @@ class _PurchaseIndex(Persistent):
 		self.purchases = self.family.II.LLTreeSet()
 
 	@Lazy
-	def intids(self):
+	def _intids(self):
 		return component.getUtility(zope.intid.IIntIds)
 
 	def add(self, purchase):
-		iid = self.intids.getId(purchase)
+		iid = self._intids.getId(purchase)
 		# main index
 		self.purchases.add(iid)
 		self.__len.change(1)
@@ -74,16 +74,31 @@ class _PurchaseIndex(Persistent):
 				item_set = self.item_index[item] = self.family.II.LLTreeSet()
 			item_set.add(iid)
 
-	def remove(self, purchase):
-		iid = self.intids.getId(purchase)
-		if iid in self.purchases:
+	def _removeFromIntIdIndex(self, iid):
+		if iid is not None and iid in self.purchases:
 			self.__len.change(-1)
 			self.purchases.remove(iid)
-			self.time_index.pop(time_to_64bit_int(purchase.StartTime), None)
-			for item in purchase.Items:
+			return True
+		return False
+	
+	def _removeFromStartTimeIndex(self, startTime):
+		if startTime is not None:
+			result = self.time_index.pop(time_to_64bit_int(startTime), None)
+			return result is not None
+		return False
+	
+	def _removeFromItemIndex(self, items=(), iid=None):
+		if iid is not None:
+			for item in items or ():
 				item_set = self.item_index.get(item)
 				if item_set and item_set.has_key(iid):
 					item_set.remove(iid)
+		
+	def remove(self, purchase):
+		iid = self._intids.queryId(purchase)
+		self._removeFromStartTimeIndex(purchase.StartTime)
+		if self._removeFromIntIdIndex(iid):
+			self._removeFromItemIndex(purchase.Items, iid)
 			return True
 		return False
 
@@ -95,7 +110,7 @@ class _PurchaseIndex(Persistent):
 	def get_history_by_item(self, purchasable_id):
 		item_set = self.item_index.get(purchasable_id) or ()
 		for uid in item_set:
-			p = self.intids.queryObject(uid)
+			p = self._intids.queryObject(uid)
 			if IPurchaseAttempt.providedBy(p):
 				# NOTE: There seem to be some attempts that are inconsistent;
 				# they exist in the backward index so that queryObject works,
@@ -104,7 +119,7 @@ class _PurchaseIndex(Persistent):
 				# those cases that allow removal (courses). We think (hope) this is a
 				# rare problem, so we pretend it doesn't exist, only logging loudly.
 				# This could also be a corruption in our internal indexes.
-				queried = self.intids.queryId(p)
+				queried = self._intids.queryId(p)
 				if queried != uid:
 					try:
 						p._p_activate()
@@ -124,13 +139,13 @@ class _PurchaseIndex(Persistent):
 		start_time = time_to_64bit_int(start_time) if start_time is not None else None
 		end_time = time_to_64bit_int(end_time) if end_time is not None else None
 		for _, iid in self.time_index.iteritems(start_time, end_time):
-			p = self.intids.queryObject(iid)
+			p = self._intids.queryObject(iid)
 			if IPurchaseAttempt.providedBy(p):
 				yield p
 
 	def values(self):
 		for iid in self.purchases:
-			p = self.intids.queryObject(iid)
+			p = self._intids.queryObject(iid)
 			if IPurchaseAttempt.providedBy(p):
 				yield p
 
@@ -172,7 +187,7 @@ class PurchaseHistory(Contained, Persistent):
 		return self.__parent__
 
 	@Lazy
-	def intids(self):
+	def _intids(self):
 		return component.getUtility(zope.intid.IIntIds)
 
 	def activate_items(self, items):
@@ -258,7 +273,7 @@ class PurchaseHistory(Contained, Persistent):
 
 	def sublocations(self):
 		for iid in self._index.purchases:
-			purchase = self.intids.queryObject(iid)
+			purchase = self._intids.queryObject(iid)
 			if getattr(purchase, '__parent__',None) is self:
 				yield purchase
 
