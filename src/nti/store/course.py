@@ -16,8 +16,6 @@ import dateutil.parser
 
 from zope import component
 from zope import interface
-from zope.deprecation.deprecation import deprecated
-from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from nti.externalization.representation import WithRepr
 
@@ -40,40 +38,14 @@ from .interfaces import IPurchasableCourse
 class PurchasableCourse(Purchasable):
 	createDirectFieldProperties(IPurchasableCourse)
 	Description = AdaptingFieldProperty(IPurchasableCourse['Description'])
-
-	# deprecated properties
 	
-	Featured = FP(IPurchasableCourse['Featured'])
-	Featured = deprecated(Featured, 'Featured is not longer used in this context')
-	
-	Preview = FP(IPurchasableCourse['Preview'])
-	Preview = deprecated(Preview, 'Preview is not longer used in this context')
-		
-	Department = FP(IPurchasableCourse['Department'])
-	Department = deprecated(Department, 'Department is not longer used in this context')
-	
-	Signature = FP(IPurchasableCourse['Signature'])
-	Signature = deprecated(Signature, 'Signature is not longer used in this context')
-	
-	Communities = FP(IPurchasableCourse['Communities'])
-	Communities = deprecated(Communities, 'Communities is not longer used in this context')
-	
-	StartDate = FP(IPurchasableCourse['StartDate'])
-	StartDate = deprecated(StartDate, 'StartDate is not longer used in this context')
-	
-	Duration = FP(IPurchasableCourse['Duration'])
-	Duration = deprecated(Duration, 'Duration is not longer used in this context')
-	
-	EndDate = FP(IPurchasableCourse['EndDate'])
-	EndDate = deprecated(EndDate, 'EndDate is not longer used in this context')
-
 Course = PurchasableCourse # alias BWC
 
 def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 				  items=(), fee=None, title=None, license_=None, author=None,
 				  description=None, icon=None, thumbnail=None, discountable=False,
 				  bulk_purchase=False, 
-				  # deprecated
+				  # deprecated / legacy
 				  communities=None, featured=False, preview=False,
 				  department=None, signature=None, startdate=None, **kwargs):
 
@@ -99,7 +71,7 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 					Amount=amount, Currency=currency, Fee=fee, License=license_,
 					Discountable=discountable, BulkPurchase=bulk_purchase, Icon=icon,
 					Thumbnail=thumbnail, 
-					# deprecated
+					# deprecated / legacy
 					Preview=preview, Communities=communities, Featured=featured,
 					Department=department, Signature=signature, StartDate=startdate,
 					**kwargs)

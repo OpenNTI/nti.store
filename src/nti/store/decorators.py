@@ -50,7 +50,6 @@ class PricedItemDecorator(object):
 		external['Amount'] = original.Amount
 		external['Currency'] = original.Currency
 
-
 @component.adapter(IPurchasableCourse)
 @interface.implementer(IExternalObjectDecorator)
 class PurchasableCourseDecorator(object):
@@ -58,9 +57,9 @@ class PurchasableCourseDecorator(object):
 	__metaclass__ = SingletonDecorator
 
 	def decorateExternalObject(self, original, external):
-		# remove deprecated
-		for name in ('Featured', 'Preview', 'StartDate', 'Department', 'Signature',
-					 'Communities', 'Duration', 'EndDate'):
+		# remove deprecated / legacy if no value is specified
+		for name in ('Featured', 'Preview', 'StartDate', 'Department', 
+					 'Signature', 'Communities', 'Duration', 'EndDate'):
 			value = external.get(name)
 			if value is None:
 				external.pop(name, None)
