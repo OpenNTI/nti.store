@@ -21,15 +21,18 @@ from nti.dataserver.interfaces import IUser
 from nti.externalization.oids import to_external_ntiid_oid
 
 from ..interfaces import IPurchaseHistory
-from ..interfaces import IEnrollmentAttempt
 from ..purchase_history import PurchaseHistory
 
+from nti.deprecated import hiding_warnings
+with hiding_warnings():
+	from ..interfaces import IEnrollmentAttempt
+	
 def update_user_purchase_data(user, intids=None):
 	# check if user has purchase history
 	annotations = IAnnotations(user)
 	annotation_key = "%s.%s" % (PurchaseHistory.__module__, PurchaseHistory.__name__)
 	if not annotation_key in annotations:
-		return
+		return (0,0)
 		
 	intids = intids or component.getUtility(zope.intid.IIntIds)
 	
