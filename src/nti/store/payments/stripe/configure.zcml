@@ -31,10 +31,6 @@
 	<utility factory=".stripe_processor.StripePaymentProcessor"
 			 provides=".interfaces.IStripePaymentProcessor"
 			 name="stripe" />
-	
-	<subscriber factory=".decorators.PurchasableDecorator"
-				for="...interfaces.IPurchasable"
-				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
 		
 	<subscriber factory=".decorators.StripePricedItemDecorator"
 				for=".interfaces.IStripePricedItem"

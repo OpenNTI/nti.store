@@ -13,14 +13,14 @@ from zope import interface
 from nti.schema.field import Object
 from nti.schema.field import ValidTextLine
 
-from .. import interfaces as store_interfaces
+from ..interfaces import IPriceable
+from ..interfaces import IPurchaseAttempt
 
-class ICouponPriceable(store_interfaces.IPriceable):
+class ICouponPriceable(IPriceable):
 	Coupon = ValidTextLine(title="The coupon", required=False)
 
 class IRegisterPurchaseData(interface.Interface):
-	object = Object(store_interfaces.IPurchaseAttempt, title="The purchase",
-				    required=True)
+	object = Object(IPurchaseAttempt, title="The purchase", required=True)
 
 class RegisterPurchaseData(object):
 
