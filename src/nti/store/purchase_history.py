@@ -5,6 +5,7 @@ Defines purchase history.
 
 .. $Id$
 """
+
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
 
@@ -45,6 +46,41 @@ from .interfaces import IPurchaseHistory
 from .purchase_attempt import create_purchase_attempt
 create_purchase_attempt = create_purchase_attempt # rexport
 
+def _check_valid(p, uid, purchasable_id=None, intids=None):
+	if not IPurchaseAttempt.providedBy(p):
+		return False
+
+	# they exist in the backward index so that queryObject works,
+	# but they do not actually have an intid that matches
+	# (_ds_intid). This means that removal cannot work for
+	# those cases that allow removal (courses). We think (hope) this is a
+	# rare problem, so we pretend it doesn't exist, only logging loudly.
+	# This could also be a corruption in our internal indexes.
+	intids = intids or component.getUtility(zope.intid.IIntIds)
+	queried = intids.queryId(p)
+	if queried != uid:
+		try:
+			p._p_activate()
+		except KeyError:
+			# It looks like queryId can hide the POSKeyError
+			# by generally catching KeyError
+			logger.exception("Broken object %r", p)
+		logger.warn("Found inconsistent purchase attempt for " +
+					"purchasable %s, ignoring: %r (%s %s). ids (%s, %s)",
+					purchasable_id, p, getattr(p, '__class__', None),
+					type(p), queried, uid)
+		return False
+	return True
+
+def _check_index(index):
+	import BTrees.check
+	index.purchases._check()
+	index.item_index._check()
+	index.time_index._check()
+	BTrees.check.check(index.purchases)
+	BTrees.check.check(index.item_index)
+	BTrees.check.check(index.time_index)
+		
 class _PurchaseIndex(Persistent):
 
 	family = BTrees.family64
@@ -59,21 +95,40 @@ class _PurchaseIndex(Persistent):
 	def _intids(self):
 		return component.getUtility(zope.intid.IIntIds)
 
+	# addition
+	
+	def _addToIntIdIndex(self, iid=None):
+		if iid is not None:
+			self.purchases.add(iid)
+			self.__len.change(1)
+			return True
+		return False
+		
+	def _addToTimeIndex(self, startTime, iid=None):
+		if iid is not None and startTime:
+			map_key = time_to_64bit_int(startTime)
+			self.time_index[map_key] = iid
+			return True
+		return False
+	
+	def _addToItemIndex(self, items=(), iid=None):
+		if iid is not None:
+			for item in  items or ():
+				item_set = self.item_index.get(item)
+				if item_set is None:
+					item_set = self.item_index[item] = self.family.II.LLTreeSet()
+				item_set.add(iid)
+			return True
+		return False
+	
 	def add(self, purchase):
 		iid = self._intids.getId(purchase)
-		# main index
-		self.purchases.add(iid)
-		self.__len.change(1)
-		# time index
-		start_time = time_to_64bit_int(purchase.StartTime)
-		self.time_index[start_time] = iid
-		# item index
-		for item in purchase.Items:
-			item_set = self.item_index.get(item)
-			if item_set is None:
-				item_set = self.item_index[item] = self.family.II.LLTreeSet()
-			item_set.add(iid)
+		self._addToIntIdIndex(iid)
+		self._addToItemIndex(purchase.Items, iid)
+		self._addToTimeIndex(purchase.StartTime, iid)
 
+	# removal
+	
 	def _removeFromIntIdIndex(self, iid):
 		if iid is not None and iid in self.purchases:
 			self.__len.change(-1)
@@ -81,7 +136,7 @@ class _PurchaseIndex(Persistent):
 			return True
 		return False
 	
-	def _removeFromStartTimeIndex(self, startTime):
+	def _removeFromTimeIndex(self, startTime):
 		if startTime is not None:
 			result = self.time_index.pop(time_to_64bit_int(startTime), None)
 			return result is not None
@@ -93,15 +148,18 @@ class _PurchaseIndex(Persistent):
 				item_set = self.item_index.get(item)
 				if item_set and item_set.has_key(iid):
 					item_set.remove(iid)
+			return True
+		return False
 		
 	def remove(self, purchase):
 		iid = self._intids.queryId(purchase)
-		self._removeFromStartTimeIndex(purchase.StartTime)
-		if self._removeFromIntIdIndex(iid):
-			self._removeFromItemIndex(purchase.Items, iid)
-			return True
-		return False
+		self._removeFromTimeIndex(purchase.StartTime)
+		self._removeFromItemIndex(purchase.Items, iid)
+		result = self._removeFromIntIdIndex(iid)
+		return result
 
+	# retrieve
+	
 	def has_history_by_item(self, purchasable_id):
 		# Actually load the history to perform consistency checks
 		items = list(self.get_history_by_item(purchasable_id))
@@ -111,28 +169,7 @@ class _PurchaseIndex(Persistent):
 		item_set = self.item_index.get(purchasable_id) or ()
 		for uid in item_set:
 			p = self._intids.queryObject(uid)
-			if IPurchaseAttempt.providedBy(p):
-				# NOTE: There seem to be some attempts that are inconsistent;
-				# they exist in the backward index so that queryObject works,
-				# but they do not actually have an intid that matches
-				# (_ds_intid). This means that removal cannot work for
-				# those cases that allow removal (courses). We think (hope) this is a
-				# rare problem, so we pretend it doesn't exist, only logging loudly.
-				# This could also be a corruption in our internal indexes.
-				queried = self._intids.queryId(p)
-				if queried != uid:
-					try:
-						p._p_activate()
-					except KeyError:
-						# It looks like queryId can hide the POSKeyError
-						#  by generally catching KeyError
-						logger.exception("Broken object %r", p)
-					logger.warn("Found inconsistent purchase attempt for " +
-								"purchasable %s, ignoring: %r (%s %s). ids (%s, %s)",
-								purchasable_id, p, getattr(p, '__class__', None),
-								type(p), queried, uid)
-					continue
-
+			if _check_valid(p, uid, purchasable_id, intids=self._intids):
 				yield p
 
 	def get_history_by_time(self, start_time=None, end_time=None):
@@ -140,13 +177,13 @@ class _PurchaseIndex(Persistent):
 		end_time = time_to_64bit_int(end_time) if end_time is not None else None
 		for _, iid in self.time_index.iteritems(start_time, end_time):
 			p = self._intids.queryObject(iid)
-			if IPurchaseAttempt.providedBy(p):
+			if _check_valid(p, iid, intids=self._intids):
 				yield p
 
 	def values(self):
 		for iid in self.purchases:
 			p = self._intids.queryObject(iid)
-			if IPurchaseAttempt.providedBy(p):
+			if _check_valid(p, iid, intids=self._intids):
 				yield p
 
 	def __iter__(self):
@@ -160,13 +197,7 @@ class _PurchaseIndex(Persistent):
 	__bool__ = __nonzero__
 
 	def _v_check(self):
-		import BTrees.check
-		self.purchases._check()
-		self.item_index._check()
-		self.time_index._check()
-		BTrees.check.check(self.purchases)
-		BTrees.check.check(self.item_index)
-		BTrees.check.check(self.time_index)
+		_check_index(self)
 
 @component.adapter(IUser)
 @interface.implementer(IPurchaseHistory, ISublocations)
@@ -213,7 +244,8 @@ class PurchaseHistory(Contained, Persistent):
 		return item in self._items_activated
 
 	def register_purchase(self, purchase):
-		locate(purchase, self, str(len(self)))
+		# locate before firing events
+		locate(purchase, self)
 		# add to connection b4 firing event
 		owner_jar = getattr(self, '_p_jar', None)
 		if owner_jar and getattr(purchase, '_p_jar', None) is None:
@@ -222,13 +254,14 @@ class PurchaseHistory(Contained, Persistent):
 		lifecycleevent.created(purchase)
 		lifecycleevent.added(purchase)  # get an iid
 		self._index.add(purchase)
+		# set __name__
+		purchase.__name__ = purchase.id
 
 	add_purchase = register_purchase
 
 	def remove_purchase(self, purchase):
 		if self._index.remove(purchase):
-			# fire to remove iid
-			lifecycleevent.removed(purchase)
+			lifecycleevent.removed(purchase) # remove iid
 			return True
 		return False
 
