@@ -19,10 +19,16 @@ import unittest
 
 from nti.dataserver.users import User
 
-from nti.store import purchasable
-from nti.store import purchase_order
-from nti.store import purchase_attempt
-from nti.store import interfaces as store_interfaces
+from nti.store.purchasable import get_purchasable
+from nti.store.purchasable import  get_content_items
+from nti.store.purchasable import get_available_items
+
+from nti.store.purchase_order import create_purchase_item
+from nti.store.purchase_order import create_purchase_order
+from nti.store.purchase_attempt import create_purchase_attempt
+
+from nti.store.interfaces import PA_STATE_SUCCESS
+from nti.store.interfaces import IPurchaseHistory
 
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
@@ -39,9 +45,9 @@ class TestPurchasable(unittest.TestCase):
 		return usr
 
 	def test_zmcl(self):
-		assert_that(purchasable.get_purchasable('iid_0'), is_not(none()))
+		assert_that(get_purchasable('iid_0'), is_not(none()))
 
-		ps = purchasable.get_purchasable('iid_3')
+		ps = get_purchasable('iid_3')
 		assert_that(ps.NTIID, is_("iid_3"))
 		assert_that(ps.Title, is_("Risk Course"))
 		assert_that(ps.Description, is_("Intro to Risk"))
@@ -56,31 +62,28 @@ class TestPurchasable(unittest.TestCase):
 	@WithMockDSTrans
 	def test_available(self):
 		self._create_user()
-		m = purchasable.get_available_items('nt@nti.com')
+		m = get_available_items('nt@nti.com')
 		assert_that(m, has_key('iid_1'))
 		assert_that(m, has_key('iid_2'))
 
-	def _create_purchase_attempt(self, item=u'iid_3', quantity=None,
-								 state=store_interfaces.PA_STATE_UNKNOWN):
-		pi = purchase_order.create_purchase_item(item, 1)
-		po = purchase_order.create_purchase_order(pi, quantity=quantity)
-		pa = purchase_attempt.create_purchase_attempt(po, processor=self.processor,
-													  state=state)
+	def _create_purchase_attempt(self, item=u'iid_3', quantity=None, state=None):
+		pi = create_purchase_item(item, 1)
+		po = create_purchase_order(pi, quantity=quantity)
+		pa = create_purchase_attempt(po, processor=self.processor, state=state)
 		return pa
 
 	@WithMockDSTrans
 	def test_purchased(self):
 		user = self._create_user()
-		hist = store_interfaces.IPurchaseHistory(user, None)
-		pa = self._create_purchase_attempt(u'iid_3',
-											state=store_interfaces.PA_STATE_SUCCESS)
+		hist = IPurchaseHistory(user, None)
+		pa = self._create_purchase_attempt(u'iid_3', state=PA_STATE_SUCCESS)
 		hist.add_purchase(pa)
 
-		m = purchasable.get_available_items('nt@nti.com')
+		m = get_available_items('nt@nti.com')
 		assert_that(m, is_not(has_key('iid_3')))
 
 	def test_get_content_items(self):
-		items = purchasable.get_content_items("iid_3")
+		items = get_content_items("iid_3")
 		assert_that(items, has_length(2))
 		assert_that('var-risk', is_in(items))
 		assert_that('volatility', is_in(items))

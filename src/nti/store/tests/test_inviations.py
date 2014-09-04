@@ -15,10 +15,14 @@ import unittest
 
 from nti.dataserver.users import User
 
-from nti.store import invitations
-from nti.store import purchase_order
-from nti.store import purchase_attempt
-from nti.store import interfaces as store_interfaces
+from nti.store.invitations import InvitationCapacityExceeded
+from nti.store.invitations import create_store_purchase_invitation
+
+from nti.store.purchase_order import create_purchase_item
+from nti.store.purchase_order import create_purchase_order
+from nti.store.purchase_attempt import create_purchase_attempt
+
+from nti.store.interfaces import IPurchaseHistory
 
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
@@ -36,23 +40,21 @@ class TestInvitations(unittest.TestCase):
 		usr = User.create_user(self.ds, username=username, password=password)
 		return usr
 
-	def _create_purchase_attempt(self, item=u'xyz-book', quantity=None,
-								 state=store_interfaces.PA_STATE_UNKNOWN):
-		pi = purchase_order.create_purchase_item(item, 1)
-		po = purchase_order.create_purchase_order(pi, quantity=quantity)
-		pa = purchase_attempt.create_purchase_attempt(po, processor=self.processor,
-													  state=state)
+	def _create_purchase_attempt(self, item=u'xyz-book', quantity=None, state=None):
+		pi = create_purchase_item(item, 1)
+		po = create_purchase_order(pi, quantity=quantity)
+		pa = create_purchase_attempt(po, processor=self.processor, state=state)
 		return pa
 
 	@WithMockDSTrans
 	def test_create_invitation(self):
 		user = self._create_user()
 
-		hist = store_interfaces.IPurchaseHistory(user, None)
+		hist = IPurchaseHistory(user, None)
 		purchase = self._create_purchase_attempt(quantity=1)
 		hist.add_purchase(purchase)
 
-		invitation = invitations.create_store_purchase_invitation(purchase)
+		invitation = create_store_purchase_invitation(purchase)
 		assert_that(invitation, is_(not_none()))
 		assert_that(invitation.capacity, is_(1))
 		assert_that(invitation.creator, is_(user))
@@ -62,13 +64,13 @@ class TestInvitations(unittest.TestCase):
 		invitation.accept(user2)
 
 		user3 = self._create_user(username='nt3@nti.com')
-		with assert_raises(invitations.InvitationCapacityExceeded):
+		with assert_raises(InvitationCapacityExceeded):
 			invitation.accept(user3)
 
 	@WithMockDSTrans
 	def test_restore_token(self):
 		user = self._create_user()
-		hist = store_interfaces.IPurchaseHistory(user, None)
+		hist = IPurchaseHistory(user, None)
 		purchase = self._create_purchase_attempt(quantity=5)
 		hist.add_purchase(purchase)
 

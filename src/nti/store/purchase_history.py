@@ -44,9 +44,6 @@ from .utils import to_frozenset
 from .interfaces import IPurchaseAttempt
 from .interfaces import IPurchaseHistory
 
-from .purchase_attempt import create_purchase_attempt
-create_purchase_attempt = create_purchase_attempt # rexport
-
 def _check_valid(p, uid, purchasable_id=None, intids=None, debug=True):
 	if not IPurchaseAttempt.providedBy(p):
 		return False

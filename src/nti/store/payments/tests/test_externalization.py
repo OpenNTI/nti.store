@@ -18,9 +18,11 @@ from nti.dataserver.users import User
 
 from nti.externalization.externalization import to_external_object
 
-from nti.store import purchase_order
-from nti.store import purchase_attempt
-from nti.store import interfaces as store_interfaces
+from nti.store.purchase_order import create_purchase_item 
+from nti.store.purchase_order import create_purchase_order
+from nti.store.purchase_attempt import  create_purchase_attempt
+
+from nti.store.interfaces import IPurchaseHistory
 
 import nti.dataserver.tests.mock_dataserver as mock_dataserver
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
@@ -36,20 +38,18 @@ class TestPaymentsExternal(unittest.TestCase):
 		usr = User.create_user(ds, username=username, password=password)
 		return usr
 
-
 	def _create_purchase_attempt(self, item=u'xyz-book', processor=None,
-								 state=store_interfaces.PA_STATE_UNKNOWN,
-								 description=None):
-		pi = purchase_order.create_purchase_item(item, 1)
-		po = purchase_order.create_purchase_order(pi)
-		pa = purchase_attempt.create_purchase_attempt(po, processor=processor,
-													  description=description,
-													  state=state)
+								 state=None, description=None):
+		pi = create_purchase_item(item, 1)
+		po = create_purchase_order(pi)
+		pa = create_purchase_attempt(po, processor=processor,
+                                     description=description,
+									 state=state)
 		return pa
 	@WithMockDSTrans
 	def test_stripe_purchase_attempt(self):
 		user = self._create_user()
-		hist = store_interfaces.IPurchaseHistory(user, None)
+		hist = IPurchaseHistory(user, None)
 
 		processor = 'stripe'
 		pa = self._create_purchase_attempt(processor=processor)
@@ -59,4 +59,3 @@ class TestPaymentsExternal(unittest.TestCase):
 		assert_that(ext, has_entry('ChargeID', is_(None)))
 		assert_that(ext, has_entry('TokenID', is_(None)))
 		assert_that(ext, has_entry('OID', is_not(None)))
-

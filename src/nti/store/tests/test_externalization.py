@@ -27,13 +27,17 @@ from nti.dataserver.users import User
 
 from nti.externalization.externalization import to_external_object
 
-from nti.store import pricing
-from nti.store import priceable
-from nti.store import purchasable
-from nti.store import purchase_order
-from nti.store import purchase_error
-from nti.store import purchase_attempt
-from nti.store import interfaces as store_interfaces
+from nti.store.purchase_order import create_purchase_item
+from nti.store.purchase_order import create_purchase_order
+from nti.store.purchase_attempt import create_purchase_attempt
+
+from nti.store.pricing import create_priced_item
+from nti.store.priceable import create_priceable
+
+from nti.store.purchasable import get_purchasable
+from nti.store.purchase_error import create_purchase_error
+
+from nti.store.interfaces import IPurchaseHistory
 
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
@@ -53,25 +57,22 @@ class TestStoreExternal(unittest.TestCase):
 		usr = User.create_user(self.ds, username=username, password=password)
 		return usr
 
-	def _create_purchase_attempt(self, item=u'xyz-book', quantity=None,
-								 state=store_interfaces.PA_STATE_UNKNOWN,
+	def _create_purchase_attempt(self, item=u'xyz-book', quantity=None, state=None,
 								 description='my purchase'):
-		pi = purchase_order.create_purchase_item(item, 1)
-		po = purchase_order.create_purchase_order(pi, quantity=quantity)
-		pa = purchase_attempt.create_purchase_attempt(po, processor=self.processor,
-													  description=description,
-													  state=state)
+		pi = create_purchase_item(item, 1)
+		po = create_purchase_order(pi, quantity=quantity)
+		pa = create_purchase_attempt(po, processor=self.processor,
+									 description=description,
+									 state=state)
 		return pa
 
 	@WithMockDSTrans
 	def test_purchase_hist(self):
 		user = self._create_user()
-		hist = store_interfaces.IPurchaseHistory(user, None)
+		hist = IPurchaseHistory(user, None)
 
 		pa = self._create_purchase_attempt(description='my charge', quantity=2)
-		pa.Error = purchase_error.create_purchase_error("An error",
-														type_='foo',
-														code="a code")
+		pa.Error = create_purchase_error("An error", type_='foo', code="a code")
 		hist.add_purchase(pa)
 
 		ext = to_external_object( pa )
@@ -98,9 +99,9 @@ class TestStoreExternal(unittest.TestCase):
 
 	@WithMockDSTrans
 	def test_purchase_order(self):
-		pi_1 = purchase_order.create_purchase_item("ichigo", 1)
-		pi_2 = purchase_order.create_purchase_item("aizen", 2)
-		po = purchase_order.create_purchase_order((pi_1, pi_2))
+		pi_1 = create_purchase_item("ichigo", 1)
+		pi_2 = create_purchase_item("aizen", 2)
+		po = create_purchase_order((pi_1, pi_2))
 		ext = to_external_object(po)
 		assert_that(ext, has_entry('Items', has_length(2)))
 		assert_that(ext, has_entry('Quantity', is_(none())))
@@ -112,7 +113,7 @@ class TestStoreExternal(unittest.TestCase):
 
 	@WithMockDSTrans
 	def test_purchasable(self):
-		ps = purchasable.get_purchasable('iid_3')
+		ps = get_purchasable('iid_3')
 		ext = to_external_object(ps)
 
 		assert_that(ext, has_key('MimeType'))
@@ -129,7 +130,7 @@ class TestStoreExternal(unittest.TestCase):
 		assert_that(ext, has_entry('Description', u'Intro to Risk'))
 
 	def test_priceable(self):
-		pp = priceable.create_priceable(u'iid_3', 1)
+		pp = create_priceable(u'iid_3', 1)
 		ext = to_external_object(pp)
 		assert_that(ext, has_key('MimeType'))
 		assert_that(ext, has_entry('NTIID', u'iid_3'))
@@ -137,7 +138,7 @@ class TestStoreExternal(unittest.TestCase):
 		assert_that(ext, has_entry('Class', u'Priceable'))
 
 	def test_priced_item(self):
-		pp = pricing.create_priced_item(ntiid=u'iid_3', purchase_price=100, purchase_fee=2)
+		pp = create_priced_item(ntiid=u'iid_3', purchase_price=100, purchase_fee=2)
 		ext = to_external_object(pp)
 		assert_that(ext, has_key('MimeType'))
 		assert_that(ext, is_not(has_key('PurchaseFee')))
@@ -146,9 +147,9 @@ class TestStoreExternal(unittest.TestCase):
 		assert_that(ext, has_entry('PurchasePrice', 100))
 		assert_that(ext, has_entry('Class', u'PricedItem'))
 
-		pp = pricing.create_priced_item(ntiid=u'iid_3', purchase_price=200,
-										purchase_fee=30, non_discounted_price=220,
-										quantity=10)
+		pp = create_priced_item(ntiid=u'iid_3', purchase_price=200,
+								purchase_fee=30, non_discounted_price=220,
+								quantity=10)
 		ext = to_external_object(pp)
 		assert_that(ext, is_not(has_key('PurchaseFee')))
 		assert_that(ext, has_entry('NonDiscountedPrice', 220))

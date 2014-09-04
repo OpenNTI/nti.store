@@ -17,11 +17,14 @@ import unittest
 
 from nti.dataserver.users import User
 
-from nti.store import purchase_order
-from nti.store import purchase_attempt
-from nti.store import interfaces as store_interfaces
+from nti.store.purchase_order import create_purchase_item
+from nti.store.purchase_order import create_purchase_order
+from nti.store.purchase_attempt import create_purchase_attempt
+
 from nti.store.payments.stripe import StripeException
-from nti.store.payments.stripe import interfaces as stripe_interfaces
+from nti.store.payments.stripe.interfaces import IStripeCustomer
+from nti.store.payments.stripe.interfaces import IStripePurchaseError
+from nti.store.payments.stripe.interfaces import IStripePurchaseAttempt
 
 import nti.dataserver.tests.mock_dataserver as mock_dataserver
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
@@ -42,7 +45,7 @@ class TestStripeAdapters(unittest.TestCase):
 	@WithMockDSTrans
 	def test_stripe_customer_adapter(self):
 		user = self._create_user()
-		adapted = stripe_interfaces.IStripeCustomer(user)
+		adapted = IStripeCustomer(user)
 		assert_that(adapted, is_not(None))
 		assert_that(adapted.customer_id, is_(None))
 
@@ -52,20 +55,19 @@ class TestStripeAdapters(unittest.TestCase):
 		adapted.customer_id = 'xyz'
 		assert_that(adapted.customer_id, is_('xyz'))
 
-	def _create_purchase_attempt(self, item=u'xyz-book', quantity=None,
-								 state=store_interfaces.PA_STATE_UNKNOWN,
+	def _create_purchase_attempt(self, item=u'xyz-book', quantity=None, state=None,
 								 description='my purchase'):
-		pi = purchase_order.create_purchase_item(item, 1)
-		po = purchase_order.create_purchase_order(pi, quantity=quantity)
-		pa = purchase_attempt.create_purchase_attempt(po, processor=self.processor,
-													  description=description,
-													  state=state)
-		return pa
+		pi = create_purchase_item(item, 1)
+		po = create_purchase_order(pi, quantity=quantity)
+		result = create_purchase_attempt(po, processor=self.processor,
+                                         description=description,
+                                         state=state)
+		return result
 
 	@WithMockDSTrans
 	def test_stripe_purchase_adapter(self):
 		pa = self._create_purchase_attempt()
-		adapted = stripe_interfaces.IStripePurchaseAttempt(pa)
+		adapted = IStripePurchaseAttempt(pa)
 		adapted.charge_id = 'charge_id'
 		adapted.token_id = 'token_id'
 		assert_that(adapted.purchase, is_(pa))
@@ -74,7 +76,7 @@ class TestStripeAdapters(unittest.TestCase):
 
 	def test_stripe_error_adapters(self):
 		e = stripe.CardError('my error', 'my param', 'my code')
-		adapted = stripe_interfaces.IStripePurchaseError(e, None)
+		adapted = IStripePurchaseError(e, None)
 		assert_that(adapted, is_not(none()))
 		assert_that(adapted.Type, is_('CardError'))
 		assert_that(adapted.Message, is_('my error'))
@@ -82,13 +84,13 @@ class TestStripeAdapters(unittest.TestCase):
 		assert_that(adapted.Code, is_('my code'))
 
 		e = StripeException('my exception')
-		adapted = stripe_interfaces.IStripePurchaseError(e, None)
+		adapted = IStripePurchaseError(e, None)
 		assert_that(adapted, is_not(none()))
 		assert_that(adapted.Type, is_('Exception'))
 		assert_that(adapted.Message, is_('my exception'))
 
 		e = u'my error message'
-		adapted = stripe_interfaces.IStripePurchaseError(e, None)
+		adapted = IStripePurchaseError(e, None)
 		assert_that(adapted, is_not(none()))
 		assert_that(adapted.Type, is_('Error'))
 		assert_that(adapted.Message, is_('my error message'))

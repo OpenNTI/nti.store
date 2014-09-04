@@ -19,8 +19,10 @@ from nti.dataserver.users import User
 
 from nti.app.store import get_possible_site_names
 
-from nti.store import purchase_history
-from nti.store.payments.stripe import stripe_purchase
+from nti.store.purchase_history import register_purchase_attempt
+from nti.store.payments.stripe.stripe_purchase import create_stripe_purchase_item
+from nti.store.payments.stripe.stripe_purchase import create_stripe_purchase_order
+from nti.store.purchase_attempt import create_purchase_attempt as purchase_attempt_creator
 
 import nti.dataserver.tests.mock_dataserver as mock_dataserver
 
@@ -40,18 +42,16 @@ def create_random_user():
 
 def create_purchase_attempt(item, processor, quantity=None, description=None,
                             coupon=None):
-    pi = stripe_purchase.create_stripe_purchase_item(item, 1)
-    po = stripe_purchase.create_stripe_purchase_order(pi, quantity=quantity,
-                                                      coupon=coupon)
-    pa = purchase_history.create_purchase_attempt(po, processor=processor,
-                                                  description=description)
+    pi = create_stripe_purchase_item(item, 1)
+    po = create_stripe_purchase_order(pi, quantity=quantity, coupon=coupon)
+    pa = purchase_attempt_creator(po, processor=processor, description=description)
     return pa
 
 def create_and_register_purchase_attempt(username, item, quantity=None, processor=None,
                                          coupon=None, description="my charge"):
     pa = create_purchase_attempt(item, quantity=quantity, processor=processor,
                                  coupon=coupon, description=description)
-    purchase_id = purchase_history.register_purchase_attempt(pa, username)
+    purchase_id = register_purchase_attempt(pa, username)
     return purchase_id
 
 def create_purchase(self, item=None, amount=100, coupon=None, manager=None,
