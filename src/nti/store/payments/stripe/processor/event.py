@@ -35,15 +35,15 @@ class EventProcessor(BaseProcessor):
 			  "charge.dispute.created", "charge.dispute.updated")
 
 	def _process(self, event, request=None):
-		evert_type = event.get('type', None)
+		event_type = event.get('type', None)
 		data = CaseInsensitiveDict(event.get('data', {}))
-		if evert_type in self.events:
+		if event_type in self.events:
 			data = decode_charge_description(data.get('description', u''))
 			purchase_id = data.get('PurchaseID', u'')
 			username = data.get('Username', u'')
 			purchase = get_purchase_attempt(purchase_id, username)
 			if purchase:
-				if evert_type in ("charge.succeeded") and not purchase.has_succeeded():
+				if event_type in ("charge.succeeded") and not purchase.has_succeeded():
 					payment_charge = None
 					api_key = self.get_api_key(purchase)
 					if api_key:
@@ -53,15 +53,15 @@ class EventProcessor(BaseProcessor):
 						payment_charge = create_payment_charge(charges[0]) \
 							 			 if charges else None
 					notify(PurchaseAttemptSuccessful(purchase, payment_charge, request))
-				elif evert_type in ("charge.refunded") and not purchase.is_refunded():
+				elif event_type in ("charge.refunded") and not purchase.is_refunded():
 					notify(PurchaseAttemptRefunded(purchase))
-				elif evert_type in ("charge.failed") and not purchase.has_failed():
+				elif event_type in ("charge.failed") and not purchase.has_failed():
 					notify(PurchaseAttemptFailed(purchase))
-				elif evert_type in ("charge.dispute.created", "charge.dispute.updated") and \
+				elif event_type in ("charge.dispute.created", "charge.dispute.updated") and \
 					 not purchase.is_disputed():
 					notify(PurchaseAttemptDisputed(purchase))
 		else:
-			logger.debug('Unhandled event type (%s)' % evert_type)
+			logger.debug('Unhandled event type (%s)' % event_type)
 
 	def _readInput(self, body):
 		result = CaseInsensitiveDict()
