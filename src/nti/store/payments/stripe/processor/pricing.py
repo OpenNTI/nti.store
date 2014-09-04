@@ -16,6 +16,7 @@ from ....interfaces import IPurchasablePricer
 from ....purchase_history import get_purchase_attempt
 
 from .. import STRIPE
+
 from .base import BaseProcessor
 
 def price_purchase(purchase_attempt, name=STRIPE):

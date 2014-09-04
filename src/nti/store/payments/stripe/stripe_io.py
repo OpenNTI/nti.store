@@ -148,6 +148,11 @@ def get_stripe_charges(customer=None, start_time=None, end_time=None, count=50,
 				_loop = False
 get_charges = get_stripe_charges
 
+def get_stripe_charge(charge_id, api_key=None):
+	result = _do_stripe_operation(stripe.Charge.retrieve, charge_id, api_key=api_key)
+	return result
+get_charge = get_stripe_charge
+	
 # coupon
 
 def get_stripe_coupon(coupon_code, api_key=None):
@@ -209,16 +214,11 @@ class StripeIO(object):
 
 	@classmethod
 	def get_stripe_charge(cls, charge_id, api_key=None):
-		charge = _do_stripe_operation(stripe.Charge.retrieve, charge_id,
-										  api_key=api_key)
-		return charge
-	get_charge = get_stripe_charge
-
-	def _get_stripe_charges(self, count=10, offset=0, customer=None, api_key=None):
-		result = query_stripe_charges(count=count, offset=offset, customer=customer,
-									  api_key=api_key)
+		result = get_stripe_charge(charge_id=charge_id, api_key=api_key)
 		return result
-
+	get_charge = get_stripe_charge # alias
+	
+	@classmethod
 	def get_stripe_charges(self, customer=None, start_time=None, end_time=None,
 						   count=50, api_key=None):		
 		result = get_stripe_charges(count=count, customer=customer, start_time=start_time,
