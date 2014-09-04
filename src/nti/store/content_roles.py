@@ -22,6 +22,7 @@ from nti.dataserver.interfaces import IMutableGroupMember
 from nti.ntiids import ntiids
 
 from . import get_user
+
 from .content_utils import get_collection_root_ntiid
 
 def get_descendants(unit):
@@ -46,7 +47,7 @@ def get_role_for_item(item):
 	role = nauth.role_for_providers_content(provider, specific)
 	return role
 
-def add_users_content_roles(user, items, library=None, verify=True, registry=component):
+def add_users_content_roles(user, items, library=None, registry=component):
 	"""
 	Add the content roles to the given user
 
@@ -58,7 +59,7 @@ def add_users_content_roles(user, items, library=None, verify=True, registry=com
 		items = set(items.split())
 
 	user = get_user(user)
-	if not user or not items:
+	if user is None or not items:
 		return 0
 
 	roles_to_add = set()
@@ -66,11 +67,12 @@ def add_users_content_roles(user, items, library=None, verify=True, registry=com
 	current_roles = {x.id:x for x in member.groups}
 
 	for item in items:
-		item = check_item_in_library(item, library, registry) if verify else item
-		if item is None:
+		lib_item = check_item_in_library(item, library, registry)
+		if lib_item is None:
+			logger.warn("Ignoring %s item", item)
 			continue
 
-		role = get_role_for_item(item)
+		role = get_role_for_item(lib_item)
 		if role.id not in current_roles:
 			logger.info("Role %s added to %s", role.id, user)
 			roles_to_add.add(role)
@@ -99,7 +101,7 @@ def remove_users_content_roles(user, items, library=None, registry=component):
 
 	for item in items:
 		item = check_item_in_library(item, library, registry)
-		if item:
+		if item is not None:
 			provider = ntiids.get_provider(item).lower()
 			specific = ntiids.get_specific(item).lower()
 			role = nauth.role_for_providers_content(provider, specific)
@@ -133,8 +135,8 @@ def get_user_accessible_content(user, library=None, registry=component):
 	user = get_user(user)
 	member = registry.getAdapter(user, IMutableGroupMember, nauth.CONTENT_ROLE_PREFIX)
 	
-	library = registry.queryUtility(IContentPackageLibrary) \
-			  if library is None else library
+	if library is None:
+		library = registry.queryUtility(IContentPackageLibrary)
 
 	packages = {}
 	for package in (library.contentPackages if library is not None else ()):
@@ -149,4 +151,5 @@ def get_user_accessible_content(user, library=None, registry=component):
 		if ntiid:
 			ntiid = get_collection_root_ntiid(ntiid, library=library, registry=registry)
 			result.add(ntiid)
+	result.discard(None)
 	return result
