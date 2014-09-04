@@ -13,13 +13,12 @@ logger = __import__('logging').getLogger(__name__)
 import six
 import datetime
 import dateutil.parser
+from collections import Mapping
 
 from zope import component
 from zope import interface
 
 from nti.externalization.representation import WithRepr
-
-from nti.ntiids import interfaces as nid_interfaces
 
 from nti.schema.schema import EqHash
 from nti.schema.fieldproperty import AdaptingFieldProperty
@@ -29,6 +28,8 @@ from .utils import to_frozenset
 
 from .purchasable import Purchasable
 from .purchasable import get_purchasable
+from .purchasable import _PurchasableResolver
+from .purchasable import DefaultPurchasableVendorInfo
 
 from .interfaces import IPurchasableCourse
 
@@ -44,7 +45,7 @@ Course = PurchasableCourse # alias BWC
 def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 				  items=(), fee=None, title=None, license_=None, author=None,
 				  description=None, icon=None, thumbnail=None, discountable=False,
-				  bulk_purchase=False, 
+				  bulk_purchase=False, public=True, vendor_info=None,
 				  # deprecated / legacy
 				  communities=None, featured=False, preview=False,
 				  department=None, signature=None, startdate=None, **kwargs):
@@ -65,25 +66,23 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 	elif isinstance(startdate, datetime.date):
 		startdate = startdate.isoformat()
 
+	vendor = DefaultPurchasableVendorInfo(vendor_info) \
+			 if vendor_info and isinstance(vendor_info, Mapping) else None
+	
 	result = PurchasableCourse(
 					NTIID=ntiid, Name=name, Provider=provider, Title=title,
 					Author=author, Items=items, Description=description, 
 					Amount=amount, Currency=currency, Fee=fee, License=license_,
 					Discountable=discountable, BulkPurchase=bulk_purchase, Icon=icon,
-					Thumbnail=thumbnail, 
+					Thumbnail=thumbnail, Public=public, VendorInfo=vendor,
 					# deprecated / legacy
 					Preview=preview, Communities=communities, Featured=featured,
-					Department=department, Signature=signature, StartDate=startdate,
-					**kwargs)
+					Department=department, Signature=signature, StartDate=startdate)
 
 	return result
-
-@interface.implementer(nid_interfaces.INTIIDResolver)
-class _CourseResolver(object):
-
-	def resolve(self, ntiid_string):
-		return get_purchasable(ntiid_string)
 
 def get_course(course_id, registry=component):
 	result = get_purchasable(course_id, registry=registry)
 	return result
+
+_CourseResolver = _PurchasableResolver # alias BWC

@@ -9,8 +9,9 @@ __docformat__ = "restructuredtext en"
 from zope import interface
 from zope.schema import vocabulary
 from zope.deprecation import deprecated
-from zope.interface.common import sequence
 from zope.location.interfaces import IContained
+from zope.interface.common.sequence import IMinimalSequence
+from zope.interface.common.mapping import IEnumerableMapping
 from zope.interface.interfaces import ObjectEvent, IObjectEvent
 
 from dolmen.builtins import IIterable
@@ -65,6 +66,16 @@ class IContentBundle(interface.Interface):
 	Items = FrozenSet(value_type=ValidTextLine(title='The item identifier'),
 					  title="Bundle items")
 
+class IPurchasableVendorInfo(IEnumerableMapping):
+	"""
+	Arbitrary purchasable vendor-specific information
+
+	This is simply a dictionary and this module does not define
+	the structure of it. However, it is recommended that the top-level
+	keys be the vendor names and within them be the actual vendor specific
+	information.
+	"""
+	
 class IPurchasable(IContentBundle):
 	Amount = Float(title="Cost amount", required=True, min=0.0)
 	Currency = ValidTextLine(title='Currency amount', required=True, default='USD')
@@ -76,6 +87,8 @@ class IPurchasable(IContentBundle):
 	Provider = ValidTextLine(title='Purchasable item provider', required=True)
 	License = ValidTextLine(title='Purchasable license', required=False)
 	Public = Bool(title="Public flag", required=False, default=False)
+	VendorInfo = Object(IPurchasableVendorInfo, title="vendor info", required=False)
+	VendorInfo.setTaggedValue('_ext_excluded_out', True)
 
 class IPurchasableCourse(IPurchasable):
 	Name = ValidTextLine(title='Course Name', required=False)
@@ -84,7 +97,7 @@ class IPurchasableCourse(IPurchasable):
 	Amount = Float(title="Cost amount", required=False, min=0.0, default=0.0)
 	Provider = ValidTextLine(title='Course provider', required=False)
 
-	# Deprecated fields
+	# Deprecated/Legacy fields
 	Featured = Bool(title='Featured flag', required=False, default=False)
 		
 	Preview = Bool(title='Course preview flag', required=False)
@@ -114,7 +127,7 @@ class IPriceable(interface.Interface):
 class IPurchaseItem(IPriceable):
 	"""marker interface for a purchase order item"""
 
-class IPurchaseOrder(sequence.IMinimalSequence):
+class IPurchaseOrder(IMinimalSequence):
 	Items = Tuple(value_type=Object(IPriceable), title='The items',
 				  required=True, min_length=1)
 
@@ -405,36 +418,3 @@ class IPurchaseHistory(IIterable):
 		"""
 class IStorePurchaseInvitation(interface.Interface):
 	pass
-
-deprecated('IEnrollmentAttemptEvent', 'Use enrollment record life cycle events')
-class IEnrollmentAttemptEvent(IPurchaseAttemptEvent):
-	object = Object(IEnrollmentAttempt, title="The enrollment")
-
-deprecated('IEnrollmentAttemptSuccessful', 'Use enrollment record life cycle events')
-class IEnrollmentAttemptSuccessful(IEnrollmentAttemptEvent):
-	request = interface.Attribute('Pyramid request')
-
-deprecated('IUnenrollmentAttemptSuccessful', 'Use enrollment record life cycle events')
-class IUnenrollmentAttemptSuccessful(IEnrollmentAttemptEvent):
-	request = interface.Attribute('Pyramid request')
-
-deprecated('IEnrollmentAttemptEvent', 'Use enrollment record life cycle events')
-@interface.implementer(IEnrollmentAttemptEvent)
-class EnrollmentAttemptEvent(PurchaseAttemptEvent):
-	pass
-
-deprecated('EnrollmentAttemptSuccessful', 'Use enrollment record life cycle events')
-@interface.implementer(IEnrollmentAttemptSuccessful)
-class EnrollmentAttemptSuccessful(EnrollmentAttemptEvent):
-
-	def __init__(self, purchase, request=None):
-		super(EnrollmentAttemptSuccessful, self).__init__(purchase)
-		self.request = request
-
-deprecated('UnenrollmentAttemptSuccessful', 'Use enrollment record life cycle events')
-@interface.implementer(IUnenrollmentAttemptSuccessful)
-class UnenrollmentAttemptSuccessful(EnrollmentAttemptEvent):
-
-	def __init__(self, purchase, request=None):
-		super(UnenrollmentAttemptSuccessful, self).__init__(purchase)
-		self.request = request

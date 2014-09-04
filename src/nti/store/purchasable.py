@@ -11,6 +11,7 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import six
+from collections import Mapping
 
 from zope import component
 from zope import interface
@@ -32,7 +33,7 @@ from nti.externalization.interfaces import LocatedExternalList
 
 from nti.mimetype.mimetype import MIME_BASE
 
-from nti.ntiids import interfaces as nid_interfaces
+from nti.ntiids.interfaces import INTIIDResolver
 
 from nti.schema.schema import EqHash
 from nti.schema.fieldproperty import AdaptingFieldProperty
@@ -42,6 +43,7 @@ from . import get_user
 
 from .interfaces import IPurchasable
 from .interfaces import IPurchaseHistory
+from .interfaces import IPurchasableVendorInfo
 
 from .content_bundle import ContentBundle
 
@@ -49,6 +51,13 @@ from .utils import to_frozenset
 from .utils import to_collection
 from .utils import MetaStoreObject
 
+@interface.implementer(IPurchasableVendorInfo)
+class DefaultPurchasableVendorInfo(dict):
+	"""
+	The default representation of vendor info. We expect the info
+	to be small.
+	"""
+		
 @interface.implementer(IPurchasable, IACLProvider, IContentTypeAware)
 @WithRepr
 @EqHash('NTIID',)
@@ -72,15 +81,20 @@ class PesistentPurchasable(Contained,
 def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=None,
 					   title=None, license_=None, author=None, description=None,
 					   icon=None, thumbnail=None, discountable=False,
-					   bulk_purchase=True, public=True):
+					   bulk_purchase=True, public=True, vendor_info=None, **kwargs):
 	fee = float(fee) if fee is not None else None
 	amount = float(amount) if amount is not None else amount
 	items = to_frozenset(items) if items else frozenset((ntiid,))
+	
+	vendor = DefaultPurchasableVendorInfo(vendor_info) \
+			 if vendor_info and isinstance(vendor_info, Mapping) else None
+	
 	result = Purchasable(NTIID=ntiid, Provider=provider, Title=title, Author=author,
 						 Items=items, Description=description, Amount=amount,
 						 Currency=currency, Fee=fee, License=license_,
 						 Discountable=discountable, BulkPurchase=bulk_purchase,
-						 Icon=icon, Thumbnail=thumbnail, Public=True)
+						 Icon=icon, Thumbnail=thumbnail, Public=True,
+						 VendorInfo=vendor)
 	return result
 
 def get_purchasable(pid, registry=component):
@@ -139,8 +153,15 @@ def get_providers(purchasables):
 	result = {p.Provider for p in purchasables or ()}
 	return sorted(result)
 
-@interface.implementer(nid_interfaces.INTIIDResolver)
+@interface.implementer(INTIIDResolver)
 class _PurchasableResolver(object):
 
+	singleton = None
+	
+	def __new__(cls, *args, **kwargs):
+		if not cls.singleton:
+			cls.singleton = super(_PurchasableResolver, cls).__new__(cls)
+		return cls.singleton
+	
 	def resolve(self, ntiid_string):
 		return get_purchasable(ntiid_string)
