@@ -231,6 +231,14 @@ class IPaymentProcessor(interface.Interface):
 		:user User that made the purchase
 		"""
 
+class IPurchaseAttemptContext(IEnumerableMapping):
+	"""
+	Arbitrary purchase attempt information
+
+	This is simply a dictionary and this module does not define
+	the structure of it. 
+	"""
+	
 class IPurchaseAttempt(IContained):
 
 	Processor = Choice(vocabulary=PAYMENT_PROCESSORS_VOCABULARY,
@@ -250,6 +258,9 @@ class IPurchaseAttempt(IContained):
 	Synced = Bool(title='if the item has been synchronized with the processors data',
 				  required=True, default=False)
 
+	Context = Object(IPurchaseAttemptContext, title="Purchase attempt context", 
+					 required=False)
+	
 	def has_completed():
 		"""
 		return if the purchase has completed
@@ -307,13 +318,24 @@ class IRedeemedPurchaseAttempt(IPurchaseAttempt):
 	RedemptionTime = Number(title='Redemption time', required=True)
 	RedemptionCode = ValidTextLine(title='Redemption Code', required=True)
 	
-deprecated('IEnrollmentAttempt', 'Use new course enrollment')
-class IEnrollmentAttempt(IPurchaseAttempt):
-	pass
-
-deprecated('IEnrollmentPurchaseAttempt', 'Use new course enrollment')
-class IEnrollmentPurchaseAttempt(IEnrollmentAttempt):
-	Processor = ValidTextLine(title='Enrollment institution', required=False)
+class IPurchaseAttemptFactory(interface.Interface):
+	"""
+	Interface to create :class:`IPurchaseAttempt` objects. 
+	
+	This factory are usually registered based the provider of the
+	purchasable(s) being bought
+	"""
+	
+	def create(order, processor, state=None, description=None, start_time=None, 
+			   context=None):
+		
+		"""
+		:param order: a :class:`IPurchaseOrder` object. 
+		:param processor: A payment processor name
+		:param description: Purchase attempt description'
+		:param start_time: Purchase attempt start time
+		:param start_time: a :class:`IPurchaseAttemptContext` object. 
+		"""
 
 class IPurchaseAttemptEvent(IObjectEvent):
 	object = Object(IPurchaseAttempt, title="The purchase")
@@ -367,7 +389,9 @@ class PurchaseAttemptStarted(PurchaseAttemptEvent):
 
 @interface.implementer(IPurchaseAttemptSuccessful)
 class PurchaseAttemptSuccessful(PurchaseAttemptEvent):
+	
 	state = PA_STATE_SUCCESS
+	
 	def __init__(self, purchase, charge=None, request=None):
 		super(PurchaseAttemptSuccessful, self).__init__(purchase)
 		self.charge = charge
@@ -418,3 +442,11 @@ class IPurchaseHistory(IIterable):
 		"""
 class IStorePurchaseInvitation(interface.Interface):
 	pass
+
+deprecated('IEnrollmentAttempt', 'Use new course enrollment')
+class IEnrollmentAttempt(IPurchaseAttempt):
+	pass
+
+deprecated('IEnrollmentPurchaseAttempt', 'Use new course enrollment')
+class IEnrollmentPurchaseAttempt(IEnrollmentAttempt):
+	Processor = ValidTextLine(title='Enrollment institution', required=False)

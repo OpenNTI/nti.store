@@ -11,14 +11,19 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import time
-import BTrees
+from collections import Mapping
 from functools import total_ordering
 
+import BTrees
+
+from zope import component
 from zope import interface
 from zope.container.contained import Contained
 from zope.mimetype.interfaces import IContentTypeAware
 from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
+
+from persistent.mapping import PersistentMapping
 
 from nti.dataserver.interfaces import ICreated
 from nti.dataserver.datastructures import ModDateTrackingObject
@@ -55,8 +60,22 @@ from .interfaces import PA_STATE_REFUNDED
 from .interfaces import PA_STATE_CANCELED
 
 from .interfaces import IPurchaseAttempt
+from .interfaces import IPurchaseAttemptContext
+from .interfaces import IPurchaseAttemptFactory
 from .interfaces import IRedeemedPurchaseAttempt
 from .interfaces import IInvitationPurchaseAttempt
+
+@interface.implementer(IPurchaseAttemptContext)
+class DefaultPurchaseAttemptContext(PersistentMapping):
+	"""
+	The default representation of context info. 
+	"""
+	
+def _to_purchase_attempt_context(context):
+	if context and not IPurchaseAttemptContext.providedBy(context):
+		assert isinstance(context, Mapping)
+		context = DefaultPurchaseAttemptContext(context)
+	return context
 
 @total_ordering
 @interface.implementer(ICreated,
@@ -77,6 +96,7 @@ class PurchaseAttempt(ModDateTrackingObject,
 	createDirectFieldProperties(IPurchaseAttempt)
 
 	id = alias('__name__')
+	Context = FP(IPurchaseAttempt['Context'])
 	
 	@property
 	def Items(self):
@@ -195,12 +215,33 @@ def get_purchasables(purchase):
 	return get_purchasables_from_order(purchase.Order)
 
 def create_purchase_attempt(order, processor, state=None, description=None,
-							start_time=None):
+							start_time=None, context=None):
+
+	# set some defaults
 	state = state or PA_STATE_UNKNOWN
+	context = _to_purchase_attempt_context(context)
 	start_time = start_time if start_time else time.time()
-	cls = PurchaseAttempt if not order.Quantity else InvitationPurchaseAttempt
-	result = cls(Order=order, Processor=processor, Description=description,
-				 State=state, StartTime=float(start_time))
+		
+	## if there is a quantity, it means it's an invitation purchase
+	if order.Quantity:
+		result = InvitationPurchaseAttempt(Order=order, Processor=processor,
+										   Description=description, State=state, 
+										   StartTime=float(start_time), Context=context)
+	else: 
+		## try to find a factory based on the providers of the 
+		## purchasables in the order
+		factory = None
+		providers = get_providers_from_order(order)
+		if providers and len(providers) ==1:
+			provider = providers[0].lower()
+			factory = component.queryUtility(IPurchaseAttemptFactory, name=provider)
+		
+		if factory is None:
+			factory = component.getUtility(IPurchaseAttemptFactory)
+			
+		result = factory.create(order=order, processor=processor, state=state, 
+								description=description, start_time=start_time,
+								context=context)
 	return result
 
 def create_redeemed_purchase_attempt(purchase, redemption_code, redemption_time=None):
@@ -221,6 +262,22 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, redemption_time=
 				RedemptionCode=unicode(redemption_code))
 	return result
 
+@interface.implementer(IPurchaseAttemptFactory)
+class DefaultPurchaseAttemptFactory(object):
+
+	def create(	self, order, processor, state=None, description=None, 
+				start_time=None, context=None, *args, **kwargs):
+		# set some defaults
+		state = state or PA_STATE_UNKNOWN
+		context = _to_purchase_attempt_context(context)
+		start_time = start_time if start_time else time.time()
+		# create 
+		result = PurchaseAttempt(Order=order, Processor=processor, 
+								 Description=description, State=state, 
+								 StartTime=float(start_time), Context=context)
+		return result
+
+# deprecated 
 from zope.deprecation import deprecated
 
 from nti.deprecated import hiding_warnings

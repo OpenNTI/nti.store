@@ -28,7 +28,6 @@ from .utils import to_frozenset
 
 from .purchasable import Purchasable
 from .purchasable import get_purchasable
-from .purchasable import _PurchasableResolver
 from .purchasable import DefaultPurchasableVendorInfo
 
 from .interfaces import IPurchasableCourse
@@ -85,4 +84,5 @@ def get_course(course_id, registry=component):
 	result = get_purchasable(course_id, registry=registry)
 	return result
 
+from .purchasable import _PurchasableResolver
 _CourseResolver = _PurchasableResolver # alias BWC
