@@ -10,8 +10,6 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
 
-from dolmen.builtins import IString, IUnicode
-
 from ... import MessageFactory
 
 from .interfaces import IStripeException
