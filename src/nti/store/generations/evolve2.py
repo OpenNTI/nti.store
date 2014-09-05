@@ -110,7 +110,7 @@ def evolve(context):
 	Evolve generation 1 to 2 by either removing old 'enrollment'
 	purchases and updating the __name__ property of them
 	"""
-	logger.debug("Store generation %s started", generation)
+	logger.info("Store generation %s started", generation)
 	setHooks()
 	conn = context.connection
 	root = conn.root()
@@ -122,5 +122,5 @@ def evolve(context):
 		for user in users.values():
 			if IUser.providedBy(user):
 				update_user_purchase_data(user, intids)
-	logger.debug("Store generation %s completed", generation)
+	logger.info("Store generation %s completed", generation)
 	
