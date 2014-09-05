@@ -11,7 +11,6 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import six
-from collections import Mapping
 
 from zope import component
 from zope import interface
@@ -32,8 +31,6 @@ from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import LocatedExternalList
 
 from nti.mimetype.mimetype import MIME_BASE
-
-from nti.ntiids.interfaces import INTIIDResolver
 
 from nti.schema.schema import EqHash
 from nti.schema.fieldproperty import AdaptingFieldProperty
@@ -57,7 +54,10 @@ class DefaultPurchasableVendorInfo(dict):
 	The default representation of vendor info. We expect the info
 	to be small.
 	"""
-		
+	
+	def toExternalObject(self, *args, **kwargs):
+		return dict(self)
+	
 @interface.implementer(IPurchasable, IACLProvider, IContentTypeAware)
 @WithRepr
 @EqHash('NTIID',)
@@ -85,9 +85,7 @@ def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=No
 	fee = float(fee) if fee is not None else None
 	amount = float(amount) if amount is not None else amount
 	items = to_frozenset(items) if items else frozenset((ntiid,))
-	
-	vendor = DefaultPurchasableVendorInfo(vendor_info) \
-			 if vendor_info and isinstance(vendor_info, Mapping) else None
+	vendor = IPurchasableVendorInfo(vendor_info, None)
 	
 	result = Purchasable(NTIID=ntiid, Provider=provider, Title=title, Author=author,
 						 Items=items, Description=description, Amount=amount,
@@ -153,15 +151,3 @@ def get_providers(purchasables):
 	result = {p.Provider for p in purchasables or ()}
 	return sorted(result)
 
-@interface.implementer(INTIIDResolver)
-class _PurchasableResolver(object):
-
-	singleton = None
-	
-	def __new__(cls, *args, **kwargs):
-		if not cls.singleton:
-			cls.singleton = super(_PurchasableResolver, cls).__new__(cls)
-		return cls.singleton
-	
-	def resolve(self, ntiid_string):
-		return get_purchasable(ntiid_string)

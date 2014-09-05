@@ -11,7 +11,6 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import time
-from collections import Mapping
 from functools import total_ordering
 
 import BTrees
@@ -71,10 +70,12 @@ class DefaultPurchaseAttemptContext(PersistentMapping):
 	The default representation of context info. 
 	"""
 	
+	def toExternalObject(self, *args, **kwargs):
+		return dict(self)
+	
 def _to_purchase_attempt_context(context):
-	if context and not IPurchaseAttemptContext.providedBy(context):
-		assert isinstance(context, Mapping)
-		context = DefaultPurchaseAttemptContext(context)
+	if context is not None:
+		context = IPurchaseAttemptContext(context)
 	return context
 
 @total_ordering

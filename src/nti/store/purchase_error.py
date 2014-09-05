@@ -10,7 +10,6 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-from zope import component
 from zope import interface
 
 from nti.externalization.representation import WithRepr
@@ -21,7 +20,6 @@ from nti.schema.fieldproperty import createDirectFieldProperties
 
 from .utils import MetaStoreObject
 from .interfaces import IPurchaseError
-from .interfaces import INTIStoreException
 
 @interface.implementer(IPurchaseError)
 @WithRepr
@@ -35,13 +33,4 @@ class PurchaseError(SchemaConfigured):
 
 def create_purchase_error(message, type_=None, code=None):
 	result = PurchaseError(Message=message, Type=type_, Code=code)
-	return result
-
-@component.adapter(INTIStoreException)
-@interface.implementer(IPurchaseError)
-def nti_store_exception_adpater(error):
-	result = PurchaseError(Type=u"NTIException")
-	args = getattr(error, 'args', ())
-	message = unicode(' '.join(map(str, args)))
-	result.Message = message or 'Unspecified Exception'
 	return result

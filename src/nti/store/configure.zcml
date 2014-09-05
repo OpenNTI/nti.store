@@ -20,13 +20,21 @@
 	<!-- Adapters -->
 	
 	<adapter factory=".purchase_history._PurchaseHistoryFactory"
-			 for="nti.dataserver.interfaces.IUser"
-			 provides=".interfaces.IPurchaseHistory" />
+			 provides=".interfaces.IPurchaseHistory"
+			 for="nti.dataserver.interfaces.IUser" />
 
-	<adapter factory=".purchase_error.nti_store_exception_adpater"
+	<adapter factory=".adapters._nti_store_exception_adpater"
 			 provides=".interfaces.IPurchaseError"
 			 for=".interfaces.INTIStoreException" />
-	
+		
+	<adapter factory=".adapters._mapping_to_vendorinfo"
+			 provides=".interfaces.IPurchasableVendorInfo"
+			 for="dict" />
+		
+	<adapter factory=".adapters._mapping_to_purchase_attempt_context"
+			 provides=".interfaces.IPurchaseAttemptContext"
+			 for="dict" />
+		 	 
 	<!-- Subscribers -->
 	
 	<subscriber handler=".subscribers._purchase_attempt_failed" />
@@ -57,9 +65,9 @@
 
 	<utility factory=".purchase_attempt.DefaultPurchaseAttemptFactory" />
 	
-	<utility factory=".course._CourseResolver" name="purchasablecourse" />
-	<utility factory=".purchasable._PurchasableResolver" name="purchasable" />
-	<utility factory=".purchasable._PurchasableResolver" name="purchasablecontent" />
+	<utility factory=".ntiids._CourseResolver" name="purchasablecourse" />
+	<utility factory=".ntiids._PurchasableResolver" name="purchasable" />
+	<utility factory=".ntiids._PurchasableResolver" name="purchasablecontent" />
 	
 	<!-- Externalization -->
 	
@@ -75,6 +83,8 @@
 						 .interfaces.IPurchaseError
 						 .interfaces.IPricingResults
 						 .interfaces.IPurchaseAttempt
+						 .interfaces.IPurchasableVendorInfo
+						 .interfaces.IPurchaseAttemptContext
 						 .interfaces.IRedeemedPurchaseAttempt
 						 .interfaces.IInvitationPurchaseAttempt"
 		modules=".purchase_order .purchase_error .purchase_attempt 

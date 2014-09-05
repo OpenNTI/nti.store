@@ -14,6 +14,8 @@ import six
 import time
 import simplejson as json
 
+from nti.externalization.externalization import to_external_object
+
 from ... import NTIStoreException
 
 from ...payment_charge import UserAddress
@@ -28,11 +30,13 @@ def makenone(s, default=None):
 		s = default if s == 'None' else unicode(s)
 	return s
 
-def encode_charge_description(purchase_id, username, customer_id):
+def encode_charge_description(purchase_id, username, customer_id, context=None):
 	"""
 	proceduce a json object for a stripe charge description
 	"""
-	data = {'PurchaseID': purchase_id, 'Username':username, 'CustomerID': customer_id}
+	context = to_external_object(context) if context else None 
+	data = {'PurchaseID': purchase_id, 'Username':username, 
+			'CustomerID': customer_id, 'Context': context}
 	result = json.dumps(data)
 	return result
 

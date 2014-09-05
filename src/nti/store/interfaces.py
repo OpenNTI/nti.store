@@ -260,6 +260,7 @@ class IPurchaseAttempt(IContained):
 
 	Context = Object(IPurchaseAttemptContext, title="Purchase attempt context", 
 					 required=False)
+	Context.setTaggedValue('_ext_excluded_out', True)
 	
 	def has_completed():
 		"""
@@ -442,6 +443,8 @@ class IPurchaseHistory(IIterable):
 		"""
 class IStorePurchaseInvitation(interface.Interface):
 	pass
+
+# depreecated interfaces
 
 deprecated('IEnrollmentAttempt', 'Use new course enrollment')
 class IEnrollmentAttempt(IPurchaseAttempt):

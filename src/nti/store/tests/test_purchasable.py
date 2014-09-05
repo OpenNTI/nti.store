@@ -19,6 +19,8 @@ import unittest
 
 from nti.dataserver.users import User
 
+from nti.ntiids.ntiids import find_object_with_ntiid
+
 from nti.store.purchasable import get_purchasable
 from nti.store.purchasable import  get_content_items
 from nti.store.purchasable import get_available_items
@@ -44,6 +46,10 @@ class TestPurchasable(unittest.TestCase):
 		usr = User.create_user(self.ds, username=username, password=password)
 		return usr
 
+	def test_ntiids(self):
+		assert_that(find_object_with_ntiid('tag:nextthought.com,2011-10:NextThought-purchasable-HelpCenter'), 
+					is_not(none()))
+		
 	def test_zmcl(self):
 		assert_that(get_purchasable('iid_0'), is_not(none()))
 
