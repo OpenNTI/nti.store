@@ -21,10 +21,13 @@ from zope.event import notify
 from nti.externalization import integer_strings
 
 from .... import NTIStoreException
-from .... import interfaces as store_interfaces
+from ....interfaces import IPurchaseAttempt
+from ....interfaces import PurchaseAttemptRefunded
+
+from ..interfaces import RegisterStripeCharge
+from ..interfaces import IStripePurchaseAttempt
 
 from .base import BaseProcessor
-from .. import interfaces as stripe_interfaces
 
 class RefundProcessor(BaseProcessor):
 
@@ -40,12 +43,11 @@ class RefundProcessor(BaseProcessor):
 		uid = integer_strings.from_external_string(trx_id)
 		zope_iids = component.getUtility(zope.intid.IIntIds)
 		purchase = zope_iids.queryObject(uid)
-		if not purchase or not store_interfaces.IPurchaseAttempt.providedBy(purchase):
+		if not purchase or not IPurchaseAttempt.providedBy(purchase):
 			raise NTIStoreException('Purchase attempt %s could not be found', trx_id)
 		
 		if not purchase.has_succeeded():
-			raise NTIStoreException('Purchase attempt %s status is not completed',
-									trx_id)
+			raise NTIStoreException('Purchase attempt %s status is not completed', trx_id)
 		elif purchase.is_refunded():
 			logger.warn('Purchase attempt %s has already been refunded', trx_id)
 			return False
@@ -69,7 +71,7 @@ class RefundProcessor(BaseProcessor):
 				refund_application_fee = False
 
 		charge = None
-		sp = stripe_interfaces.IStripePurchaseAttempt(purchase)
+		sp = IStripePurchaseAttempt(purchase)
 		if sp.ChargeID:
 			charge = self.get_stripe_charge(sp.ChargeID, api_key=api_key)
 		else:
@@ -79,7 +81,7 @@ class RefundProcessor(BaseProcessor):
 			if charges:
 				charge = charges[0]  # get first
 				# re-register for future use
-				notify(stripe_interfaces.RegisterStripeCharge(purchase, charge.id))
+				notify(RegisterStripeCharge(purchase, charge.id))
 			
 		if charge:
 			cents_amount = int(amount * 100.0) if amount is not None else None
@@ -90,7 +92,7 @@ class RefundProcessor(BaseProcessor):
 							  refund_application_fee=refund_application_fee)
 			else:
 				logger.warn('Stripe charge already refunded')
-			notify(store_interfaces.PurchaseAttemptRefunded(local_purchase))
+			notify(PurchaseAttemptRefunded(local_purchase))
 		else:
 			raise NTIStoreException('Stripe purchase was found')
 

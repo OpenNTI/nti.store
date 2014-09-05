@@ -19,7 +19,7 @@ import stripe
 import unittest
 from datetime import date
 
-from .. import stripe_io
+from ..stripe_io import StripeIO
 
 class TestZopeTestrunner(unittest.TestCase):
 
@@ -46,7 +46,7 @@ class TestStripeIO(unittest.TestCase):
 		email = username + '@nextthought.com'
 		description = 'test user ' +  code
 
-		sio = stripe_io.StripeIO()
+		sio = StripeIO()
 		customer = sio.create_stripe_customer(email, description)
 		assert_that(customer, is_not(None))
 
@@ -61,7 +61,7 @@ class TestStripeIO(unittest.TestCase):
 		assert_that(r, is_(True))
 
 	def test_create_token_and_charge(self):
-		sio = stripe_io.StripeIO()
+		sio = StripeIO()
 		t = sio.create_stripe_token(number="5105105105105100",
 									exp_month="11",
 									exp_year="30",
@@ -88,7 +88,7 @@ class TestStripeIO(unittest.TestCase):
 		assert_that(charges, has_length(greater_than_or_equal_to(1)))
 
 	def test_invalid_token(self):
-		sio = stripe_io.StripeIO()
+		sio = StripeIO()
 		try:
 			sio.get_stripe_token('tok_unknown')
 			self.fail()
@@ -96,7 +96,7 @@ class TestStripeIO(unittest.TestCase):
 			pass
 
 	def test_invalid_charge(self):
-		sio = stripe_io.StripeIO()
+		sio = StripeIO()
 		try:
 			sio.get_stripe_charge('c_unknown')
 			self.fail()
@@ -104,7 +104,7 @@ class TestStripeIO(unittest.TestCase):
 			pass
 
 	def test_invalid_customer(self):
-		sio = stripe_io.StripeIO()
+		sio = StripeIO()
 		try:
 			sio.get_stripe_customer('cus_unknown')
 			self.fail()
@@ -115,7 +115,7 @@ class TestStripeIO(unittest.TestCase):
 		code =  str(uuid.uuid4()).split('-')[0]
 		c = stripe.Coupon.create(percent_off=25,duration='once', id=code)
 		try:
-			sio = stripe_io.StripeIO()
+			sio = StripeIO()
 			coupon = sio.get_stripe_coupon(code)
 			assert_that(coupon, is_not(None))
 		finally:
@@ -123,7 +123,7 @@ class TestStripeIO(unittest.TestCase):
 
 	def test_invalid_coupon(self):
 		code =  'notknown'
-		sio = stripe_io.StripeIO()
+		sio = StripeIO()
 		try:
 			sio.get_stripe_coupon(code)
 			self.fail()

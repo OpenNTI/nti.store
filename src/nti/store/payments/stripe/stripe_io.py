@@ -12,13 +12,12 @@ logger = __import__('logging').getLogger(__name__)
 
 import six
 import sys
+
 import stripe
 
 from . import StripeException
 
 _marker = object()
-
-# misc
 
 def _do_stripe_operation(func, *args, **kwargs):
 	try:
