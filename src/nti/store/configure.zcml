@@ -65,9 +65,9 @@
 
 	<utility factory=".purchase_attempt.DefaultPurchaseAttemptFactory" />
 	
-	<utility factory=".ntiids._CourseResolver" name="purchasablecourse" />
 	<utility factory=".ntiids._PurchasableResolver" name="purchasable" />
-	<utility factory=".ntiids._PurchasableResolver" name="purchasablecontent" />
+	<utility factory=".ntiids._PurchasableResolver" name="purchasable_course" />
+	<utility factory=".ntiids._PurchasableResolver" name="purchasable_content" />
 	
 	<!-- Externalization -->
 	
