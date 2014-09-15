@@ -29,6 +29,7 @@ from nti.dataserver.datastructures import PersistentCreatedModDateTrackingObject
 from nti.externalization.representation import WithRepr
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import LocatedExternalList
+from nti.externalization.interfaces import IInternalObjectExternalizer
 
 from nti.mimetype.mimetype import MIME_BASE
 
@@ -38,21 +39,20 @@ from nti.schema.fieldproperty import createDirectFieldProperties
 
 from . import get_user
 
-from .interfaces import IPurchasable
-from .interfaces import IPurchaseHistory
-from .interfaces import IPurchasableVendorInfo
-
-from .content_bundle import ContentBundle
-
 from .utils import to_frozenset
 from .utils import to_collection
 from .utils import MetaStoreObject
 
-@interface.implementer(IPurchasableVendorInfo)
+from .content_bundle import ContentBundle
+
+from .interfaces import IPurchasable
+from .interfaces import IPurchaseHistory
+from .interfaces import IPurchasableVendorInfo
+
+@interface.implementer(IPurchasableVendorInfo, IInternalObjectExternalizer)
 class DefaultPurchasableVendorInfo(dict):
 	"""
-	The default representation of vendor info. We expect the info
-	to be small.
+	The default representation of vendor info.
 	"""
 	
 	def toExternalObject(self, *args, **kwargs):

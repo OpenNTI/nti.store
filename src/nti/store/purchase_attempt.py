@@ -28,6 +28,7 @@ from nti.dataserver.interfaces import ICreated
 from nti.dataserver.datastructures import ModDateTrackingObject
 
 from nti.externalization.representation import WithRepr
+from nti.externalization.interfaces import IInternalObjectExternalizer
 
 from nti.mimetype.mimetype import MIME_BASE
 
@@ -64,7 +65,7 @@ from .interfaces import IPurchaseAttemptFactory
 from .interfaces import IRedeemedPurchaseAttempt
 from .interfaces import IInvitationPurchaseAttempt
 
-@interface.implementer(IPurchaseAttemptContext)
+@interface.implementer(IPurchaseAttemptContext, IInternalObjectExternalizer)
 class DefaultPurchaseAttemptContext(PersistentMapping):
 	"""
 	The default representation of context info. 
