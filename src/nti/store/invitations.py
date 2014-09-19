@@ -21,7 +21,8 @@ from zope import interface
 from nti.appserver.invitations.interfaces import IInvitation
 from nti.appserver.invitations.invitation import JoinEntitiesInvitation
 
-from nti.externalization import integer_strings
+from nti.externalization.integer_strings import to_external_string
+from nti.externalization.integer_strings import from_external_string
 
 from . import get_user
 
@@ -68,14 +69,14 @@ def get_invitation_code(purchase, registry=component):
 	if purchase is not None:
 		iid = registry.getUtility(zc_intid.IIntIds).getId(purchase)
 		__traceback_info__ = purchase, iid
-		result = integer_strings.to_external_string(iid)
+		result = to_external_string(iid)
 		return result
 	return None
 
 def get_purchase_by_code(code, registry=component):
 	if code is not None:
 		__traceback_info__ = code
-		iid = integer_strings.from_external_string(code)
+		iid = from_external_string(code)
 		result = registry.getUtility(zc_intid.IIntIds).queryObject(iid)
 		return result
 	return None
