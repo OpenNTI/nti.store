@@ -73,7 +73,11 @@ def _do_stripe_purchase(purchase_id, username, cents_amount, currency,
 	purchase = get_purchase_attempt(purchase_id, username)
 	if purchase.is_pending() and customer_id is not None:
 		# charge card, user description for tracking purposes
-		descid = encode_charge_description(purchase_id, username, customer_id)
+		context = purchase.Context
+		descid = encode_charge_description(purchase_id=purchase_id, 
+										   username=username,
+										   customer_id=customer_id,
+										   context=context)
 		logger.info('Creating stripe charge for %s', purchase_id)
 		charge = create_charge(	cents_amount, currency=currency,
 								card=card, description=descid,

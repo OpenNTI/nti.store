@@ -70,7 +70,6 @@ class DefaultPurchaseAttemptContext(PersistentMapping):
 	"""
 	The default representation of context info. 
 	"""
-	
 	def toExternalObject(self, *args, **kwargs):
 		return dict(self)
 	
@@ -97,9 +96,11 @@ class PurchaseAttempt(ModDateTrackingObject,
 
 	createDirectFieldProperties(IPurchaseAttempt)
 
-	id = alias('__name__')
 	Context = FP(IPurchaseAttempt['Context'])
 	
+	id = alias('__name__')
+	context = alias('Context')
+
 	@property
 	def Items(self):
 		return self.Order.NTIIDs
