@@ -90,6 +90,16 @@
 		modules=".purchase_order .purchase_error .purchase_attempt 
 				 .purchasable .priceable .pricing" />
 
+	<adapter factory=".externalization._PurchasableSummaryExternalizer"
+			 for=".interfaces.IPurchasable"
+			 provides="nti.externalization.interfaces.IInternalObjectExternalizer"
+			 name="summary" />
+		
+	<adapter factory=".externalization._PurchasableCourseSummaryExternalizer"
+			 for=".interfaces.IPurchasableCourse"
+			 provides="nti.externalization.interfaces.IInternalObjectExternalizer"
+			 name="summary" />
+			 	 
 	<!-- Test purchasables -->
 			
 	<configure zcml:condition="have devmode">

@@ -14,6 +14,7 @@ from hamcrest import has_key
 from hamcrest import has_entry
 from hamcrest import has_length
 from hamcrest import assert_that
+does_not = is_not
 
 import os
 import unittest
@@ -129,6 +130,28 @@ class TestStoreExternal(unittest.TestCase):
 		assert_that(ext, has_entry('Icon', u'http://prmia.org/'))
 		assert_that(ext, has_entry('Description', u'Intro to Risk'))
 
+	@WithMockDSTrans
+	def test_purchasable_summary(self):
+		ps = get_purchasable('iid_3')
+		ext = to_external_object(ps, name='summary')
+
+		assert_that(ext, has_key('MimeType'))
+		assert_that(ext, has_entry('NTIID', u'iid_3'))
+		assert_that(ext, has_entry('Class', u'Purchasable'))
+		assert_that(ext, has_entry('Amount', 90))
+		assert_that(ext, has_entry('Currency', u'USD'))
+		assert_that(ext, has_entry('BulkPurchase', False))
+		assert_that(ext, has_entry('Discountable', True))
+		assert_that(ext, has_entry('Provider', u'PRMIA'))
+		assert_that(ext, has_entry('Title', u'Risk Course'))
+		assert_that(ext, has_entry('Author', u'Alan Laubsch'))
+		assert_that(ext, does_not(has_key('Icon')))
+		assert_that(ext, does_not(has_key('Public')))
+		assert_that(ext, does_not(has_key('License')))
+		assert_that(ext, does_not(has_key('Thumbnail')))
+		assert_that(ext, does_not(has_key('VendorInfo')))
+		assert_that(ext, does_not(has_key('Description')))
+		
 	def test_priceable(self):
 		pp = create_priceable(u'iid_3', 1)
 		ext = to_external_object(pp)
