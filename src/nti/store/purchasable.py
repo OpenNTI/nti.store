@@ -15,7 +15,6 @@ import six
 from zope import component
 from zope import interface
 from zope.container.contained import Contained
-from zope.cachedescriptors.property import Lazy
 from zope.mimetype.interfaces import IContentTypeAware
 
 from nti.dataserver import authorization
@@ -32,6 +31,8 @@ from nti.externalization.interfaces import LocatedExternalList
 from nti.externalization.interfaces import IInternalObjectExternalizer
 
 from nti.mimetype.mimetype import MIME_BASE
+
+from nti.utils.property import Lazy
 
 from nti.schema.schema import EqHash
 from nti.schema.fieldproperty import AdaptingFieldProperty
@@ -150,4 +151,3 @@ def get_content_items(purchased_items, registry=component):
 def get_providers(purchasables):
 	result = {p.Provider for p in purchasables or ()}
 	return sorted(result)
-

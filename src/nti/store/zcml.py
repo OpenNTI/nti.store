@@ -43,24 +43,8 @@ class IRegisterPurchasableDirective(interface.Interface):
 	license = fields.TextLine(title='Purchasable License', required=False)
 	public = fields.Bool(title="Public flag", required=False, default=True)
 	items = fields.Tokens(value_type=schema.TextLine(title='The item identifier'), 
-						  title="Purchasable content items", required=False)
+						  title="Items to purchase", required=False)
 
-class IRegisterCourseDirective(IRegisterPurchasableDirective):
-	name = schema.TextLine(title="Course name", required=False)
-	
-	# overrides
-	amount = schema.Float(title="Cost amount", required=False, default=0.0)
-	provider = fields.TextLine(title='Course provider', required=False)
-
-	# deprecated
-	featured = schema.Bool(title="Featured flag", required=False)
-	startdate = schema.TextLine(title="Start date", required=False)
-	preview = fields.Bool(title='Preview item flag', required=False, default=False)
-	department = fields.TextLine(title='Course department', required=False)
-	signature = fields.Text(title='Course/Professor signature', required=False)
-	communities = fields.Tokens(value_type=schema.TextLine(title='The community'),
-								title="Course communities", required=False)
-	
 def registerPurchasable(_context, ntiid, provider, title, description=None, amount=None,
 						currency='USD', items=None, fee=None, author=None, icon=None,
 						thumbnail=None, license=None, discountable=False,
