@@ -20,17 +20,14 @@ from .interfaces import INTIStoreException
 
 @interface.implementer(INTIStoreException)
 class NTIStoreException(Exception):
-    pass
+	pass
 
 class InvalidPurchasable(NTIStoreException):
-    pass
+	pass
 
 class PricingException(NTIStoreException):
-    pass
+	pass
 
 def get_user(user):
-    if user is not None:
-        result = User.get_user(str(user)) if not IUser.providedBy(user) else user
-        return result
-    return None
-
+	result = User.get_user(str(user)) if user and not IUser.providedBy(user) else user
+	return result
