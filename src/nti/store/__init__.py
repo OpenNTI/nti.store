@@ -16,9 +16,6 @@ from zope import interface
 from nti.dataserver.users import User
 from nti.dataserver.interfaces import IUser
 
-from .purchasable import get_purchasable
-from .purchasable import get_all_purchasables
-
 from .interfaces import INTIStoreException
 
 @interface.implementer(INTIStoreException)
