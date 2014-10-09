@@ -27,7 +27,7 @@ from nti.store.tests import SharedConfiguringTestLayer
 
 from nti.testing.matchers import verifiably_provides
 
-class TestPurchasableStore(unittest.TestCase):
+class TestAdapters(unittest.TestCase):
 
 	layer = SharedConfiguringTestLayer
 
@@ -50,9 +50,9 @@ class TestPurchasableStore(unittest.TestCase):
 		assert_that(ext_obj, is_not(none()))
 		
 	def test_pricing_exception(self):
-		e = PricingException("foo")
-		error = IPricingError(e, None)
-		assert_that(error, is_not(none()))
-		assert_that(error, has_property('Type', is_('PricingError')))
-		assert_that(error, has_property('Message', is_('foo')))
-		assert_that(error, verifiably_provides(IPricingError))
+		for e in ('foo',  PricingException("foo")):
+			error = IPricingError(e, None)
+			assert_that(error, is_not(none()))
+			assert_that(error, has_property('Type', is_('PricingError')))
+			assert_that(error, has_property('Message', is_('foo')))
+			assert_that(error, verifiably_provides(IPricingError))
