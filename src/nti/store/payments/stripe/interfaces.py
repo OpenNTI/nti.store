@@ -25,6 +25,7 @@ from ..interfaces import IRegisterPurchaseData
 
 from ...interfaces import IPriceable
 from ...interfaces import IPricedItem
+from ...interfaces import IPricingError
 from ...interfaces import IPurchaseItem
 from ...interfaces import IPurchaseError
 from ...interfaces import IPurchaseOrder
@@ -125,6 +126,9 @@ class IStripeOperationError(IOperationError):
 	Param = ValidTextLine(title="Optional parameter", required=False)
 
 class IStripePurchaseError(IPurchaseError, IStripeOperationError):
+	pass
+
+class IStripePricingError(IPricingError):
 	pass
 
 class IStripePurchaseAttempt(interface.Interface):
