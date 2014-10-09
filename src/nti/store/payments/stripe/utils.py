@@ -16,14 +16,16 @@ import simplejson as json
 
 from nti.externalization.externalization import to_external_object
 
-from ... import NTIStoreException
-
 from ...payment_charge import UserAddress
 from ...payment_charge import PaymentCharge
 
 from ...interfaces import IPurchaseError
 
-from .interfaces  import IStripePurchaseError
+from .stripe_error import StripePurchaseError
+
+from .interfaces import IStripeError
+from .interfaces import IStripePurchaseError
+from .interfaces import IStripeOperationError
 
 def makenone(s, default=None):
 	if isinstance(s, six.string_types):
@@ -89,11 +91,14 @@ def create_payment_charge(charge):
 						   Address=address, Name=name)
 	return result
 
-def adapt_to_error(e):
+def adapt_to_purchase_error(e):
 	"""
-	adapts an exception to a IStripePurchaseError
+	adapts an exception to a [purchase] error
 	"""
-	result = IPurchaseError(e, None) or IStripePurchaseError(e, None)
+	if IStripeError.providedBy(e):
+		result = IStripeOperationError(e, None)
+	else:
+		result = IStripePurchaseError(e, None) or IPurchaseError(e, None)
 	if result is None and isinstance(e, Exception):
-		result = IPurchaseError(NTIStoreException(e.args), None)
+		result = StripePurchaseError(e.args)
 	return result

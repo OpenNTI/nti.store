@@ -26,13 +26,17 @@ from nti.utils.property import alias
 from .utils import makenone
 
 from . import StripePurchaseError
+from . import StripeOperationError
 
 from .interfaces import IStripeError
 from .interfaces import IStripeAPIError
 from .interfaces import IStripeCustomer
 from .interfaces import IStripeCardError
 from .interfaces import IStripeException
+from .interfaces import INoSuchStripeCoupon
+from .interfaces import IInvalidStripeCoupon
 from .interfaces import IStripePurchaseError
+from .interfaces import IStripeOperationError
 from .interfaces import IStripePurchaseAttempt
 from .interfaces import IStripeAPIConnectionError
 from .interfaces import IStripeAuthenticationError
@@ -83,62 +87,83 @@ _StripePurchaseAttemptFactory = an_factory(_StripePurchaseAttempt)
 @component.adapter(basestring)
 @interface.implementer(IStripePurchaseError)
 def _string_purchase_error(message):
-	result = StripePurchaseError(Type=u"Error")
+	result = StripePurchaseError(Type=u"PurchaseError")
 	result.Message = unicode(message or u'')
 	return result
 
 @component.adapter(IStripeException)
 @interface.implementer(IStripePurchaseError)
 def stripe_exception_adpater(error):
-	result = StripePurchaseError(Type=u"Exception")
+	result = StripePurchaseError(Type=u"PurchaseError")
 	args = getattr(error, 'args', ())
 	message = unicode(' '.join(map(str, args)))
-	result.Message = message or 'Unspecified Stripe Exception'
+	result.Message = message or 'Unspecified Stripe Purchase Exception'
 	return result
 
-@component.adapter(IStripeError)
+@component.adapter(INoSuchStripeCoupon)
 @interface.implementer(IStripePurchaseError)
-def stripe_error_adpater(error):
-	result = StripePurchaseError(Type=u"Error")
-	result.HttpStatus = getattr(error, 'http_status', None)
+def no_such_stripe_coupon_adpater(error):
+	result = stripe_exception_adpater(error)
+	result.Message = u'No such Stripe coupon'
+	return result
+
+@component.adapter(IInvalidStripeCoupon)
+@interface.implementer(IStripePurchaseError)
+def invalid_stripe_coupon_adpater(error):
+	result = stripe_exception_adpater(error)
+	result.Message = u'Invalid Stripe coupon'
+	return result
+
+def stripe_operation_adpater(error, Type, clazz=StripeOperationError):
+	result = clazz(Type=Type)
 	args = getattr(error, 'args', ())
+	result.HttpStatus = getattr(error, 'http_status', None)
 	message = makenone(error.message) or ' '.join(map(str, args))
 	result.Message = unicode(message or 'Unspecified Stripe Error')
 	return result
 
+@component.adapter(basestring)
+@interface.implementer(IStripeOperationError)
+def _string_operation_error(message):
+	result = StripeOperationError(Type=u"OperationError")
+	result.Message = unicode(message or u'')
+	return result
+
 @component.adapter(IStripeAPIError)
-@interface.implementer(IStripePurchaseError)
+@interface.implementer(IStripeOperationError)
 def stripe_api_error_adpater(error):
-	result = stripe_error_adpater(error)
-	result.Type = u"APIError"
+	result = stripe_operation_adpater(error, Type=u"APIError")
 	return result
 
 @component.adapter(IStripeAPIConnectionError)
-@interface.implementer(IStripePurchaseError)
+@interface.implementer(IStripeOperationError)
 def stripe_api_connection_error_adpater(error):
-	result = stripe_error_adpater(error)
-	result.Type = "APIConnectionError"
+	result = stripe_operation_adpater(error, Type=u"APIConnectionError")
 	return result
 
 @component.adapter(IStripeCardError)
-@interface.implementer(IStripePurchaseError)
+@interface.implementer(IStripeOperationError)
 def stripe_card_error_adpater(error):
-	result = stripe_error_adpater(error)
-	result.Type = u"CardError"
+	result = stripe_operation_adpater(error, Type=u"CardError")
 	result.Code = makenone(getattr(error, 'code', None))
 	result.Param = makenone(getattr(error, 'param', None))
 	return result
 
-@component.adapter(IStripeCardError)
-@interface.implementer(IStripeInvalidRequestError)
+@component.adapter(IStripeInvalidRequestError)
+@interface.implementer(IStripeOperationError)
 def stripe_invalid_request_error_adpater(error):
-	result = stripe_error_adpater(error)
-	result.Type = u"InvalidRequestError"
+	result = stripe_operation_adpater(error, Type=u"InvalidRequestError")
+	result.Code = makenone(getattr(error, 'code', None))
 	return result
 
 @component.adapter(IStripeAuthenticationError)
-@interface.implementer(IStripePurchaseError)
+@interface.implementer(IStripeOperationError)
 def stripe_auth_error_adpater(error):
-	result = stripe_error_adpater(error)
-	result.Type = u"AuthenticationError"
+	result = stripe_operation_adpater(error, Type=u"AuthenticationError")
+	return result
+
+@component.adapter(IStripeError)
+@interface.implementer(IStripeOperationError)
+def stripe_error_adpater(error):
+	result = stripe_operation_adpater(error, Type=u"StripeError")
 	return result

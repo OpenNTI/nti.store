@@ -12,11 +12,11 @@
 
 	<include package="." file="stripe_objects.zcml" />
 	
-	<subscriber handler=".subscribers.stripe_customer_created" />
-	<subscriber handler=".subscribers.stripe_customer_deleted" />
 	<subscriber handler=".subscribers.register_stripe_token" />
 	<subscriber handler=".subscribers.register_stripe_charge" />
-
+	<subscriber handler=".subscribers.stripe_customer_created" />
+	<subscriber handler=".subscribers.stripe_customer_deleted" />
+	
 	<adapter factory=".stripe_adapters._StripeCustomerFactory"
 			 for="nti.dataserver.interfaces.IUser"
 			 provides=".interfaces.IStripeCustomer" />
@@ -44,6 +44,18 @@
 			 provides=".interfaces.IStripePurchaseError"
 			 for="basestring" />
 			 
+	<adapter factory=".stripe_adapters.stripe_exception_adpater"
+			 provides=".interfaces.IStripePurchaseError"
+			 for=".interfaces.IStripeException" />
+		
+	<adapter factory=".stripe_adapters.no_such_stripe_coupon_adpater"
+			 provides=".interfaces.IStripePurchaseError"
+			 for=".interfaces.INoSuchStripeCoupon" />
+			
+	<adapter factory=".stripe_adapters.invalid_stripe_coupon_adpater"
+			 provides=".interfaces.IStripePurchaseError"
+			 for=".interfaces.IInvalidStripeCoupon" /> 	 
+
 	<!-- Externalization -->
 	
 	<adapter factory=".externalization.StripeCouponExternalizer" />
@@ -55,7 +67,8 @@
 		root_interfaces=".interfaces.IStripePriceable
 						 .interfaces.IStripePricedItem
 						 .interfaces.IStripeConnectKey
-						 .interfaces.IStripePurchaseError"
+						 .interfaces.IStripePurchaseError
+						 .interfaces.IStripeOperationError"
 		modules=".stripe_purchase .stripe_key .stripe_error" />
 
 	<!-- Test keys -->

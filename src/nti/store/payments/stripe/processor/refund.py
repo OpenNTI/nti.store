@@ -20,7 +20,8 @@ from zope.event import notify
 
 from nti.externalization import integer_strings
 
-from .... import NTIStoreException
+from .... import RefundException
+
 from ....interfaces import IPurchaseAttempt
 from ....interfaces import PurchaseAttemptRefunded
 
@@ -38,16 +39,16 @@ class RefundProcessor(BaseProcessor):
 		"""
 
 		if amount is not None and amount <= 0:
-			raise NTIStoreException('Invalid refund amount')
+			raise RefundException('Invalid refund amount')
 
 		uid = integer_strings.from_external_string(trx_id)
 		zope_iids = component.getUtility(zope.intid.IIntIds)
 		purchase = zope_iids.queryObject(uid)
 		if not purchase or not IPurchaseAttempt.providedBy(purchase):
-			raise NTIStoreException('Purchase attempt %s could not be found', trx_id)
+			raise RefundException('Purchase attempt %s could not be found', trx_id)
 		
 		if not purchase.has_succeeded():
-			raise NTIStoreException('Purchase attempt %s status is not completed', trx_id)
+			raise RefundException('Purchase attempt %s status is not completed', trx_id)
 		elif purchase.is_refunded():
 			logger.warn('Purchase attempt %s has already been refunded', trx_id)
 			return False
@@ -94,6 +95,6 @@ class RefundProcessor(BaseProcessor):
 				logger.warn('Stripe charge already refunded')
 			notify(PurchaseAttemptRefunded(local_purchase))
 		else:
-			raise NTIStoreException('Stripe purchase was found')
+			raise RefundException('Stripe purchase was found')
 
 		return charge

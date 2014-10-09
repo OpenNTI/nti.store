@@ -171,14 +171,40 @@ class IPaymentCharge(interface.Interface):
 	Name = ValidTextLine(title='The customer/charge name', required=False)
 	Address = Object(IUserAddress, title='User address', required=False)
 
-class IPurchaseError(interface.Interface):
+class IOperationError(interface.Interface):
 	Type = ValidTextLine(title='Error type', required=True)
 	Code = ValidTextLine(title='Error code', required=False)
 	Message = ValidText(title='Error message', required=True)
 
-class INTIStoreException(interface.Interface):
-	""" marker interface for store exceptions """
+class IPricingError(IOperationError):
+	pass
 
+class IPurchaseError(IOperationError):
+	pass
+
+class IRefundError(IOperationError):
+	pass
+
+class INTIStoreException(interface.Interface):
+	"""
+	interface for store exceptions 
+	"""
+
+class IPurchaseException(INTIStoreException):
+	""" 
+	interface for purchase exceptions 
+	"""
+	
+class IPricingException(INTIStoreException):
+	""" 
+	interface for pricing exceptions 
+	"""
+	
+class IRefundException(INTIStoreException):
+	""" 
+	interface for refund exceptions 
+	"""
+	
 class IPurchasablePricer(interface.Interface):
 
 	def price(priceable):
@@ -254,7 +280,7 @@ class IPurchaseAttempt(IContained):
 	EndTime = Number(title='Completion time', required=False)
 
 	Pricing = Object(IPricingResults, title='Pricing results', required=False)
-	Error = Object(IPurchaseError, title='Error object', required=False)
+	Error = Object(IOperationError, title='Error object', required=False)
 	Synced = Bool(title='if the item has been synchronized with the processors data',
 				  required=True, default=False)
 

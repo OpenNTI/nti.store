@@ -22,8 +22,8 @@ from ....interfaces import PurchaseAttemptSuccessful
 
 from ....purchase_history import get_purchase_attempt
 
-from ..utils import adapt_to_error
 from ..utils import create_payment_charge
+from ..utils import adapt_to_purchase_error
 
 from ..interfaces import RegisterStripeCharge
 from ..interfaces import IStripePurchaseAttempt
@@ -81,14 +81,14 @@ def sync_purchase(purchase_id, username, api_key=None, request=None):
 							sp.TokenID, purchase_id, username)
 				if not purchase.has_completed():
 					do_synch = True
-					notify(PurchaseAttemptFailed(purchase, adapt_to_error(message)))
+					notify(PurchaseAttemptFailed(purchase, adapt_to_purchase_error(message)))
 			elif token.used:
 				tid = sp.TokenID
 				message = "Token %s has been used and no charge was found" % tid
 				logger.warn(message)
 				if not purchase.has_completed():
 					do_synch = True
-					notify(PurchaseAttemptFailed(purchase, adapt_to_error(message)))
+					notify(PurchaseAttemptFailed(purchase, adapt_to_purchase_error(message)))
 			elif not purchase.is_pending():  # no charge and unused token
 				logger.warn('No charge and unused token. Incorrect status for ' +
 							'purchase %r/%s', purchase_id, username)
@@ -100,14 +100,14 @@ def sync_purchase(purchase_id, username, api_key=None, request=None):
 			notify(PurchaseAttemptSuccessful(purchase, pc, request))
 		elif charge.failure_message and not purchase.has_failed():
 			message = charge.failure_message
-			notify(PurchaseAttemptFailed(purchase, adapt_to_error(message)))
+			notify(PurchaseAttemptFailed(purchase, adapt_to_purchase_error(message)))
 		elif charge.refunded and not purchase.is_refunded():
 			notify(PurchaseAttemptRefunded(purchase))
 
 	elif time.time() - purchase.StartTime >= 180 and not purchase.has_completed():
 		do_synch = True
 		message = message or "Failed purchase after expiration time"
-		notify(PurchaseAttemptFailed(purchase, adapt_to_error(message)))
+		notify(PurchaseAttemptFailed(purchase, adapt_to_purchase_error(message)))
 
 	if do_synch:
 		notify(PurchaseAttemptSynced(purchase))

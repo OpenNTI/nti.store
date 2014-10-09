@@ -22,10 +22,12 @@ from zope.event import notify
 
 from nti.dataserver.interfaces import IDataserverTransactionRunner
 
-from .... import NTIStoreException
+from .... import PurchaseException
+
 from ....interfaces import PurchaseAttemptFailed
 from ....interfaces import PurchaseAttemptStarted
 from ....interfaces import PurchaseAttemptSuccessful
+
 from ....purchase_history import get_purchase_attempt
 
 from ..stripe_io import create_charge
@@ -33,8 +35,8 @@ from ..stripe_customer import StripeCustomer
 from ..stripe_customer import update_customer
 from ..stripe_customer import get_or_create_customer
 
-from ..utils import adapt_to_error
 from ..utils import create_payment_charge
+from ..utils import adapt_to_purchase_error
 from ..utils import encode_charge_description
 
 from ..interfaces import RegisterStripeToken
@@ -48,7 +50,7 @@ from .pricing import PricingProcessor
 def _start_purchase(purchase_id, username):
 	purchase = get_purchase_attempt(purchase_id, username)
 	if purchase is None:
-		raise NTIStoreException("Could not find purchase attempt %s" % purchase_id)
+		raise PurchaseException("Could not find purchase attempt %s" % purchase_id)
 
 	if not purchase.is_pending():
 		notify(PurchaseAttemptStarted(purchase))
@@ -152,7 +154,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 				not math.fabs(expected_amount - amount) <= 0.05:
 				logger.error("Purchase order amount %.2f did not match the " +
 							 "expected amount %.2f", amount, expected_amount)
-				raise NTIStoreException("Purchase order amount did not match the "
+				raise PurchaseException("Purchase order amount did not match the "
 										"expected amount")
 
 			# create a stripe customer
@@ -189,7 +191,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 		except Exception as e:
 			logger.exception("Cannot complete process purchase for '%s'", purchase_id)
 			t, v, tb = sys.exc_info()
-			error = adapt_to_error(e)
+			error = adapt_to_purchase_error(e)
 			
 			fail_purchase = partial(_fail_purchase, 
 									purchase_id=purchase_id,
@@ -206,11 +208,11 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 			purchase = get_purchase_attempt(purchase, username)
 
 		if purchase is None:
-			raise NTIStoreException("Could not find purchase attempt %s" % purchase_id)
+			raise PurchaseException("Could not find purchase attempt %s" % purchase_id)
 
 		api_key = api_key or self.get_api_key(purchase)
 		if not api_key:
-			raise NTIStoreException("Could not find a stripe key for %s" % purchase_id)
+			raise PurchaseException("Could not find a stripe key for %s" % purchase_id)
 
 		spurchase = IStripePurchaseAttempt(purchase)
 		charge_id = spurchase.ChargeID

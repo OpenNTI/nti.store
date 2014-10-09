@@ -28,6 +28,7 @@ from ...interfaces import IPricedItem
 from ...interfaces import IPurchaseItem
 from ...interfaces import IPurchaseError
 from ...interfaces import IPurchaseOrder
+from ...interfaces import IOperationError 
 from ...interfaces import IPaymentProcessor
 
 # stripe marker interfaces
@@ -38,6 +39,12 @@ class IStripeCoupon(interface.Interface):
 class IStripeException(interface.Interface):
 	"""marker interface for a stripe exception"""
 
+class IInvalidStripeCoupon(IStripeException):
+	"""marker interface for an invalid stripe exception"""
+	
+class INoSuchStripeCoupon(IStripeException):
+	"""marker interface for an no such stripe exception"""
+	
 class IStripeError(interface.Interface):
 	"""marker interface for a stripe errors"""
 
@@ -113,9 +120,12 @@ class IStripeConnectKey(interface.Interface):
 	PublicKey = ValidTextLine(title="The private key", required=False)
 	StripeUserID = ValidTextLine(title="String user id", required=False)
 
-class IStripePurchaseError(IPurchaseError):
+class IStripeOperationError(IOperationError):
 	HttpStatus = Int(title='HTTP Status', required=False)
 	Param = ValidTextLine(title="Optional parameter", required=False)
+
+class IStripePurchaseError(IPurchaseError, IStripeOperationError):
+	pass
 
 class IStripePurchaseAttempt(interface.Interface):
 	ChargeID = ValidTextLine(title='Charge id', required=False)

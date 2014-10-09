@@ -19,11 +19,13 @@ import unittest
 from nti.externalization.externalization import to_external_object
 
 from nti.store import PricingException
-from nti.store.interfaces import IPurchaseError
+from nti.store.interfaces import IPricingError
 from nti.store.interfaces import IPurchasableVendorInfo
 from nti.store.interfaces import IPurchaseAttemptContext
 
 from nti.store.tests import SharedConfiguringTestLayer
+
+from nti.testing.matchers import verifiably_provides
 
 class TestPurchasableStore(unittest.TestCase):
 
@@ -47,9 +49,10 @@ class TestPurchasableStore(unittest.TestCase):
 		ext_obj = to_external_object(context)
 		assert_that(ext_obj, is_not(none()))
 		
-	def test_nti_exception(self):
-		e = PricingException("Error")
-		error = IPurchaseError(e, None)
+	def test_pricing_exception(self):
+		e = PricingException("foo")
+		error = IPricingError(e, None)
 		assert_that(error, is_not(none()))
-		assert_that(error, has_property('Type', is_('NTIException')))
-		assert_that(error, has_property('Message', is_('Error')))
+		assert_that(error, has_property('Type', is_('PricingError')))
+		assert_that(error, has_property('Message', is_('foo')))
+		assert_that(error, verifiably_provides(IPricingError))

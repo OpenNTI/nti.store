@@ -9,7 +9,6 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
-from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from nti.externalization.representation import WithRepr
 
@@ -17,23 +16,19 @@ from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from ...utils import MetaStoreObject
-from ...purchase_error import PurchaseError
+from .utils import MetaStoreObject
+from .interfaces import IRefundError
 
-from .interfaces import IStripePurchaseError
-from .interfaces import IStripeOperationError
-
-@interface.implementer(IStripeOperationError)
+@interface.implementer(IRefundError)
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
-class StripeOperationError(SchemaConfigured):
+class RefundError(SchemaConfigured):
 	__metaclass__ = MetaStoreObject
-	createDirectFieldProperties(IStripeOperationError)
+	createDirectFieldProperties(IRefundError)
 
 	def __str__(self):
 		return self.Message
 
-@interface.implementer(IStripePurchaseError)
-class StripePurchaseError(PurchaseError):
-	Param = FP(IStripePurchaseError['Param'])
-	HttpStatus = FP(IStripePurchaseError['HttpStatus'])
+def create_refudn_error(message, type_=None, code=None):
+	result = RefundError(Message=message, Type=type_, Code=code)
+	return result

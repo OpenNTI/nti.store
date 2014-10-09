@@ -13,7 +13,11 @@ from zope import interface
 from ... import MessageFactory
 
 from .interfaces import IStripeException
+from .interfaces import INoSuchStripeCoupon
+from .interfaces import IInvalidStripeCoupon
+
 from .stripe_error import StripePurchaseError # re-export
+from .stripe_error import StripeOperationError # re-export
 
 STRIPE = u"stripe"
 
@@ -21,9 +25,11 @@ STRIPE = u"stripe"
 class StripeException(Exception):
 	pass
 
+@interface.implementer(IInvalidStripeCoupon)
 class InvalidStripeCoupon(StripeException):
 	pass
 
+@interface.implementer(INoSuchStripeCoupon)
 class NoSuchStripeCoupon(StripeException):
 	pass
 

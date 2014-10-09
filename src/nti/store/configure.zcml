@@ -22,10 +22,6 @@
 	<adapter factory=".purchase_history._PurchaseHistoryFactory"
 			 provides=".interfaces.IPurchaseHistory"
 			 for="nti.dataserver.interfaces.IUser" />
-
-	<adapter factory=".adapters._nti_store_exception_adpater"
-			 provides=".interfaces.IPurchaseError"
-			 for=".interfaces.INTIStoreException" />
 		
 	<adapter factory=".adapters._mapping_to_vendorinfo"
 			 provides=".interfaces.IPurchasableVendorInfo"
@@ -35,6 +31,30 @@
 			 provides=".interfaces.IPurchaseAttemptContext"
 			 for="dict" />
 		 	 
+	<adapter factory=".adapters._string_purchase_error"
+			 provides=".interfaces.IPurchaseError"
+			 for="basestring" />
+		
+	<adapter factory=".adapters._purchase_exception_adpater"
+			 provides=".interfaces.IPurchaseError"
+			 for=".interfaces.IPurchaseException" />	
+
+	<adapter factory=".adapters._string_pricing_error"
+			 provides=".interfaces.IPricingError"
+			 for="basestring" />
+		
+	<adapter factory=".adapters._pricing_exception_adpater"
+			 provides=".interfaces.IPricingError"
+			 for=".interfaces.IPricingException" />	
+ 
+ 	<adapter factory=".adapters._string_refund_error"
+			 provides=".interfaces.IRefundError"
+			 for="basestring" />
+		
+	<adapter factory=".adapters._refund_exception_adpater"
+			 provides=".interfaces.IRefundError"
+			 for=".interfaces.IRefundException" />	
+
 	<!-- Subscribers -->
 	
 	<subscriber handler=".subscribers._purchase_attempt_failed" />
@@ -80,6 +100,8 @@
 						 .interfaces.IPurchasable
 						 .interfaces.IPurchaseOrder
 						 .interfaces.IPurchaseItem
+						 .interfaces.IPricingError
+						 .interfaces.IRefundError
 						 .interfaces.IPurchaseError
 						 .interfaces.IPricingResults
 						 .interfaces.IPurchaseAttempt
@@ -88,7 +110,8 @@
 						 .interfaces.IRedeemedPurchaseAttempt
 						 .interfaces.IInvitationPurchaseAttempt"
 		modules=".purchase_order .purchase_error .purchase_attempt 
-				 .purchasable .priceable .pricing" />
+				 .purchasable .priceable .pricing .pricing_error
+				 .refund_error" />
 
 	<adapter factory=".externalization._PurchasableSummaryExternalizer"
 			 for=".interfaces.IPurchasable"

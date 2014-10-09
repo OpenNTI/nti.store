@@ -24,12 +24,15 @@ from nti.store.purchase_attempt import create_purchase_attempt
 from nti.store.payments.stripe import StripeException
 from nti.store.payments.stripe.interfaces import IStripeCustomer
 from nti.store.payments.stripe.interfaces import IStripePurchaseError
+from nti.store.payments.stripe.interfaces import IStripeOperationError
 from nti.store.payments.stripe.interfaces import IStripePurchaseAttempt
 
 import nti.dataserver.tests.mock_dataserver as mock_dataserver
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
 from nti.store.tests import SharedConfiguringTestLayer
+
+from nti.testing.matchers import verifiably_provides
 
 class TestStripeAdapters(unittest.TestCase):
 
@@ -74,23 +77,30 @@ class TestStripeAdapters(unittest.TestCase):
 		assert_that(adapted.charge_id, is_('charge_id'))
 		assert_that(adapted.token_id, is_('token_id'))
 
+	def test_exception_adapter(self):
+		e = StripeException('my exception')
+		adapted = IStripePurchaseError(e, None)
+		assert_that(adapted, is_not(none()))
+		assert_that(adapted.Type, is_('PurchaseError'))
+		assert_that(adapted.Message, is_('my exception'))
+		
 	def test_stripe_error_adapters(self):
 		e = stripe.CardError('my error', 'my param', 'my code')
-		adapted = IStripePurchaseError(e, None)
+		adapted = IStripeOperationError(e, None)
 		assert_that(adapted, is_not(none()))
 		assert_that(adapted.Type, is_('CardError'))
 		assert_that(adapted.Message, is_('my error'))
 		assert_that(adapted.Param, is_('my param'))
 		assert_that(adapted.Code, is_('my code'))
-
-		e = StripeException('my exception')
-		adapted = IStripePurchaseError(e, None)
-		assert_that(adapted, is_not(none()))
-		assert_that(adapted.Type, is_('Exception'))
-		assert_that(adapted.Message, is_('my exception'))
-
+		assert_that(adapted, verifiably_provides(IStripeOperationError))
+		
 		e = u'my error message'
-		adapted = IStripePurchaseError(e, None)
+		adapted = IStripeOperationError(e, None)
 		assert_that(adapted, is_not(none()))
-		assert_that(adapted.Type, is_('Error'))
+		assert_that(adapted.Type, is_(u'OperationError'))
 		assert_that(adapted.Message, is_('my error message'))
+		
+		e = stripe.InvalidRequestError("++invalidtoken++", 'token id')
+		adapted = IStripeOperationError(e, None)
+		assert_that(adapted, verifiably_provides(IStripeOperationError))
+		
