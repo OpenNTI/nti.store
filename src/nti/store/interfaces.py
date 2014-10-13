@@ -57,6 +57,11 @@ PAYMENT_PROCESSORS = ('stripe',)
 PAYMENT_PROCESSORS_VOCABULARY = \
 	vocabulary.SimpleVocabulary([vocabulary.SimpleTerm(_x) for _x in PAYMENT_PROCESSORS])
 
+class IStore(interface.Interface):
+	"""
+	Marker interface for a NTI Store
+	"""
+
 class IItemBundle(interface.Interface):
 	NTIID = ValidTextLine(title='Content bundle NTTID', required=True)
 	Title = ValidTextLine(title='Content bundle title', required=False)
