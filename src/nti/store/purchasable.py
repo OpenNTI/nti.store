@@ -45,7 +45,7 @@ from .utils import to_frozenset
 from .utils import to_collection
 from .utils import MetaStoreObject
 
-from .content_bundle import ContentBundle
+from .item_bundle import ItemBundle
 
 from .interfaces import IPurchasable
 from .interfaces import IPurchaseHistory
@@ -63,7 +63,7 @@ class DefaultPurchasableVendorInfo(dict):
 @interface.implementer(IPurchasable, IACLProvider, IContentTypeAware)
 @WithRepr
 @EqHash('NTIID',)
-class Purchasable(ContentBundle):
+class Purchasable(ItemBundle):
 
 	__metaclass__ = MetaStoreObject
 	mime_type = mimeType = MIME_BASE + b'purchasable'

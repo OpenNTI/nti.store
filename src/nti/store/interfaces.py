@@ -57,7 +57,7 @@ PAYMENT_PROCESSORS = ('stripe',)
 PAYMENT_PROCESSORS_VOCABULARY = \
 	vocabulary.SimpleVocabulary([vocabulary.SimpleTerm(_x) for _x in PAYMENT_PROCESSORS])
 
-class IContentBundle(interface.Interface):
+class IItemBundle(interface.Interface):
 	NTIID = ValidTextLine(title='Content bundle NTTID', required=True)
 	Title = ValidTextLine(title='Content bundle title', required=False)
 	Author = ValidTextLine(title='Content bundle author', required=False)
@@ -65,6 +65,7 @@ class IContentBundle(interface.Interface):
 									  required=False, default='')
 	Items = FrozenSet(value_type=ValidTextLine(title='The item identifier'),
 					  title="Bundle items")
+IContentBundle = IItemBundle #BWC
 
 class IPurchasableVendorInfo(IEnumerableMapping):
 	"""

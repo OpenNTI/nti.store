@@ -20,15 +20,15 @@ from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import AdaptingFieldProperty
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from .interfaces import IContentBundle
+from .interfaces import IItemBundle
 
-@interface.implementer(IContentBundle, IAttributeAnnotatable)
+@interface.implementer(IItemBundle, IAttributeAnnotatable)
 @WithRepr
 @EqHash('NTIID',)
-class ContentBundle(SchemaConfigured):
+class ItemBundle(SchemaConfigured):
 
-	createDirectFieldProperties(IContentBundle)
-	Description = AdaptingFieldProperty(IContentBundle['Description'])
+	createDirectFieldProperties(IItemBundle)
+	Description = AdaptingFieldProperty(IItemBundle['Description'])
 
 	@property
 	def id(self):
@@ -36,3 +36,4 @@ class ContentBundle(SchemaConfigured):
 
 	def __str__(self):
 		return self.NTIID
+ContentBundle = ItemBundle # BWC
