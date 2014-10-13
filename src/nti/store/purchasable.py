@@ -33,6 +33,7 @@ from nti.externalization.interfaces import IInternalObjectExternalizer
 from nti.mimetype.mimetype import MIME_BASE
 
 from nti.utils.property import Lazy
+from nti.utils.property import alias
 
 from nti.schema.schema import EqHash
 from nti.schema.fieldproperty import AdaptingFieldProperty
@@ -69,6 +70,8 @@ class Purchasable(ContentBundle):
 	
 	createDirectFieldProperties(IPurchasable)
 	Description = AdaptingFieldProperty(IPurchasable['Description'])
+
+	isPublic = alias('Public')
 
 	@Lazy
 	def __acl__(self):
