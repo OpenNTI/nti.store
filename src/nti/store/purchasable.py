@@ -92,7 +92,7 @@ def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=No
 						 Items=items, Description=description, Amount=amount,
 						 Currency=currency, Fee=fee, License=license_,
 						 Discountable=discountable, BulkPurchase=bulk_purchase,
-						 Icon=icon, Thumbnail=thumbnail, Public=True,
+						 Icon=icon, Thumbnail=thumbnail, Public=public,
 						 VendorInfo=vendor)
 	return result
 
