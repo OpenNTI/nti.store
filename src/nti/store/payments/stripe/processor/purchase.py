@@ -47,7 +47,7 @@ from .coupon import CouponProcessor
 from .pricing import price_purchase
 from .pricing import PricingProcessor
 
-def _start_purchase(purchase_id, username):
+def _start_purchase(purchase_id, username=None):
 	purchase = get_purchase_attempt(purchase_id, username)
 	if purchase is None:
 		raise PurchaseException("Could not find purchase attempt %s" % purchase_id)
@@ -59,21 +59,22 @@ def _start_purchase(purchase_id, username):
 	pricing = price_purchase(purchase)
 	return pricing
 		
-def _register_stripe_user(purchase_id, username, token, api_key=None):
+def _register_stripe_token_and_user(purchase_id, token, username=None, api_key=None):
 	purchase = get_purchase_attempt(purchase_id, username)
 	if not purchase.has_completed():
-		logger.info('Getting/Creating Stripe Customer for %s', username)
-		customer_id = get_or_create_customer(username, api_key=api_key)
 		notify(RegisterStripeToken(purchase, token))
-		return customer_id
+		if username:
+			logger.info('Getting/Creating Stripe Customer for %s', username)
+			customer_id = get_or_create_customer(username, api_key=api_key)
+			return customer_id
 	return None
 	
-def _do_stripe_purchase(purchase_id, username, cents_amount, currency,
-						card, application_fee=None, customer_id=None,
+def _do_stripe_purchase(purchase_id, cents_amount, currency, card,
+						username=None, application_fee=None, customer_id=None,
 						api_key=None):
 	charge = None
 	purchase = get_purchase_attempt(purchase_id, username)
-	if purchase.is_pending() and customer_id is not None:
+	if purchase.is_pending():
 		# charge card, user description for tracking purposes
 		context = purchase.Context
 		descid = encode_charge_description(purchase_id=purchase_id, 
@@ -87,7 +88,7 @@ def _do_stripe_purchase(purchase_id, username, cents_amount, currency,
 								api_key=api_key)
 	return charge
 
-def _register_charge_notify(purchase_id, username, charge,
+def _register_charge_notify(purchase_id, charge, username=None,
 							pricing=None, request=None, api_key=None):
 	
 	purchase = get_purchase_attempt(purchase_id, username)
@@ -106,21 +107,21 @@ def _register_charge_notify(purchase_id, username, charge,
 		# (e.g. max redemptions reached) the we will still the transaction go.
 		# Log error and this must be check manually
 		coupon = purchase.Order.Coupon
-		if coupon is not None:
+		if coupon is not None and username:
 			try:
 				update_customer(username, coupon=coupon, api_key=api_key)
-			except Exception:
+			except StandardError:
 				logger.exception("Exception while updating the user " +
 								 "coupon. The charge is still valid")
 
-def _fail_purchase(purchase_id, username, error):
+def _fail_purchase(purchase_id, error, username=None):
 	purchase = get_purchase_attempt(purchase_id, username)
 	if purchase is not None:
 		notify(PurchaseAttemptFailed(purchase, error))
 			
 class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 
-	def process_purchase(self, purchase_id, username, token, expected_amount=None,
+	def process_purchase(self, purchase_id, token, username=None, expected_amount=None,
 						 api_key=None, request=None, site_names=None):
 		"""
 		Executes the process purchase.
@@ -137,11 +138,11 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 								 purchase_id=purchase_id,
 								 username=username)
 
-		register_stripe_user =  partial(_register_stripe_user, 
-										purchase_id=purchase_id,
-								 		username=username,
-								 		token=token,
-								 		api_key=api_key)
+		register_stripe_token_and_user = partial(_register_stripe_token_and_user, 
+												 purchase_id=purchase_id,
+								 				 username=username,
+								 				 token=token,
+								 				 api_key=api_key)
 		try:
 			# start the purchase and price trx
 			pricing = transaction_runner(start_purchase)
@@ -158,22 +159,21 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 										"expected amount")
 
 			# create a stripe customer
-			customer_id = transaction_runner(register_stripe_user)
+			customer_id = transaction_runner(register_stripe_token_and_user)
 
 			# get price amount in cents
 			cents_amount = int(amount * 100.0)
 			application_fee = int(application_fee * 100.0) if application_fee else None
 
 			do_stripe_purchase =  partial(_do_stripe_purchase, 
-										  purchase_id=purchase_id,
-										  username=username,
-										  cents_amount=cents_amount,
-										  currency=currency,
 										  card=token,
-										  application_fee=application_fee,
+										  username=username,
+										  currency=currency,
+										  purchase_id=purchase_id,
 										  customer_id=customer_id,
+										  cents_amount=cents_amount,
+										  application_fee=application_fee,
 										  api_key=api_key)
-
 			charge = transaction_runner(do_stripe_purchase)
 
 			if charge is not None:

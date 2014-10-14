@@ -60,6 +60,7 @@ from .interfaces import PA_STATE_REFUNDED
 from .interfaces import PA_STATE_CANCELED
 
 from .interfaces import IPurchaseAttempt
+from .interfaces import IGiftPurchaseAttempt
 from .interfaces import IPurchaseAttemptContext
 from .interfaces import IPurchaseAttemptFactory
 from .interfaces import IRedeemedPurchaseAttempt
@@ -209,6 +210,14 @@ class RedeemedPurchaseAttempt(PurchaseAttempt):
 	RedemptionCode = FP(IRedeemedPurchaseAttempt['RedemptionCode'])
 	RedemptionTime = FP(IRedeemedPurchaseAttempt['RedemptionTime'])
 
+@interface.implementer(IGiftPurchaseAttempt)
+class GiftPurchaseAttempt(PurchaseAttempt):
+	mime_type = mimeType = MIME_BASE + b'giftpurchaseattempt'
+
+	creator = FP(IGiftPurchaseAttempt['creator'])
+	Message = FP(IGiftPurchaseAttempt['Message'])
+	Receiver = FP(IGiftPurchaseAttempt['Receiver'])
+		
 def get_providers(purchase):
 	return get_providers_from_order(purchase.Order)
 

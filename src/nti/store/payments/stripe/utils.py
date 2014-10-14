@@ -32,7 +32,8 @@ def makenone(s, default=None):
 		s = default if s == 'None' else unicode(s)
 	return s
 
-def encode_charge_description(purchase_id, username, customer_id, context=None):
+def encode_charge_description(purchase_id, username=None, 
+							  customer_id=None, context=None):
 	"""
 	proceduce a json object for a stripe charge description
 	"""

@@ -322,63 +322,88 @@ _PurchaseHistoryFactory = an_factory(PurchaseHistory)
 
 def activate_items(user, items):
 	user = get_user(user)
-	hist = IPurchaseHistory(user)
-	hist.activate_items(items)
+	if user is not None:
+		hist = IPurchaseHistory(user)
+		hist.activate_items(items)
+		return True
+	return False
 
 def deactivate_items(user, items):
 	user = get_user(user)
-	hist = IPurchaseHistory(user)
-	return hist.deactivate_items(items)
+	if user is not None:
+		hist = IPurchaseHistory(user)
+		result = hist.deactivate_items(items)
+		return result
+	return None
 
 def is_item_activated(user, item):
 	user = get_user(user)
-	hist = IPurchaseHistory(user)
-	return hist.is_item_activated(item)
+	if user is not None:
+		hist = IPurchaseHistory(user)
+		result = hist.is_item_activated(item)
+		return result
+	return False
 
 def get_purchase_attempt(purchase_id, user=None):
-	user = get_user(user)
-	result = PurchaseHistory.get_purchase(purchase_id) if purchase_id else None
-	if result is not None and user is not None:  # validate
-		result = None if result.creator != user else result
+	result = ntiids.find_object_with_ntiid(purchase_id)
+	if result is not None and user:
+		user = get_user(user)
+		if user is not None:  # validate
+			result = None if result.creator != user else result
 	return result
 
 def remove_purchase_attempt(purchase, user=None):
 	user = get_user(user) or purchase.creator
-	hist = IPurchaseHistory(user)
-	return hist.remove_purchase(purchase)
+	if user is not None:
+		hist = IPurchaseHistory(user)
+		result = hist.remove_purchase(purchase)
+		return result
+	return False
 
 def get_pending_purchases(user):
 	user = get_user(user)
-	hist = IPurchaseHistory(user)
-	result = LocatedExternalList(hist.get_pending_purchases())
-	return result
+	if user is not None:
+		hist = IPurchaseHistory(user)
+		result = LocatedExternalList(hist.get_pending_purchases())
+		return result
+	return ()
 
 def get_purchase_history(user, start_time=None, end_time=None):
 	user = get_user(user)
-	hist = IPurchaseHistory(user)
-	result = LocatedExternalList(hist.get_purchase_history(start_time, end_time))
-	return result
+	if user is not None:
+		hist = IPurchaseHistory(user)
+		result = LocatedExternalList(hist.get_purchase_history(start_time, end_time))
+		return result
+	return ()
 
 def has_history_by_item(user, purchasable_id):
 	user = get_user(user)
-	hist = IPurchaseHistory(user)
-	result = hist.has_history_by_item(purchasable_id)
-	return result
+	if user is not None:
+		hist = IPurchaseHistory(user)
+		result = hist.has_history_by_item(purchasable_id)
+		return result
+	return False
 
 def get_purchase_history_by_item(user, purchasable_id):
 	user = get_user(user)
-	hist = IPurchaseHistory(user)
-	result = LocatedExternalList(hist.get_purchase_history_by_item(purchasable_id))
-	return result
+	if user is not None:
+		hist = IPurchaseHistory(user)
+		result = LocatedExternalList(hist.get_purchase_history_by_item(purchasable_id))
+		return result
+	return ()
 
 def get_pending_purchase_for(user, items):
 	user = get_user(user)
-	hist = IPurchaseHistory(user)
-	result = hist.get_pending_purchase_for(items)
-	return result
+	if user is not None:
+		hist = IPurchaseHistory(user)
+		result = hist.get_pending_purchase_for(items)
+		return result
+	return ()
 
 def register_purchase_attempt(purchase, user):
 	user = get_user(user)
-	hist = IPurchaseHistory(user)
-	hist.register_purchase(purchase)
-	return purchase.id
+	if user is not None:
+		hist = IPurchaseHistory(user)
+		hist.register_purchase(purchase)
+		return purchase.id
+	return None

@@ -28,52 +28,60 @@ from .interfaces import StripeCustomerDeleted
 
 def create_customer(user, coupon=None, api_key=None):
 	user = get_user(user)
-	profile = IUserProfile(user)
-	email = getattr(profile, 'email', None)
-	description = getattr(profile, 'description', None)
-	customer = create_stripe_customer(email=email, description=description,
-									  coupon=coupon, api_key=api_key)
-	notify(StripeCustomerCreated(user, customer.id))
-	return customer
+	if user is not None:
+		profile = IUserProfile(user)
+		email = getattr(profile, 'email', None)
+		description = getattr(profile, 'description', None)
+		customer = create_stripe_customer(email=email, description=description,
+										  coupon=coupon, api_key=api_key)
+		notify(StripeCustomerCreated(user, customer.id))
+		return customer
+	return None
 	
 def delete_customer(user, api_key=None):
 	result = False
 	user = get_user(user)
-	adapted = IStripeCustomer(user)
-	if adapted.customer_id:
-		result = delete_stripe_customer(customer_id=adapted.customer_id, api_key=api_key)
-		notify(StripeCustomerDeleted(user, adapted.customer_id))
-	return result
+	if user is not None:
+		adapted = IStripeCustomer(user)
+		customer_id = adapted.customer_id
+		if customer_id:
+			result = delete_stripe_customer(customer_id=customer_id, api_key=api_key)
+			notify(StripeCustomerDeleted(user, adapted.customer_id))
+		return result
+	return False
 
 def update_customer(user, customer=None, coupon=None, api_key=None):
 	user = get_user(user)
-	profile = IUserProfile(user)
-	email = getattr(profile, 'email', None)
-	description = getattr(profile, 'description', None)
-	adapted = IStripeCustomer(user)
-	if adapted.customer_id:
-		result = update_stripe_customer(customer=customer or adapted.customer_id,
-										email=email,
-										coupon=coupon,
-										description=description,
-										api_key=api_key)
-		return result
+	if user is not None:
+		profile = IUserProfile(user)
+		adapted = IStripeCustomer(user)
+		email = getattr(profile, 'email', None)
+		description = getattr(profile, 'description', None)
+		if adapted.customer_id:
+			result = update_stripe_customer(customer=customer or adapted.customer_id,
+											email=email,
+											coupon=coupon,
+											description=description,
+											api_key=api_key)
+			return result
 	return False
 	
 def get_or_create_customer(user, api_key=None):
 	user = get_user(user)
-	adapted = IStripeCustomer(user)
-	if adapted.customer_id is None:
-		customer = create_customer(user, api_key=api_key)
-		result = customer.id
-	else:
-		result = adapted.customer_id
-		# get or create the customer so it can be updated later
-		customer = 	get_stripe_customer(result, api_key=api_key) or \
-					create_customer(user, api_key=api_key)
-		# reset the id in case the customer was recreated
-		result = adapted.customer_id = customer.id
-	return result
+	if user is not None:
+		adapted = IStripeCustomer(user)
+		if adapted.customer_id is None:
+			customer = create_customer(user, api_key=api_key)
+			result = customer.id
+		else:
+			result = adapted.customer_id
+			# get or create the customer so it can be updated later
+			customer = 	get_stripe_customer(result, api_key=api_key) or \
+						create_customer(user, api_key=api_key)
+			# reset the id in case the customer was recreated
+			result = adapted.customer_id = customer.id
+		return result
+	return None
 		
 class StripeCustomer(StripeIO):
 

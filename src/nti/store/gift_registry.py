@@ -40,8 +40,8 @@ from nti.zodb.containers import time_to_64bit_int
 
 from .interfaces import IGiftRegistry
 from .interfaces import IUserGiftIndex
-from .interfaces import IPurchaseAttempt
 from .interfaces import IUserGiftHistory
+from .interfaces import IGiftPurchaseAttempt
 
 @interface.implementer(IUserGiftIndex)
 class UserGiftIndex(Contained, Persistent):
@@ -78,7 +78,6 @@ class UserGiftIndex(Contained, Persistent):
 		return False
 	
 	def add(self, purchase):
-		purchase.id = unicode(to_external_ntiid_oid(purchase))
 		iid = self._intids.getId(purchase)
 		result = self._addToPurchaseIndex(iid)
 		self._addToTimeIndex(purchase.StartTime, iid)
@@ -108,7 +107,7 @@ class UserGiftIndex(Contained, Persistent):
 	def values(self):
 		for iid in self.purchases:
 			p = self._intids.queryObject(iid)
-			if IPurchaseAttempt.providedBy(p):
+			if IGiftPurchaseAttempt.providedBy(p):
 				yield p
 
 	def __iter__(self):
@@ -138,6 +137,8 @@ class UserGiftHistory(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 		return dict(self)
 	
 	def recordPurchase(self, username, purchase):
+		assert IGiftPurchaseAttempt.providedBy(purchase)
+		
 		try:
 			index = self[username]
 		except KeyError:
@@ -150,6 +151,9 @@ class UserGiftHistory(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 		lifecycleevent.created(purchase)
 		lifecycleevent.added(purchase)  # get an iid
 		index.add(purchase)
+		# set id/name
+		purchase.creator = username
+		purchase.id = unicode(to_external_ntiid_oid(purchase))
 		return purchase
 	add = recordPurchase
 	

@@ -7,11 +7,14 @@ from __future__ import print_function, unicode_literals, absolute_import, divisi
 __docformat__ = "restructuredtext en"
 
 from zope import interface
+
 from zope.schema import vocabulary
 from zope.deprecation import deprecated
+
 from zope.container.constraints import contains
 from zope.container.interfaces import IContained
 from zope.container.interfaces import IContainer
+
 from zope.interface.common.sequence import IMinimalSequence
 from zope.interface.common.mapping import IEnumerableMapping
 from zope.interface.interfaces import ObjectEvent, IObjectEvent
@@ -19,6 +22,8 @@ from zope.interface.interfaces import ObjectEvent, IObjectEvent
 from dolmen.builtins import IIterable
 
 from nti.contentfragments.schema import HTMLContentFragment
+
+from nti.dataserver.users.interfaces import checkEmailAddress
 
 from nti.schema.field import Int
 from nti.schema.field import Bool
@@ -353,6 +358,14 @@ class IInvitationPurchaseAttempt(IPurchaseAttempt):
 class IRedeemedPurchaseAttempt(IPurchaseAttempt):
 	RedemptionTime = Number(title='Redemption time', required=True)
 	RedemptionCode = ValidTextLine(title='Redemption Code', required=True)
+	
+class IGiftPurchaseAttempt(IPurchaseAttempt):
+	Receiver =  ValidTextLine(title='Receiver Email',
+							  required=False,
+							  constraint=checkEmailAddress)
+	Message = ValidText(title='Gift message', required=False)
+	
+	creator = ValidTextLine(title='Gift sender', required=False)
 	
 class IPurchaseAttemptFactory(interface.Interface):
 	"""
