@@ -274,6 +274,21 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, redemption_time=
 				RedemptionCode=unicode(redemption_code))
 	return result
 
+def create_gift_purchase_attempt(order, processor, state=None, description=None,
+								 start_time=None, receiver=None, message=None,
+								 context=None):
+
+	state = state or PA_STATE_UNKNOWN
+	context = to_purchase_attempt_context(context)
+	start_time = start_time if start_time else time.time()
+
+	result = GiftPurchaseAttempt(
+				Order=order, Processor=processor, 
+				Description=description, State=state, 
+				StartTime=float(start_time), Context=context,
+				Message=message, Receiver=receiver)
+	return result
+
 @interface.implementer(IPurchaseAttemptFactory)
 class DefaultPurchaseAttemptFactory(object):
 

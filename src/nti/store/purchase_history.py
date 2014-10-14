@@ -258,8 +258,8 @@ class PurchaseHistory(Contained, Persistent):
 		self._index.add(purchase)
 		# set id/__name__
 		purchase.id = unicode(to_external_ntiid_oid(purchase))
-
-	add_purchase = register_purchase
+		return purchase.id
+	add = add_purchase = register_purchase
 
 	def remove_purchase(self, purchase):
 		if self._index.remove(purchase):

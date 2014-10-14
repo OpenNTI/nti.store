@@ -485,6 +485,9 @@ class IPurchaseHistory(IIterable):
 	def get_purchase_history(start_time=None, end_time=None):
 		pass
 
+	def get_pending_purchases():
+		pass
+	
 	def values():
 		"""
 		Return all purchase attempts
@@ -505,16 +508,22 @@ class IUserGiftHistory(IContainer, IContained):
 	"""
 	contains(b'.IUserGiftIndex')
 	
-	def registerPurchase(username, purchase):
+	def register_purchase(username, purchase):
 		pass
 	
+	def get_pending_purchases(username, items=None):
+		pass
+
 class IGiftRegistry(IContained):
 	"""
 	marker interface for gift registry. 
 	This object is registerd as a persistent utility
 	"""
 
-	def registerPurchase(username, purchase):
+	def register_purchase(username, purchase):
+		pass
+	
+	def get_pending_purchases(username, items=None):
 		pass
 	
 # depreecated interfaces
