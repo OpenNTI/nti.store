@@ -74,10 +74,9 @@ class DefaultPurchaseAttemptContext(PersistentMapping):
 	def toExternalObject(self, *args, **kwargs):
 		return dict(self)
 	
-def _to_purchase_attempt_context(context):
-	if context is not None:
-		context = IPurchaseAttemptContext(context)
-	return context
+def to_purchase_attempt_context(context):
+	result = IPurchaseAttemptContext(context, None)
+	return result
 
 @total_ordering
 @interface.implementer(ICreated,
@@ -232,7 +231,7 @@ def create_purchase_attempt(order, processor, state=None, description=None,
 
 	# set some defaults
 	state = state or PA_STATE_UNKNOWN
-	context = _to_purchase_attempt_context(context)
+	context = to_purchase_attempt_context(context)
 	start_time = start_time if start_time else time.time()
 		
 	## if there is a quantity, it means it's an invitation purchase
@@ -282,7 +281,7 @@ class DefaultPurchaseAttemptFactory(object):
 				start_time=None, context=None, *args, **kwargs):
 		# set some defaults
 		state = state or PA_STATE_UNKNOWN
-		context = _to_purchase_attempt_context(context)
+		context = to_purchase_attempt_context(context)
 		start_time = start_time if start_time else time.time()
 		# create 
 		result = PurchaseAttempt(Order=order, Processor=processor, 
