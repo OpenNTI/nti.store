@@ -99,6 +99,7 @@ class PurchaseAttempt(ModDateTrackingObject,
 	Context = FP(IPurchaseAttempt['Context'])
 	
 	id = alias('__name__')
+	state = alias('State')
 	context = alias('Context')
 
 	@property

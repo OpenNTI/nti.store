@@ -29,6 +29,8 @@ from .interfaces import PA_STATE_STARTED
 from .interfaces import PA_STATE_SUCCESS
 from .interfaces import PA_STATE_DISPUTED
 from .interfaces import PA_STATE_REFUNDED
+
+from .interfaces import IPurchaseAttempt
 from .interfaces import IPurchaseAttemptFailed
 from .interfaces import IPurchaseAttemptSynced
 from .interfaces import IPurchaseAttemptStarted
@@ -45,9 +47,8 @@ def _update_state(purchase, state):
 		purchase.State = state
 		lifecycleevent.modified(purchase)
 
-@component.adapter(IPurchaseAttemptStarted)
-def _purchase_attempt_started(event):
-	purchase = event.object
+@component.adapter(IPurchaseAttempt, IPurchaseAttemptStarted)
+def _purchase_attempt_started(purchase, event):
 	_update_state(purchase, PA_STATE_STARTED)
 	logger.info('%r started' % purchase)
 
@@ -58,16 +59,12 @@ def _activate_items(purchase, user=None, add_roles=True):
 		lib_items = purchasable.get_content_items(purchase.Items)
 		content_roles.add_users_content_roles(user, lib_items)
 
-@component.adapter(IPurchaseAttemptSuccessful)
-def _purchase_attempt_successful(event):
-	purchase = event.object
+@component.adapter(IPurchaseAttempt, IPurchaseAttemptSuccessful)
+def _purchase_attempt_successful(purchase, event):
 	purchase.EndTime = time.time()
 	_update_state(purchase, PA_STATE_SUCCESS)
-
-	# if not register invitation
 	if not purchase.Quantity:
 		_activate_items(purchase)
-	
 	logger.info('%r completed successfully', purchase.id)
 
 def _return_items(purchase, user=None, remove_roles=True):
@@ -79,51 +76,45 @@ def _return_items(purchase, user=None, remove_roles=True):
 		lib_items = purchasable.get_content_items(purchase.Items)
 		content_roles.remove_users_content_roles(user, lib_items)
 
-@component.adapter(IPurchaseAttemptRefunded)
-def _purchase_attempt_refunded(event):
-	purchase = event.object
-
+@component.adapter(IPurchaseAttempt, IPurchaseAttemptRefunded)
+def _purchase_attempt_refunded(purchase, event):
 	purchase.EndTime = time.time()
 	_update_state(purchase, PA_STATE_REFUNDED)
-
-	if IInvitationPurchaseAttempt.providedBy(purchase):
-		# set all tokens to zero
-		purchase.reset()
-		# return all items from linked purchases (redemptions) and refund them
-		for username, pid in purchase.consumerMap().items():
-			p = purchase_history.get_purchase_attempt(pid)
-			_return_items(p, username)
-			_update_state(p, PA_STATE_REFUNDED)
-
-	elif not purchase.Quantity:
+	if not purchase.Quantity:
 		_return_items(purchase, purchase.creator)
-
-	# return consumed token
-	if IRedeemedPurchaseAttempt.providedBy(purchase):
-		code = purchase.RedemptionCode
-		p = invitations.get_purchase_by_code(code)
-		if IInvitationPurchaseAttempt.providedBy(p):
-			p.restore_token()
-
 	logger.info('%r has been refunded', purchase)
 
-@component.adapter(IPurchaseAttemptDisputed)
-def _purchase_attempt_disputed(event):
-	purchase = event.object
+@component.adapter(IInvitationPurchaseAttempt, IPurchaseAttemptRefunded)
+def _invitation_purchase_attempt_refunded(purchase, event):
+	# set all tokens to zero
+	purchase.reset()
+	# return all items from linked purchases (redemptions) and refund them
+	for username, pid in purchase.consumerMap().items():
+		p = purchase_history.get_purchase_attempt(pid)
+		_return_items(p, username)
+		_update_state(p, PA_STATE_REFUNDED)
+
+@component.adapter(IRedeemedPurchaseAttempt, IPurchaseAttemptRefunded)
+def _redeemed_purchase_attempt_refunded(purchase, event):
+	code = purchase.RedemptionCode
+	p = invitations.get_purchase_by_code(code)
+	if IInvitationPurchaseAttempt.providedBy(p):
+		p.restore_token()
+	
+@component.adapter(IPurchaseAttempt, IPurchaseAttemptDisputed)
+def _purchase_attempt_disputed(purchase, event):
 	_update_state(purchase, PA_STATE_DISPUTED)
 	logger.info('%r has been disputed', purchase)
 
-@component.adapter(IPurchaseAttemptFailed)
-def _purchase_attempt_failed(event):
-	purchase = event.object
+@component.adapter(IPurchaseAttempt, IPurchaseAttemptFailed)
+def _purchase_attempt_failed(purchase, event):
 	purchase.Error = event.error
 	purchase.EndTime = time.time()
 	_update_state(purchase, PA_STATE_FAILED)
 	logger.info('%r failed. %s', purchase.id, purchase.Error)
 
-@component.adapter(IPurchaseAttemptSynced)
-def _purchase_attempt_synced(event):
-	purchase = event.object
+@component.adapter(IPurchaseAttempt, IPurchaseAttemptSynced)
+def _purchase_attempt_synced(purchase, event):
 	purchase.Synced = True
 	purchase.updateLastMod()
 	lifecycleevent.modified(purchase)
@@ -137,7 +128,8 @@ def _purchase_invitation_accepted(invitation, event):
 		original = invitation.purchase
 
 		# create and register a purchase attempt for accepting user
-		rpa = purchase_attempt.create_redeemed_purchase_attempt(original, invitation.code)
+		code = invitation.code
+		rpa = purchase_attempt.create_redeemed_purchase_attempt(original, code)
 		new_pid = purchase_history.register_purchase_attempt(rpa, event.user)
 		purchase_history.activate_items(event.user, rpa.Items)
 

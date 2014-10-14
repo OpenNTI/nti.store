@@ -64,6 +64,8 @@
 	<subscriber handler=".subscribers._purchase_attempt_disputed" />
 	<subscriber handler=".subscribers._purchase_attempt_successful" />
 	<subscriber handler=".subscribers._purchase_invitation_accepted" />
+	<subscriber handler=".subscribers._redeemed_purchase_attempt_refunded" />
+	<subscriber handler=".subscribers._invitation_purchase_attempt_refunded" />
 	
 	<!-- Decorators -->
 	
