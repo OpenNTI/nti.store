@@ -10,7 +10,7 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-import functools
+from functools import partial
 
 from zope import schema
 from zope import interface
@@ -42,23 +42,24 @@ class IRegisterPurchasableDirective(interface.Interface):
 	provider = fields.TextLine(title='Purchasable item provider', required=True)
 	license = fields.TextLine(title='Purchasable License', required=False)
 	public = fields.Bool(title="Public flag", required=False, default=True)
+	giftable = fields.Bool(title="Giftable flag", required=False, default=False)
 	items = fields.Tokens(value_type=schema.TextLine(title='The item identifier'), 
 						  title="Items to purchase", required=False)
 
 def registerPurchasable(_context, ntiid, provider, title, description=None, amount=None,
 						currency='USD', items=None, fee=None, author=None, icon=None,
-						thumbnail=None, license=None, discountable=False,
+						thumbnail=None, license=None, discountable=False, giftable=False,
 						bulk_purchase=True, public=True):
 	"""
 	Register a purchasable
 	"""
 	description = _context.info.text.strip() if description is None else description
-	factory = functools.partial(create_purchasable, ntiid=ntiid, 
-								provider=provider, title=title, author=author, 
-								description=description, items=items, amount=amount, 
-								thumbnail=thumbnail, currency=currency, icon=icon,
-								fee=fee, license_=license, discountable=discountable,
-								bulk_purchase=bulk_purchase, public=public)
+	factory = partial(create_purchasable, ntiid=ntiid, 
+					  provider=provider, title=title, author=author, 
+					  description=description, items=items, amount=amount, 
+					  thumbnail=thumbnail, currency=currency, icon=icon,
+					  fee=fee, license_=license, discountable=discountable,
+					  bulk_purchase=bulk_purchase, public=public, giftable=giftable)
 	utility(_context, provides=IPurchasable, factory=factory, name=ntiid)
 	logger.debug("Purchasable '%s' has been registered", ntiid)
 

@@ -72,6 +72,7 @@ class Purchasable(ItemBundle):
 	Description = AdaptingFieldProperty(IPurchasable['Description'])
 
 	isPublic = alias('Public')
+	isGiftable = alias('Giftable')
 
 	@Lazy
 	def __acl__(self):
@@ -84,7 +85,7 @@ class PesistentPurchasable(Contained,
 	
 def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=None,
 					   title=None, license_=None, author=None, description=None,
-					   icon=None, thumbnail=None, discountable=False,
+					   icon=None, thumbnail=None, discountable=False, giftable=False,
 					   bulk_purchase=True, public=True, vendor_info=None, **kwargs):
 	fee = float(fee) if fee is not None else None
 	amount = float(amount) if amount is not None else amount
@@ -93,7 +94,7 @@ def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=No
 	
 	result = Purchasable(NTIID=ntiid, Provider=provider, Title=title, Author=author,
 						 Items=items, Description=description, Amount=amount,
-						 Currency=currency, Fee=fee, License=license_,
+						 Currency=currency, Fee=fee, License=license_, Giftable=giftable,
 						 Discountable=discountable, BulkPurchase=bulk_purchase,
 						 Icon=icon, Thumbnail=thumbnail, Public=public,
 						 VendorInfo=vendor)
