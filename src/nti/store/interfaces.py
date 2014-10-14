@@ -9,7 +9,9 @@ __docformat__ = "restructuredtext en"
 from zope import interface
 from zope.schema import vocabulary
 from zope.deprecation import deprecated
-from zope.location.interfaces import IContained
+from zope.container.constraints import contains
+from zope.container.interfaces import IContained
+from zope.container.interfaces import IContainer
 from zope.interface.common.sequence import IMinimalSequence
 from zope.interface.common.mapping import IEnumerableMapping
 from zope.interface.interfaces import ObjectEvent, IObjectEvent
@@ -477,6 +479,31 @@ class IPurchaseHistory(IIterable):
 class IStorePurchaseInvitation(interface.Interface):
 	pass
 
+# gift registry
+
+class IUserGiftIndex(IContained):
+	"""
+	marker interface to store gifts given by a user
+	"""
+
+class IUserGiftHistory(IContainer, IContained):
+	"""
+	username based gift storage
+	"""
+	contains(b'.IUserGiftIndex')
+	
+	def registerPurchase(username, purchase):
+		pass
+	
+class IGiftRegistry(IContained):
+	"""
+	marker interface for gift registry. 
+	This object is registerd as a persistent utility
+	"""
+
+	def registerPurchase(username, purchase):
+		pass
+	
 # depreecated interfaces
 
 deprecated('IEnrollmentAttempt', 'Use new course enrollment')
