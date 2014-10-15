@@ -64,6 +64,8 @@
 	<subscriber handler=".subscribers._purchase_attempt_disputed" />
 	<subscriber handler=".subscribers._purchase_attempt_successful" />
 	<subscriber handler=".subscribers._purchase_invitation_accepted" />
+	<subscriber handler=".subscribers._gift_purchase_attempt_redeemed" />
+	<subscriber handler=".subscribers._gift_purchase_attempt_refunded" />
 	<subscriber handler=".subscribers._redeemed_purchase_attempt_refunded" />
 	<subscriber handler=".subscribers._invitation_purchase_attempt_refunded" />
 	
@@ -107,6 +109,7 @@
 						 .interfaces.IPurchaseError
 						 .interfaces.IPricingResults
 						 .interfaces.IPurchaseAttempt
+						 .interfaces.IGiftPurchaseAttempt
 						 .interfaces.IPurchasableVendorInfo
 						 .interfaces.IPurchaseAttemptContext
 						 .interfaces.IRedeemedPurchaseAttempt

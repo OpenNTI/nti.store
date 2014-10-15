@@ -16,6 +16,7 @@ from zope import interface
 from nti.dataserver.users import User
 from nti.dataserver.interfaces import IUser
 
+from .interfaces import IRedeemException
 from .interfaces import IRefundException
 from .interfaces import IPricingException
 from .interfaces import IPurchaseException
@@ -38,6 +39,10 @@ class PurchaseException(NTIStoreException):
 
 @interface.implementer(IRefundException)
 class RefundException(NTIStoreException):
+	pass
+
+@interface.implementer(IRedeemException)
+class RedeemException(NTIStoreException):
 	pass
 
 def get_user(user):

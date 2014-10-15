@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Defines purchase attempt object.
-
 .. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
@@ -54,10 +52,11 @@ from .interfaces import PA_STATE_SUCCESS
 from .interfaces import PA_STATE_UNKNOWN
 from .interfaces import PA_STATE_STARTED
 from .interfaces import PA_STATE_PENDING
-from .interfaces import PA_STATE_RESERVED
 from .interfaces import PA_STATE_DISPUTED
-from .interfaces import PA_STATE_REFUNDED
 from .interfaces import PA_STATE_CANCELED
+from .interfaces import PA_STATE_REDEEMED
+from .interfaces import PA_STATE_REFUNDED
+from .interfaces import PA_STATE_RESERVED
 
 from .interfaces import IPurchaseAttempt
 from .interfaces import IGiftPurchaseAttempt
@@ -114,6 +113,7 @@ class PurchaseAttempt(ModDateTrackingObject,
 	def creator(self):
 		result = getattr(self.__parent__, 'user', None)
 		return result
+	Creator = creator
 
 	def __str__(self):
 		return "%s,%s" % (self.Items, self.State)
@@ -208,15 +208,24 @@ class RedeemedPurchaseAttempt(PurchaseAttempt):
 
 	RedemptionCode = FP(IRedeemedPurchaseAttempt['RedemptionCode'])
 	RedemptionTime = FP(IRedeemedPurchaseAttempt['RedemptionTime'])
-
+	
 @interface.implementer(IGiftPurchaseAttempt)
 class GiftPurchaseAttempt(PurchaseAttempt):
 	mime_type = mimeType = MIME_BASE + b'giftpurchaseattempt'
 
-	creator = FP(IGiftPurchaseAttempt['creator'])
+	Creator = FP(IGiftPurchaseAttempt['Creator'])
 	Message = FP(IGiftPurchaseAttempt['Message'])
 	Receiver = FP(IGiftPurchaseAttempt['Receiver'])
+	TargetPurchaseID = FP(IGiftPurchaseAttempt['TargetPurchaseID'])
 		
+	creator = alias('Creator')
+
+	def has_succeeded(self):
+		return self.State == (PA_STATE_SUCCESS, PA_STATE_REDEEMED)
+	
+	def is_redeemed(self):
+		return self.State == PA_STATE_SUCCESS
+	
 def get_providers(purchase):
 	return get_providers_from_order(purchase.Order)
 
@@ -274,19 +283,19 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, redemption_time=
 				RedemptionCode=unicode(redemption_code))
 	return result
 
-def create_gift_purchase_attempt(order, processor, state=None, description=None,
+def create_gift_purchase_attempt(creator, order, processor, state=None, description=None,
 								 start_time=None, receiver=None, message=None,
-								 context=None):
+								 target=None, context=None):
 
 	state = state or PA_STATE_UNKNOWN
 	context = to_purchase_attempt_context(context)
 	start_time = start_time if start_time else time.time()
 
 	result = GiftPurchaseAttempt(
-				Order=order, Processor=processor, 
+				Order=order, Processor=processor, Creator=creator,
 				Description=description, State=state, 
 				StartTime=float(start_time), Context=context,
-				Message=message, Receiver=receiver)
+				Message=message, Receiver=receiver, TargetPurchaseID=target)
 	return result
 
 @interface.implementer(IPurchaseAttemptFactory)

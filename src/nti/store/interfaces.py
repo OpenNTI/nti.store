@@ -23,6 +23,7 @@ from dolmen.builtins import IIterable
 
 from nti.contentfragments.schema import HTMLContentFragment
 
+from nti.dataserver.interfaces import IUser
 from nti.dataserver.users.interfaces import checkEmailAddress
 
 from nti.schema.field import Int
@@ -53,10 +54,11 @@ PA_STATE_DISPUTED = u'Disputed'
 PA_STATE_REFUNDED = u'Refunded'
 PA_STATE_CANCELED = u'Canceled'
 PA_STATE_RESERVED = u'Reserved'
+PA_STATE_REDEEMED = u'Redeemed'
 
 PA_STATES = (PA_STATE_UNKNOWN, PA_STATE_FAILED, PA_STATE_FAILURE, PA_STATE_PENDING,
 			 PA_STATE_STARTED, PA_STATE_DISPUTED, PA_STATE_REFUNDED, PA_STATE_SUCCESS,
-			 PA_STATE_CANCELED, PA_STATE_RESERVED)
+			 PA_STATE_CANCELED, PA_STATE_RESERVED, PA_STATE_REDEEMED)
 PA_STATE_VOCABULARY = \
 	vocabulary.SimpleVocabulary([vocabulary.SimpleTerm(_x) for _x in PA_STATES])
 
@@ -219,6 +221,11 @@ class IRefundException(INTIStoreException):
 	interface for refund exceptions 
 	"""
 	
+class IRedeemException(INTIStoreException):
+	""" 
+	interface for redeeem exceptions 
+	"""
+	
 class IPurchasablePricer(interface.Interface):
 
 	def price(priceable):
@@ -360,13 +367,21 @@ class IRedeemedPurchaseAttempt(IPurchaseAttempt):
 	RedemptionCode = ValidTextLine(title='Redemption Code', required=True)
 	
 class IGiftPurchaseAttempt(IPurchaseAttempt):
-	Receiver =  ValidTextLine(title='Receiver Email',
+	
+	Creator = ValidTextLine(title="Gift creator", required=True)
+	
+	Receiver =  ValidTextLine(title='Receiver Email/username',
 							  required=False,
 							  constraint=checkEmailAddress)
 	Message = ValidText(title='Gift message', required=False)
 	
-	creator = ValidTextLine(title='Gift sender', required=False)
+	TargetPurchaseID = ValidTextLine(title='NTIID of target purchase', required=False)
 	
+	def is_redeemed():
+		"""
+		return if the purchase has been redeemed
+		"""
+
 class IPurchaseAttemptFactory(interface.Interface):
 	"""
 	Interface to create :class:`IPurchaseAttempt` objects. 
@@ -416,6 +431,9 @@ class IPurchaseAttemptReserved(IPurchaseAttemptStateEvent):
 
 class IPurchaseAttemptFailed(IPurchaseAttemptStateEvent):
 	error = interface.Attribute('Failure error')
+
+class IGiftPurchaseAttemptRedeemed(IPurchaseAttemptEvent):
+	user = Object(IUser, title="The gift receiver")
 
 @interface.implementer(IPurchaseAttemptEvent)
 class PurchaseAttemptEvent(ObjectEvent):
@@ -468,6 +486,15 @@ class PurchaseAttemptFailed(PurchaseAttemptEvent):
 		super(PurchaseAttemptFailed, self).__init__(purchase)
 		self.error = error
 
+@interface.implementer(IGiftPurchaseAttemptRedeemed)
+class GiftPurchaseAttemptRedeemed(PurchaseAttemptFailed):
+
+	state = PA_STATE_REDEEMED
+	
+	def __init__(self, purchase, user):
+		super(GiftPurchaseAttemptRedeemed, self).__init__(purchase)
+		self.user = user
+	
 class IPurchaseHistory(IIterable):
 
 	def add_purchase(purchase):
