@@ -78,6 +78,8 @@ def _activate_items(purchase, user=None, add_roles=True):
 def _purchase_attempt_successful(purchase, event):
 	purchase.EndTime = time.time()
 	_update_state(purchase, PA_STATE_SUCCESS)
+	## CS: We are assuming a non null quantity is for a bulk purchase
+	## Therefore we don't activate items
 	if not purchase.Quantity:
 		_activate_items(purchase)
 	logger.info('%r completed successfully', purchase.id)
