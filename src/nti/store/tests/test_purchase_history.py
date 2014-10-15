@@ -28,8 +28,8 @@ from nti.externalization.oids import to_external_ntiid_oid
 from nti.store.purchase_order import create_purchase_item
 from nti.store.purchase_order import create_purchase_order
 from nti.store.purchase_history import get_purchase_attempt
+from nti.store.purchase_history import get_pending_purchases
 from nti.store.purchase_attempt import create_purchase_attempt
-from nti.store.purchase_history import get_pending_purchase_for
 from nti.store.purchase_history import register_purchase_attempt
 
 from nti.store.interfaces import PA_STATE_STARTED
@@ -158,9 +158,10 @@ class TestPurchaseHistory(unittest.TestCase):
 		pending = self._create_purchase_attempt(item, state=PA_STATE_STARTED)
 		hist.add_purchase(pending)
 
-		pa = get_pending_purchase_for(user, item)
-		assert_that(pa, is_(not_none()))
-		assert_that(pa, is_(pending))
+		purchases = get_pending_purchases(user, item)
+		assert_that(purchases, is_(not_none()))
+		assert_that(purchases, has_length(1))
+		assert_that(purchases[0], is_(pending))
 
 	@WithMockDSTrans
 	def test_missing_purchase(self):

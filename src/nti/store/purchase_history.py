@@ -175,8 +175,8 @@ class _PurchaseIndex(Persistent):
 				yield p
 
 	def get_history_by_time(self, start_time=None, end_time=None):
-		start_time = time_to_64bit_int(start_time) if start_time is not None else None
 		end_time = time_to_64bit_int(end_time) if end_time is not None else None
+		start_time = time_to_64bit_int(start_time) if start_time is not None else None
 		for _, iid in self.time_index.iteritems(start_time, end_time):
 			p = self._intids.queryObject(iid)
 			if _check_valid(p, iid, intids=self._intids):
@@ -276,17 +276,12 @@ class PurchaseHistory(Contained, Persistent):
 		p = self.get_purchase(pid)
 		return p.State if p else None
 
-	def get_pending_purchases(self):
+	def get_pending_purchases(self, items=None):
+		items = to_frozenset(items) if items else None
 		for p in self.values():
-			if p.is_pending() or p.is_unknown():
+			if	(p.is_pending() or p.is_unknown()) or \
+				(not items or p.Items.intersection(items)):
 				yield p
-
-	def get_pending_purchase_for(self, items):
-		items = to_frozenset(items)
-		for p in self.values():
-			if (p.is_pending() or p.is_unknown()) and p.Items.intersection(items):
-				return p
-		return None
 
 	def get_purchase_history_by_item(self, item):
 		return self._index.get_history_by_item(item)
@@ -346,6 +341,7 @@ def is_item_activated(user, item):
 
 def get_purchase_attempt(purchase_id, user=None):
 	result = ntiids.find_object_with_ntiid(purchase_id)
+	result = result if IPurchaseAttempt.providedBy(result) else None
 	if result is not None and user:
 		user = get_user(user)
 		if user is not None:  # validate
@@ -360,11 +356,11 @@ def remove_purchase_attempt(purchase, user=None):
 		return result
 	return False
 
-def get_pending_purchases(user):
+def get_pending_purchases(user, items=None):
 	user = get_user(user)
 	if user is not None:
 		hist = IPurchaseHistory(user)
-		result = LocatedExternalList(hist.get_pending_purchases())
+		result = LocatedExternalList(hist.get_pending_purchases(items))
 		return result
 	return ()
 
@@ -389,14 +385,6 @@ def get_purchase_history_by_item(user, purchasable_id):
 	if user is not None:
 		hist = IPurchaseHistory(user)
 		result = LocatedExternalList(hist.get_purchase_history_by_item(purchasable_id))
-		return result
-	return ()
-
-def get_pending_purchase_for(user, items):
-	user = get_user(user)
-	if user is not None:
-		hist = IPurchaseHistory(user)
-		result = hist.get_pending_purchase_for(items)
 		return result
 	return ()
 

@@ -118,7 +118,7 @@ class UserGiftHistory(Contained, Persistent):
 			if IGiftPurchaseAttempt.providedBy(p):
 				yield p
 
-	def get_pending_purchase_for(self, items=None):
+	def get_pending_purchases(self, items=None):
 		items = to_frozenset(items) if items else None
 		for p in self.values():
 			if 	(p.is_pending() or p.is_unknown()) and \
@@ -168,70 +168,51 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 			lifecycleevent.created(index)
 			self[username] = index
 			
+		# register
 		locate(purchase, index)
 		IConnection(self).add(purchase)
 		lifecycleevent.created(purchase)
-		lifecycleevent.added(purchase)  # get an iid
+		lifecycleevent.added(purchase)
 		index.add(purchase)
 		
+		# set idens
 		purchase.creator = username
 		purchase.id = unicode(to_external_ntiid_oid(purchase))
 		return purchase
 	add = register_purchase
 	
-	def get_pending_purchase_for(self, username, items=None):
-		pass
+	def get_pending_purchases(self, username, items=None):
+		try:
+			index = self[username]
+			return list(index.get_pending_purchases(items))
+		except KeyError:
+			return ()
+		
+	def get_purchase_history(self, username, start_time=None, end_time=None):
+		try:
+			index = self[username]
+			return list(index.get_history_by_time(username, start_time, end_time))
+		except KeyError:
+			return ()
 
 def get_gift_purchase_attempt(purchase_id, username=None):
 	result = find_object_with_ntiid(purchase_id)
-	if IGiftPurchaseAttempt.providedBy(result) and username:
+	result = result if IGiftPurchaseAttempt.providedBy(result) else None
+	if result is not None and username:
 		result = None if result.creator != username else result
 	return result
 
-# def get_pending_purchases(username):
-# 	user = get_user(user)
-# 	if user is not None:
-# 		hist = IPurchaseHistory(user)
-# 		result = LocatedExternalList(hist.get_pending_purchases())
-# 		return result
-# 	return ()
+def get_gift_pending_purchases(username, items=None):
+	registry = component.getUtility(IGiftRegistry)
+	result = registry.get_pending_purchases(username, items)
+	return result
 
-# def get_purchase_history(user, start_time=None, end_time=None):
-# 	user = get_user(user)
-# 	if user is not None:
-# 		hist = IPurchaseHistory(user)
-# 		result = LocatedExternalList(hist.get_purchase_history(start_time, end_time))
-# 		return result
-# 	return ()
-# 
-# def has_history_by_item(user, purchasable_id):
-# 	user = get_user(user)
-# 	if user is not None:
-# 		hist = IPurchaseHistory(user)
-# 		result = hist.has_history_by_item(purchasable_id)
-# 		return result
-# 	return False
-# 
-# def get_purchase_history_by_item(user, purchasable_id):
-# 	user = get_user(user)
-# 	if user is not None:
-# 		hist = IPurchaseHistory(user)
-# 		result = LocatedExternalList(hist.get_purchase_history_by_item(purchasable_id))
-# 		return result
-# 	return ()
-# 
-# def get_pending_purchase_for(user, items):
-# 	user = get_user(user)
-# 	if user is not None:
-# 		hist = IPurchaseHistory(user)
-# 		result = hist.get_pending_purchase_for(items)
-# 		return result
-# 	return ()
-# 
-# def register_purchase_attempt(purchase, user):
-# 	user = get_user(user)
-# 	if user is not None:
-# 		hist = IPurchaseHistory(user)
-# 		hist.register_purchase(purchase)
-# 		return purchase.id
-# 	return None
+def get_gift_purchase_history(username, start_time=None, end_time=None):
+	registry = component.getUtility(IGiftRegistry)
+	result = registry.get_purchase_history(username, start_time, end_time)
+	return result
+
+def register_gift_purchase_attempt(username, purchase):
+	registry = component.getUtility(IGiftRegistry)
+	result = registry.register_purchase(username, purchase)
+	return result
