@@ -43,12 +43,11 @@ from nti.zodb.containers import time_to_64bit_int
 from .utils import to_frozenset
 
 from .interfaces import IGiftRegistry
-from .interfaces import IUserGiftIndex
 from .interfaces import IUserGiftHistory
 from .interfaces import IGiftPurchaseAttempt
 
-@interface.implementer(IUserGiftIndex)
-class UserGiftIndex(Contained, Persistent):
+@interface.implementer(IUserGiftHistory)
+class UserGiftHistory(Contained, Persistent):
 
 	family = BTrees.family64
 
@@ -145,15 +144,15 @@ class UserGiftIndex(Contained, Persistent):
 	
 	@property
 	def __acl__(self):
-		aces = [ace_allowing(ROLE_ADMIN, ALL_PERMISSIONS, UserGiftIndex)]
+		aces = [ace_allowing(ROLE_ADMIN, ALL_PERMISSIONS, UserGiftHistory)]
 		creator = self.creator
 		if creator is not None:
-			aces.append(ace_allowing(creator, ALL_PERMISSIONS, UserGiftIndex))
+			aces.append(ace_allowing(creator, ALL_PERMISSIONS, UserGiftHistory))
 		aces.append(ACE_DENY_ALL)
 		return acl_from_aces(aces)
 
-@interface.implementer(IUserGiftHistory)
-class UserGiftHistory(CaseInsensitiveCheckingLastModifiedBTreeContainer):
+@interface.implementer(IGiftRegistry)
+class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 
 	@property
 	def Items(self):
@@ -165,7 +164,7 @@ class UserGiftHistory(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 		try:
 			index = self[username]
 		except KeyError:
-			index = UserGiftIndex()
+			index = UserGiftHistory()
 			lifecycleevent.created(index)
 			self[username] = index
 			
@@ -174,7 +173,7 @@ class UserGiftHistory(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 		lifecycleevent.created(purchase)
 		lifecycleevent.added(purchase)  # get an iid
 		index.add(purchase)
-		# set id/name
+		
 		purchase.creator = username
 		purchase.id = unicode(to_external_ntiid_oid(purchase))
 		return purchase
@@ -182,22 +181,6 @@ class UserGiftHistory(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 	
 	def get_pending_purchase_for(self, username, items=None):
 		pass
-		
-	@property
-	def __acl__(self):
-		aces = [ace_allowing(ROLE_ADMIN, ALL_PERMISSIONS, UserGiftHistory)]
-		aces.append(ACE_DENY_ALL)
-		return acl_from_aces(aces)
-
-@interface.implementer(IGiftRegistry)
-class GiftRegistry(Contained, Persistent):
-	
-	def __init__(self):
-		self._history = UserGiftHistory()
-
-	def recordPurchase(self, username, purchase):
-		return self._history.recordPurchase(username, purchase)
-	add = recordPurchase
 
 def get_gift_purchase_attempt(purchase_id, username=None):
 	result = find_object_with_ntiid(purchase_id)

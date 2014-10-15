@@ -497,35 +497,24 @@ class IStorePurchaseInvitation(interface.Interface):
 
 # gift registry
 
-class IUserGiftIndex(IContained):
+class IUserGiftHistory(IContained):
 	"""
 	marker interface to store gifts given by a user
 	"""
 
-class IUserGiftHistory(IContainer, IContained):
-	"""
-	username based gift storage
-	"""
-	contains(b'.IUserGiftIndex')
-	
-	def register_purchase(username, purchase):
-		pass
-	
-	def get_pending_purchases(username, items=None):
-		pass
-
-class IGiftRegistry(IContained):
+class IGiftRegistry(IContainer, IContained):
 	"""
 	marker interface for gift registry. 
 	This object is registerd as a persistent utility
 	"""
-
+	contains(b'.IUserGiftHistory')
+	
 	def register_purchase(username, purchase):
 		pass
 	
 	def get_pending_purchases(username, items=None):
 		pass
-	
+
 # depreecated interfaces
 
 deprecated('IEnrollmentAttempt', 'Use new course enrollment')
