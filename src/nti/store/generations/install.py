@@ -14,6 +14,11 @@ generation = 2
 
 from zope.generations.generations import SchemaManager
 
+import zope.intid
+
+from ..interfaces import IGiftRegistry
+from ..gift_registry import GiftRegistry
+
 class _StoreSchemaManager(SchemaManager):
 	"""
 	A schema manager that we can register as a utility in ZCML.
@@ -25,4 +30,19 @@ class _StoreSchemaManager(SchemaManager):
 											package_name='nti.store.generations')
 
 def evolve(context):
-	pass
+	install_gift_registry(context)
+
+def install_gift_registry(context):
+	conn = context.connection
+	root = conn.root()
+
+	dataserver_folder = root['nti.dataserver']
+	lsm = dataserver_folder.getSiteManager()
+	intids = lsm.getUtility(zope.intid.IIntIds)
+
+	registry = GiftRegistry()
+	registry.__parent__ = dataserver_folder
+	registry.__name__ = '++etc++store++giftregistry'
+	intids.register(registry)
+	lsm.registerUtility(registry, provided=IGiftRegistry)
+	return registry
