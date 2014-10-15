@@ -153,6 +153,9 @@ class UserGiftHistory(Contained, Persistent):
 
 @interface.implementer(IGiftRegistry)
 class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
+	
+	def __init__(self):
+		super(GiftRegistry,self).__init__()
 
 	@property
 	def Items(self):
