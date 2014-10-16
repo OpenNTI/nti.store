@@ -91,7 +91,7 @@ class IPurchasableVendorInfo(IEnumerableMapping):
 	information.
 	"""
 	
-class IPurchasable(IContentBundle):
+class IPurchasable(IItemBundle):
 	Amount = Float(title="Cost amount", required=True, min=0.0)
 	Currency = ValidTextLine(title='Currency amount', required=True, default='USD')
 	Discountable = Bool(title="Discountable flag", required=True, default=False)
