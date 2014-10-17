@@ -34,6 +34,7 @@ from nti.schema.field import Tuple
 from nti.schema.field import Choice
 from nti.schema.field import Number
 from nti.schema.field import Object
+from nti.schema.field import Iterable
 from nti.schema.field import Datetime
 from nti.schema.field import FrozenSet
 from nti.schema.field import Timedelta
@@ -309,6 +310,9 @@ class IPurchaseAttempt(IContained):
 					 required=False)
 	Context.setTaggedValue('_ext_excluded_out', True)
 	
+	Items = Iterable(title="Purchasable NTIIDs", required=True, readonly=True)
+	Items.setTaggedValue('_ext_excluded_out', True)
+		
 	def has_completed():
 		"""
 		return if the purchase has completed
