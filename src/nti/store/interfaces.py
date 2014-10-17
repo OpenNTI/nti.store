@@ -34,12 +34,12 @@ from nti.schema.field import Tuple
 from nti.schema.field import Choice
 from nti.schema.field import Number
 from nti.schema.field import Object
-from nti.schema.field import Iterable
 from nti.schema.field import Datetime
 from nti.schema.field import FrozenSet
 from nti.schema.field import Timedelta
 from nti.schema.field import ValidText
 from nti.schema.field import ValidTextLine
+from nti.schema.field import IndexedIterable
 
 # : A :class:`zope.Interfaces.IVocabularyTokenized` vocabulary
 # : will be available as a registered vocabulary under this name
@@ -150,7 +150,10 @@ class IPurchaseOrder(IMinimalSequence):
 
 	Quantity = Int(title='Purchase bulk quantity (overwrites-item quantity)',
 				   required=False)
-
+	
+	NTIIDs = IndexedIterable(title="Purchasable NTIIDs", required=True, readonly=True)
+	NTIIDs.setTaggedValue('_ext_excluded_out', True)
+	
 	def copy():
 		"""makes a new copy of this purchase order"""
 
@@ -310,7 +313,7 @@ class IPurchaseAttempt(IContained):
 					 required=False)
 	Context.setTaggedValue('_ext_excluded_out', True)
 	
-	Items = Iterable(title="Purchasable NTIIDs", required=True, readonly=True)
+	Items = IndexedIterable(title="Purchasable NTIIDs", required=True, readonly=True)
 	Items.setTaggedValue('_ext_excluded_out', True)
 		
 	def has_completed():
