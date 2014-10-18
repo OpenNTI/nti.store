@@ -26,27 +26,33 @@ from ...pricing import DefaultPurchasablePricer
 
 from .stripe_purchase import StripePricedPurchasable
 
+from . import STRIPE
+
+def get_coupon(coupon=None, api_key=None, processor=STRIPE):
+	manager = component.getUtility(IPaymentProcessor, name=processor)
+	if coupon is not None and api_key:
+		# stripe defines an 80 sec timeout for http requests
+		# at this moment we are to wait for coupon validation
+		if isinstance(coupon, six.string_types):
+			try:
+				coupon = manager.get_coupon(coupon, api_key=api_key)
+			except stripe.InvalidRequestError as e:
+				logger.error("Cannot retrieve coupon %s. %s", coupon, e)
+				raise NoSuchStripeCoupon()
+
+		if coupon is not None:
+			validated_coupon = manager.validate_coupon(coupon, api_key=api_key)
+			if not validated_coupon:
+				raise InvalidStripeCoupon()
+	return coupon
+	
 class StripePurchasablePricer(DefaultPurchasablePricer):
 
-	processor = "stripe"
+	processor = STRIPE
 
 	def get_coupon(self, coupon=None, api_key=None):
-		manager = component.getUtility(IPaymentProcessor, name=self.processor)
-		if coupon is not None and api_key:
-			# stripe defines an 80 sec timeout for http requests
-			# at this moment we are to wait for coupon validation
-			if isinstance(coupon, six.string_types):
-				try:
-					coupon = manager.get_coupon(coupon, api_key=api_key)
-				except stripe.InvalidRequestError as e:
-					logger.error("Cannot retrieve coupon %s. %s", coupon, e)
-					raise NoSuchStripeCoupon()
-
-			if coupon is not None:
-				validated_coupon = manager.validate_coupon(coupon, api_key=api_key)
-				if not validated_coupon:
-					raise InvalidStripeCoupon()
-		return coupon
+		result = get_coupon(coupon=coupon, api_key=api_key, processor=self.processor)
+		return result
 
 	def price(self, priceable):
 		priced = super(StripePurchasablePricer, self).price(priceable)
