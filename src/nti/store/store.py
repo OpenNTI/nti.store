@@ -16,21 +16,41 @@ from .interfaces import IPurchaseAttempt
 from .interfaces import IGiftPurchaseAttempt
 
 from .gift_registry import get_gift_pending_purchases
+from .gift_registry import register_gift_purchase_attempt
 
+from .invitations import get_invitation_code
+from .invitations import get_purchase_by_code
+
+from .purchasable import get_purchasable
 from .purchasable import get_all_purchasables
 
 from .purchase_history import activate_items
 from .purchase_history import deactivate_items
 from .purchase_history import is_item_activated
 from .purchase_history import get_pending_purchases
+from .purchase_history import register_purchase_attempt
+
+from .purchase_attempt import create_purchase_attempt
+from .purchase_attempt import create_gift_purchase_attempt
 
 # rexport
+get_purchasable = get_purchasable
+get_all_purchasables = get_all_purchasables
+
+get_invitation_code = get_invitation_code
+get_purchase_by_code = get_purchase_by_code
+
 activate_items = activate_items
 deactivate_items = deactivate_items
 is_item_activated = is_item_activated
-get_all_purchasables = get_all_purchasables
 get_pending_purchases = get_pending_purchases
+register_purchase_attempt = register_purchase_attempt
+
 get_gift_pending_purchases = get_gift_pending_purchases
+register_gift_purchase_attempt = register_gift_purchase_attempt
+
+create_purchase_attempt = create_purchase_attempt
+create_gift_purchase_attempt = create_gift_purchase_attempt
 
 def get_purchase_attempt(purchase_id, user=None):
     result = find_object_with_ntiid(purchase_id)
