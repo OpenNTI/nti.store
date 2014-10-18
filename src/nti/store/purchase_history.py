@@ -279,7 +279,7 @@ class PurchaseHistory(Contained, Persistent):
 	def get_pending_purchases(self, items=None):
 		items = to_frozenset(items) if items else None
 		for p in self.values():
-			if	(p.is_pending() or p.is_unknown()) or \
+			if	(p.is_pending() or p.is_unknown()) and \
 				(not items or p.Items.intersection(items)):
 				yield p
 
