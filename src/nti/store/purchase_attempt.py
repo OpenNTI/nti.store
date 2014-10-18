@@ -284,8 +284,8 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, redemption_time=
 	return result
 
 def create_gift_purchase_attempt(creator, order, processor, state=None, description=None,
-								 start_time=None, receiver=None, message=None,
-								 target=None, context=None):
+								 start_time=None, sender=None, receiver=None, 
+								 message=None, target=None, context=None):
 
 	state = state or PA_STATE_UNKNOWN
 	context = to_purchase_attempt_context(context)
@@ -294,7 +294,7 @@ def create_gift_purchase_attempt(creator, order, processor, state=None, descript
 	result = GiftPurchaseAttempt(
 				Order=order, Processor=processor, Creator=creator,
 				Description=description, State=state, 
-				StartTime=float(start_time), Context=context,
+				StartTime=float(start_time), Context=context, Sender=sender,
 				Message=message, Receiver=receiver, TargetPurchaseID=target)
 	return result
 

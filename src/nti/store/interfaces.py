@@ -374,14 +374,12 @@ class IRedeemedPurchaseAttempt(IPurchaseAttempt):
 	RedemptionCode = ValidTextLine(title='Redemption Code', required=True)
 	
 class IGiftPurchaseAttempt(IPurchaseAttempt):
-	
 	Creator = ValidTextLine(title="Gift creator", required=True)
-	
+	Sender =  ValidTextLine(title='Sender name', required=False)
 	Receiver =  ValidTextLine(title='Receiver Email/username',
 							  required=False,
 							  constraint=checkEmailAddress)
 	Message = ValidText(title='Gift message', required=False)
-	
 	TargetPurchaseID = ValidTextLine(title='NTIID of target purchase', required=False)
 	
 	def is_redeemed():
