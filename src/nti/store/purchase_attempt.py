@@ -292,7 +292,7 @@ def create_gift_purchase_attempt(creator, order, processor, state=None, descript
 	start_time = start_time if start_time else time.time()
 
 	result = GiftPurchaseAttempt(
-				Order=order, Processor=processor, Creator=creator,
+				Order=order, Processor=processor, Creator=creator.lower(),
 				Description=description, State=state, 
 				StartTime=float(start_time), Context=context, Sender=sender,
 				Message=message, Receiver=receiver, TargetPurchaseID=target)
