@@ -47,6 +47,10 @@ from .coupon import CouponProcessor
 from .pricing import price_purchase
 from .pricing import PricingProcessor
 
+def get_transaction_runner():
+	result = component.getUtility(IDataserverTransactionRunner)
+	return result
+
 def _start_purchase(purchase_id, username=None):
 	purchase = get_purchase_attempt(purchase_id, username)
 	if purchase is None:
@@ -131,7 +135,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 		"""
 
 		# prepare transaction runner
-		transaction_runner = component.getUtility(IDataserverTransactionRunner)
+		transaction_runner = get_transaction_runner()
 		transaction_runner = partial(transaction_runner, site_names=site_names)
 
 		start_purchase = partial(_start_purchase, 
