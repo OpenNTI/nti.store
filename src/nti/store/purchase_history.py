@@ -24,6 +24,8 @@ from zope.container.contained import Contained
 from zope.annotation import factory as an_factory
 from zope.location.interfaces import ISublocations
 
+from ZODB.interfaces import IConnection
+
 from persistent import Persistent
 
 from nti.dataserver.interfaces import IUser
@@ -249,9 +251,7 @@ class PurchaseHistory(Contained, Persistent):
 		# locate before firing events
 		locate(purchase, self)
 		# add to connection before firing event
-		owner_jar = getattr(self, '_p_jar', None)
-		if owner_jar and getattr(purchase, '_p_jar', None) is None:
-			owner_jar.add(purchase)
+		IConnection(self).add(purchase)
 		# fire events
 		lifecycleevent.created(purchase)
 		lifecycleevent.added(purchase)  # get an iid
@@ -280,7 +280,7 @@ class PurchaseHistory(Contained, Persistent):
 		items = to_frozenset(items) if items else None
 		for p in self.values():
 			if	(p.is_pending() or p.is_unknown()) and \
-				(not items or p.Items.intersection(items)):
+				(not items or to_frozenset(p.Items).intersection(items)):
 				yield p
 
 	def get_purchase_history_by_item(self, item):

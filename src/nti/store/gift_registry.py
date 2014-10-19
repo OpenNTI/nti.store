@@ -123,7 +123,7 @@ class UserGiftHistory(Contained, Persistent):
 		items = to_frozenset(items) if items else None
 		for p in self.values():
 			if 	(p.is_pending() or p.is_unknown()) and \
-				(not items or p.Items.intersection(items)):
+				(not items or to_frozenset(p.Items).intersection(items)):
 				yield p
 	
 	def values(self):
