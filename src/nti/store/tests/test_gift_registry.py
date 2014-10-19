@@ -17,8 +17,6 @@ from functools import partial
 
 from zope import component
 
-import transaction
-
 from nti.dataserver.users import User
 from nti.dataserver.interfaces import IDataserverTransactionRunner
 
@@ -35,6 +33,7 @@ from nti.store.gift_registry import get_gift_pending_purchases
 from nti.store.gift_registry import register_gift_purchase_attempt
 
 from nti.store.interfaces import PA_STATE_STARTED
+from nti.store.interfaces import PA_STATE_SUCCESS
 
 from nti.dataserver.tests import mock_dataserver
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
@@ -83,11 +82,14 @@ class TestGiftRegistry(unittest.TestCase):
 		pending = get_gift_pending_purchases(username)
 		assert_that(pending, has_length(1))
 		
-		# force a commit
-		transaction.commit()
-		
 		transaction_runner = component.getUtility(IDataserverTransactionRunner)
 		get_purchase = partial(get_purchase_attempt, 
 							   purchase_id=pid)
 		attempt = transaction_runner(get_purchase)
 		assert_that(attempt, is_(not_none()))
+		
+		with mock_dataserver.mock_db_trans(self.ds):
+			attempt.state = PA_STATE_SUCCESS
+		
+		pending = get_gift_pending_purchases(username)
+		assert_that(pending, has_length(0))
