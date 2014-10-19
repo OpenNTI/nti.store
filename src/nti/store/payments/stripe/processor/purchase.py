@@ -28,7 +28,7 @@ from ....interfaces import PurchaseAttemptFailed
 from ....interfaces import PurchaseAttemptStarted
 from ....interfaces import PurchaseAttemptSuccessful
 
-from ....purchase_history import get_purchase_attempt
+from ....store import get_purchase_attempt
 
 from ..stripe_io import create_charge
 from ..stripe_customer import StripeCustomer
