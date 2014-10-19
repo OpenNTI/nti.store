@@ -123,8 +123,7 @@ class UserGiftHistory(Contained, Persistent):
 		for p in self.values():
 			if 	(p.is_pending() or p.is_unknown()) and \
 				(not items or p.Items.intersection(items)):
-				return p
-		return None
+				yield p
 	
 	def values(self):
 		for iid in self.purchases:
@@ -180,7 +179,7 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 		
 		# set idens
 		purchase.creator = username
-		purchase.id = unicode(to_external_ntiid_oid(purchase))
+		purchase.id = unicode(to_external_ntiid_oid(purchase, mask_creator=False))
 		return purchase
 	add = register_purchase
 	
@@ -218,4 +217,4 @@ def get_gift_purchase_history(username, start_time=None, end_time=None):
 def register_gift_purchase_attempt(username, purchase):
 	registry = component.getUtility(IGiftRegistry)
 	result = registry.register_purchase(username, purchase)
-	return result
+	return result.id
