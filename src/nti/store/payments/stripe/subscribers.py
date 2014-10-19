@@ -21,30 +21,34 @@ from .interfaces import IStripePurchaseAttempt
 @component.adapter(IStripeCustomerCreated)
 def stripe_customer_created(event):
 	user = event.user
-	su = IStripeCustomer(user)
-	su.customer_id = event.customer_id
+	su = IStripeCustomer(user, None)
+	if su is not None:
+		su.customer_id = event.customer_id
 
 @component.adapter(IStripeCustomerDeleted)
 def stripe_customer_deleted(event):
 	user = event.user
-	su = IStripeCustomer(user)
-	su.customer_id = None
-	module = "%s.%s" % (su.__class__.__module__, su.__class__.__name__)
-	IAnnotations(user).pop(module, None)
+	su = IStripeCustomer(user, None)
+	if su is not None:
+		su.customer_id = None
+		module = "%s.%s" % (su.__class__.__module__, su.__class__.__name__)
+		IAnnotations(user).pop(module, None)
 
 @component.adapter(IRegisterStripeToken)
 def register_stripe_token(event):
 	purchase = event.purchase
 	sp = IStripePurchaseAttempt(purchase)
 	sp.TokenID = event.token
-
+	logger.debug("Purchase %s was associated with stripe token %s",
+				 purchase.id, event.token)
+	
 @component.adapter(IRegisterStripeCharge)
 def register_stripe_charge(event):
 	purchase = event.purchase
 	sp = IStripePurchaseAttempt(purchase)
 	sp.ChargeID = event.charge_id
-	user = purchase.creator
-	su = IStripeCustomer(user)
-	su.Charges.add(event.charge_id)
+	su = IStripeCustomer(purchase.creator, None)
+	if su is not None:
+		su.Charges.add(event.charge_id)
 	logger.debug("Purchase %s was associated with stripe charge %s",
 				 purchase.id, event.charge_id)
