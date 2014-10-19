@@ -220,6 +220,10 @@ class GiftPurchaseAttempt(PurchaseAttempt):
 		
 	creator = alias('Creator')
 
+	@property
+	def NTIID(self):
+		return self.id
+
 	def has_succeeded(self):
 		return self.State == (PA_STATE_SUCCESS, PA_STATE_REDEEMED)
 	

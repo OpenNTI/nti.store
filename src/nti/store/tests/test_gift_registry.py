@@ -20,8 +20,6 @@ from zope import component
 from nti.dataserver.users import User
 from nti.dataserver.interfaces import IDataserverTransactionRunner
 
-from nti.externalization.oids import to_external_ntiid_oid
-
 from nti.store.store import get_purchase_attempt
 
 from nti.store.purchase_order import create_purchase_item
@@ -73,7 +71,6 @@ class TestGiftRegistry(unittest.TestCase):
 		with mock_dataserver.mock_db_trans(self.ds):
 			attempt = get_gift_purchase_attempt(pid)
 			assert_that(attempt, is_(not_none()))
-			assert_that(to_external_ntiid_oid(attempt), is_(pid))
 			
 		with mock_dataserver.mock_db_trans(self.ds):
 			attempt = get_purchase_attempt(pid) 
