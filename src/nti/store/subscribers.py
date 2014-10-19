@@ -65,7 +65,7 @@ def _update_state(purchase, state):
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptStarted)
 def _purchase_attempt_started(purchase, event):
 	_update_state(purchase, PA_STATE_STARTED)
-	logger.info('%r started' % purchase)
+	logger.info('%s started' % purchase.id)
 
 def _activate_items(purchase, user=None, add_roles=True):
 	user = user or purchase.creator
@@ -82,7 +82,7 @@ def _purchase_attempt_successful(purchase, event):
 	## Therefore we don't activate items
 	if not purchase.Quantity:
 		_activate_items(purchase)
-	logger.info('%r completed successfully', purchase.id)
+	logger.info('%s completed successfully', purchase.id)
 
 def _return_items(purchase, user=None, remove_roles=True):
 	if purchase is not None:
@@ -98,7 +98,7 @@ def _purchase_attempt_refunded(purchase, event):
 	_update_state(purchase, PA_STATE_REFUNDED)
 	if not purchase.Quantity:
 		_return_items(purchase, purchase.creator)
-	logger.info('%r has been refunded', purchase)
+	logger.info('%s has been refunded', purchase.id)
 
 @component.adapter(IInvitationPurchaseAttempt, IPurchaseAttemptRefunded)
 def _invitation_purchase_attempt_refunded(purchase, event):
@@ -124,21 +124,21 @@ def _redeemed_purchase_attempt_refunded(purchase, event):
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptDisputed)
 def _purchase_attempt_disputed(purchase, event):
 	_update_state(purchase, PA_STATE_DISPUTED)
-	logger.info('%r has been disputed', purchase)
+	logger.info('%s has been disputed', purchase.id)
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptFailed)
 def _purchase_attempt_failed(purchase, event):
 	purchase.Error = event.error
 	purchase.EndTime = time.time()
 	_update_state(purchase, PA_STATE_FAILED)
-	logger.info('%r failed. %s', purchase.id, purchase.Error)
+	logger.info('%s failed. %s', purchase.id, purchase.Error)
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptSynced)
 def _purchase_attempt_synced(purchase, event):
 	purchase.Synced = True
 	purchase.updateLastMod()
 	lifecycleevent.modified(purchase)
-	logger.info('%r has been synched' % purchase)
+	logger.info('%s has been synched' % purchase.id)
 
 def _redeem_purchase_attempt(user, original, code, activate_roles=True):
 	# create and register a purchase attempt for accepting user
@@ -180,7 +180,7 @@ def _gift_purchase_attempt_redeemed(purchase, event):
 	purchase.TargetPurchaseID = new_pid
 	purchase.updateLastMod()
 	lifecycleevent.modified(purchase)
-	logger.info('%r has been redeemed' % purchase)
+	logger.info('%s has been redeemed' % purchase.id)
 
 from .interfaces import PurchaseAttemptRefunded
 

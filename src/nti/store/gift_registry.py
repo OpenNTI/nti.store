@@ -32,9 +32,8 @@ from nti.dataserver.authorization import ROLE_ADMIN
 from nti.dataserver.authorization_acl import ace_allowing
 from nti.dataserver.authorization_acl import acl_from_aces
 
-from nti.externalization.integer_strings import to_external_string
+from nti.externalization.oids import to_external_ntiid_oid
 
-from nti.ntiids.ntiids import make_ntiid
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.utils.property import Lazy
@@ -166,13 +165,6 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 		result = component.getUtility(zope.intid.IIntIds)
 		return result
 		
-	def get_ntiid(self, purchase):
-		uid = self.intids.getId(purchase)
-		result = make_ntiid(provider=purchase.creator,
-							nttype="giftpurchaseattempt",
-							specific=to_external_string(uid))
-		return result
-			
 	def register_purchase(self, username, purchase):
 		assert IGiftPurchaseAttempt.providedBy(purchase)
 		
@@ -192,7 +184,7 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 		
 		# set idens
 		purchase.creator = username
-		purchase.id = self.get_ntiid(purchase)
+		purchase.id = unicode(to_external_ntiid_oid(purchase))
 		return purchase
 	add = register_purchase
 	
