@@ -8,6 +8,8 @@ __docformat__ = "restructuredtext en"
 # pylint: disable=W0212,R0904
 
 from hamcrest import is_
+from hamcrest import none
+from hamcrest import is_not
 from hamcrest import assert_that
 from hamcrest import has_property
 
@@ -26,6 +28,7 @@ from nti.store.interfaces import PurchaseAttemptStarted
 from nti.store.interfaces import PurchaseAttemptRefunded
 from nti.store.interfaces import PurchaseAttemptSuccessful
 from nti.store.interfaces import IInvitationPurchaseAttempt
+from nti.store.interfaces import GiftPurchaseAttemptRedeemed
 
 from nti.store.invitations import get_invitation_code
 
@@ -34,6 +37,10 @@ from nti.store.purchase_order import create_purchase_order
 from nti.store.purchase_attempt import create_purchase_attempt
 from nti.store.purchase_history import register_purchase_attempt
 from nti.store.purchase_attempt import create_redeemed_purchase_attempt
+
+
+from nti.store.gift_registry import register_gift_purchase_attempt
+from nti.store.purchase_attempt import create_gift_purchase_attempt
 
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
@@ -54,6 +61,14 @@ class TestEvents(unittest.TestCase):
 		result = create_purchase_attempt(order, processor='stripe', state=state)
 		if user is not None:
 			register_purchase_attempt(result, user)
+		return result
+	
+	def create_gift_attempt(self, creator, item=u'xyz-book', state=None):
+		state = state or PA_STATE_STARTED
+		item = create_purchase_item(item, 1)
+		order = create_purchase_order(item, quantity=None)
+		result = create_gift_purchase_attempt(order=order, processor='stripe', 
+										  	  state=state, creator=creator)
 		return result
 	
 	@WithMockDSTrans
@@ -117,3 +132,14 @@ class TestEvents(unittest.TestCase):
 		
 		assert_that(inv, has_property('tokens', is_(5)))		
 		assert_that(rpa, has_property('State', is_(PA_STATE_REFUNDED)))
+		
+	@WithMockDSTrans
+	def test_redeemed_gift(self):
+		ichigo = 'ichigo@bleach.org'
+		gift = self.create_gift_attempt(ichigo, state=PA_STATE_SUCCESS)
+		gid = register_gift_purchase_attempt(ichigo, gift)
+		assert_that(gid, is_not(none()))
+		
+		aizen = self._create_user(username="aizen")
+		notify(GiftPurchaseAttemptRedeemed(gift, aizen))
+		
