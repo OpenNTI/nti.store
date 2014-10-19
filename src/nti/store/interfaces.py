@@ -381,6 +381,7 @@ class IGiftPurchaseAttempt(IPurchaseAttempt):
 							  constraint=checkEmailAddress)
 	Message = ValidText(title='Gift message', required=False)
 	TargetPurchaseID = ValidTextLine(title='NTIID of target purchase', required=False)
+	TargetPurchaseID.setTaggedValue('_ext_excluded_out', True)
 	
 	def is_redeemed():
 		"""
