@@ -119,6 +119,7 @@ def _redeemed_purchase_attempt_refunded(purchase, event):
 	elif IGiftPurchaseAttempt.providedBy(source):
 		_return_items(purchase, purchase.creator)
 		# change the state to success to be able to be given again
+		source.TargetPurchaseID = None
 		_update_state(source, PA_STATE_SUCCESS)
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptDisputed)

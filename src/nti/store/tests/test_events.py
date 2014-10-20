@@ -155,4 +155,8 @@ class TestEvents(unittest.TestCase):
 
 		with self.assertRaises(RedeemException):
 			notify(GiftPurchaseAttemptRedeemed(gift, aizen))
-	
+			
+		notify(PurchaseAttemptRefunded(pa))
+		assert_that(gift, has_property('State', is_(PA_STATE_SUCCESS)))
+		assert_that(gift, has_property('TargetPurchaseID', is_(none())))
+		
