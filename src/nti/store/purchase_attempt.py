@@ -224,7 +224,7 @@ class GiftPurchaseAttempt(PurchaseAttempt):
 		return self.State == (PA_STATE_SUCCESS, PA_STATE_REDEEMED)
 	
 	def is_redeemed(self):
-		return self.State == PA_STATE_SUCCESS
+		return self.State == PA_STATE_REDEEMED
 	
 def get_providers(purchase):
 	return get_providers_from_order(purchase.Order)

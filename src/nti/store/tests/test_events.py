@@ -19,10 +19,13 @@ from zope.event import notify
 
 from nti.dataserver.users import User
 
+from nti.store import RedeemException
+
 from nti.store.interfaces import PA_STATE_STARTED
 from nti.store.interfaces import PA_STATE_SUCCESS
 from nti.store.interfaces import PA_STATE_UNKNOWN 
 from nti.store.interfaces import PA_STATE_REFUNDED
+from nti.store.interfaces import PA_STATE_REDEEMED
 
 from nti.store.interfaces import PurchaseAttemptStarted
 from nti.store.interfaces import PurchaseAttemptRefunded
@@ -34,13 +37,12 @@ from nti.store.invitations import get_invitation_code
 
 from nti.store.purchase_order import create_purchase_item
 from nti.store.purchase_order import create_purchase_order
+from nti.store.purchase_history import get_purchase_attempt
 from nti.store.purchase_attempt import create_purchase_attempt
 from nti.store.purchase_history import register_purchase_attempt
-from nti.store.purchase_attempt import create_redeemed_purchase_attempt
-
-
 from nti.store.gift_registry import register_gift_purchase_attempt
 from nti.store.purchase_attempt import create_gift_purchase_attempt
+from nti.store.purchase_attempt import create_redeemed_purchase_attempt
 
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
@@ -143,3 +145,14 @@ class TestEvents(unittest.TestCase):
 		aizen = self._create_user(username="aizen")
 		notify(GiftPurchaseAttemptRedeemed(gift, aizen))
 		
+		assert_that(gift, has_property('State', is_(PA_STATE_REDEEMED)))
+		assert_that(gift, has_property('TargetPurchaseID', is_not(none())))
+		
+		pa = get_purchase_attempt(gift.TargetPurchaseID, aizen)
+		assert_that(pa, has_property('creator', is_(aizen)))
+		assert_that(pa, has_property('State', is_(PA_STATE_SUCCESS)))
+		assert_that(pa, has_property('RedemptionCode', is_not(none())))
+
+		with self.assertRaises(RedeemException):
+			notify(GiftPurchaseAttemptRedeemed(gift, aizen))
+	

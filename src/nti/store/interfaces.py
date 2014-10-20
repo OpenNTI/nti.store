@@ -493,7 +493,7 @@ class PurchaseAttemptFailed(PurchaseAttemptEvent):
 		self.error = error
 
 @interface.implementer(IGiftPurchaseAttemptRedeemed)
-class GiftPurchaseAttemptRedeemed(PurchaseAttemptFailed):
+class GiftPurchaseAttemptRedeemed(PurchaseAttemptEvent):
 
 	state = PA_STATE_REDEEMED
 	
