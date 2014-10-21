@@ -440,6 +440,7 @@ class IPurchaseAttemptFailed(IPurchaseAttemptStateEvent):
 
 class IGiftPurchaseAttemptRedeemed(IPurchaseAttemptEvent):
 	user = Object(IUser, title="The gift receiver")
+	request = interface.Attribute('Purchase pyramid request')
 
 @interface.implementer(IPurchaseAttemptEvent)
 class PurchaseAttemptEvent(ObjectEvent):
@@ -497,9 +498,10 @@ class GiftPurchaseAttemptRedeemed(PurchaseAttemptEvent):
 
 	state = PA_STATE_REDEEMED
 	
-	def __init__(self, purchase, user):
+	def __init__(self, purchase, user, request=None):
 		super(GiftPurchaseAttemptRedeemed, self).__init__(purchase)
 		self.user = user
+		self.request = request
 	
 class IPurchaseHistory(IIterable):
 
