@@ -20,7 +20,7 @@ from ....interfaces import PurchaseAttemptSynced
 from ....interfaces import PurchaseAttemptRefunded
 from ....interfaces import PurchaseAttemptSuccessful
 
-from ....purchase_history import get_purchase_attempt
+from ....store import get_purchase_attempt
 
 from ..utils import create_payment_charge
 from ..utils import adapt_to_purchase_error
