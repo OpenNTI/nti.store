@@ -8,6 +8,7 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import logging
 from zope import interface
 
 from ... import MessageFactory
@@ -33,3 +34,6 @@ class InvalidStripeCoupon(StripeException):
 class NoSuchStripeCoupon(StripeException):
 	pass
 
+## CS: Reduce verbosity of stripe logger
+from stripe.util import logger as stripe_logger
+stripe_logger.setLevel(logging.ERROR)
