@@ -38,7 +38,7 @@ def sync_purchase(purchase_id, username=None, api_key=None, request=None):
 	Attempts to synchronize a purchase attempt with the information collected in
 	stripe.com and/or local db.
 	"""
-	purchase = get_purchase_attempt(purchase_id, username)
+	purchase = get_purchase_attempt(purchase_id)
 	if purchase is None:
 		logger.error('Purchase %r for user %s could not be found in dB', purchase_id,
 					  username)
