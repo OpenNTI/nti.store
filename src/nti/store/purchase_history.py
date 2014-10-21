@@ -56,7 +56,8 @@ def _check_valid(p, uid, purchasable_id=None, intids=None, debug=True):
 	# those cases that allow removal (courses). We think (hope) this is a
 	# rare problem, so we pretend it doesn't exist, only logging loudly.
 	# This could also be a corruption in our internal indexes.
-	intids = intids or component.getUtility(zope.intid.IIntIds)
+	if intids is None:
+		intids = component.getUtility(zope.intid.IIntIds)
 	queried = intids.queryId(p)
 	if queried != uid:
 		try:
@@ -83,7 +84,7 @@ def _check_index(index):
 	BTrees.check.check(index.purchases)
 	BTrees.check.check(index.item_index)
 	BTrees.check.check(index.time_index)
-		
+
 class _PurchaseIndex(Persistent):
 
 	family = BTrees.family64
@@ -99,21 +100,21 @@ class _PurchaseIndex(Persistent):
 		return component.getUtility(zope.intid.IIntIds)
 
 	# addition
-	
+
 	def _addToIntIdIndex(self, iid=None):
 		if iid is not None:
 			self.purchases.add(iid)
 			self.__len.change(1)
 			return True
 		return False
-		
+
 	def _addToTimeIndex(self, startTime, iid=None):
 		if iid is not None and startTime:
 			map_key = time_to_64bit_int(startTime)
 			self.time_index[map_key] = iid
 			return True
 		return False
-	
+
 	def _addToItemIndex(self, items=(), iid=None):
 		if iid is not None:
 			for item in  items or ():
@@ -123,7 +124,7 @@ class _PurchaseIndex(Persistent):
 				item_set.add(iid)
 			return True
 		return False
-	
+
 	def add(self, purchase):
 		iid = self._intids.getId(purchase)
 		result = self._addToIntIdIndex(iid)
@@ -132,20 +133,20 @@ class _PurchaseIndex(Persistent):
 		return result
 
 	# removal
-	
+
 	def _removeFromIntIdIndex(self, iid):
 		if iid is not None and iid in self.purchases:
 			self.__len.change(-1)
 			self.purchases.remove(iid)
 			return True
 		return False
-	
+
 	def _removeFromTimeIndex(self, startTime):
 		if startTime is not None:
 			result = self.time_index.pop(time_to_64bit_int(startTime), None)
 			return result is not None
 		return False
-	
+
 	def _removeFromItemIndex(self, items=(), iid=None):
 		if iid is not None:
 			for item in items or ():
@@ -154,7 +155,7 @@ class _PurchaseIndex(Persistent):
 					item_set.remove(iid)
 			return True
 		return False
-		
+
 	def remove(self, purchase):
 		iid = self._intids.queryId(purchase)
 		self._removeFromTimeIndex(purchase.StartTime)
@@ -163,7 +164,7 @@ class _PurchaseIndex(Persistent):
 		return result
 
 	# retrieve
-	
+
 	def has_history_by_item(self, purchasable_id):
 		# Actually load the history to perform consistency checks
 		items = list(self.get_history_by_item(purchasable_id))
