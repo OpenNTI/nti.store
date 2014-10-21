@@ -13,8 +13,6 @@ from datetime import date
 
 from zope.event import notify
 
-from nti.dataserver.users import User
-
 from ....interfaces import PurchaseAttemptFailed
 from ....interfaces import PurchaseAttemptSynced
 from ....interfaces import PurchaseAttemptRefunded
@@ -35,12 +33,11 @@ from .base import get_api_key
 from .base import get_charges
 from .base import BaseProcessor
 
-def sync_purchase(purchase_id, username, api_key=None, request=None):
+def sync_purchase(purchase_id, username=None, api_key=None, request=None):
 	"""
 	Attempts to synchronize a purchase attempt with the information collected in
 	stripe.com and/or local db.
 	"""
-	user = User.get_user(username)
 	purchase = get_purchase_attempt(purchase_id, username)
 	if purchase is None:
 		logger.error('Purchase %r for user %s could not be found in dB', purchase_id,
@@ -63,7 +60,7 @@ def sync_purchase(purchase_id, username, api_key=None, request=None):
 			# or the charge has been deleted from stripe.
 			message = "Charge %s cannot be found in Stripe" % sp.ChargeID
 			logger.warn('Charge %s for purchase %r/%s could not be found in Stripe',
-						sp.ChargeID, purchase_id, user)
+						sp.ChargeID, purchase_id, username)
 	else:
 		start_time = time.mktime(date.fromtimestamp(purchase.StartTime).timetuple())
 		charges = get_charges(purchase_id=purchase_id, start_time=start_time,
