@@ -100,9 +100,6 @@ def sync_purchase(purchase_id, username=None, api_key=None, request=None):
 			notify(PurchaseAttemptFailed(purchase, adapt_to_purchase_error(message)))
 		elif charge.refunded and not purchase.is_refunded():
 			notify(PurchaseAttemptRefunded(purchase))
-		else:
-			do_synch = (time.time() - purchase.StartTime) > 240
-
 	elif time.time() - purchase.StartTime >= 180 and not purchase.has_completed():
 		do_synch = True
 		message = message or "Failed purchase after expiration time"
