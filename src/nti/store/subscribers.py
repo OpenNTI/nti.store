@@ -189,8 +189,8 @@ from .interfaces import PurchaseAttemptRefunded
 def _gift_purchase_attempt_refunded(purchase, event):
 	target = purchase.TargetPurchaseID
 	if target:
-		pa = get_purchase_attempt(target)
-		if pa is not None and not pa.is_refunded():
-			notify(PurchaseAttemptRefunded(pa))
+		attempt = get_purchase_attempt(target)
+		if attempt is not None and not attempt.is_refunded():
+			notify(PurchaseAttemptRefunded(attempt))
 	# update state in case other subscribers change it
 	_update_state(purchase, PA_STATE_REFUNDED)
