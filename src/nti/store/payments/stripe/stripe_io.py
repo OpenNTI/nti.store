@@ -106,13 +106,14 @@ def create_stripe_charge(amount, currency='USD', customer_id=None, card=None,
 						 description=None, application_fee=None, metadata=None,
 						 api_key=None):
 	assert customer_id or card
-	data = {'amount':amount, 'currency':currency, 'description':description}
+	data = {'amount':amount, 'currency':currency}
+	data['metadata'] = metadata or {}
+	if description:
+		data['description'] = description
 	if card:
 		data['card'] = card
 	else:
 		data['customer'] = customer_id
-
-	data['metadata'] = metadata or {}
 	if application_fee:
 		data['application_fee'] = application_fee
 	charge = _do_stripe_operation(stripe.Charge.create, api_key=api_key, **data)
