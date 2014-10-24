@@ -17,7 +17,6 @@ from nti.dataserver.users.interfaces import IUserProfile
 from ... import get_user
 
 from .stripe_io import StripeIO
-from .stripe_io import get_stripe_customer
 from .stripe_io import create_stripe_customer
 from .stripe_io import delete_stripe_customer
 from .stripe_io import update_stripe_customer
@@ -75,11 +74,6 @@ def get_or_create_customer(user, api_key=None):
 			result = customer.id
 		else:
 			result = adapted.customer_id
-			# get or create the customer so it can be updated later
-			customer = 	get_stripe_customer(result, api_key=api_key) or \
-						create_customer(user, api_key=api_key)
-			# reset the id in case the customer was recreated
-			result = adapted.customer_id = customer.id
 		return result
 	return None
 		
