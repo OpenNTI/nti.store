@@ -52,26 +52,24 @@ def get_transaction_runner():
 	result = component.getUtility(IDataserverTransactionRunner)
 	return result
 
-def _start_purchase(purchase_id, username=None):
+def _start_purchase(purchase_id, token, username=None):
 	purchase = get_purchase_attempt(purchase_id, username)
 	if purchase is None:
 		raise PurchaseException("Could not find purchase attempt %s" % purchase_id)
 
 	if not purchase.is_pending():
 		notify(PurchaseAttemptStarted(purchase))
+		notify(RegisterStripeToken(purchase, token))
 
 	# return a copy of the order
 	result = purchase.Order.copy()
 	return result
 		
-def _register_stripe_token_and_user(purchase_id, token, username=None, api_key=None):
-	purchase = get_purchase_attempt(purchase_id, username)
-	if not purchase.has_completed():
-		notify(RegisterStripeToken(purchase, token))
-		if username:
-			logger.info('Getting/Creating Stripe Customer for %s', username)
-			customer_id = get_or_create_customer(username, api_key=api_key)
-			return customer_id
+def _register_stripe_user(username=None, api_key=None):
+	if username:
+		logger.info('Getting/Creating Stripe Customer for %s', username)
+		customer_id = get_or_create_customer(username, api_key=api_key)
+		return customer_id
 	return None
 	
 def _do_stripe_purchase(purchase_id, cents_amount, currency, card,
@@ -141,13 +139,12 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 
 		start_purchase = partial(_start_purchase, 
 								 purchase_id=purchase_id,
-								 username=username)
+								 username=username,
+								 token=token)
 
-		register_stripe_token_and_user = partial(_register_stripe_token_and_user, 
-												 purchase_id=purchase_id,
-								 				 username=username,
-								 				 token=token,
-								 				 api_key=api_key)
+		register_stripe_user = partial(_register_stripe_user,
+								 	   username=username,
+								 	   api_key=api_key)
 		try:
 			# start the purchase and price
 			order = transaction_runner(start_purchase)
@@ -165,7 +162,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 										"expected amount")
 
 			# create a stripe customer
-			customer_id = transaction_runner(register_stripe_token_and_user)
+			customer_id = transaction_runner(register_stripe_user)
 
 			# get price amount in cents
 			cents_amount = int(amount * 100.0)

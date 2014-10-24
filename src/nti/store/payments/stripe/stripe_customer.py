@@ -25,14 +25,24 @@ from .interfaces import IStripeCustomer
 from .interfaces import StripeCustomerCreated
 from .interfaces import StripeCustomerDeleted
 
-def create_customer(user, coupon=None, api_key=None):
+def get_customer_data(user):
+	result = None
 	user = get_user(user)
 	if user is not None:
 		profile = IUserProfile(user)
-		email = getattr(profile, 'email', None)
-		description = getattr(profile, 'description', None)
-		customer = create_stripe_customer(email=email, description=description,
-										  coupon=coupon, api_key=api_key)
+		result = {
+			'email':getattr(profile, 'email', None),
+			'description':getattr(profile, 'description', None) 
+		}
+	return result
+
+def create_customer(user, coupon=None, api_key=None):
+	user = get_user(user)
+	if user is not None:
+		params = get_customer_data(user)
+		params['coupon'] = coupon
+		params['api_key'] = api_key
+		customer = create_stripe_customer(**params)
 		notify(StripeCustomerCreated(user, customer.id))
 		return customer
 	return None

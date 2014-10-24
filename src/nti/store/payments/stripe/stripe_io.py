@@ -103,7 +103,8 @@ get_token = get_stripe_token # alias
 # charges
 
 def create_stripe_charge(amount, currency='USD', customer_id=None, card=None,
-						 description=None, application_fee=None, api_key=None):
+						 description=None, application_fee=None, metadata=None,
+						 api_key=None):
 	assert customer_id or card
 	data = {'amount':amount, 'currency':currency, 'description':description}
 	if card:
@@ -111,6 +112,7 @@ def create_stripe_charge(amount, currency='USD', customer_id=None, card=None,
 	else:
 		data['customer'] = customer_id
 
+	data['metadata'] = metadata or {}
 	if application_fee:
 		data['application_fee'] = application_fee
 	charge = _do_stripe_operation(stripe.Charge.create, api_key=api_key, **data)
@@ -152,11 +154,21 @@ def get_stripe_charge(charge_id, api_key=None):
 	return result
 get_charge = get_stripe_charge
 	
+def update_stripe_charge(charge, description=None, metadata=None, api_key=None):
+	if isinstance(charge, six.string_types):
+		charge = get_stripe_charge(charge, api_key=api_key)
+	charge.description = description
+	charge.metadata = {} if metadata is None else metadata
+	charge.save()
+update_charge = update_stripe_charge
+
 # coupon
 
 def get_stripe_coupon(coupon_code, api_key=None):
 	coupon = _do_stripe_operation(stripe.Coupon.retrieve, coupon_code, api_key=api_key)
 	return coupon
+
+# processor class
 	
 class StripeIO(object):
 
@@ -202,10 +214,12 @@ class StripeIO(object):
 
 	@classmethod
 	def create_stripe_charge(cls, amount, currency='USD', customer_id=None, card=None,
-							 description=None, application_fee=None, api_key=None):
+							 description=None, application_fee=None,
+							 metadata=None, api_key=None):
 		result = create_stripe_charge(amount=amount, currency=currency, 
 									  customer_id=customer_id, card=card,
 									  description=description,
+									  metadata=metadata,
 									  application_fee=application_fee,
 									  api_key=api_key)
 		return result
@@ -220,12 +234,21 @@ class StripeIO(object):
 	@classmethod
 	def get_stripe_charges(self, customer=None, start_time=None, end_time=None,
 						   count=50, api_key=None):		
-		result = get_stripe_charges(count=count, customer=customer, start_time=start_time,
+		result = get_stripe_charges(count=count, customer=customer, 
+									start_time=start_time,
 									end_time=end_time, api_key=api_key)
 		return result
 	get_charges = get_stripe_charges # alias
 
 	@classmethod
+	def update_stripe_charge(self, charge, description=None, metadata=None, api_key=None):		
+		result = update_stripe_charge(charge=charge, description=description,
+									  metadata=metadata, api_key=api_key)
+		return result
+	update_charge = update_stripe_charge # alias
+
+	@classmethod
 	def get_stripe_coupon(cls, coupon_code, api_key=None):
 		result = get_stripe_coupon(coupon_code=coupon_code, api_key=api_key)
 		return result
+	get_coupon = get_stripe_coupon
