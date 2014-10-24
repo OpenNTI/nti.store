@@ -44,7 +44,8 @@ from ..interfaces import RegisterStripeCharge
 from ..interfaces import IStripePurchaseAttempt
 
 from .coupon import CouponProcessor
-from .pricing import price_purchase
+
+from .pricing import price_order
 from .pricing import PricingProcessor
 
 def get_transaction_runner():
@@ -59,9 +60,9 @@ def _start_purchase(purchase_id, username=None):
 	if not purchase.is_pending():
 		notify(PurchaseAttemptStarted(purchase))
 
-	# price purchase
-	pricing = price_purchase(purchase)
-	return pricing
+	# return a copy of the order
+	result = purchase.Order.copy()
+	return result
 		
 def _register_stripe_token_and_user(purchase_id, token, username=None, api_key=None):
 	purchase = get_purchase_attempt(purchase_id, username)
@@ -148,8 +149,9 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 								 				 token=token,
 								 				 api_key=api_key)
 		try:
-			# start the purchase and price trx
-			pricing = transaction_runner(start_purchase)
+			# start the purchase and price
+			order = transaction_runner(start_purchase)
+			pricing = price_order(order)
 			
 			currency = pricing.Currency
 			amount = pricing.TotalPurchasePrice

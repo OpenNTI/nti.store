@@ -19,9 +19,13 @@ from .. import STRIPE
 
 from .base import BaseProcessor
 
-def price_purchase(purchase_attempt, name=STRIPE):
+def price_order(order, name=STRIPE):
 	pricer = component.getUtility(IPurchasablePricer, name=name)
-	result = pricer.evaluate(purchase_attempt.Order)
+	result = pricer.evaluate(order)
+	return result
+
+def price_purchase(purchase_attempt, name=STRIPE):
+	result = price_order(purchase_attempt.Order)
 	return result
 	
 class PricingProcessor(BaseProcessor):
