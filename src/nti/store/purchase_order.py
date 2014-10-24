@@ -58,8 +58,8 @@ class PurchaseOrder(SchemaConfigured):
 		return result
 
 	def copy(self):
-		items = [item.copy() for item in self.Items]
-		return self.__class__(Items=tuple(items), Quantity=self.Quantity)
+		items = tuple(item.copy() for item in self.Items)
+		return self.__class__(Items=items, Quantity=self.Quantity)
 
 	def __str__(self):
 		return "(%s,%s)" % (self.Items, self.Quantity)
