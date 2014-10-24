@@ -32,14 +32,25 @@ def makenone(s, default=None):
 		s = default if s == 'None' else unicode(s)
 	return s
 
-def encode_charge_description(purchase_id, username=None, 
-							  customer_id=None, context=None):
+def get_charge_metata(purchase_id, username=None, 
+					  customer_id=None, context=None):
 	"""
 	proceduce a json object for a stripe charge description
 	"""
 	context = to_external_object(context) if context else None 
 	data = {'PurchaseID': purchase_id, 'Username':username, 
 			'CustomerID': customer_id, 'Context': context}
+	return data
+
+def encode_charge_description(purchase_id, username=None, 
+							  customer_id=None, context=None):
+	"""
+	proceduce a json object for a stripe charge description
+	"""
+	data = get_charge_metata(purchase_id=purchase_id, 
+							 username=username,
+							 customer_id=customer_id,
+							 context=context)
 	result = json.dumps(data)
 	return result
 
