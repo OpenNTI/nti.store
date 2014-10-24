@@ -42,15 +42,19 @@ def get_charge_metata(purchase_id, username=None,
 			'CustomerID': customer_id, 'Context': context}
 	return data
 
-def encode_charge_description(purchase_id, username=None, 
-							  customer_id=None, context=None):
+def encode_charge_description(purchase_id=None, username=None, 
+							  customer_id=None, context=None,
+							  metadata=None):
 	"""
 	proceduce a json object for a stripe charge description
 	"""
-	data = get_charge_metata(purchase_id=purchase_id, 
-							 username=username,
-							 customer_id=customer_id,
-							 context=context)
+	if not metadata:
+		data = get_charge_metata(purchase_id=purchase_id, 
+								 username=username,
+								 customer_id=customer_id,
+								 context=context)
+	else:
+		data = metadata
 	result = json.dumps(data)
 	return result
 
