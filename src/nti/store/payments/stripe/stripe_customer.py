@@ -17,6 +17,7 @@ from nti.dataserver.users.interfaces import IUserProfile
 from ... import get_user
 
 from .stripe_io import StripeIO
+from .stripe_io import get_stripe_customer
 from .stripe_io import create_stripe_customer
 from .stripe_io import delete_stripe_customer
 from .stripe_io import update_stripe_customer
@@ -62,28 +63,21 @@ def delete_customer(user, api_key=None):
 def update_customer(user, customer=None, coupon=None, api_key=None):
 	user = get_user(user)
 	if user is not None:
-		profile = IUserProfile(user)
-		adapted = IStripeCustomer(user)
-		email = getattr(profile, 'email', None)
-		description = getattr(profile, 'description', None)
-		if adapted.customer_id:
-			result = update_stripe_customer(customer=customer or adapted.customer_id,
-											email=email,
-											coupon=coupon,
-											description=description,
-											api_key=api_key)
-			return result
+		params = get_customer_data(user)
+		params['coupon'] = coupon
+		params['api_key'] = api_key
+		if customer is None:	
+			customer = IStripeCustomer(user).customer_id
+		params['customer'] = customer
+		result = update_stripe_customer(**params)
+		return result
 	return False
 	
-def get_or_create_customer(user, api_key=None):
+def get_customer(user, api_key=None):
 	user = get_user(user)
 	if user is not None:
-		adapted = IStripeCustomer(user)
-		if adapted.customer_id is None:
-			customer = create_customer(user, api_key=api_key)
-			result = customer.id
-		else:
-			result = adapted.customer_id
+		customer_id = IStripeCustomer(user).customer_id
+		result = get_stripe_customer(customer_id, api_key=api_key)
 		return result
 	return None
 		
@@ -106,8 +100,8 @@ class StripeCustomer(StripeIO):
 		return result
 
 	@classmethod
-	def get_or_create_customer(cls, user, api_key=None):
-		result = get_or_create_customer(user=user, api_key=api_key)
+	def get_customer(cls, user, api_key=None):
+		result = get_customer(user=user, api_key=api_key)
 		return result
 
 _StripeCustomer = StripeCustomer  # BWC

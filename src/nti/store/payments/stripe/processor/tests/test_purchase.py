@@ -181,7 +181,7 @@ class TestPurchaseProcessor(unittest.TestCase):
 										  purchase_id=purchase_id, expected_amount=100.0)
 
 		assert_that(eventtesting.getEvents(stripe_interfaces.IStripeCustomerCreated),
-					has_length(1))
+					has_length(0))
 		assert_that(eventtesting.getEvents(store_interfaces.IPurchaseAttemptStarted),
 					has_length(1))
 		assert_that(eventtesting.getEvents(store_interfaces.IPurchaseAttemptFailed),
