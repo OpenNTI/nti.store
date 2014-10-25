@@ -55,9 +55,9 @@ def get_charge_metata(purchase_id, username=None,
 	proceduce a json object for a stripe charge description
 	"""
 	context = to_external_object(context) if context else None 
-	data = {'PurchaseID': purchase_id},
+	data = {'PurchaseID': purchase_id}
 	if username:
-		data['Username']= username
+		data['Username'] = username
 	if customer_id:
 		data['CustomerID'] = customer_id
 	
@@ -140,5 +140,8 @@ def adapt_to_purchase_error(e):
 	else:
 		result = IStripePurchaseError(e, None) or IPurchaseError(e, None)
 	if result is None and isinstance(e, Exception):
-		result = StripePurchaseError(e.args)
+		result = StripePurchaseError(Type=u"PurchaseError")
+		args = getattr(e, 'args', ())
+		message = unicode(' '.join(map(str, args)))
+		result.Message = message
 	return result
