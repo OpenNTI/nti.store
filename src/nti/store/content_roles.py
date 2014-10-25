@@ -69,7 +69,7 @@ def add_users_content_roles(user, items, library=None, registry=component):
 	for item in items:
 		lib_item = check_item_in_library(item, library, registry)
 		if lib_item is None:
-			logger.warn("Ignoring %s item", item)
+			logger.debug("Ignoring %s item", item)
 			continue
 
 		role = get_role_for_item(lib_item)
