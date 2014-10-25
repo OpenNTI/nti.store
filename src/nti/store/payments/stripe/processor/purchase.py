@@ -79,11 +79,13 @@ def _start_purchase(purchase_id, token, username=None):
 	return (order, metadata, customer_id)
 
 def _execute_stripe_charge(	purchase_id, cents_amount, currency, card,
-							application_fee=None, metadata=None, api_key=None):
+							application_fee=None, customer_id=None, 
+							metadata=None, api_key=None):
 	logger.info('Creating stripe charge for %s', purchase_id)
 	metadata = metadata or {}
 	charge = create_charge(	cents_amount, currency=currency,
 							card=card, metadata=metadata,
+							customer_id=customer_id,
 							application_fee=application_fee,
 							api_key=api_key,
 							description=encode_charge_description(metadata=metadata))
@@ -160,7 +162,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 		"""
 		charge = None
 		success = False
-		
+
 		# prepare transaction runner
 		transaction_runner = get_transaction_runner()
 		transaction_runner = partial(transaction_runner, 
@@ -202,6 +204,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 			charge = _execute_stripe_charge(card=token,
 											currency=currency,
 											metadata=metadata,
+											customer_id=customer_id,
 											purchase_id=purchase_id, 
 											cents_amount=cents_amount,
 											application_fee=application_fee,
