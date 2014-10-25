@@ -27,10 +27,27 @@ from .interfaces import IStripeError
 from .interfaces import IStripePurchaseError
 from .interfaces import IStripeOperationError
 
+def safestr(s):
+	s = s.decode("utf-8") if isinstance(s, bytes) else s
+	return unicode(s) if s is not None else None
+
 def makenone(s, default=None):
 	if isinstance(s, six.string_types):
-		s = default if s == 'None' else unicode(s)
+		s = default if s == 'None' else unicode(s)		
 	return s
+
+def flatten_context(context=None):
+	if not context:
+		return None
+	result = {}
+	for k, v in context.items():
+		if v and not isinstance(v, six.string_types):
+			v = str(v)
+		v = safestr(v) if v else v
+		if not v:
+			continue
+		result[k] = v[:500] # stripe requirement
+	return result
 
 def get_charge_metata(purchase_id, username=None, 
 					  customer_id=None, context=None):
@@ -38,8 +55,15 @@ def get_charge_metata(purchase_id, username=None,
 	proceduce a json object for a stripe charge description
 	"""
 	context = to_external_object(context) if context else None 
-	data = {'PurchaseID': purchase_id, 'Username':username, 
-			'CustomerID': customer_id, 'Context': context}
+	data = {'PurchaseID': purchase_id},
+	if username:
+		data['Username']= username
+	if customer_id:
+		data['CustomerID'] = customer_id
+	
+	context = flatten_context(context)
+	if context:
+		data.update(flatten_context(context))
 	return data
 
 def encode_charge_description(purchase_id=None, username=None, 
