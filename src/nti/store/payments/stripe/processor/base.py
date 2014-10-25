@@ -12,6 +12,8 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import component
 
+from nti.utils.maps import CaseInsensitiveDict
+
 from ....purchase_attempt import get_providers
 
 from .. import STRIPE
@@ -33,14 +35,22 @@ get_api_key_from_purchase = get_api_key # alias
 def get_charges(purchase_id=None, username=None, customer=None,
 				start_time=None, end_time=None, api_key=None):
 	result = []
-	for c in get_stripe_charges(start_time=start_time,
-								end_time=end_time,
-								api_key=api_key):
-		desc = c.description
-		if  (purchase_id and purchase_id in desc) or \
-			(username and username in desc) or \
-			(customer and customer in desc):
-			result.append(c)
+	for charge in get_stripe_charges(start_time=start_time,
+									 end_time=end_time,
+									 api_key=api_key):
+		
+		metadata = CaseInsensitiveDict(charge.metadata or {})
+		if  (purchase_id and metadata.get('PurchaseID') == purchase_id) or \
+			(customer and metadata.get('CustomerID') == customer) or \
+			(username and metadata.get('Username') == username):
+			result.append(charge)
+		else:
+			## legacy
+			desc = charge.description
+			if  (purchase_id and purchase_id in desc) or \
+				(username and username in desc) or \
+				(customer and customer in desc):
+				result.append(charge)
 	return result
 
 def create_card_token(customer_id=None, number=None, exp_month=None,
