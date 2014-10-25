@@ -4,6 +4,7 @@
 .. $Id$
 """
 from __future__ import print_function, unicode_literals, absolute_import, division
+
 __docformat__ = "restructuredtext en"
 
 from zope import interface
@@ -14,6 +15,7 @@ from zope.deprecation import deprecated
 from zope.container.constraints import contains
 from zope.container.interfaces import IContained
 from zope.container.interfaces import IContainer
+from zope.catalog.interfaces import INoAutoIndex
 
 from zope.interface.common.sequence import IMinimalSequence
 from zope.interface.common.mapping import IEnumerableMapping
@@ -289,8 +291,8 @@ class IPurchaseAttemptContext(IEnumerableMapping):
 	This is simply a dictionary and this module does not define
 	the structure of it. 
 	"""
-	
-class IPurchaseAttempt(IContained):
+
+class IPurchaseAttempt(IContained, INoAutoIndex):
 
 	Processor = Choice(vocabulary=PAYMENT_PROCESSORS_VOCABULARY,
 					   title='purchase processor', required=True)
