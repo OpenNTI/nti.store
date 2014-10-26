@@ -70,7 +70,7 @@ class StripePurchasablePricer(DefaultPurchasablePricer):
 
 		if coupon is not None and stripe_key:
 			priced.Coupon = self.get_coupon(coupon=coupon, 
-											stripe_key.PrivateKey, 
+											api_key=stripe_key.PrivateKey, 
 											registry=registry)
 			if priced.Coupon is not None:
 				priced.NonDiscountedPrice = purchase_price

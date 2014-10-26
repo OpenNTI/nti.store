@@ -79,7 +79,7 @@ class DefaultPurchasablePricer(object):
 			fee_amount = amount * pct
 		return fee_amount
 
-	def price(self, priceable):
+	def price(self, priceable, registry=None):
 		__traceback_info__ = priceable
 		quantity = priceable.Quantity or 1
 		purchasable = priceable.purchasable
@@ -98,11 +98,11 @@ class DefaultPurchasablePricer(object):
 									currency=priceable.Currency)
 		return result
 
-	def evaluate(self, priceables):
+	def evaluate(self, priceables, registry=None):
 		currencies = set()
 		result = create_pricing_results()
 		for priceable in priceables:
-			priced = self.price(priceable)
+			priced = self.price(priceable, registry=registry)
 			result.Items.append(priced)
 			currencies.add(priceable.Currency)
 			result.TotalPurchaseFee += priced.PurchaseFee
