@@ -234,12 +234,12 @@ class IRedeemException(INTIStoreException):
 	
 class IPurchasablePricer(interface.Interface):
 
-	def price(priceable):
+	def price(priceable, registry=None):
 		"""
 		price the specfied priceable
 		"""
 
-	def evaluate(priceables):
+	def evaluate(priceables, registry=None):
 		"""
 		price the specfied priceables
 		"""
