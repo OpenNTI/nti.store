@@ -33,6 +33,7 @@ class TestZcml(unittest.TestCase):
 		cap_name = 'NTI-TEST'
 		sk = component.getUtility(IStripeConnectKey, cap_name)
 		assert_that(sk, has_property('PrivateKey', 'sk_test_3K9VJFyfj0oGIMi7Aeg3HNBp'))
+		assert_that(sk, has_property('RefreshToken', 'rt_nti_test_jBCSE4ACnJBHGItexYhLF8At2PRpLh'))
 				
 		assert_that(sk, is_not(none()))
 		extobj = toExternalObject(sk)
@@ -43,4 +44,5 @@ class TestZcml(unittest.TestCase):
 		assert_that(extobj, has_entry('StripeUserID', 'NEXTTHOUGHT'))
 		assert_that(extobj, has_entry('PublicKey', 'pk_test_LIpQyLD7p5FmspOs6pPW9gWG'))
 		assert_that(extobj, does_not(has_key('PrivateKey')))
+		assert_that(extobj, does_not(has_key('RefreshToken')))
 

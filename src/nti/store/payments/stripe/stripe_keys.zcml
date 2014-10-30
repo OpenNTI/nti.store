@@ -16,6 +16,7 @@
 		live_mode="False"
 		stripe_user_id="NEXTTHOUGHT"
 		public_key="pk_test_LIpQyLD7p5FmspOs6pPW9gWG"
-		private_key="PVgnADEbRCpUI013awU3VRJEOy95OA5fNURGcAZ9OgQ=" />
+		private_key="PVgnADEbRCpUI013awU3VRJEOy95OA5fNURGcAZ9OgQ="
+		refresh_token="PEcnGiABbwECGwB+SwENYD1AFStePyUgM2hVJjZqEDgSUHEBVTgmUW0r" />
 		
 </configure>
