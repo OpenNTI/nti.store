@@ -52,7 +52,7 @@ class StripeConnectKey(SchemaConfigured):
 	alias = name = _('Alias')
 
 	def __setattr__(self, name, value):
-		if name in ("key", "PrivateKey"):
+		if name in ("key", "PrivateKey", 'RefreshToken'):
 			try:
 				key = get_plaintext(value)
 				value = unicode(key)
