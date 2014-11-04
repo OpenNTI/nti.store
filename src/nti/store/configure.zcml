@@ -71,8 +71,12 @@
 	
 	<!-- Decorators -->
 	
-	<subscriber factory=".decorators.PurchaseAttemptDecorator"
-				for=".interfaces.IPurchaseAttempt"
+	<subscriber factory=".decorators.InvitationPurchaseAttemptDecorator"
+				for=".interfaces.IInvitationPurchaseAttempt"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
+
+	<subscriber factory=".decorators.GiftPurchaseAttemptDecorator"
+				for=".interfaces.IGiftPurchaseAttempt"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
 
 	<subscriber factory=".decorators.PricedItemDecorator"

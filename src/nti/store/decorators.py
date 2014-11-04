@@ -15,27 +15,37 @@ from nti.externalization.singleton import SingletonDecorator
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalObjectDecorator
 
-from .invitations import get_invitation_code
+from .store import get_gift_code
+from .store import get_invitation_code
 
 from .interfaces import IPricedItem
-from .interfaces import IPurchaseAttempt
 from .interfaces import IPurchasableCourse
+from .interfaces import IGiftPurchaseAttempt
 from .interfaces import IInvitationPurchaseAttempt
 
 LINKS = StandardExternalFields.LINKS
 
-@component.adapter(IPurchaseAttempt)
+@component.adapter(IInvitationPurchaseAttempt)
 @interface.implementer(IExternalObjectDecorator)
-class PurchaseAttemptDecorator(object):
+class InvitationPurchaseAttemptDecorator(object):
 
 	__metaclass__ = SingletonDecorator
 
 	def decorateExternalObject(self, original, external):
-		if IInvitationPurchaseAttempt.providedBy(original):
-			code = get_invitation_code(original)
-			external['InvitationCode'] = code
-			external['RemainingInvitations'] = original.tokens
+		code = get_invitation_code(original)
+		external['InvitationCode'] = code
+		external['RemainingInvitations'] = original.tokens
 
+@component.adapter(IGiftPurchaseAttempt)
+@interface.implementer(IExternalObjectDecorator)
+class GiftPurchaseAttemptDecorator(object):
+
+	__metaclass__ = SingletonDecorator
+
+	def decorateExternalObject(self, original, external):
+		code = get_gift_code(original)
+		external['GiftCode'] = code
+		
 @component.adapter(IPricedItem)
 @interface.implementer(IExternalObjectDecorator)
 class PricedItemDecorator(object):
