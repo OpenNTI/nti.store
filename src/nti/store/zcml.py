@@ -43,13 +43,14 @@ class IRegisterPurchasableDirective(interface.Interface):
 	license = fields.TextLine(title='Purchasable License', required=False)
 	public = fields.Bool(title="Public flag", required=False, default=True)
 	giftable = fields.Bool(title="Giftable flag", required=False, default=False)
+	redeemable = fields.Bool(title="Redeemable flag", required=False, default=False)
 	items = fields.Tokens(value_type=schema.TextLine(title='The item identifier'), 
 						  title="Items to purchase", required=False)
 
 def registerPurchasable(_context, ntiid, provider, title, description=None, amount=None,
 						currency='USD', items=None, fee=None, author=None, icon=None,
 						thumbnail=None, license=None, discountable=False, giftable=False,
-						bulk_purchase=True, public=True):
+						redeemable=False, bulk_purchase=True, public=True):
 	"""
 	Register a purchasable
 	"""
@@ -59,7 +60,8 @@ def registerPurchasable(_context, ntiid, provider, title, description=None, amou
 					  description=description, items=items, amount=amount, 
 					  thumbnail=thumbnail, currency=currency, icon=icon,
 					  fee=fee, license_=license, discountable=discountable,
-					  bulk_purchase=bulk_purchase, public=public, giftable=giftable)
+					  bulk_purchase=bulk_purchase, public=public, 
+					  redeemable=redeemable, giftable=giftable)
 	utility(_context, provides=IPurchasable, factory=factory, name=ntiid)
 	logger.debug("Purchasable '%s' has been registered", ntiid)
 

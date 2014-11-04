@@ -57,6 +57,8 @@
 		author="Alan Laubsch"
 		amount="90"
 		currency="USD"
+		redeemable="True"
+		giftable="True"
 		discountable="True"
 		bulk_purchase="False"
 		icon="http://prmia.org/"

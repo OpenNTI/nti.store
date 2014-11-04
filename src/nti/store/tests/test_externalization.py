@@ -129,6 +129,8 @@ class TestStoreExternal(unittest.TestCase):
 		assert_that(ext, has_entry('Author', u'Alan Laubsch'))
 		assert_that(ext, has_entry('Icon', u'http://prmia.org/'))
 		assert_that(ext, has_entry('Description', u'Intro to Risk'))
+		assert_that(ext, has_entry('Giftable', True))
+		assert_that(ext, has_entry('Redeemable', True))
 
 	@WithMockDSTrans
 	def test_purchasable_summary(self):

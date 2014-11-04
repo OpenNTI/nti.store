@@ -44,7 +44,8 @@ Course = PurchasableCourse # alias BWC
 def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 				  items=(), fee=None, title=None, license_=None, author=None,
 				  description=None, icon=None, thumbnail=None, discountable=False,
-				  bulk_purchase=False, public=True, giftable=False, vendor_info=None,
+				  bulk_purchase=False, public=True, giftable=False, redeemable=False,
+				  vendor_info=None,
 				  # deprecated / legacy
 				  communities=None, featured=False, preview=False,
 				  department=None, signature=None, startdate=None, **kwargs):
@@ -74,7 +75,7 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 					Amount=amount, Currency=currency, Fee=fee, License=license_,
 					Discountable=discountable, BulkPurchase=bulk_purchase, Icon=icon,
 					Thumbnail=thumbnail, Public=public, Giftable=giftable, 
-					VendorInfo=vendor,
+					Redeemable=redeemable, VendorInfo=vendor,
 					# deprecated / legacy
 					Preview=preview, Communities=communities, Featured=featured,
 					Department=department, Signature=signature, StartDate=startdate)
