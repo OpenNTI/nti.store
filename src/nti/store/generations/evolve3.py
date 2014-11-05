@@ -14,7 +14,7 @@ from .install import install_gift_registry
 
 def evolve(context):
     """
-    Evolve generation 3 to 3 by registering the gift registry
+    Evolve generation 2 to 3 by registering the gift registry
     """
     logger.info("Store generation %s started", generation)
     install_gift_registry(context)
