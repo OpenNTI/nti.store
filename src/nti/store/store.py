@@ -58,11 +58,11 @@ def get_purchase_attempt(purchase_id, user=None):
     result = find_object_with_ntiid(purchase_id)
     result = result if IPurchaseAttempt.providedBy(result) else None
     if result is not None and user:
-        if IPurchaseAttempt.providedBy(result):
+        if IGiftPurchaseAttempt.providedBy(result):
+            username = getattr(user, 'username', user)
+            result = None if result.creator != username.lower() else result
+        elif IPurchaseAttempt.providedBy(result):
             user = get_user(user)
             if user is not None:
                 result = None if result.creator != user else result
-        elif IGiftPurchaseAttempt.providedBy(result):
-            username = getattr(user, 'username', user)
-            result = None if result.creator != username.lower() else result
     return result
