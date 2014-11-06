@@ -8,17 +8,25 @@ __docformat__ = "restructuredtext en"
 # pylint: disable=W0212,R0904
 
 from hamcrest import is_
+from hamcrest import none
+from hamcrest import is_not
+from hamcrest import has_key
 from hamcrest import not_none
+from hamcrest import has_entry
 from hamcrest import has_length
 from hamcrest import assert_that
+does_not = is_not
 
 import unittest
+
 from functools import partial
 
 from zope import component
 
 from nti.dataserver.users import User
 from nti.dataserver.interfaces import IDataserverTransactionRunner
+
+from nti.externalization.externalization import to_external_object
 
 from nti.store.store import get_purchase_attempt
 
@@ -92,6 +100,20 @@ class TestGiftRegistry(unittest.TestCase):
 		pending = get_gift_pending_purchases(username)
 		assert_that(pending, has_length(0))
 		
+		with mock_dataserver.mock_db_trans(self.ds):
+			ext = to_external_object(attempt)
+			assert_that( ext, has_key('MimeType') )
+			assert_that( ext, has_entry( 'Class', 'PurchaseAttempt') )
+			assert_that( ext, has_entry( 'State', 'Success') )
+			assert_that( ext, has_entry( 'OID', is_not(none())) )
+			assert_that( ext, has_entry( 'Processor', is_not(none())) )
+			assert_that( ext, has_entry( 'Last Modified', is_not(none())) )
+			assert_that( ext, has_entry( 'StartTime', is_not(none())) )
+			assert_that( ext, has_entry( 'EndTime', is_(none())) )
+			assert_that( ext, has_entry( 'Creator', is_(username)) )
+			assert_that( ext, does_not(has_key('Items')) )
+			assert_that( ext, does_not(has_key('Profile')) )
+			
 		removal = remove_gift_purchase_attempt(pid, username)
 		assert_that(removal, is_(True))
 

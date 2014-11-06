@@ -88,6 +88,8 @@ class TestStoreExternal(unittest.TestCase):
 		assert_that( ext, has_entry( 'Description', is_('my charge')) )
 		assert_that( ext, has_entry( 'InvitationCode', is_not(none())) )
 		assert_that( ext, has_entry( 'Error', has_entry('Message', pa.Error.Message) ) )
+		assert_that( ext, does_not(has_key('Items')) )
+		assert_that( ext, does_not(has_key('Profile')) )
 
 		# check order
 		assert_that(ext, has_key('Order'))
