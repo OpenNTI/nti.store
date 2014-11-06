@@ -240,7 +240,7 @@ class GiftPurchaseAttempt(PurchaseAttempt):
 	@property
 	def profile(self):
 		result = GiftPurchaseUserProfile()
-		result.email = result.Creator
+		result.email = self.Creator
 		result.alias = result.realname = self.Sender or self.Creator
 		return result
 	Profile = profile

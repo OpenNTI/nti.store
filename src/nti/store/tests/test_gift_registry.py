@@ -15,6 +15,7 @@ from hamcrest import not_none
 from hamcrest import has_entry
 from hamcrest import has_length
 from hamcrest import assert_that
+from hamcrest import has_property
 does_not = is_not
 
 import unittest
@@ -64,7 +65,7 @@ class TestGiftRegistry(unittest.TestCase):
 		item = create_purchase_item(item, 1)
 		order = create_purchase_order(item, quantity=None)
 		result = create_gift_purchase_attempt(order=order, processor='stripe', 
-										  	  state=state, creator=creator)
+										  	  state=state, creator=creator, sender='Ichigo Kurosaki')
 		return result
 
 	@WithMockDSTrans
@@ -111,9 +112,16 @@ class TestGiftRegistry(unittest.TestCase):
 			assert_that( ext, has_entry( 'StartTime', is_not(none())) )
 			assert_that( ext, has_entry( 'EndTime', is_(none())) )
 			assert_that( ext, has_entry( 'Creator', is_(username)) )
+			assert_that( ext, has_entry( 'Sender', is_('Ichigo Kurosaki')) )
 			assert_that( ext, does_not(has_key('Items')) )
 			assert_that( ext, does_not(has_key('Profile')) )
 			
+		with mock_dataserver.mock_db_trans(self.ds):
+			attempt = get_purchase_attempt(pid) 
+			assert_that( attempt, has_property('Profile', has_property('email', username)) )
+			assert_that( attempt, has_property('Profile', has_property('realname', 'Ichigo Kurosaki')) )
+			assert_that( attempt, has_property('Profile', has_property('alias', 'Ichigo Kurosaki')) )
+						
 		removal = remove_gift_purchase_attempt(pid, username)
 		assert_that(removal, is_(True))
 
