@@ -26,6 +26,7 @@ from dolmen.builtins import IIterable
 from nti.contentfragments.schema import HTMLContentFragment
 
 from nti.dataserver.interfaces import IUser
+from nti.dataserver.users.interfaces import IUserProfile
 from nti.dataserver.users.interfaces import checkEmailAddress
 
 from nti.schema.field import Int
@@ -319,6 +320,9 @@ class IPurchaseAttempt(IContained, INoAutoIndex):
 	Items = IndexedIterable(title="Purchasable NTIIDs", required=True, readonly=True)
 	Items.setTaggedValue('_ext_excluded_out', True)
 		
+	Profile = Object(IUserProfile, title="user profile", required=True, readonly=True)
+	Profile.setTaggedValue('_ext_excluded_out', True)
+	
 	def has_completed():
 		"""
 		return if the purchase has completed
