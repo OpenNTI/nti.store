@@ -26,7 +26,6 @@ from dolmen.builtins import IIterable
 from nti.contentfragments.schema import HTMLContentFragment
 
 from nti.dataserver.interfaces import IUser
-from nti.dataserver.users.interfaces import IUserProfile
 from nti.dataserver.users.interfaces import checkEmailAddress
 
 from nti.schema.field import Int
@@ -317,10 +316,11 @@ class IPurchaseAttempt(IContained, INoAutoIndex):
 					 required=False)
 	Context.setTaggedValue('_ext_excluded_out', True)
 	
-	Items = IndexedIterable(title="Purchasable NTIIDs", required=True, readonly=True)
+	## CS. these fields are readonly and must not be created
+	Items = interface.Attribute("Purchasable NTIIDs")
 	Items.setTaggedValue('_ext_excluded_out', True)
 		
-	Profile = Object(IUserProfile, title="user profile", required=True, readonly=True)
+	Profile = interface.Attribute('user profile')
 	Profile.setTaggedValue('_ext_excluded_out', True)
 	
 	def has_completed():
@@ -381,7 +381,7 @@ class IRedeemedPurchaseAttempt(IPurchaseAttempt):
 	RedemptionCode = ValidTextLine(title='Redemption Code', required=True)
 	
 class IGiftPurchaseAttempt(IPurchaseAttempt):
-	Creator = ValidTextLine(title="Gift creator", required=True)
+	Creator = ValidTextLine(title="Gift creator Email", required=True)
 	Sender =  ValidTextLine(title='Sender name', required=False)
 	Receiver =  ValidTextLine(title='Receiver Email/username',
 							  required=False,

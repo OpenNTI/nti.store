@@ -23,8 +23,10 @@ from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 from persistent.mapping import PersistentMapping
 
 from nti.dataserver.interfaces import ICreated
-from nti.dataserver.users.interfaces import IUserProfile
 from nti.dataserver.datastructures import ModDateTrackingObject
+
+from nti.dataserver.users.interfaces import IUserProfile
+from nti.dataserver.users.user_profile import get_searchable_realname_parts
 
 from nti.externalization.representation import WithRepr
 from nti.externalization.interfaces import IInternalObjectExternalizer
@@ -118,7 +120,7 @@ class PurchaseAttempt(ModDateTrackingObject,
 
 	@property
 	def profile(self):
-		return IUserProfile(self.creator, None)
+		return IUserProfile(self.creator)
 	Profile = profile
 
 	def __str__(self):
@@ -172,7 +174,7 @@ class InvitationPurchaseAttempt(PurchaseAttempt):
 	mime_type = mimeType = MIME_BASE + b'invitationpurchaseattempt'
 
 	def __init__(self, *args, **kwargs):
-		super(PurchaseAttempt, self).__init__(*args, **kwargs)
+		super(InvitationPurchaseAttempt, self).__init__(*args, **kwargs)
 		self._consumers = BTrees.OOBTree.OOBTree()
 		self._tokens = minmax.NumericMinimum(self.Quantity)
 
@@ -215,17 +217,34 @@ class RedeemedPurchaseAttempt(PurchaseAttempt):
 	RedemptionCode = FP(IRedeemedPurchaseAttempt['RedemptionCode'])
 	RedemptionTime = FP(IRedeemedPurchaseAttempt['RedemptionTime'])
 	
+@interface.implementer(IUserProfile)
+class GiftPurchaseUserProfile(object):
+	avatarURL = email = realname = alias = None
+	
+	def get_searchable_realname_parts(self):
+		return get_searchable_realname_parts(self.realname)
+	
 @interface.implementer(IGiftPurchaseAttempt)
 class GiftPurchaseAttempt(PurchaseAttempt):
 	mime_type = mimeType = MIME_BASE + b'giftpurchaseattempt'
 
+	Sender = FP(IGiftPurchaseAttempt['Sender'])
 	Creator = FP(IGiftPurchaseAttempt['Creator'])
 	Message = FP(IGiftPurchaseAttempt['Message'])
 	Receiver = FP(IGiftPurchaseAttempt['Receiver'])
 	TargetPurchaseID = FP(IGiftPurchaseAttempt['TargetPurchaseID'])
 		
+	sender = alias('Sender')
 	creator = alias('Creator')
 
+	@property
+	def profile(self):
+		result = GiftPurchaseUserProfile()
+		result.email = result.Creator
+		result.alias = result.realname = self.Sender or self.Creator
+		return result
+	Profile = profile
+	
 	def has_succeeded(self):
 		return self.State == (PA_STATE_SUCCESS, PA_STATE_REDEEMED)
 	
@@ -297,6 +316,7 @@ def create_gift_purchase_attempt(creator, order, processor, state=None, descript
 	context = to_purchase_attempt_context(context)
 	start_time = start_time if start_time else time.time()
 
+	sender = sender or creator
 	result = GiftPurchaseAttempt(
 				Order=order, Processor=processor, Creator=creator.lower(),
 				Description=description, State=state, 
