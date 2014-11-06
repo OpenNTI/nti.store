@@ -188,6 +188,16 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 		return purchase
 	add = register_purchase
 	
+	def remove_purchase(self, username, purchase):
+		assert IGiftPurchaseAttempt.providedBy(purchase)
+		if username in self:
+			index = self[username]
+			if index.remove(purchase):
+				lifecycleevent.removed(purchase) # remove iid
+				locate(purchase, None)
+				return True
+		return False
+	
 	def get_pending_purchases(self, username, items=None):
 		try:
 			index = self[username]
@@ -208,6 +218,14 @@ def get_gift_purchase_attempt(purchase_id, username=None):
 	if result is not None and username:
 		result = None if result.creator != username else result
 	return result
+
+def remove_gift_purchase_attempt(purchase_id, username):
+	purchase = get_gift_purchase_attempt(purchase_id, username)
+	if purchase is not None and username:
+		registry = component.getUtility(IGiftRegistry)
+		result = registry.remove_purchase(username, purchase)
+		return result
+	return False
 
 def get_gift_pending_purchases(username, items=None):
 	registry = component.getUtility(IGiftRegistry)

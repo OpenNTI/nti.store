@@ -28,6 +28,7 @@ from nti.store.purchase_attempt import create_gift_purchase_attempt
 
 from nti.store.gift_registry import get_gift_purchase_attempt
 from nti.store.gift_registry import get_gift_pending_purchases
+from nti.store.gift_registry import remove_gift_purchase_attempt
 from nti.store.gift_registry import register_gift_purchase_attempt
 
 from nti.store.interfaces import PA_STATE_STARTED
@@ -90,3 +91,7 @@ class TestGiftRegistry(unittest.TestCase):
 		
 		pending = get_gift_pending_purchases(username)
 		assert_that(pending, has_length(0))
+		
+		removal = remove_gift_purchase_attempt(pid, username)
+		assert_that(removal, is_(True))
+

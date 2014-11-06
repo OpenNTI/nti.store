@@ -16,6 +16,7 @@ from .interfaces import IPurchaseAttempt
 from .interfaces import IGiftPurchaseAttempt
 
 from .gift_registry import get_gift_pending_purchases
+from .gift_registry import remove_gift_purchase_attempt
 from .gift_registry import register_gift_purchase_attempt
 
 from .invitations import get_invitation_code
@@ -30,6 +31,7 @@ from .purchase_history import is_item_activated
 from .purchase_history import get_pending_purchases
 from .purchase_history import register_purchase_attempt
 from .purchase_history import get_purchase_history_by_item
+from .purchase_history import remove_purchase_attempt as remove_hist_purchase_attempt
 
 from .purchase_attempt import create_purchase_attempt
 from .purchase_attempt import create_gift_purchase_attempt
@@ -65,4 +67,18 @@ def get_purchase_attempt(purchase_id, user=None):
             user = get_user(user)
             if user is not None:
                 result = None if result.creator != user else result
+    return result
+
+def remove_purchase_attempt(purchase, user=None):
+    if not IPurchaseAttempt.providedBy(purchase):
+        purchase = get_purchase_attempt(purchase, user)
+    
+    if IGiftPurchaseAttempt.providedBy(purchase):
+        username = user or purchase.creator
+        result = remove_gift_purchase_attempt(purchase, username)
+    elif IPurchaseAttempt.providedBy(purchase):
+        user = get_user(user or purchase.creator)
+        result = remove_hist_purchase_attempt(purchase, user)
+    else:
+        result = False
     return result
