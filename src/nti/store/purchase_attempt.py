@@ -23,6 +23,7 @@ from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 from persistent.mapping import PersistentMapping
 
 from nti.dataserver.interfaces import ICreated
+from nti.dataserver.users.interfaces import IUserProfile
 from nti.dataserver.datastructures import ModDateTrackingObject
 
 from nti.externalization.representation import WithRepr
@@ -114,6 +115,11 @@ class PurchaseAttempt(ModDateTrackingObject,
 		result = getattr(self.__parent__, 'user', None)
 		return result
 	Creator = creator
+
+	@property
+	def profile(self):
+		return IUserProfile(self.creator, None)
+	Profile = profile
 
 	def __str__(self):
 		return "%s,%s" % (self.Items, self.State)
