@@ -44,7 +44,7 @@ class GiftPurchaseAttemptDecorator(object):
 
 	def decorateExternalObject(self, original, external):
 		code = get_gift_code(original)
-		external['GiftCode'] = code
+		external['RedemptionCode'] = external['GiftCode'] = code
 		
 @component.adapter(IPricedItem)
 @interface.implementer(IExternalObjectDecorator)
