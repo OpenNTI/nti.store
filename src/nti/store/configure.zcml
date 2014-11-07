@@ -119,6 +119,7 @@
 						 .interfaces.IPricingError
 						 .interfaces.IRefundError
 						 .interfaces.IPurchaseError
+						 .interfaces.IRedemptionError
 						 .interfaces.IPricingResults
 						 .interfaces.IPurchaseAttempt
 						 .interfaces.IGiftPurchaseAttempt
@@ -128,7 +129,7 @@
 						 .interfaces.IInvitationPurchaseAttempt"
 		modules=".purchase_order .purchase_error .purchase_attempt 
 				 .purchasable .priceable .pricing .pricing_error
-				 .refund_error" />
+				 .refund_error .redemption_error" />
 
 	<adapter factory=".externalization._PurchasableSummaryExternalizer"
 			 for=".interfaces.IPurchasable"
