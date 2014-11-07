@@ -19,7 +19,7 @@ from zope import lifecycleevent
 # TODO: break this dep
 from nti.appserver.invitations.interfaces import IInvitationAcceptedEvent
 
-from . import RedeemException
+from . import RedemptionException
 
 from .interfaces import PA_STATE_FAILED
 from .interfaces import PA_STATE_STARTED
@@ -170,7 +170,7 @@ def _purchase_invitation_accepted(invitation, event):
 @component.adapter(IGiftPurchaseAttempt, IGiftPurchaseAttemptRedeemed)
 def _gift_purchase_attempt_redeemed(purchase, event):
 	if purchase.is_redeemed():
-		raise RedeemException("Gift purchase already redeemded")
+		raise RedemptionException("Gift purchase already redeemded")
 	
 	# create  and register a purchase attempt for accepting user
 	code = get_invitation_code(purchase)

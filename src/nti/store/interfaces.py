@@ -202,10 +202,14 @@ class IOperationError(interface.Interface):
 class IPricingError(IOperationError):
 	pass
 
+
 class IPurchaseError(IOperationError):
 	pass
 
 class IRefundError(IOperationError):
+	pass
+
+class IRedemptionError(IOperationError):
 	pass
 
 class INTIStoreException(interface.Interface):
@@ -228,7 +232,7 @@ class IRefundException(INTIStoreException):
 	interface for refund exceptions 
 	"""
 	
-class IRedeemException(INTIStoreException):
+class IRedemptionException(INTIStoreException):
 	""" 
 	interface for redeeem exceptions 
 	"""

@@ -19,7 +19,9 @@ import unittest
 from nti.externalization.externalization import to_external_object
 
 from nti.store import PricingException
+from nti.store import RedemptionException
 from nti.store.interfaces import IPricingError
+from nti.store.interfaces import IRedemptionError
 from nti.store.interfaces import IPurchasableVendorInfo
 from nti.store.interfaces import IPurchaseAttemptContext
 
@@ -56,3 +58,11 @@ class TestAdapters(unittest.TestCase):
 			assert_that(error, has_property('Type', is_('PricingError')))
 			assert_that(error, has_property('Message', is_('foo')))
 			assert_that(error, verifiably_provides(IPricingError))
+
+	def test_redemption_exception(self):
+		for e in ('foo',  RedemptionException("foo")):
+			error = IRedemptionError(e, None)
+			assert_that(error, is_not(none()))
+			assert_that(error, has_property('Type', is_(u'RedemptionError')))
+			assert_that(error, has_property('Message', is_('foo')))
+			assert_that(error, verifiably_provides(IRedemptionError))

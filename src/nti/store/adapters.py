@@ -17,15 +17,18 @@ from dolmen.builtins import IString
 from .interfaces import IRefundError
 from .interfaces import IPricingError
 from .interfaces import IPurchaseError
+from .interfaces import IRedemptionError
 from .interfaces import IRefundException
 from .interfaces import IPricingException
 from .interfaces import IPurchaseException
+from .interfaces import IRedemptionException
 from .interfaces import IPurchasableVendorInfo
 from .interfaces import IPurchaseAttemptContext
 
 from .refund_error import RefundError
 from .pricing_error import PricingError
 from .purchase_error import PurchaseError
+from .redemption_error import RedemptionError
 from .purchasable import DefaultPurchasableVendorInfo
 from .purchase_attempt import DefaultPurchaseAttemptContext
 
@@ -85,4 +88,20 @@ def _refund_exception_adpater(error):
 	args = getattr(error, 'args', ())
 	message = unicode(' '.join(map(str, args)))
 	result.Message = message or 'Unspecified Refund Exception'
+	return result
+
+@component.adapter(IString)
+@interface.implementer(IRedemptionError)
+def _string_redemption_error(message):
+	result = RedemptionError(Type=u"RedemptionError")
+	result.Message = unicode(message or u'')
+	return result
+
+@component.adapter(IRedemptionException)
+@interface.implementer(IRedemptionError)
+def _redemption_exception_adpater(error):
+	result = RedemptionError(Type=u"RedemptionError")
+	args = getattr(error, 'args', ())
+	message = unicode(' '.join(map(str, args)))
+	result.Message = message or 'Unspecified Redemption Exception'
 	return result

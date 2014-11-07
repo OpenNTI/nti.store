@@ -19,7 +19,7 @@ from zope.event import notify
 
 from nti.dataserver.users import User
 
-from nti.store import RedeemException
+from nti.store import RedemptionException
 
 from nti.store.interfaces import PA_STATE_STARTED
 from nti.store.interfaces import PA_STATE_SUCCESS
@@ -153,7 +153,7 @@ class TestEvents(unittest.TestCase):
 		assert_that(pa, has_property('State', is_(PA_STATE_SUCCESS)))
 		assert_that(pa, has_property('RedemptionCode', is_not(none())))
 
-		with self.assertRaises(RedeemException):
+		with self.assertRaises(RedemptionException):
 			notify(GiftPurchaseAttemptRedeemed(gift, aizen))
 			
 		notify(PurchaseAttemptRefunded(pa))

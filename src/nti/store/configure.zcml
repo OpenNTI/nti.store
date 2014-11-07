@@ -55,6 +55,14 @@
 			 provides=".interfaces.IRefundError"
 			 for=".interfaces.IRefundException" />	
 
+ 	<adapter factory=".adapters._string_redemption_error"
+			 provides=".interfaces.IRedemptionError"
+			 for="basestring" />
+		
+	<adapter factory=".adapters._redemption_exception_adpater"
+			 provides=".interfaces.IRedemptionError"
+			 for=".interfaces.IRedemptionException" />
+
 	<!-- Subscribers -->
 	
 	<subscriber handler=".subscribers._purchase_attempt_failed" />
