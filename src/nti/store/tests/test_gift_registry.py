@@ -113,6 +113,7 @@ class TestGiftRegistry(unittest.TestCase):
 			assert_that( ext, has_entry( 'EndTime', is_(none())) )
 			assert_that( ext, has_entry( 'Creator', is_(username)) )
 			assert_that( ext, has_entry( 'Sender', is_('Ichigo Kurosaki')) )
+			assert_that( ext, has_entry( 'RedemptionCode', is_not(none())) )
 			assert_that( ext, does_not(has_key('Items')) )
 			assert_that( ext, does_not(has_key('Profile')) )
 			
