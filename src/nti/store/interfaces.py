@@ -386,13 +386,23 @@ class IRedeemedPurchaseAttempt(IPurchaseAttempt):
 	
 class IGiftPurchaseAttempt(IPurchaseAttempt):
 	Creator = ValidTextLine(title="Gift creator Email", required=True)
-	Sender =  ValidTextLine(title='Sender name', required=False)
-	Receiver =  ValidTextLine(title='Receiver Email/username',
+	SenderName = ValidTextLine(title='Sender name', required=False)
+	Receiver = ValidTextLine(title='Receiver Email/username',
 							  required=False,
 							  constraint=checkEmailAddress)
+	ReceiverName = ValidTextLine(title='Receiver name', required=False)
 	Message = ValidText(title='Gift message', required=False)
 	TargetPurchaseID = ValidTextLine(title='NTIID of target purchase', required=False)
 	TargetPurchaseID.setTaggedValue('_ext_excluded_out', True)
+	
+	Sender = interface.Attribute("Alias for Sender name")
+	Sender.setTaggedValue('_ext_excluded_out', True)
+	
+	From = interface.Attribute("alias for Creator")
+	From.setTaggedValue('_ext_excluded_out', True)
+	
+	To = interface.Attribute("alias for Receiver")
+	To.setTaggedValue('_ext_excluded_out', True)
 	
 	def is_redeemed():
 		"""

@@ -228,15 +228,17 @@ class GiftPurchaseUserProfile(object):
 class GiftPurchaseAttempt(PurchaseAttempt):
 	mime_type = mimeType = MIME_BASE + b'giftpurchaseattempt'
 
-	Sender = FP(IGiftPurchaseAttempt['Sender'])
 	Creator = FP(IGiftPurchaseAttempt['Creator'])
 	Message = FP(IGiftPurchaseAttempt['Message'])
 	Receiver = FP(IGiftPurchaseAttempt['Receiver'])
+	SenderName = FP(IGiftPurchaseAttempt['SenderName'])
+	ReceiverName = FP(IGiftPurchaseAttempt['ReceiverName'])
 	TargetPurchaseID = FP(IGiftPurchaseAttempt['TargetPurchaseID'])
 		
-	sender = alias('Sender')
-	creator = alias('Creator')
-
+	Sender = alias('SenderName')
+	creator = From = alias('Creator')
+	receiver = To = alias('Receiver')
+	
 	@property
 	def profile(self):
 		result = GiftPurchaseUserProfile()
