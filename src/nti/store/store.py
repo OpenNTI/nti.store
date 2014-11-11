@@ -28,6 +28,7 @@ from .purchasable import get_all_purchasables
 from .purchase_history import activate_items
 from .purchase_history import deactivate_items
 from .purchase_history import is_item_activated
+from .purchase_history import has_history_by_item
 from .purchase_history import get_pending_purchases
 from .purchase_history import register_purchase_attempt
 from .purchase_history import get_purchase_history_by_item
@@ -46,6 +47,7 @@ get_purchase_by_code = get_purchase_by_code
 activate_items = activate_items
 deactivate_items = deactivate_items
 is_item_activated = is_item_activated
+has_history_by_item = has_history_by_item
 get_pending_purchases = get_pending_purchases
 register_purchase_attempt = register_purchase_attempt
 get_purchase_history_by_item = get_purchase_history_by_item
