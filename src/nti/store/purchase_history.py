@@ -353,6 +353,7 @@ def remove_purchase_attempt(purchase, user=None):
 	user = get_user(user) or purchase.creator
 	if user is not None:
 		hist = IPurchaseHistory(user)
+		hist.deactivate_items(purchase.Items)
 		result = hist.remove_purchase(purchase)
 		return result
 	return False
