@@ -396,7 +396,6 @@ class IGiftPurchaseAttempt(IPurchaseAttempt):
 	TargetPurchaseID.setTaggedValue('_ext_excluded_out', True)
 	
 	DeliveryDate = Datetime(title="The gift delivery date", required=False)
-	DeliveryDate.setTaggedValue('_ext_excluded_out', True)
 	
 	Sender = interface.Attribute("Alias for Sender name")
 	Sender.setTaggedValue('_ext_excluded_out', True)

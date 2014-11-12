@@ -122,12 +122,12 @@ class TestGiftRegistry(unittest.TestCase):
 			assert_that( ext, has_entry( 'Sender', is_('Ichigo Kurosaki')) )
 			assert_that( ext, has_entry( 'SenderName', is_('Ichigo Kurosaki')) )
 			assert_that( ext, has_entry( 'RedemptionCode', is_not(none())) )
+			assert_that( ext, has_entry( 'DeliveryDate', is_not(none())) )
 			assert_that( ext, does_not(has_key('Items')) )
 			assert_that( ext, does_not(has_key('Profile')) )
 			
 		with mock_dataserver.mock_db_trans(self.ds):
 			attempt = get_purchase_attempt(pid) 
-			assert_that( attempt, has_property('DeliveryDate', is_not(none())) )
 			assert_that( attempt, has_property('Profile', has_property('email', username)) )
 			assert_that( attempt, has_property('Profile', has_property('realname', 'Ichigo Kurosaki')) )
 			assert_that( attempt, has_property('Profile', has_property('alias', 'Ichigo Kurosaki')) )
