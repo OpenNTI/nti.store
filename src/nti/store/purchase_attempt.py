@@ -235,10 +235,11 @@ class GiftPurchaseAttempt(PurchaseAttempt):
 	ReceiverName = FP(IGiftPurchaseAttempt['ReceiverName'])
 	TargetPurchaseID = FP(IGiftPurchaseAttempt['TargetPurchaseID'])
 		
-	Sender = alias('SenderName')
+	receiver = alias('Receiver')
+	to = To = alias('ReceiverName')
 	creator = From = alias('Creator')
-	receiver = To = alias('Receiver')
-	
+	sender = Sender = alias('SenderName')
+		
 	@property
 	def profile(self):
 		result = GiftPurchaseUserProfile()
