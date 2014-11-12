@@ -233,6 +233,7 @@ class GiftPurchaseAttempt(PurchaseAttempt):
 	Receiver = FP(IGiftPurchaseAttempt['Receiver'])
 	SenderName = FP(IGiftPurchaseAttempt['SenderName'])
 	ReceiverName = FP(IGiftPurchaseAttempt['ReceiverName'])
+	DeliveryDate =  FP(IGiftPurchaseAttempt['DeliveryDate'])
 	TargetPurchaseID = FP(IGiftPurchaseAttempt['TargetPurchaseID'])
 		
 	receiver = alias('Receiver')
@@ -314,7 +315,7 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, redemption_time=
 def create_gift_purchase_attempt(creator, order, processor, state=None, description=None,
 								 start_time=None, sender=None, receiver=None, 
 								 receiver_name=None, message=None,  target=None,
-								 context=None):
+								 delivery_date=None, context=None):
 
 	state = state or PA_STATE_UNKNOWN
 	context = to_purchase_attempt_context(context)
@@ -326,7 +327,7 @@ def create_gift_purchase_attempt(creator, order, processor, state=None, descript
 				Order=order, Processor=processor, Creator=creator.lower(),
 				Description=description, State=state, 
 				StartTime=float(start_time), Context=context, SenderName=sender,
-				ReceiverName=receiver_name,	Message=message,
+				ReceiverName=receiver_name,	Message=message, DeliveryDate=delivery_date,
 				Receiver=receiver, TargetPurchaseID=target)
 	return result
 

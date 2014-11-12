@@ -395,13 +395,16 @@ class IGiftPurchaseAttempt(IPurchaseAttempt):
 	TargetPurchaseID = ValidTextLine(title='NTIID of target purchase', required=False)
 	TargetPurchaseID.setTaggedValue('_ext_excluded_out', True)
 	
+	DeliveryDate = Datetime(title="The gift delivery date", required=False)
+	DeliveryDate.setTaggedValue('_ext_excluded_out', True)
+	
 	Sender = interface.Attribute("Alias for Sender name")
 	Sender.setTaggedValue('_ext_excluded_out', True)
 	
 	From = interface.Attribute("alias for Creator")
 	From.setTaggedValue('_ext_excluded_out', True)
 	
-	To = interface.Attribute("alias for Receiver")
+	To = interface.Attribute("alias for Receiver Name")
 	To.setTaggedValue('_ext_excluded_out', True)
 	
 	def is_redeemed():

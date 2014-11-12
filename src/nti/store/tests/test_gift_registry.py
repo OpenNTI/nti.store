@@ -19,7 +19,7 @@ from hamcrest import has_property
 does_not = is_not
 
 import unittest
-
+from datetime import datetime
 from functools import partial
 
 from zope import component
@@ -68,7 +68,8 @@ class TestGiftRegistry(unittest.TestCase):
 										  	  state=state, creator=creator, 
 										  	  sender='Ichigo Kurosaki',
 										  	  receiver="azien@bleach.org",
-										  	  receiver_name="Azien Sosuke")
+										  	  receiver_name="Azien Sosuke",
+										  	  delivery_date=datetime.now())
 		return result
 
 	@WithMockDSTrans
@@ -126,6 +127,7 @@ class TestGiftRegistry(unittest.TestCase):
 			
 		with mock_dataserver.mock_db_trans(self.ds):
 			attempt = get_purchase_attempt(pid) 
+			assert_that( attempt, has_property('DeliveryDate', is_not(none())) )
 			assert_that( attempt, has_property('Profile', has_property('email', username)) )
 			assert_that( attempt, has_property('Profile', has_property('realname', 'Ichigo Kurosaki')) )
 			assert_that( attempt, has_property('Profile', has_property('alias', 'Ichigo Kurosaki')) )
