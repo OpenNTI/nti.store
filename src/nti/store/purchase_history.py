@@ -293,6 +293,13 @@ class PurchaseHistory(Contained, Persistent):
 	def has_history_by_item(self, purchasable_id):
 		return self._index.has_history_by_item(purchasable_id)
 
+	def clear(self):
+		result = 0
+		for p in list(self.values()):
+			self.remove_purchase(p)
+			result +=1
+		return result
+				
 	def values(self):
 		return self._index.values()
 

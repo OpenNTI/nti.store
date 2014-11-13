@@ -15,9 +15,12 @@ import time
 from zope import component
 from zope.event import notify
 from zope import lifecycleevent
+from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 
 # TODO: break this dep
 from nti.appserver.invitations.interfaces import IInvitationAcceptedEvent
+
+from nti.dataserver.interfaces import IUser
 
 from . import RedemptionException
 
@@ -33,6 +36,7 @@ from .interfaces import IGiftPurchaseAttempt
 from .interfaces import IPurchaseAttemptFailed
 from .interfaces import IPurchaseAttemptSynced
 from .interfaces import IPurchaseAttemptStarted
+from .interfaces import PurchaseAttemptRefunded
 from .interfaces import IPurchaseAttemptDisputed
 from .interfaces import IPurchaseAttemptRefunded
 from .interfaces import IRedeemedPurchaseAttempt
@@ -55,6 +59,8 @@ from .purchase_history import activate_items
 from .purchase_history import deactivate_items
 from .purchase_history import get_purchase_attempt
 from .purchase_history import register_purchase_attempt
+
+from .store import get_purchase_history
 
 def _update_state(purchase, state):
 	if purchase is not None:
@@ -183,8 +189,6 @@ def _gift_purchase_attempt_redeemed(purchase, event):
 	lifecycleevent.modified(purchase)
 	logger.info('%s has been redeemed' % purchase.id)
 
-from .interfaces import PurchaseAttemptRefunded
-
 @component.adapter(IGiftPurchaseAttempt, IPurchaseAttemptRefunded)
 def _gift_purchase_attempt_refunded(purchase, event):
 	target = purchase.TargetPurchaseID
@@ -194,3 +198,10 @@ def _gift_purchase_attempt_refunded(purchase, event):
 			notify(PurchaseAttemptRefunded(attempt))
 	# update state in case other subscribers change it
 	_update_state(purchase, PA_STATE_REFUNDED)
+
+@component.adapter(IUser, IObjectRemovedEvent)
+def _on_user_removed(user, event):
+	logger.info("Removing purchase data for user %s", user)
+	history = get_purchase_history(user, safe=False)
+	if history is not None:
+		history.clear()

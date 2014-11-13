@@ -8,11 +8,14 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from zope.annotation import IAnnotations
+
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 from . import get_user
 
 from .interfaces import IPurchaseAttempt
+from .interfaces import IPurchaseHistory
 from .interfaces import IGiftPurchaseAttempt
 
 from .gift_registry import get_gift_pending_purchases
@@ -24,6 +27,8 @@ from .invitations import get_purchase_by_code
 
 from .purchasable import get_purchasable
 from .purchasable import get_all_purchasables
+
+from .purchase_history import PurchaseHistory
 
 from .purchase_history import activate_items
 from .purchase_history import deactivate_items
@@ -59,28 +64,51 @@ create_purchase_attempt = create_purchase_attempt
 create_gift_purchase_attempt = create_gift_purchase_attempt
 
 def get_purchase_attempt(purchase_id, user=None):
-    result = find_object_with_ntiid(purchase_id)
-    result = result if IPurchaseAttempt.providedBy(result) else None
-    if result is not None and user:
-        if IGiftPurchaseAttempt.providedBy(result):
-            username = getattr(user, 'username', user)
-            result = None if result.creator != username.lower() else result
-        elif IPurchaseAttempt.providedBy(result):
-            user = get_user(user)
-            if user is not None:
-                result = None if result.creator != user else result
-    return result
+	result = find_object_with_ntiid(purchase_id)
+	result = result if IPurchaseAttempt.providedBy(result) else None
+	if result is not None and user:
+		if IGiftPurchaseAttempt.providedBy(result):
+			username = getattr(user, 'username', user)
+			result = None if result.creator != username.lower() else result
+		elif IPurchaseAttempt.providedBy(result):
+			user = get_user(user)
+			if user is not None:
+				result = None if result.creator != user else result
+	return result
 
 def remove_purchase_attempt(purchase, user=None):
-    if not IPurchaseAttempt.providedBy(purchase):
-        purchase = get_purchase_attempt(purchase, user)
-    
-    if IGiftPurchaseAttempt.providedBy(purchase):
-        username = user or purchase.creator
-        result = remove_gift_purchase_attempt(purchase, username)
-    elif IPurchaseAttempt.providedBy(purchase):
-        user = get_user(user or purchase.creator)
-        result = remove_hist_purchase_attempt(purchase, user)
-    else:
-        result = False
-    return result
+	if not IPurchaseAttempt.providedBy(purchase):
+		purchase = get_purchase_attempt(purchase, user)
+	
+	if IGiftPurchaseAttempt.providedBy(purchase):
+		username = user or purchase.creator
+		result = remove_gift_purchase_attempt(purchase, username)
+	elif IPurchaseAttempt.providedBy(purchase):
+		user = get_user(user or purchase.creator)
+		result = remove_hist_purchase_attempt(purchase, user)
+	else:
+		result = False
+	return result
+
+def get_purchase_history_annotation_key():
+	annotation_key = "%s.%s" % (PurchaseHistory.__module__, PurchaseHistory.__name__)
+	return annotation_key
+
+def get_purchase_history(user, safe=True):
+	if safe:
+		result = IPurchaseHistory(user)
+	else:
+		annotations = IAnnotations(user)
+		annotation_key = get_purchase_history_annotation_key()
+		result = annotations.get(annotation_key, None)
+	return result
+
+def delete_purchase_history(user):
+	history = get_purchase_history(user, safe=False)
+	if history is not None:
+		history.clear()
+		annotations = IAnnotations(user)
+		annotation_key = get_purchase_history_annotation_key()
+		annotations.pop(annotation_key, None)
+		return True
+	return False

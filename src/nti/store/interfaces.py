@@ -546,6 +546,9 @@ class IPurchaseHistory(IIterable):
 	def get_pending_purchases():
 		pass
 	
+	def clear():
+		pass
+	
 	def values():
 		"""
 		Return all purchase attempts

@@ -10,7 +10,6 @@
 	<include package="zope.security" />
 	
 	<!-- Generations -->
-			 
 	<utility factory=".generations.install._StoreSchemaManager"
 			 name="nti.dataserver-store"
 			 provides="zope.generations.interfaces.IInstallableSchemaManager"/>
@@ -18,7 +17,6 @@
 	<include package=".payments" file="configure.zcml" />
 				 
 	<!-- Adapters -->
-	
 	<adapter factory=".purchase_history._PurchaseHistoryFactory"
 			 provides=".interfaces.IPurchaseHistory"
 			 for="nti.dataserver.interfaces.IUser" />
@@ -64,7 +62,7 @@
 			 for=".interfaces.IRedemptionException" />
 
 	<!-- Subscribers -->
-	
+	<subscriber handler=".subscribers._on_user_removed" />
 	<subscriber handler=".subscribers._purchase_attempt_failed" />
 	<subscriber handler=".subscribers._purchase_attempt_synced" />
 	<subscriber handler=".subscribers._purchase_attempt_started" />
@@ -78,7 +76,6 @@
 	<subscriber handler=".subscribers._invitation_purchase_attempt_refunded" />
 	
 	<!-- Decorators -->
-	
 	<subscriber factory=".decorators.InvitationPurchaseAttemptDecorator"
 				for=".interfaces.IInvitationPurchaseAttempt"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
@@ -96,7 +93,6 @@
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
 				
 	<!-- Utilities -->
-
 	<utility factory=".pricing.DefaultPurchasablePricer" />
 
 	<utility factory=".purchase_attempt.DefaultPurchaseAttemptFactory" />
@@ -106,7 +102,6 @@
 	<utility factory=".ntiids._PurchasableResolver" name="purchasable_content" />
 	
 	<!-- Externalization -->
-	
 	<include package="nti.externalization" file="meta.zcml" />
 	<include package="nti.externalization" />
 
@@ -142,7 +137,6 @@
 			 name="summary" />
 			 	 
 	<!-- Test purchasables -->
-			
 	<configure zcml:condition="have devmode">
 		<include file="_sample.zcml" />
 	</configure>

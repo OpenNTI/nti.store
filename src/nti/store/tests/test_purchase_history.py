@@ -40,6 +40,9 @@ from nti.store.interfaces import PA_STATE_REFUNDED
 from nti.store.interfaces import IPurchaseHistory
 from nti.store.interfaces import PurchaseAttemptRefunded
 
+from nti.store.store import get_purchase_history
+from nti.store.store import delete_purchase_history
+
 from nti.dataserver.tests import mock_dataserver
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
@@ -72,6 +75,10 @@ class TestPurchaseHistory(unittest.TestCase):
 		assert_that(hist, is_(not_none()))
 		assert_that(hist, has_property('__parent__', is_(user)))
 
+		hist = get_purchase_history(user, safe=False)
+		assert_that(hist, is_(not_none()))
+		assert_that(hist, has_property('__parent__', is_(user)))
+		
 		pa_1 = self._create_purchase_attempt()
 		hist.add_purchase(pa_1)
 		assert_that(hist, has_length(1))
@@ -96,6 +103,8 @@ class TestPurchaseHistory(unittest.TestCase):
 
 		hist.remove_purchase(pa_2)
 		assert_that(hist, has_length(1))
+		
+		assert_that(delete_purchase_history(user), is_(True))
 
 	@WithMockDSTrans
 	def test_purchase_remove(self):
@@ -247,4 +256,7 @@ class TestPurchaseHistory(unittest.TestCase):
 
 			lst = list(hist.get_purchase_history_by_item(u'10'))
 			assert_that(lst, has_length(1))
-
+			
+			assert_that(hist.clear(), is_(100))
+			assert_that(hist, has_length(0))
+			hist._v_check()
