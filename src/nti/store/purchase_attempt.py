@@ -250,7 +250,7 @@ class GiftPurchaseAttempt(PurchaseAttempt):
 	Profile = profile
 	
 	def has_succeeded(self):
-		return self.State == (PA_STATE_SUCCESS, PA_STATE_REDEEMED)
+		return self.State in (PA_STATE_SUCCESS, PA_STATE_REDEEMED)
 	
 	def is_redeemed(self):
 		return self.State == PA_STATE_REDEEMED
