@@ -263,22 +263,21 @@ class IPaymentProcessor(interface.Interface):
 		apply the specified coupon to the specified amout
 		"""
 
-	def process_purchase(purchase_id, username, expected_amount=None):
+	def process_purchase(purchase, username, expected_amount=None):
 		"""
 		Process a purchase attempt
 
-		:purchase_id purchase identifier
+		:purchase purchase identifier
 		:username User making the purchase
 		:expected_amount: expected amount
 		"""
 
-	def refund_purchase(purchase_id):
+	def refund_purchase(purchase, amount=None):
 		"""
 		Refund a purchase attempt
 
-		:purchase_id purchase identifier
-		:username User making the purchase
-		:expected_amount: expected amount
+		:purchase purchase identifier
+		:amount: expected amount
 		"""
 
 	def sync_purchase(purchase_id, username):
@@ -450,7 +449,8 @@ class IPurchaseAttemptSuccessful(IPurchaseAttemptStateEvent):
 	request = interface.Attribute('Purchase pyramid request')
 
 class IPurchaseAttemptRefunded(IPurchaseAttemptStateEvent):
-	pass
+	charge = interface.Attribute('Purchase charge')
+	request = interface.Attribute('Purchase pyramid request')
 
 class IPurchaseAttemptDisputed(IPurchaseAttemptStateEvent):
 	pass
@@ -497,6 +497,11 @@ class PurchaseAttemptSuccessful(PurchaseAttemptEvent):
 @interface.implementer(IPurchaseAttemptRefunded)
 class PurchaseAttemptRefunded(PurchaseAttemptEvent):
 	state = PA_STATE_REFUNDED
+	
+	def __init__(self, purchase, charge=None, request=None):
+		super(PurchaseAttemptRefunded, self).__init__(purchase)
+		self.charge = charge
+		self.request = request
 
 @interface.implementer(IPurchaseAttemptDisputed)
 class PurchaseAttemptDisputed(PurchaseAttemptEvent):

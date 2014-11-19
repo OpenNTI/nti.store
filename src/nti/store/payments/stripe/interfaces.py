@@ -176,11 +176,11 @@ class IStripePaymentProcessor(IPaymentProcessor):
 		return a payment charge object (or None) for the specified purchase
 		"""
 		
-	def refund_purchase(trx_id, amount=None, refund_application_fee=None):
+	def refund_purchase(purchase, amount=None, refund_application_fee=None):
 		"""
-		Returns a purchase
+		Refunds a purchase
 
-		:trx_id Transaction id
+		:purchase Transaction/Purchase iden or object
 		"""
 		
 class IStripePriceable(IPriceable):

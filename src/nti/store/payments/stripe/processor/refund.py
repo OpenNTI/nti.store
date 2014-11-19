@@ -10,29 +10,36 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import six
 import time
 from datetime import date
 
-import zope.intid
-
-from zope import component
 from zope.event import notify
-
-from nti.externalization import integer_strings
 
 from .... import RefundException
 
+from ....store import get_purchase_attempt
+from ....store import get_purchase_by_code
 from ....interfaces import IPurchaseAttempt
 from ....interfaces import PurchaseAttemptRefunded
+
+from ..utils import create_payment_charge
 
 from ..interfaces import RegisterStripeCharge
 from ..interfaces import IStripePurchaseAttempt
 
 from .base import BaseProcessor
 
+def find_purchase(key):
+	try:
+		purchase = get_purchase_by_code(key)
+	except Exception:
+		purchase = get_purchase_attempt(key)
+	return purchase
+
 class RefundProcessor(BaseProcessor):
 
-	def refund_purchase(self, trx_id, amount=None, refund_application_fee=None,
+	def refund_purchase(self, purchase, amount=None, refund_application_fee=None,
 						api_key=None, request=None):
 		"""
 		Refunds to a purchase attempt
@@ -41,16 +48,17 @@ class RefundProcessor(BaseProcessor):
 		if amount is not None and amount <= 0:
 			raise RefundException('Invalid refund amount')
 
-		uid = integer_strings.from_external_string(trx_id)
-		zope_iids = component.getUtility(zope.intid.IIntIds)
-		purchase = zope_iids.queryObject(uid)
-		if not purchase or not IPurchaseAttempt.providedBy(purchase):
-			raise RefundException('Purchase attempt %s could not be found', trx_id)
+		if isinstance(purchase, six.string_types):
+			purchase = find_purchase(purchase)
+			if purchase is None:
+				raise RefundException('Purchase attempt could not be found')
+		
+		assert IPurchaseAttempt.providedBy(purchase)
 		
 		if not purchase.has_succeeded():
-			raise RefundException('Purchase attempt %s status is not completed', trx_id)
+			raise RefundException('Purchase did not succeeded')
 		elif purchase.is_refunded():
-			logger.warn('Purchase attempt %s has already been refunded', trx_id)
+			logger.warn('Purchase attempt has already been refunded')
 			return False
 
 		purchase_id = purchase.id
@@ -86,15 +94,17 @@ class RefundProcessor(BaseProcessor):
 			
 		if charge:
 			cents_amount = int(amount * 100.0) if amount is not None else None
-			logger.debug('Refunding %s...', trx_id)
-			local_purchase = zope_iids.queryObject(uid)
+			logger.debug('Refunding %s...', purchase_id)
 			if not charge.refunded:
 				charge.refund(amount=cents_amount,
 							  refund_application_fee=refund_application_fee)
 			else:
 				logger.warn('Stripe charge already refunded')
-			notify(PurchaseAttemptRefunded(local_purchase))
+
+			notify(PurchaseAttemptRefunded(purchase, 
+										   create_payment_charge(charge),
+										   request))
 		else:
-			raise RefundException('Stripe purchase was found')
+			raise RefundException('Stripe charge not found')
 
 		return charge
