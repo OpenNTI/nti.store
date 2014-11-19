@@ -11,6 +11,7 @@ logger = __import__('logging').getLogger(__name__)
 import time
 from functools import total_ordering
 
+import copy
 import BTrees
 
 from zope import component
@@ -303,11 +304,13 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, redemption_time=
 	new_order.Quantity = None
 	replace_quantity(new_order, 1)
 
+	# copy context
+	context = copy.copy(purchase.Context) if purchase.Context is not None else None
 	result = RedeemedPurchaseAttempt(
 				Order=new_order, Processor=purchase.Processor,
 				Description=purchase.Description, State=purchase.State,
 				StartTime=purchase.StartTime, EndTime=purchase.EndTime,
-				Error=purchase.Error, Synced=purchase.Synced,
+				Error=purchase.Error, Synced=purchase.Synced, Context=context,
 				RedemptionTime=float(redemption_time),
 				RedemptionCode=unicode(redemption_code))
 	return result

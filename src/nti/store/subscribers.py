@@ -147,7 +147,7 @@ def _purchase_attempt_synced(purchase, event):
 	lifecycleevent.modified(purchase)
 	logger.info('%s has been synched' % purchase.id)
 
-def _redeem_purchase_attempt(user, original, code, activate_roles=True):
+def _make_redeem_purchase_attempt(user, original, code, activate_roles=True):
 	# create and register a purchase attempt for accepting user
 	redeemed = create_redeemed_purchase_attempt(original, code)
 	result = register_purchase_attempt(redeemed, user)
@@ -167,7 +167,7 @@ def _purchase_invitation_accepted(invitation, event):
 		original = invitation.purchase
 
 		# create and register a purchase attempt for accepting user
-		new_pid = _redeem_purchase_attempt(user, original, code)
+		new_pid = _make_redeem_purchase_attempt(user, original, code)
 		
 		# link purchase. This validates there are enough tokens and
 		# use has not accepted already
@@ -180,7 +180,7 @@ def _gift_purchase_attempt_redeemed(purchase, event):
 	
 	# create  and register a purchase attempt for accepting user
 	code = get_invitation_code(purchase)
-	new_pid = _redeem_purchase_attempt(event.user, purchase, code)
+	new_pid = _make_redeem_purchase_attempt(event.user, purchase, code)
 	
 	# change state
 	purchase.State = PA_STATE_REDEEMED
