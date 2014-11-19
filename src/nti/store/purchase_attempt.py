@@ -81,6 +81,9 @@ def to_purchase_attempt_context(context):
 	result = IPurchaseAttemptContext(context, None)
 	return result
 
+def empty_purchase_attempt_context():
+	return DefaultPurchaseAttemptContext()
+
 @total_ordering
 @interface.implementer(ICreated,
 					   IPurchaseAttempt,
@@ -326,6 +329,7 @@ def create_gift_purchase_attempt(creator, order, processor, state=None, descript
 
 	sender = sender or creator
 	receiver_name = receiver_name or receiver
+	context = context if context is not None else empty_purchase_attempt_context()
 	result = GiftPurchaseAttempt(
 				Order=order, Processor=processor, Creator=creator.lower(),
 				Description=description, State=state, 
@@ -342,6 +346,7 @@ class DefaultPurchaseAttemptFactory(object):
 		# set some defaults
 		state = state or PA_STATE_UNKNOWN
 		context = to_purchase_attempt_context(context)
+		context = context if context is not None else empty_purchase_attempt_context()
 		start_time = start_time if start_time else time.time()
 		# create 
 		result = PurchaseAttempt(Order=order, Processor=processor, 
