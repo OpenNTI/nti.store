@@ -76,6 +76,10 @@
 	<subscriber handler=".subscribers._invitation_purchase_attempt_refunded" />
 	
 	<!-- Decorators -->
+	<subscriber factory=".decorators.PurchaseAttemptDecorator"
+				for=".interfaces.IPurchaseAttempt"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
+
 	<subscriber factory=".decorators.InvitationPurchaseAttemptDecorator"
 				for=".interfaces.IInvitationPurchaseAttempt"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>

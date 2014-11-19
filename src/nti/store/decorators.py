@@ -19,12 +19,23 @@ from .store import get_gift_code
 from .store import get_invitation_code
 
 from .interfaces import IPricedItem
+from .interfaces import IPurchaseAttempt
 from .interfaces import IPurchasableCourse
 from .interfaces import IGiftPurchaseAttempt
 from .interfaces import IInvitationPurchaseAttempt
 
 LINKS = StandardExternalFields.LINKS
 
+@component.adapter(IPurchaseAttempt)
+@interface.implementer(IExternalObjectDecorator)
+class PurchaseAttemptDecorator(object):
+
+	__metaclass__ = SingletonDecorator
+
+	def decorateExternalObject(self, original, external):
+		code = get_gift_code(original)
+		external['TransactionID'] = code
+			
 @component.adapter(IInvitationPurchaseAttempt)
 @interface.implementer(IExternalObjectDecorator)
 class InvitationPurchaseAttemptDecorator(object):
