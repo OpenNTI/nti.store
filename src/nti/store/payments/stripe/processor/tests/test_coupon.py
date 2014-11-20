@@ -31,6 +31,7 @@ class TestCouponProcessor(unittest.TestCase):
 			duration = 'forever'
 			redeem_by = None
 			times_redeemed = 0
+			created = time.time()
 			max_redemptions = None
 			duration_in_months = None
 
@@ -50,15 +51,19 @@ class TestCouponProcessor(unittest.TestCase):
 		c.redeem_by = time.time() + 100000
 		assert_that(self.manager.validate_coupon(c), is_(True))
 		c.redeem_by = None
+
 		c.max_redemptions = 0
 		assert_that(self.manager.validate_coupon(c), is_(False))
 		c.max_redemptions = 1
 		assert_that(self.manager.validate_coupon(c), is_(True))
 		c.max_redemptions = None
-		c.duration_in_months = 0
-		assert_that(self.manager.validate_coupon(c), is_(False))
-		c.duration_in_months = 10
+		
+		c.created = c.created - 10000000
+		c.duration_in_months = 5
 		assert_that(self.manager.validate_coupon(c), is_(True))
+		
+		c.duration_in_months = 2
+		assert_that(self.manager.validate_coupon(c), is_(False))
 
 	def test_apply_coupon(self):
 		amount = 1000

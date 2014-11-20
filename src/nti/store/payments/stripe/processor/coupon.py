@@ -13,6 +13,9 @@ logger = __import__('logging').getLogger(__name__)
 import six
 import sys
 import time
+from datetime import datetime
+
+from dateutil import relativedelta
 
 from ... import _BasePaymentProcessor
 
@@ -27,20 +30,30 @@ def get_coupon(coupon, api_key=None):
 	else:
 		result = coupon
 	return result
-	
+
+def months_between(a, b):
+	a = datetime.utcfromtimestamp(a)
+	b = datetime.utcfromtimestamp(b)
+	r = relativedelta.relativedelta(b, a)
+	result = r.months or 0
+	return abs(result)
+
 def validate_coupon(coupon, api_key=None):
 	if isinstance(coupon, six.string_types):
 		coupon = get_stripe_coupon(coupon, api_key=api_key)
 	result = (coupon is not None)
 	if result:
 		if coupon.duration == u'repeating':
+			redeem_by = coupon.redeem_by
 			times_redeemed = coupon.times_redeemed or 0 
+			duration_in_months = coupon.duration_in_months
+			diff_months = months_between(coupon.created, time.time())
 			max_redemptions = \
 				sys.maxint if coupon.max_redemptions is None else coupon.max_redemptions
 			result = \
 				(times_redeemed < max_redemptions) and \
-				(coupon.redeem_by is None or time.time() <= coupon.redeem_by) and \
-				(coupon.duration_in_months is None or coupon.duration_in_months > 0)
+				(redeem_by is None or time.time() <= redeem_by) and \
+				(duration_in_months is None or diff_months <= duration_in_months)
 		elif coupon.duration == u'once':
 			result = (coupon.redeem_by is None or time.time() <= coupon.redeem_by) and \
 					 (not coupon.times_redeemed)
