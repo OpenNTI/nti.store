@@ -118,7 +118,7 @@ def _fail_purchase(purchase_id, error, username=None):
 	purchase = get_purchase_attempt(purchase_id, username)
 	if purchase is not None:
 		notify(PurchaseAttemptFailed(purchase, error))
-			
+				
 class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 
 	def _create_customer(self, transaction_runner, user, api_key=None):
@@ -141,18 +141,31 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 			logger.error("Could not update stripe charge %s. %s", charge.id, e)
 		return None
 
-	def _post_purchase(self, transaction_runner, charge, metadata=None,
-					   customer_id=None, username=None, api_key=None): 
-		if not username or customer_id:
+	def _post_purchase(self, transaction_runner, purchase_id, charge, 
+					   metadata=None, customer_id=None, username=None, api_key=None):
+		if not username:
 			return
 		
-		customer = self._create_customer(transaction_runner, 
-										 username, 
-										 api_key=api_key)
-		customer_id = customer.id if customer is not None else None
+		if not customer_id:
+			customer = self._create_customer(transaction_runner, 
+											 username, 
+											 api_key=api_key)
+			customer_id = customer.id if customer is not None else None
+			if customer_id:
+				self._update_charge(charge, customer_id, metadata, api_key)
 		
-		if customer_id:
-			self._update_charge(charge, customer_id, metadata, api_key)
+		user = get_user(username)
+		purchase = get_purchase_attempt(purchase_id, username)
+		if user is not None and customer_id and purchase is not None:
+			# update coupon. In case there is an error updating the coupon
+			# (e.g. max redemptions reached) Log error and this must be check manually
+			coupon = purchase.Order.Coupon
+			if coupon is not None:
+				try:
+					self.update_customer(user, customer=customer_id, 
+										 coupon=coupon, api_key=api_key)
+				except Exception:
+					logger.exception("Exception while updating the user coupon.")
 
 	def process_purchase(self, purchase_id, token, username=None, expected_amount=None,
 						 api_key=None, request=None, site_names=None):
@@ -225,6 +238,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 												 request=request,
 												 api_key=api_key)
 				success = transaction_runner(register_charge_notify)
+				
 			else:
 				error = _("Could not execute purchase charge at Stripe")
 				error = adapt_to_purchase_error(error)
@@ -255,6 +269,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 								api_key=api_key,
 								metadata=metadata,
 								username=username, 
+								purchase_id=purchase_id,
 								customer_id=customer_id)
 
 		# return charge id
