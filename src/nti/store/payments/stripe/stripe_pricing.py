@@ -40,7 +40,6 @@ def get_coupon(coupon=None, api_key=None, processor=STRIPE, registry=component):
 			except stripe.InvalidRequestError as e:
 				logger.error("Cannot retrieve coupon %s. %s", coupon, e)
 				raise NoSuchStripeCoupon()
-
 		if coupon is not None:
 			validated_coupon = manager.validate_coupon(coupon, api_key=api_key)
 			if not validated_coupon:

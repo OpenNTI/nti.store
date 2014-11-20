@@ -11,6 +11,7 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import six
+import sys
 import time
 
 from ... import _BasePaymentProcessor
@@ -33,12 +34,16 @@ def validate_coupon(coupon, api_key=None):
 	result = (coupon is not None)
 	if result:
 		if coupon.duration == u'repeating':
+			times_redeemed = coupon.times_redeemed or 0 
+			max_redemptions = \
+				sys.maxint if coupon.max_redemptions is None else coupon.max_redemptions
 			result = \
-				(coupon.duration_in_months is None or coupon.duration_in_months > 0) and \
-				(coupon.max_redemptions is None or coupon.max_redemptions > 0) and \
-				(coupon.redeem_by is None or time.time() <= coupon.redeem_by)
+				(times_redeemed < max_redemptions) and \
+				(coupon.redeem_by is None or time.time() <= coupon.redeem_by) and \
+				(coupon.duration_in_months is None or coupon.duration_in_months > 0)
 		elif coupon.duration == u'once':
-			result = coupon.redeem_by is None or time.time() <= coupon.redeem_by
+			result = (coupon.redeem_by is None or time.time() <= coupon.redeem_by) and \
+					 (not coupon.times_redeemed)
 	return result
 	
 def get_and_validate_coupon(coupon=None, api_key=None):

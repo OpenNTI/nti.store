@@ -30,6 +30,7 @@ class TestCouponProcessor(unittest.TestCase):
 		class Coupon(object):
 			duration = 'forever'
 			redeem_by = None
+			times_redeemed = 0
 			max_redemptions = None
 			duration_in_months = None
 
