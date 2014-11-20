@@ -118,7 +118,11 @@ def _fail_purchase(purchase_id, error, username=None):
 	purchase = get_purchase_attempt(purchase_id, username)
 	if purchase is not None:
 		notify(PurchaseAttemptFailed(purchase, error))
-				
+	
+def _get_purchase(purchase_id, username=None):
+	purchase = get_purchase_attempt(purchase_id, username)
+	return purchase
+					
 class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 
 	def _create_customer(self, transaction_runner, user, api_key=None):
@@ -126,7 +130,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 			creator_func = partial(create_customer, user=user, api_key=api_key)
 			result = transaction_runner(creator_func)
 			return result
-		except StandardError as e:
+		except Exception as e:
 			logger.error("Could not create stripe customer %s. %s", user, e)
 		return None
 	
@@ -137,10 +141,19 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 			description = encode_charge_description(metadata=metadata)
 			update_charge(charge, metadata=metadata, description=description,
 						  api_key=api_key)
-		except StandardError as e:
+		except Exception as e:
 			logger.error("Could not update stripe charge %s. %s", charge.id, e)
 		return None
 
+	def _update_customer(self, transaction_runner, username, customer, coupon, api_key=None):
+		updater_func = partial(self.update_customer, user=username, customer=customer,
+							   coupon=coupon, api_key=api_key)
+		try:
+			result = transaction_runner(updater_func)
+			return result
+		except Exception:
+			logger.exception("Exception while updating the user coupon.")
+					
 	def _post_purchase(self, transaction_runner, purchase_id, charge, 
 					   metadata=None, customer_id=None, username=None, api_key=None):
 		if not username:
@@ -153,19 +166,17 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 			customer_id = customer.id if customer is not None else None
 			if customer_id:
 				self._update_charge(charge, customer_id, metadata, api_key)
-		
-		user = get_user(username)
-		purchase = get_purchase_attempt(purchase_id, username)
-		if user is not None and customer_id and purchase is not None:
+
+		getter_func = partial(_get_purchase, purchase_id=purchase_id, username=username)
+		purchase = transaction_runner(getter_func)
+		if customer_id and purchase is not None:
 			# update coupon. In case there is an error updating the coupon
 			# (e.g. max redemptions reached) Log error and this must be check manually
 			coupon = purchase.Order.Coupon
 			if coupon is not None:
-				try:
-					self.update_customer(user, customer=customer_id, 
-										 coupon=coupon, api_key=api_key)
-				except Exception:
-					logger.exception("Exception while updating the user coupon.")
+				self._update_customer(transaction_runner, username=username,
+									  customer=customer_id, coupon=coupon, 
+									  api_key=api_key)
 
 	def process_purchase(self, purchase_id, token, username=None, expected_amount=None,
 						 api_key=None, request=None, site_names=None):
