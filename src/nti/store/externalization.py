@@ -22,8 +22,7 @@ from .interfaces import IPurchasableCourse
 @interface.implementer(IInternalObjectExternalizer)
 class _PurchasableSummaryExternalizer(object):
 
-    fields_to_remove = ('Icon', 'Thumbnail', 'License', 'Public', 'VendorInfo',
-                        'Description')
+    fields_to_remove = ('Icon', 'Thumbnail', 'License', 'Public', 'Description')
 
     interface = IPurchasable
 
