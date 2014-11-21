@@ -136,6 +136,7 @@ class IPurchasableCourse(IPurchasable):
 					   required=False)
 
 	# For purchaseables, we want to share this.
+	VendorInfo = Object(IPurchasableVendorInfo, title="vendor info", required=False)
 	VendorInfo.setTaggedValue('_ext_excluded_out', False)
 
 ICourse = IPurchasableCourse # alias BWC
