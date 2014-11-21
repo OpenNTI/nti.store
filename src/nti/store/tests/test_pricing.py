@@ -35,6 +35,14 @@ class TestPurchasableStore(unittest.TestCase):
 		assert_that(priced.PurchaseFee, is_(200))
 		assert_that(priced.PurchasePrice, is_(1000))
 		assert_that(priced.Quantity, is_(10))
+		
+		p = priceable.create_priceable(u"iid_2", 2)
+		priced = pricer.price(p)
+		assert_that(priced, is_not(none()))
+		assert_that(priced.NTIID, is_(u'iid_2'))
+		assert_that(priced.PurchaseFee, is_(36.42))
+		assert_that(priced.PurchasePrice, is_(181.66))
+		assert_that(priced.Quantity, is_(2))
 
 	def test_evaluate(self):
 		pricer = component.getUtility(store_interfaces.IPurchasablePricer)
