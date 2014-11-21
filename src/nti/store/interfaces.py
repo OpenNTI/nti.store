@@ -93,7 +93,7 @@ class IPurchasableVendorInfo(IEnumerableMapping):
 	keys be the vendor names and within them be the actual vendor specific
 	information.
 	"""
-	
+
 class IPurchasable(IItemBundle):
 	Amount = Float(title="Cost amount", required=True, min=0.0)
 	Currency = ValidTextLine(title='Currency amount', required=True, default='USD')
@@ -119,21 +119,24 @@ class IPurchasableCourse(IPurchasable):
 
 	# Deprecated/Legacy fields
 	Featured = Bool(title='Featured flag', required=False, default=False)
-		
+
 	Preview = Bool(title='Course preview flag', required=False)
 	StartDate = ValidTextLine(title="Course start date", required=False)
 	Department = ValidTextLine(title='Course Department', required=False)
-	
+
 	Signature = ValidText(title='Course/Professor Signature', required=False)
 	Communities = FrozenSet(value_type=ValidTextLine(title='The community identifier'),
 							title="Communities", required=False)
-	
+
 	Duration = Timedelta(title="The length of the course",
 						 description="Currently optional, may be None",
 						 required=False)
-	
+
 	EndDate = Datetime(title="The date on which the course ends",
 					   required=False)
+
+	# For purchaseables, we want to share this.
+	VendorInfo.setTaggedValue('_ext_excluded_out', False)
 
 ICourse = IPurchasableCourse # alias BWC
 
@@ -153,17 +156,17 @@ class IPurchaseOrder(IMinimalSequence):
 
 	Quantity = Int(title='Purchase bulk quantity (overwrites-item quantity)',
 				   required=False)
-	
+
 	NTIIDs = IndexedIterable(title="Purchasable NTIIDs", required=True, readonly=True)
 	NTIIDs.setTaggedValue('_ext_excluded_out', True)
-	
+
 	def copy():
 		"""makes a new copy of this purchase order"""
 
 class IPricedItem(IPriceable):
 	PurchaseFee = Float(title="Fee Amount", required=False)
 	PurchaseFee.setTaggedValue('_ext_excluded_out', True)
-	
+
 	PurchasePrice = Float(title="Cost amount", required=True)
 	NonDiscountedPrice = Float(title="Non discounted price", required=False)
 	Currency = ValidTextLine(title='Currency ISO code', required=True, default='USD')
@@ -171,10 +174,10 @@ class IPricedItem(IPriceable):
 class IPricingResults(interface.Interface):
 	Items = List(value_type=Object(IPricedItem), title='The priced items',
 				 required=True, min_length=0)
-	
+
 	TotalPurchaseFee = Float(title="Fee Amount", required=False)
 	TotalPurchaseFee.setTaggedValue('_ext_excluded_out', True)
-	
+
 	TotalPurchasePrice = Float(title="Cost amount", required=True)
 	TotalNonDiscountedPrice = Float(title="Non discounted price", required=False)
 	Currency = ValidTextLine(title='Currency ISO code', required=True, default='USD')
@@ -214,29 +217,29 @@ class IRedemptionError(IOperationError):
 
 class INTIStoreException(interface.Interface):
 	"""
-	interface for store exceptions 
+	interface for store exceptions
 	"""
 
 class IPurchaseException(INTIStoreException):
-	""" 
-	interface for purchase exceptions 
 	"""
-	
+	interface for purchase exceptions
+	"""
+
 class IPricingException(INTIStoreException):
-	""" 
-	interface for pricing exceptions 
 	"""
-	
+	interface for pricing exceptions
+	"""
+
 class IRefundException(INTIStoreException):
-	""" 
-	interface for refund exceptions 
 	"""
-	
+	interface for refund exceptions
+	"""
+
 class IRedemptionException(INTIStoreException):
-	""" 
-	interface for redeeem exceptions 
 	"""
-	
+	interface for redeeem exceptions
+	"""
+
 class IPurchasablePricer(interface.Interface):
 
 	def price(priceable, registry=None):
@@ -293,7 +296,7 @@ class IPurchaseAttemptContext(IEnumerableMapping):
 	Arbitrary purchase attempt information
 
 	This is simply a dictionary and this module does not define
-	the structure of it. 
+	the structure of it.
 	"""
 
 class IPurchaseAttempt(IContained, INoAutoIndex):
@@ -315,17 +318,17 @@ class IPurchaseAttempt(IContained, INoAutoIndex):
 	Synced = Bool(title='if the item has been synchronized with the processors data',
 				  required=True, default=False)
 
-	Context = Object(IPurchaseAttemptContext, title="Purchase attempt context", 
+	Context = Object(IPurchaseAttemptContext, title="Purchase attempt context",
 					 required=False)
 	Context.setTaggedValue('_ext_excluded_out', True)
-	
+
 	## CS. these fields are readonly and must not be created
 	Items = interface.Attribute("Purchasable NTIIDs")
 	Items.setTaggedValue('_ext_excluded_out', True)
-		
+
 	Profile = interface.Attribute('user profile')
 	Profile.setTaggedValue('_ext_excluded_out', True)
-	
+
 	def has_completed():
 		"""
 		return if the purchase has completed
@@ -382,7 +385,7 @@ class IInvitationPurchaseAttempt(IPurchaseAttempt):
 class IRedeemedPurchaseAttempt(IPurchaseAttempt):
 	RedemptionTime = Number(title='Redemption time', required=True)
 	RedemptionCode = ValidTextLine(title='Redemption Code', required=True)
-	
+
 class IGiftPurchaseAttempt(IPurchaseAttempt):
 	Creator = ValidTextLine(title="Gift creator Email", required=True)
 	SenderName = ValidTextLine(title='Sender name', required=False)
@@ -393,18 +396,18 @@ class IGiftPurchaseAttempt(IPurchaseAttempt):
 	Message = ValidText(title='Gift message', required=False)
 	TargetPurchaseID = ValidTextLine(title='NTIID of target purchase', required=False)
 	TargetPurchaseID.setTaggedValue('_ext_excluded_out', True)
-	
+
 	DeliveryDate = Datetime(title="The gift delivery date", required=False)
-	
+
 	Sender = interface.Attribute("Alias for Sender name")
 	Sender.setTaggedValue('_ext_excluded_out', True)
-	
+
 	From = interface.Attribute("alias for Creator")
 	From.setTaggedValue('_ext_excluded_out', True)
-	
+
 	To = interface.Attribute("alias for Receiver Name")
 	To.setTaggedValue('_ext_excluded_out', True)
-	
+
 	def is_redeemed():
 		"""
 		return if the purchase has been redeemed
@@ -412,21 +415,21 @@ class IGiftPurchaseAttempt(IPurchaseAttempt):
 
 class IPurchaseAttemptFactory(interface.Interface):
 	"""
-	Interface to create :class:`IPurchaseAttempt` objects. 
-	
+	Interface to create :class:`IPurchaseAttempt` objects.
+
 	This factory are usually registered based the provider of the
 	purchasable(s) being bought
 	"""
-	
-	def create(order, processor, state=None, description=None, start_time=None, 
+
+	def create(order, processor, state=None, description=None, start_time=None,
 			   context=None):
-		
+
 		"""
-		:param order: a :class:`IPurchaseOrder` object. 
+		:param order: a :class:`IPurchaseOrder` object.
 		:param processor: A payment processor name
 		:param description: Purchase attempt description'
 		:param start_time: Purchase attempt start time
-		:param start_time: a :class:`IPurchaseAttemptContext` object. 
+		:param start_time: a :class:`IPurchaseAttemptContext` object.
 		"""
 
 class IPurchaseAttemptEvent(IObjectEvent):
@@ -486,9 +489,9 @@ class PurchaseAttemptStarted(PurchaseAttemptEvent):
 
 @interface.implementer(IPurchaseAttemptSuccessful)
 class PurchaseAttemptSuccessful(PurchaseAttemptEvent):
-	
+
 	state = PA_STATE_SUCCESS
-	
+
 	def __init__(self, purchase, charge=None, request=None):
 		super(PurchaseAttemptSuccessful, self).__init__(purchase)
 		self.charge = charge
@@ -497,7 +500,7 @@ class PurchaseAttemptSuccessful(PurchaseAttemptEvent):
 @interface.implementer(IPurchaseAttemptRefunded)
 class PurchaseAttemptRefunded(PurchaseAttemptEvent):
 	state = PA_STATE_REFUNDED
-	
+
 	def __init__(self, purchase, charge=None, request=None):
 		super(PurchaseAttemptRefunded, self).__init__(purchase)
 		self.charge = charge
@@ -525,12 +528,12 @@ class PurchaseAttemptFailed(PurchaseAttemptEvent):
 class GiftPurchaseAttemptRedeemed(PurchaseAttemptEvent):
 
 	state = PA_STATE_REDEEMED
-	
+
 	def __init__(self, purchase, user, request=None):
 		super(GiftPurchaseAttemptRedeemed, self).__init__(purchase)
 		self.user = user
 		self.request = request
-	
+
 class IPurchaseHistory(IIterable):
 
 	def add_purchase(purchase):
@@ -550,10 +553,10 @@ class IPurchaseHistory(IIterable):
 
 	def get_pending_purchases():
 		pass
-	
+
 	def clear():
 		pass
-	
+
 	def values():
 		"""
 		Return all purchase attempts
@@ -570,14 +573,14 @@ class IUserGiftHistory(IContained):
 
 class IGiftRegistry(IContainer, IContained):
 	"""
-	marker interface for gift registry. 
+	marker interface for gift registry.
 	This object is registerd as a persistent utility
 	"""
 	contains(b'.IUserGiftHistory')
-	
+
 	def register_purchase(username, purchase):
 		pass
-	
+
 	def get_pending_purchases(username, items=None):
 		pass
 

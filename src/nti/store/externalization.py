@@ -18,15 +18,15 @@ from nti.externalization.datastructures import InterfaceObjectIO
 from .interfaces import IPurchasable
 from .interfaces import IPurchasableCourse
 
-@component.adapter(IPurchasable)    
+@component.adapter(IPurchasable)
 @interface.implementer(IInternalObjectExternalizer)
 class _PurchasableSummaryExternalizer(object):
-    
-    fields_to_remove = ('Icon', 'Thumbnail', 'License', 'Public', 'VendorInfo', 
+
+    fields_to_remove = ('Icon', 'Thumbnail', 'License', 'Public', 'VendorInfo',
                         'Description')
-    
+
     interface = IPurchasable
-    
+
     def __init__(self, obj):
         self.obj = obj
 
@@ -36,12 +36,12 @@ class _PurchasableSummaryExternalizer(object):
             result.pop(name, None)
         return result
 
-@component.adapter(IPurchasableCourse)    
+@component.adapter(IPurchasableCourse)
 @interface.implementer(IInternalObjectExternalizer)
 class _PurchasableCourseSummaryExternalizer(_PurchasableSummaryExternalizer):
-    
+
     fields_to_remove = _PurchasableSummaryExternalizer.fields_to_remove + \
-                        ('Featured', 'Preview', 'StartDate', 'Department', 
+                        ('Featured', 'Preview', 'StartDate', 'Department',
                          'Signature', 'Communities', 'Duration', 'EndDate')
-        
+
     interface = IPurchasableCourse
