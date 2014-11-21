@@ -61,6 +61,7 @@ from .purchase_history import get_purchase_attempt
 from .purchase_history import register_purchase_attempt
 
 from .store import get_purchase_history
+from .store import get_transaction_code
 
 def _update_state(purchase, state):
 	if purchase is not None:
@@ -71,7 +72,7 @@ def _update_state(purchase, state):
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptStarted)
 def _purchase_attempt_started(purchase, event):
 	_update_state(purchase, PA_STATE_STARTED)
-	logger.info('%s started' % purchase.id)
+	logger.info('%s started', purchase.id)
 
 def _activate_items(purchase, user=None, add_roles=True):
 	user = user or purchase.creator
@@ -88,7 +89,8 @@ def _purchase_attempt_successful(purchase, event):
 	## Therefore we don't activate items
 	if not purchase.Quantity:
 		_activate_items(purchase)
-	logger.info('%s completed successfully', purchase.id)
+	logger.info('%s completed successfully. Transaction code %s',
+				purchase.id, get_transaction_code(purchase))
 
 def _return_items(purchase, user=None, remove_roles=True):
 	if purchase is not None:
@@ -115,6 +117,7 @@ def _invitation_purchase_attempt_refunded(purchase, event):
 		p = get_purchase_attempt(pid)
 		_return_items(p, username)
 		_update_state(p, PA_STATE_REFUNDED)
+	logger.info('%s has been refunded', purchase.id)
 
 @component.adapter(IRedeemedPurchaseAttempt, IPurchaseAttemptRefunded)
 def _redeemed_purchase_attempt_refunded(purchase, event):
@@ -127,6 +130,7 @@ def _redeemed_purchase_attempt_refunded(purchase, event):
 		# change the state to success to be able to be given again
 		source.TargetPurchaseID = None
 		_update_state(source, PA_STATE_SUCCESS)
+	logger.info('%s has been refunded', purchase.id)
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptDisputed)
 def _purchase_attempt_disputed(purchase, event):
@@ -138,14 +142,14 @@ def _purchase_attempt_failed(purchase, event):
 	purchase.Error = event.error
 	purchase.EndTime = time.time()
 	_update_state(purchase, PA_STATE_FAILED)
-	logger.info('%s failed. %s', purchase.id, purchase.Error)
+	logger.warn('%s failed. %s', purchase.id, purchase.Error)
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptSynced)
 def _purchase_attempt_synced(purchase, event):
 	purchase.Synced = True
 	purchase.updateLastMod()
 	lifecycleevent.modified(purchase)
-	logger.info('%s has been synched' % purchase.id)
+	logger.info('%s has been synched', purchase.id)
 
 def _make_redeem_purchase_attempt(user, original, code, activate_roles=True):
 	# create and register a purchase attempt for accepting user
@@ -172,6 +176,9 @@ def _purchase_invitation_accepted(invitation, event):
 		# link purchase. This validates there are enough tokens and
 		# use has not accepted already
 		invitation.register(user, new_pid)
+		
+		logger.info('invitation %s has been accepted with purchase %s',
+					code, new_pid)
 
 @component.adapter(IGiftPurchaseAttempt, IGiftPurchaseAttemptRedeemed)
 def _gift_purchase_attempt_redeemed(purchase, event):
@@ -187,7 +194,7 @@ def _gift_purchase_attempt_redeemed(purchase, event):
 	purchase.TargetPurchaseID = new_pid
 	purchase.updateLastMod()
 	lifecycleevent.modified(purchase)
-	logger.info('%s has been redeemed' % purchase.id)
+	logger.info('%s has been redeemed', purchase.id)
 
 @component.adapter(IGiftPurchaseAttempt, IPurchaseAttemptRefunded)
 def _gift_purchase_attempt_refunded(purchase, event):
@@ -198,6 +205,7 @@ def _gift_purchase_attempt_refunded(purchase, event):
 			notify(PurchaseAttemptRefunded(attempt))
 	# update state in case other subscribers change it
 	_update_state(purchase, PA_STATE_REFUNDED)
+	logger.info('%s has been refunded', purchase.id)
 
 @component.adapter(IUser, IObjectRemovedEvent)
 def _on_user_removed(user, event):

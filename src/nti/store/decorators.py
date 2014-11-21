@@ -17,6 +17,7 @@ from nti.externalization.interfaces import IExternalObjectDecorator
 
 from .store import get_gift_code
 from .store import get_invitation_code
+from .store import get_transaction_code
 
 from .interfaces import IPricedItem
 from .interfaces import IPurchaseAttempt
@@ -33,7 +34,7 @@ class PurchaseAttemptDecorator(object):
 	__metaclass__ = SingletonDecorator
 
 	def decorateExternalObject(self, original, external):
-		code = get_gift_code(original)
+		code = get_transaction_code(original)
 		external['TransactionID'] = code
 			
 @component.adapter(IInvitationPurchaseAttempt)

@@ -47,6 +47,7 @@ get_purchasable = get_purchasable
 get_all_purchasables = get_all_purchasables
 
 get_gift_code = get_invitation_code
+get_transaction_code = get_invitation_code
 get_purchase_by_code = get_purchase_by_code
 
 activate_items = activate_items
