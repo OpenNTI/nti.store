@@ -129,6 +129,8 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 		try:
 			creator_func = partial(create_customer, user=user, api_key=api_key)
 			result = transaction_runner(creator_func)
+			if result is not None:
+				logger.info("Stripe customer %s created for user %s", result.id, user)
 			return result
 		except Exception as e:
 			logger.error("Could not create stripe customer %s. %s", user, e)
@@ -141,6 +143,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 			description = encode_charge_description(metadata=metadata)
 			update_charge(charge, metadata=metadata, description=description,
 						  api_key=api_key)
+			logger.info("Charge %s updated", charge.id)
 		except Exception as e:
 			logger.error("Could not update stripe charge %s. %s", charge.id, e)
 		return None
@@ -150,6 +153,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 							   coupon=coupon, api_key=api_key)
 		try:
 			result = transaction_runner(updater_func)
+			logger.info("Customer %s/%s updated", customer, username)
 			return result
 		except Exception:
 			logger.exception("Exception while updating the user coupon.")
