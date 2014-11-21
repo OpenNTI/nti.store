@@ -22,7 +22,7 @@ from nti.dataserver.users import User
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.store.purchasable import get_purchasable
-from nti.store.purchasable import  get_content_items
+from nti.store.purchasable import get_content_items
 from nti.store.purchasable import get_available_items
 
 from nti.store.purchase_order import create_purchase_item
