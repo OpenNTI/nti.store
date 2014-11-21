@@ -32,6 +32,8 @@ from .interfaces import IPricedItem
 from .interfaces import IPricingResults
 from .interfaces import IPurchasablePricer
 
+from . import ROUND_DECIMAL
+
 @interface.implementer(IPricedItem, IContentTypeAware)
 @WithRepr
 @EqHash('NTIID',)
@@ -76,7 +78,7 @@ class DefaultPurchasablePricer(object):
 		fee_amount = 0.0
 		if fee is not None:
 			pct = fee / 100.0 if fee >= 1 else fee
-			fee_amount = amount * pct
+			fee_amount = round(amount * pct, ROUND_DECIMAL)
 		return fee_amount
 
 	def price(self, priceable, registry=None):
@@ -88,7 +90,7 @@ class DefaultPurchasablePricer(object):
 									priceable.NTIID)
 
 		amount = purchasable.Amount
-		new_amount = amount * quantity
+		new_amount = round(amount * quantity, ROUND_DECIMAL)
 
 		fee_amount = self.calc_fee(new_amount, purchasable.Fee)
 		result = create_priced_item(ntiid=purchasable.NTIID,

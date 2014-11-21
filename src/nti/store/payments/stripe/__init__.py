@@ -11,6 +11,7 @@ logger = __import__('logging').getLogger(__name__)
 import logging
 from zope import interface
 
+from ... import ROUND_DECIMAL
 from ... import MessageFactory
 
 from .interfaces import IStripeException

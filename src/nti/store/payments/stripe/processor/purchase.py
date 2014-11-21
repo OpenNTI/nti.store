@@ -27,6 +27,7 @@ from nti.dataserver.interfaces import IDataserverTransactionRunner
 from nti.site.site import find_site_components
 
 from .... import get_user
+from .... import ROUND_DECIMAL
 from .... import PurchaseException
 
 from ....store import get_purchase_attempt
@@ -231,8 +232,10 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 										"expected amount")
 
 			## get priced amount in cents as expected by stripe
-			cents_amount = int(amount * 100.0)
-			application_fee = int(application_fee * 100.0) if application_fee else None
+			## round to two decimal places first
+			cents_amount = int(round(amount * 100.0, ROUND_DECIMAL))
+			application_fee = int(round(application_fee * 100.0, ROUND_DECIMAL)) \
+							  if application_fee else None
 							
 			## execute stripe charge outside a DS transaction
 			charge = _execute_stripe_charge(card=token,

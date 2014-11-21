@@ -19,7 +19,9 @@ from dateutil import relativedelta
 
 from ... import _BasePaymentProcessor
 
+from .. import ROUND_DECIMAL
 from .. import InvalidStripeCoupon
+
 from ..stripe_io import get_stripe_coupon
 
 from .base import BaseProcessor
@@ -76,7 +78,7 @@ def apply_coupon(amount, coupon, api_key=None):
 		elif coupon.amount_off is not None:
 			amount_off = coupon.amount_off / 100.0
 			amount -= amount_off
-	result = float(max(0, amount))
+	result = round(float(max(0, amount)), ROUND_DECIMAL)
 	return result
 
 class CouponProcessor(_BasePaymentProcessor, BaseProcessor):

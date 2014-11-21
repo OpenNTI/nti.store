@@ -22,6 +22,8 @@ from .interfaces import IPurchaseException
 from .interfaces import INTIStoreException
 from .interfaces import IRedemptionException
 
+ROUND_DECIMAL = 2
+
 @interface.implementer(INTIStoreException)
 class NTIStoreException(Exception):
 	pass
