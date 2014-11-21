@@ -135,6 +135,14 @@ class TestStoreExternal(unittest.TestCase):
 		assert_that(ext, has_entry('Description', u'Intro to Risk'))
 		assert_that(ext, has_entry('Giftable', True))
 		assert_that(ext, has_entry('Redeemable', True))
+		
+		ext = to_external_object(ps, name="summary")
+		assert_that(ext, has_length(15))
+		assert_that(ext, does_not(has_key('Icon')))
+		assert_that(ext, does_not(has_key('Public')))
+		assert_that(ext, does_not(has_key('License')))
+		assert_that(ext, does_not(has_key('Thumbnail')))
+		assert_that(ext, does_not(has_key('Description')))
 
 	@WithMockDSTrans
 	def test_purchasable_summary(self):

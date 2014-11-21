@@ -14,7 +14,7 @@ from hamcrest import has_entry
 from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import has_entries
-doest_not = is_not
+does_not = is_not
 
 import unittest
 
@@ -57,19 +57,19 @@ class TestPurchasableCourse(unittest.TestCase):
 								'VendorInfo', is_({u'CRN': 34846, u'Term': 201410})))
 		
 		ext = to_external_object(course, name="summary")
-		assert_that(ext, doest_not(has_key('Icon')))
-		assert_that(ext, doest_not(has_key('Public')))
-		assert_that(ext, doest_not(has_key('License')))
-		assert_that(ext, doest_not(has_key('Thumbnail')))
-		assert_that(ext, doest_not(has_key('Description')))
-		assert_that(ext, doest_not(has_key('EndDate')))
-		assert_that(ext, doest_not(has_key('Preview')))
-		assert_that(ext, doest_not(has_key('Featured')))
-		assert_that(ext, doest_not(has_key('Duration')))
-		assert_that(ext, doest_not(has_key('StartDate')))
-		assert_that(ext, doest_not(has_key('Signature')))
-		assert_that(ext, doest_not(has_key('Department')))
-		assert_that(ext, doest_not(has_key('Communities')))
+		assert_that(ext, does_not(has_key('Icon')))
+		assert_that(ext, does_not(has_key('Public')))
+		assert_that(ext, does_not(has_key('License')))
+		assert_that(ext, does_not(has_key('Thumbnail')))
+		assert_that(ext, does_not(has_key('Description')))
+		assert_that(ext, does_not(has_key('EndDate')))
+		assert_that(ext, does_not(has_key('Preview')))
+		assert_that(ext, does_not(has_key('Featured')))
+		assert_that(ext, does_not(has_key('Duration')))
+		assert_that(ext, does_not(has_key('StartDate')))
+		assert_that(ext, does_not(has_key('Signature')))
+		assert_that(ext, does_not(has_key('Department')))
+		assert_that(ext, does_not(has_key('Communities')))
 		
 		assert_that(ext, has_entry('VendorInfo', has_length(2)))
 		
