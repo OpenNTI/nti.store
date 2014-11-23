@@ -65,7 +65,7 @@ create_purchase_attempt = create_purchase_attempt
 create_gift_purchase_attempt = create_gift_purchase_attempt
 
 def get_purchase_attempt(purchase_id, user=None):
-	result = find_object_with_ntiid(purchase_id)
+	result = find_object_with_ntiid(purchase_id) if purchase_id else None
 	result = result if IPurchaseAttempt.providedBy(result) else None
 	if result is not None and user:
 		if IGiftPurchaseAttempt.providedBy(result):

@@ -44,7 +44,6 @@ from ..stripe_customer import create_customer
 from ..utils import get_charge_metata
 from ..utils import create_payment_charge
 from ..utils import adapt_to_purchase_error
-from ..utils import encode_charge_description
 
 from ..interfaces import IStripeCustomer
 from ..interfaces import RegisterStripeToken
@@ -77,21 +76,23 @@ def _start_purchase(purchase_id, token, username=None):
 		
 	context = purchase.Context
 	order = purchase.Order.copy() # make a copy of the order
+	description = purchase.Description or purchase.id
 	metadata = get_charge_metata(purchase_id, username=username, 
 								 context=context, customer_id=customer_id)
-	return (order, metadata, customer_id)
+	return (order, metadata, description, customer_id)
 
 def _execute_stripe_charge(	purchase_id, cents_amount, currency, card,
 							application_fee=None, customer_id=None, 
-							metadata=None, api_key=None):
+							metadata=None, description=None, api_key=None):
 	logger.info('Creating stripe charge for %s', purchase_id)
 	metadata = metadata or {}
+	description = description or purchase_id
 	charge = create_charge(	cents_amount, currency=currency,
 							card=card, metadata=metadata,
 							customer_id=customer_id,
 							application_fee=application_fee,
 							api_key=api_key,
-							description=encode_charge_description(metadata=metadata))
+							description=description)
 	return charge
 
 def _register_charge_notify(purchase_id, charge, username=None,
@@ -137,11 +138,11 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 			logger.error("Could not create stripe customer %s. %s", user, e)
 		return None
 	
-	def _update_charge(self, charge, customer_id, metadata=None, api_key=None):
+	def _update_charge(self, charge, customer_id, metadata=None,
+					   description=None, api_key=None):
 		try:
 			metadata = metadata or {}
 			metadata['CustomerID'] = customer_id
-			description = encode_charge_description(metadata=metadata)
 			update_charge(charge, metadata=metadata, description=description,
 						  api_key=api_key)
 			logger.info("Charge %s updated", charge.id)
@@ -160,7 +161,8 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 			logger.exception("Exception while updating the user coupon.")
 					
 	def _post_purchase(self, transaction_runner, purchase_id, charge, 
-					   metadata=None, customer_id=None, username=None, api_key=None):
+					   metadata=None, customer_id=None, username=None,
+					   description=None, api_key=None):
 		if not username:
 			return
 		
@@ -170,7 +172,11 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 											 api_key=api_key)
 			customer_id = customer.id if customer is not None else None
 			if customer_id:
-				self._update_charge(charge, customer_id, metadata, api_key)
+				self._update_charge(charge=charge,
+									api_key=api_key,
+									metadata=metadata,
+									customer_id=customer_id,
+									description=description)
 
 		getter_func = partial(_get_purchase, purchase_id=purchase_id, username=username)
 		purchase = transaction_runner(getter_func)
@@ -208,8 +214,9 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 		try:
 			## start the purchase. 
 			## We notify purchase has started and 
-			## return the order to price, charge metatada, stripe customer id
-			order, metadata, customer_id = transaction_runner(start_purchase)
+			## return the order to price, charge metatada, description,  
+			## stripe customer id
+			order, metadata, description, customer_id = transaction_runner(start_purchase)
 			
 			## price the purchasable order
 			## this is done outside a DS transaction in case
@@ -241,6 +248,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 			charge = _execute_stripe_charge(card=token,
 											currency=currency,
 											metadata=metadata,
+											description=description,
 											customer_id=customer_id,
 											purchase_id=purchase_id, 
 											cents_amount=cents_amount,
@@ -287,6 +295,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 								api_key=api_key,
 								metadata=metadata,
 								username=username, 
+								description=description,
 								purchase_id=purchase_id,
 								customer_id=customer_id)
 

@@ -17,7 +17,7 @@ from zope.event import notify
 
 from nti.utils.maps import CaseInsensitiveDict
 
-from ....purchase_history import get_purchase_attempt
+from ....store import get_purchase_attempt
 
 from ....interfaces import PurchaseAttemptFailed
 from ....interfaces import PurchaseAttemptDisputed
@@ -25,7 +25,6 @@ from ....interfaces import PurchaseAttemptRefunded
 from ....interfaces import PurchaseAttemptSuccessful
 
 from ..utils import create_payment_charge
-from ..utils import decode_charge_description
 
 from .base import BaseProcessor
 
@@ -38,7 +37,7 @@ class EventProcessor(BaseProcessor):
 		event_type = event.get('type', None)
 		data = CaseInsensitiveDict(event.get('data', {}))
 		if event_type in self.events:
-			data = decode_charge_description(data.get('description', u''))
+			data = data.get('metadata') or {}
 			purchase_id = data.get('PurchaseID', u'')
 			username = data.get('Username', u'')
 			purchase = get_purchase_attempt(purchase_id, username)

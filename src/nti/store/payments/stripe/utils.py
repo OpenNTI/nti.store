@@ -12,7 +12,6 @@ logger = __import__('logging').getLogger(__name__)
 
 import six
 import time
-import simplejson as json
 
 from nti.externalization.externalization import to_external_object
 
@@ -65,32 +64,6 @@ def get_charge_metata(purchase_id, username=None,
 	if context:
 		data.update(flatten_context(context))
 	return data
-
-def encode_charge_description(purchase_id=None, username=None, 
-							  customer_id=None, context=None,
-							  metadata=None):
-	"""
-	proceduce a json object for a stripe charge description
-	"""
-	if not metadata:
-		data = get_charge_metata(purchase_id=purchase_id, 
-								 username=username,
-								 customer_id=customer_id,
-								 context=context)
-	else:
-		data = metadata
-	result = json.dumps(data)
-	return result
-
-def decode_charge_description(s):
-	"""
-	decode a stripe charge description
-	"""
-	try:
-		result = json.loads(s)
-	except (TypeError, ValueError):
-		result = {}
-	return result
 
 def create_user_address(charge):
 	"""
