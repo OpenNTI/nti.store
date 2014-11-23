@@ -40,7 +40,7 @@ def flatten_context(context=None):
 		return None
 	result = {}
 	for k, v in context.items():
-		if v and not isinstance(v, six.string_types):
+		if v is not None and not isinstance(v, six.string_types):
 			v = str(v)
 		v = safestr(v) if v else v
 		if not v:
