@@ -18,6 +18,7 @@ from .interfaces import IPurchaseAttempt
 from .interfaces import IPurchaseHistory
 from .interfaces import IGiftPurchaseAttempt
 
+from .gift_registry import get_gift_purchase_history
 from .gift_registry import get_gift_pending_purchases
 from .gift_registry import remove_gift_purchase_attempt
 from .gift_registry import register_gift_purchase_attempt
@@ -58,6 +59,7 @@ get_pending_purchases = get_pending_purchases
 register_purchase_attempt = register_purchase_attempt
 get_purchase_history_by_item = get_purchase_history_by_item
 
+get_gift_purchase_history = get_gift_purchase_history
 get_gift_pending_purchases = get_gift_pending_purchases
 register_gift_purchase_attempt = register_gift_purchase_attempt
 
