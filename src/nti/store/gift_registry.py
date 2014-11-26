@@ -208,7 +208,7 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 	def get_purchase_history(self, username, start_time=None, end_time=None):
 		try:
 			index = self[username]
-			return list(index.get_history_by_time(username, start_time, end_time))
+			return list(index.get_history_by_time(start_time, end_time))
 		except KeyError:
 			return ()
 
