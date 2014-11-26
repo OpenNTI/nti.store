@@ -48,9 +48,6 @@ from .interfaces import IGiftPurchaseAttemptRedeemed
 from .content_roles import add_users_content_roles
 from .content_roles import remove_users_content_roles
 
-from .invitations import get_invitation_code
-from .invitations import get_purchase_by_code
-
 from .purchasable import get_content_items
 
 from .purchase_attempt import create_redeemed_purchase_attempt
@@ -60,6 +57,9 @@ from .purchase_history import deactivate_items
 from .purchase_history import get_purchase_attempt
 from .purchase_history import register_purchase_attempt
 
+from .store import get_gift_code
+from .store import get_invitation_code
+from .store import get_purchase_by_code
 from .store import get_purchase_history
 from .store import get_transaction_code
 
@@ -180,6 +180,11 @@ def _purchase_invitation_accepted(invitation, event):
 		logger.info('invitation %s has been accepted with purchase %s',
 					code, new_pid)
 
+@component.adapter(IGiftPurchaseAttempt, IPurchaseAttemptSuccessful)
+def _gift_purchase_attempt_successful(purchase, event):
+	logger.info('Gift purchase by %s completed successfully. Gift code %s',
+				purchase.Creator, get_gift_code(purchase))
+	
 @component.adapter(IGiftPurchaseAttempt, IGiftPurchaseAttemptRedeemed)
 def _gift_purchase_attempt_redeemed(purchase, event):
 	if purchase.is_redeemed():
