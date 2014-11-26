@@ -212,6 +212,10 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 		except KeyError:
 			return ()
 
+def get_gift_registry(registry=component):
+	result = registry.getUtility(IGiftRegistry)
+	return result
+
 def get_gift_purchase_attempt(purchase_id, username=None):
 	result = find_object_with_ntiid(purchase_id)
 	result = result if IGiftPurchaseAttempt.providedBy(result) else None
@@ -222,22 +226,22 @@ def get_gift_purchase_attempt(purchase_id, username=None):
 def remove_gift_purchase_attempt(purchase_id, username):
 	purchase = get_gift_purchase_attempt(purchase_id, username)
 	if purchase is not None and username:
-		registry = component.getUtility(IGiftRegistry)
+		registry = get_gift_registry()
 		result = registry.remove_purchase(username, purchase)
 		return result
 	return False
 
 def get_gift_pending_purchases(username, items=None):
-	registry = component.getUtility(IGiftRegistry)
+	registry = get_gift_registry()
 	result = registry.get_pending_purchases(username, items)
 	return result
 
 def get_gift_purchase_history(username, start_time=None, end_time=None):
-	registry = component.getUtility(IGiftRegistry)
+	registry = get_gift_registry()
 	result = registry.get_purchase_history(username, start_time, end_time)
 	return result
 
 def register_gift_purchase_attempt(username, purchase):
-	registry = component.getUtility(IGiftRegistry)
+	registry = get_gift_registry()
 	result = registry.register_purchase(username, purchase)
 	return result.id
