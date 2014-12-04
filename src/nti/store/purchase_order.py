@@ -69,6 +69,9 @@ class PurchaseOrder(SchemaConfigured):
 
 	def __iter__(self):
 		return iter(self.Items)
+	
+	def __len__(self):
+		return len(self.Items)
 
 def get_purchasables(order):
 	"""
@@ -109,4 +112,3 @@ def create_purchase_order(items=None, quantity=None, cls=PurchaseOrder):
 		replace_quantity(items, quantity)
 	result = cls(Items=tuple(items), Quantity=quantity)
 	return result
-

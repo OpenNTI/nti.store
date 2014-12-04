@@ -60,13 +60,12 @@ class TestPurchaseHistory(unittest.TestCase):
 
 	def _create_purchase_attempt(self, item=u'xyz-book', quantity=None, state=None):
 		state = state or PA_STATE_UNKNOWN
-		pi = create_purchase_item(item, 1)
-		assert_that(hash(pi), is_(not_none()))
-		po = create_purchase_order(pi, quantity=quantity)
-		assert_that(hash(po), is_(not_none()))
-		pa = create_purchase_attempt(po, processor=self.processor, state=state)
-		assert_that(hash(pa), is_(not_none()))
-		return pa
+		purchase_item = create_purchase_item(item, 1)
+		purchase_order = create_purchase_order(purchase_item, quantity=quantity)
+		purchase = create_purchase_attempt(purchase_order, 
+										   processor=self.processor, 
+										   state=state)
+		return purchase
 
 	@WithMockDSTrans
 	def test_purchase_simple_history(self):
