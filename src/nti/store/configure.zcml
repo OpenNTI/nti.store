@@ -140,7 +140,16 @@
 			 for=".interfaces.IPurchasableCourse"
 			 provides="nti.externalization.interfaces.IInternalObjectExternalizer"
 			 name="summary" />
-			 	 
+			 	
+	<!-- Metadata -->
+	<configure zcml:condition="installed nti.metadata">
+		<subscriber	factory=".metadata_index._PurchaseAttemptPrincipalObjectsIntIds"
+					provides="nti.dataserver.interfaces.IPrincipalMetadataObjectsIntIds" />
+			
+		<subscriber	factory=".metadata_index._GiftPurchaseAttemptPrincipalObjectsIntIds"
+					provides="nti.dataserver.interfaces.IPrincipalMetadataObjectsIntIds" />
+	</configure>
+		 
 	<!-- Test purchasables -->
 	<configure zcml:condition="have devmode">
 		<include file="_sample.zcml" />

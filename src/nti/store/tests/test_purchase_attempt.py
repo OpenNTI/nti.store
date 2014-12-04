@@ -62,6 +62,7 @@ class TestPurchaseAttempt(unittest.TestCase):
 	def test_simple_purchase_attempt(self):
 		purchase = self._create_purchase_attempt(state=PA_STATE_SUCCESS, 
 												 context={"Ichigo":"Bleach"})
+		assert_that(purchase, has_property('createdTime', is_not(none())))
 		assert_that(purchase, has_property('StartTime', is_not(none())))
 		assert_that(purchase, has_property('Processor', is_(self.processor)))
 		assert_that(purchase, has_property('Description', is_(none())))

@@ -39,6 +39,7 @@ from .purchase_history import has_history_by_item
 from .purchase_history import get_pending_purchases
 from .purchase_history import register_purchase_attempt
 from .purchase_history import get_purchase_history_by_item
+from .purchase_history import get_purchase_history as get_user_purchase_history
 from .purchase_history import remove_purchase_attempt as remove_hist_purchase_attempt
 
 from .purchase_attempt import create_purchase_attempt
@@ -58,6 +59,7 @@ is_item_activated = is_item_activated
 has_history_by_item = has_history_by_item
 get_pending_purchases = get_pending_purchases
 register_purchase_attempt = register_purchase_attempt
+get_user_purchase_history = get_user_purchase_history
 get_purchase_history_by_item = get_purchase_history_by_item
 
 get_gift_registry = get_gift_registry

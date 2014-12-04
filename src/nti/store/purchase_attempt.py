@@ -107,6 +107,7 @@ class PurchaseAttempt(ModDateTrackingObject,
 	id = alias('__name__')
 	state = alias('State')
 	context = alias('Context')
+	createdTime = alias('StartTime')
 
 	@property
 	def Items(self):
