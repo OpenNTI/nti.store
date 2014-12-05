@@ -66,9 +66,10 @@ class _GiftPurchaseAttemptPrincipalObjectsIntIds(object):
 	def __init__(self, *args, **kwargs):
 		pass
 
-	def iter_intids(self):
+	def iter_intids(self, intids=None):
 		registry = get_gift_registry()
-		intids = component.getUtility(zope.intid.IIntIds) 
+		intids = component.getUtility(zope.intid.IIntIds) \
+				 if intids is None else intids
 		for username in registry.keys():
 			for gift in registry.get_purchase_history(username):
 				uid = get_uid(gift, intids=intids)
