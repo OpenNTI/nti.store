@@ -16,17 +16,24 @@ from hamcrest import assert_that
 from hamcrest import has_property
 
 import unittest
+from datetime import datetime
 
 from nti.dataserver.users import User
 
 from nti.store.purchase_order import create_purchase_item
 from nti.store.purchase_order import create_purchase_order
+
 from nti.store.purchase_attempt import create_purchase_attempt
+from nti.store.purchase_attempt import create_gift_purchase_attempt
+
+from nti.store.gift_registry import register_gift_purchase_attempt
 
 from nti.store.interfaces import PA_STATE_SUCCESS
 from nti.store.interfaces import PA_STATE_UNKNOWN
 
 from nti.store.interfaces import IPurchaseHistory
+from nti.store.metadata_index import _PurchaseAttemptPrincipalObjectsIntIds
+from nti.store.metadata_index import _GiftPurchaseAttemptPrincipalObjectsIntIds
 
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
@@ -57,6 +64,19 @@ class TestPurchaseAttempt(unittest.TestCase):
 										 	context=context)
 		assert_that(hash(purchase), is_(not_none()))
 		return purchase
+
+	def create_gift_attempt(self, creator, item=u'xyz-book', state=None):
+		state = state or PA_STATE_SUCCESS
+		item = create_purchase_item(item, 1)
+		order = create_purchase_order(item, quantity=None)
+		result = create_gift_purchase_attempt(order=order, processor='stripe', 
+										  	  state=state, creator=creator, 
+										  	  sender='Ichigo Kurosaki',
+										  	  receiver="azien@bleach.org",
+										  	  receiver_name="Azien Sosuke",
+										  	  delivery_date=datetime.now())
+		return result
+
 
 	@WithMockDSTrans
 	def test_simple_purchase_attempt(self):
@@ -98,3 +118,38 @@ class TestPurchaseAttempt(unittest.TestCase):
 		
 		assert_that(purchase, has_property('profile', is_not(none())))
 		assert_that(purchase, has_property('Profile', is_not(none())))
+
+		predicate = _PurchaseAttemptPrincipalObjectsIntIds(user)
+		ids = list(predicate.iter_intids())
+		assert_that(ids, has_length(1))
+
+	@WithMockDSTrans
+	def test_simple_gift_purchase_attempt(self):
+		username = "ichigo@bleach.org"
+		attempt = self.create_gift_attempt(username)
+		register_gift_purchase_attempt(username, attempt)
+		
+		assert_that(attempt, has_property('createdTime', is_not(none())))
+		assert_that(attempt, has_property('StartTime', is_not(none())))
+		assert_that(attempt, has_property('Processor', is_(self.processor)))
+		assert_that(attempt, has_property('Description', is_(none())))
+		assert_that(attempt, has_property('Order', is_not(none())))
+		
+		assert_that(attempt, has_property('state', is_(PA_STATE_SUCCESS)))
+		assert_that(attempt, has_property('state', is_(PA_STATE_SUCCESS)))
+		
+		assert_that(attempt, has_property('creator', is_(username)) )
+		assert_that(attempt, has_property('Creator', is_(username)) )
+		
+		assert_that(attempt, has_property('To', is_('Azien Sosuke')) )
+		assert_that(attempt, has_property('ReceiverName', is_('Azien Sosuke')) )
+		assert_that(attempt, has_property('Receiver', is_('azien@bleach.org')) )
+		
+		assert_that(attempt, has_property('Sender', is_('Ichigo Kurosaki')) )
+		assert_that(attempt, has_property('SenderName', is_('Ichigo Kurosaki')) )
+	
+		assert_that(attempt, has_property('DeliveryDate', is_not(none())) )
+		
+		predicate = _GiftPurchaseAttemptPrincipalObjectsIntIds()
+		ids = list(predicate.iter_intids())
+		assert_that(ids, has_length(1))
