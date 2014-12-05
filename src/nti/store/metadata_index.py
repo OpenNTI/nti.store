@@ -25,8 +25,7 @@ from .store import get_gift_registry
 from .store import get_user_purchase_history
 
 def get_uid(obj, intids=None):
-	intids = component.getUtility(zope.intid.IIntIds) \
-			 if intids is None else intids
+	intids = component.getUtility(zope.intid.IIntIds) if intids is None else intids
 	try:
 		if IBroken.providedBy(obj):
 			logger.warn("ignoring broken object %s", type(obj))
@@ -68,8 +67,7 @@ class _GiftPurchaseAttemptPrincipalObjectsIntIds(object):
 
 	def iter_intids(self, intids=None):
 		registry = get_gift_registry()
-		intids = component.getUtility(zope.intid.IIntIds) \
-				 if intids is None else intids
+		intids = component.getUtility(zope.intid.IIntIds) if intids is None else intids
 		for username in registry.keys():
 			for gift in registry.get_purchase_history(username):
 				uid = get_uid(gift, intids=intids)
