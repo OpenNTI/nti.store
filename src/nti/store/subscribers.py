@@ -160,7 +160,7 @@ def _make_redeem_purchase_attempt(user, original, code, activate_roles=True):
 		lib_items = get_content_items(original.Items)
 		add_users_content_roles(user, lib_items)
 	return result
-		
+
 @component.adapter(IStorePurchaseInvitation, IInvitationAcceptedEvent)
 def _purchase_invitation_accepted(invitation, event):
 	if 	IStorePurchaseInvitation.providedBy(invitation) and \
@@ -172,11 +172,11 @@ def _purchase_invitation_accepted(invitation, event):
 
 		# create and register a purchase attempt for accepting user
 		new_pid = _make_redeem_purchase_attempt(user, original, code)
-		
+
 		# link purchase. This validates there are enough tokens and
 		# use has not accepted already
 		invitation.register(user, new_pid)
-		
+
 		logger.info('invitation %s has been accepted with purchase %s',
 					code, new_pid)
 
@@ -184,16 +184,16 @@ def _purchase_invitation_accepted(invitation, event):
 def _gift_purchase_attempt_successful(purchase, event):
 	logger.info('Gift purchase by %s completed successfully. Gift code %s',
 				purchase.Creator, get_gift_code(purchase))
-	
+
 @component.adapter(IGiftPurchaseAttempt, IGiftPurchaseAttemptRedeemed)
 def _gift_purchase_attempt_redeemed(purchase, event):
 	if purchase.is_redeemed():
-		raise RedemptionException("Gift purchase already redeemded")
-	
+		raise RedemptionException("Gift purchase already redeemed")
+
 	# create  and register a purchase attempt for accepting user
 	code = get_invitation_code(purchase)
 	new_pid = _make_redeem_purchase_attempt(event.user, purchase, code)
-	
+
 	# change state
 	purchase.State = PA_STATE_REDEEMED
 	purchase.TargetPurchaseID = new_pid
