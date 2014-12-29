@@ -161,8 +161,9 @@ def _make_redeem_purchase_attempt(user, original, code, activate_roles=True):
 		add_users_content_roles(user, lib_items)
 	return result
 
-@component.adapter(IStorePurchaseInvitation, IInvitationAcceptedEvent)
-def _purchase_invitation_accepted(invitation, event):
+@component.adapter(IInvitationAcceptedEvent)
+def _purchase_invitation_accepted(event):
+	invitation = event.object
 	if 	IStorePurchaseInvitation.providedBy(invitation) and \
 		IInvitationPurchaseAttempt.providedBy(invitation.purchase):
 
