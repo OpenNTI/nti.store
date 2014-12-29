@@ -47,6 +47,7 @@ class InvitationPurchaseAttemptDecorator(object):
 		code = get_invitation_code(original)
 		external['InvitationCode'] = code
 		external['RemainingInvitations'] = original.tokens
+		external['IsExpired'] = original.isExpired()
 
 @component.adapter(IGiftPurchaseAttempt)
 @interface.implementer(IExternalObjectDecorator)
