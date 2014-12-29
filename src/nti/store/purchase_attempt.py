@@ -177,7 +177,9 @@ class PurchaseAttempt(ModDateTrackingObject,
 class InvitationPurchaseAttempt(PurchaseAttempt):
 
 	mime_type = mimeType = MIME_BASE + b'invitationpurchaseattempt'
-
+	
+	ExpirationTime = FP(IInvitationPurchaseAttempt['ExpirationTime'])
+	
 	def __init__(self, *args, **kwargs):
 		super(InvitationPurchaseAttempt, self).__init__(*args, **kwargs)
 		self._consumers = BTrees.OOBTree.OOBTree()
@@ -189,6 +191,12 @@ class InvitationPurchaseAttempt(PurchaseAttempt):
 	def consumerMap(self):
 		return dict(self._consumers)
 
+	def isExpired(self, now=None):
+		now = now or time.time()
+		result = bool(self.ExpirationTime and now > self.ExpirationTime)
+		return result
+	is_expired = isExpired
+			
 	def register(self, user, linked_purchase_id=None):
 		user = getattr(user, "username", user)
 		if user and not user in self._consumers:
@@ -270,7 +278,7 @@ def get_purchasables(purchase):
 	return get_purchasables_from_order(purchase.Order)
 
 def create_purchase_attempt(order, processor, state=None, description=None,
-							start_time=None, context=None):
+							start_time=None, context=None, expiration=None):
 
 	# set some defaults
 	state = state or PA_STATE_UNKNOWN
@@ -279,9 +287,11 @@ def create_purchase_attempt(order, processor, state=None, description=None,
 		
 	## if there is a quantity, it means it's an invitation purchase
 	if order.Quantity:
+		expiration = float(expiration) if expiration else None
 		result = InvitationPurchaseAttempt(Order=order, Processor=processor,
 										   Description=description, State=state, 
-										   StartTime=float(start_time), Context=context)
+										   StartTime=float(start_time), Context=context,
+										   ExpirationTime=expiration)
 	else: 
 		## try to find a factory based on the providers of the 
 		## purchasables in the order

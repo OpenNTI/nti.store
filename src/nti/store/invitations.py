@@ -43,6 +43,12 @@ class InvitationAlreadyAccepted(Exception):
 	"""
 	i18n_message = _("Invitation already accepted")
 
+class InvitationExpired(Exception):
+	"""
+	Raised when a user is attempting to accept an expired invitation
+	"""
+	i18n_message = _("Invitation expired")
+	
 @interface.implementer(IStorePurchaseInvitation)
 class _StorePurchaseInvitation(JoinEntitiesInvitation):
 
@@ -54,7 +60,10 @@ class _StorePurchaseInvitation(JoinEntitiesInvitation):
 	def capacity(self):
 		return self.purchase.Quantity
 
-	def register(self, user, linked_purchase_id=None):
+	def register(self, user, linked_purchase_id=None, now=None):
+		if self.purchase.isExpired(now=now):
+			raise InvitationExpired()
+			
 		if not self.purchase.register(user, linked_purchase_id):
 			raise InvitationAlreadyAccepted()
 

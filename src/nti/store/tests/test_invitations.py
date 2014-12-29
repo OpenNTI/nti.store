@@ -15,6 +15,7 @@ import unittest
 
 from nti.dataserver.users import User
 
+from nti.store.invitations import InvitationExpired
 from nti.store.invitations import InvitationCapacityExceeded
 from nti.store.invitations import create_store_purchase_invitation
 
@@ -40,10 +41,12 @@ class TestInvitations(unittest.TestCase):
 		usr = User.create_user(self.ds, username=username, password=password)
 		return usr
 
-	def _create_purchase_attempt(self, item=u'xyz-book', quantity=None, state=None):
+	def _create_purchase_attempt(self, item=u'xyz-book', quantity=None, 
+								 state=None, expiration=None):
 		pi = create_purchase_item(item, 1)
 		po = create_purchase_order(pi, quantity=quantity)
-		pa = create_purchase_attempt(po, processor=self.processor, state=state)
+		pa = create_purchase_attempt(po, processor=self.processor, state=state,
+									 expiration=expiration)
 		return pa
 
 	@WithMockDSTrans
@@ -65,6 +68,19 @@ class TestInvitations(unittest.TestCase):
 
 		user3 = self._create_user(username='nt3@nti.com')
 		with assert_raises(InvitationCapacityExceeded):
+			invitation.accept(user3)
+
+	@WithMockDSTrans
+	def test_create_invitation_expired(self):
+		user = self._create_user()
+
+		hist = IPurchaseHistory(user, None)
+		purchase = self._create_purchase_attempt(quantity=1, expiration=1)
+		hist.add_purchase(purchase)
+
+		invitation = create_store_purchase_invitation(purchase)
+		user3 = self._create_user(username='nt3@nti.com')
+		with assert_raises(InvitationExpired):
 			invitation.accept(user3)
 
 	@WithMockDSTrans

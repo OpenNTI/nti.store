@@ -380,7 +380,12 @@ class IPurchaseAttempt(IContained):
 		"""
 
 class IInvitationPurchaseAttempt(IPurchaseAttempt):
-	pass
+	ExpirationTime = Number(title="The expirtation time", required=False)
+	
+	def isExpired(now=None):
+		"""
+		return if this invitation is expired
+		"""
 
 class IRedeemedPurchaseAttempt(IPurchaseAttempt):
 	RedemptionTime = Number(title='Redemption time', required=True)
