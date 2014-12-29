@@ -197,7 +197,7 @@ class InvitationPurchaseAttempt(PurchaseAttempt):
 		return result
 	is_expired = isExpired
 	
-	def linked_purchase(self, user):
+	def linked_purchase_id(self, user):
 		user = getattr(user, "username", user)
 		return self._consumers.get(user)
 
