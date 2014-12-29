@@ -196,7 +196,11 @@ class InvitationPurchaseAttempt(PurchaseAttempt):
 		result = bool(self.ExpirationTime and now > self.ExpirationTime)
 		return result
 	is_expired = isExpired
-			
+	
+	def linked_purchase(self, user):
+		user = getattr(user, "username", user)
+		return self._consumers.get(user)
+
 	def register(self, user, linked_purchase_id=None):
 		user = getattr(user, "username", user)
 		if user and not user in self._consumers:
