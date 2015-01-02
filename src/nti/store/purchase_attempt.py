@@ -188,6 +188,7 @@ class InvitationPurchaseAttempt(PurchaseAttempt):
 	def reset(self):
 		self._tokens.value = 0
 
+	@property
 	def consumerMap(self):
 		return dict(self._consumers)
 
@@ -199,12 +200,12 @@ class InvitationPurchaseAttempt(PurchaseAttempt):
 	
 	def linked_purchase_id(self, user):
 		user = getattr(user, "username", user)
-		return self._consumers.get(user)
+		return self._consumers.get(user.lower()) if user else None
 
 	def register(self, user, linked_purchase_id=None):
 		user = getattr(user, "username", user)
-		if user and not user in self._consumers:
-			self._consumers[user] = linked_purchase_id
+		if user and not user.lower() in self._consumers:
+			self._consumers[user.lower()] = linked_purchase_id
 			return True
 		return False
 

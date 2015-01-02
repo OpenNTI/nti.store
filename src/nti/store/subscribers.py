@@ -113,7 +113,7 @@ def _invitation_purchase_attempt_refunded(purchase, event):
 	# set all tokens to zero
 	purchase.reset()
 	# return all items from linked purchases (redemptions) and refund them
-	for username, pid in purchase.consumerMap().items():
+	for username, pid in purchase.consumerMap.items():
 		p = get_purchase_attempt(pid)
 		_return_items(p, username)
 		_update_state(p, PA_STATE_REFUNDED)
