@@ -3,6 +3,7 @@
 """
 .. $Id$
 """
+
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
 
@@ -13,21 +14,21 @@ import six
 from zope import interface
 from zope import component
 
-from nti.externalization .interfaces import IExternalObject
 from nti.externalization.interfaces import IInternalObjectIO
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.datastructures import InterfaceObjectIO
+from nti.externalization .interfaces import IInternalObjectExternalizer
 
 from .interfaces import IStripeCoupon
-from . interfaces import IStripePurchaseError
+from .interfaces import IStripePurchaseError
 
 def _makenone(s):
 	if isinstance(s, six.string_types) and s == 'None':
 		s = None
 	return s
 
-@interface.implementer(IExternalObject)
 @component.adapter(IStripeCoupon)
+@interface.implementer(IInternalObjectExternalizer)
 class StripeCouponExternalizer(object):
 
 	__slots__ = ('coupon',)
@@ -59,4 +60,3 @@ class StripeCouponExternalizer(object):
 @component.adapter(IStripePurchaseError)
 class StripePurchaseErrorExternal(InterfaceObjectIO):
 	_ext_iface_upper_bound = IStripePurchaseError
-
