@@ -30,8 +30,6 @@ from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import LocatedExternalList
 from nti.externalization.interfaces import IInternalObjectExternalizer
 
-from nti.mimetype.mimetype import MIME_BASE
-
 from nti.utils.property import Lazy
 from nti.utils.property import alias
 
@@ -66,7 +64,6 @@ class DefaultPurchasableVendorInfo(dict):
 class Purchasable(ItemBundle):
 
 	__metaclass__ = MetaStoreObject
-	mime_type = mimeType = MIME_BASE + b'purchasable'
 	
 	createDirectFieldProperties(IPurchasable)
 	Description = AdaptingFieldProperty(IPurchasable['Description'])
