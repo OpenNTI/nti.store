@@ -98,7 +98,6 @@ class PurchaseAttempt(ModDateTrackingObject,
 
 	__metaclass__ = MetaStoreObject
 	__external_class_name__ = "PurchaseAttempt"
-	mime_type = mimeType = MIME_BASE + b'purchaseattempt'
 
 	createDirectFieldProperties(IPurchaseAttempt)
 
@@ -175,8 +174,6 @@ class PurchaseAttempt(ModDateTrackingObject,
 
 @interface.implementer(IInvitationPurchaseAttempt)
 class InvitationPurchaseAttempt(PurchaseAttempt):
-
-	mime_type = mimeType = MIME_BASE + b'invitationpurchaseattempt'
 	
 	ExpirationTime = FP(IInvitationPurchaseAttempt['ExpirationTime'])
 	
@@ -230,8 +227,6 @@ class InvitationPurchaseAttempt(PurchaseAttempt):
 
 @interface.implementer(IRedeemedPurchaseAttempt)
 class RedeemedPurchaseAttempt(PurchaseAttempt):
-	mime_type = mimeType = MIME_BASE + b'redeemedpurchaseattempt'
-
 	RedemptionCode = FP(IRedeemedPurchaseAttempt['RedemptionCode'])
 	RedemptionTime = FP(IRedeemedPurchaseAttempt['RedemptionTime'])
 	
@@ -244,7 +239,6 @@ class GiftPurchaseUserProfile(object):
 	
 @interface.implementer(IGiftPurchaseAttempt)
 class GiftPurchaseAttempt(PurchaseAttempt):
-	mime_type = mimeType = MIME_BASE + b'giftpurchaseattempt'
 
 	Creator = FP(IGiftPurchaseAttempt['Creator'])
 	Message = FP(IGiftPurchaseAttempt['Message'])
