@@ -5,6 +5,7 @@ Defines course object and operations on them
 
 .. $Id$
 """
+
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
 
@@ -45,7 +46,7 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 				  items=(), fee=None, title=None, license_=None, author=None,
 				  description=None, icon=None, thumbnail=None, discountable=False,
 				  bulk_purchase=False, public=True, giftable=False, redeemable=False,
-				  vendor_info=None,
+				  vendor_info=None, factory=PurchasableCourse,
 				  # deprecated / legacy
 				  communities=None, featured=False, preview=False,
 				  department=None, signature=None, startdate=None, **kwargs):
@@ -69,17 +70,43 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 	vendor = DefaultPurchasableVendorInfo(vendor_info) \
 			 if vendor_info and isinstance(vendor_info, Mapping) else None
 	
-	result = PurchasableCourse(
-					NTIID=ntiid, Name=name, Provider=provider, Title=title,
-					Author=author, Items=items, Description=description, 
-					Amount=amount, Currency=currency, Fee=fee, License=license_,
-					Discountable=discountable, BulkPurchase=bulk_purchase, Icon=icon,
-					Thumbnail=thumbnail, Public=public, Giftable=giftable, 
-					Redeemable=redeemable, VendorInfo=vendor,
-					# deprecated / legacy
-					Preview=preview, Communities=communities, Featured=featured,
-					Department=department, Signature=signature, StartDate=startdate)
-
+	result = factory()
+	
+	# basic info
+	result.Name = name
+	result.NTIID = ntiid
+	result.Title = title
+	result.Items = items
+	result.Author = author
+	result.Provider = provider
+	result.Description = description
+	
+	# cost
+	result.Fee = fee
+	result.Amount = amount
+	result.Currency = currency
+	
+	# flags
+	result.Public = public
+	result.Giftable = giftable
+	result.Redeemable = redeemable
+	result.Discountable = discountable
+	result.BulkPurchase = bulk_purchase
+	
+	# extras
+	result.Icon = icon
+	result.VendorInfo = vendor
+	result.Thumbnail = thumbnail
+	
+	# deprecated / legacy
+	result.Preview = preview
+	result.License = license_
+	result.Featured = featured
+	result.StartDate = startdate
+	result.Signature = signature
+	result.Department = department
+	result.Communities = communities
+	
 	return result
 
 def get_course(course_id, registry=component):
