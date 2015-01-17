@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Store utils module
-
 .. $Id$
 """
+
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
 
@@ -16,6 +15,11 @@ import sys
 from nti.mimetype.mimetype import MIME_BASE
 
 STORE_MIME_BASE = MIME_BASE + b'.store'
+
+PURCHASE_ATTEMPT_MIME_TYPES = [MIME_BASE+x for x in (b'.purchaseattempt',
+													 b'.invitationpurchaseattempt',
+													 b'.redeemedpurchaseattempt',
+													 b'.giftpurchaseattempt')]
 
 def from_delimited(value, delim=' '):
 	result = value.split(delim)
