@@ -16,10 +16,14 @@ from nti.mimetype.mimetype import MIME_BASE
 
 STORE_MIME_BASE = MIME_BASE + b'.store'
 
-PURCHASE_ATTEMPT_MIME_TYPES = [MIME_BASE+x for x in (b'.purchaseattempt',
-													 b'.invitationpurchaseattempt',
-													 b'.redeemedpurchaseattempt',
-													 b'.giftpurchaseattempt')]
+PURCHASE_ATTEMPT_MIME_TYPES = [MIME_BASE + x for x in (	b'.purchaseattempt',
+													 	b'.invitationpurchaseattempt',
+														b'.redeemedpurchaseattempt',
+													 	b'.giftpurchaseattempt') ]
+
+ALL_STORE_MIME_TYPES = list(PURCHASE_ATTEMPT_MIME_TYPES) 
+ALL_STORE_MIME_TYPES.append( MIME_BASE + b'.purchasable')
+ALL_STORE_MIME_TYPES.append( MIME_BASE + b'.purchasablecourse')
 
 def from_delimited(value, delim=' '):
 	result = value.split(delim)
