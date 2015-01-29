@@ -18,10 +18,12 @@ from zope.component.hooks import site, setHooks
 
 from nti.dataserver.interfaces import IUser
 
-from ..metadata_index import get_uid
-from ..metadata_index import _GiftPurchaseAttemptPrincipalObjectsIntIds as gift_source
+from nti.metadata import get_uid
+from nti.metadata.interfaces import IMetadataQueue
 
 from ..store import get_purchase_history
+
+from ..metadata_predicates import _GiftPurchaseAttemptPrincipalObjects as gift_source
 
 def do_evolve(context):
 	setHooks()
@@ -31,13 +33,8 @@ def do_evolve(context):
 
 	lsm = ds_folder.getSiteManager()
 	intids = lsm.getUtility(zope.intid.IIntIds)
-
-	try:
-		from nti.metadata.interfaces import IMetadataQueue
-		queue = lsm.getUtility(IMetadataQueue)
-	except Exception:
-		logger.error("Could not find metata queue")
-		return
+	
+	queue = lsm.getUtility(IMetadataQueue)
 	
 	logger.info('Generation %s started', generation)
 	

@@ -143,11 +143,11 @@
 			 	
 	<!-- Metadata -->
 	<configure zcml:condition="installed nti.metadata">
-		<subscriber	factory=".metadata_index._PurchaseAttemptPrincipalObjectsIntIds"
-					provides="nti.dataserver.interfaces.IPrincipalMetadataObjectsIntIds" />
+		<subscriber	factory=".metadata_predicates._PurchaseAttemptPrincipalObjects"
+					provides="nti.dataserver.interfaces.IPrincipalMetadataObjects" />
 			
-		<subscriber	factory=".metadata_index._GiftPurchaseAttemptPrincipalObjectsIntIds"
-					provides="nti.dataserver.interfaces.IPrincipalMetadataObjectsIntIds" />
+		<subscriber	factory=".metadata_predicates._GiftPurchaseAttemptPrincipalObjects"
+					provides="nti.dataserver.interfaces.IPrincipalMetadataObjects" />
 	</configure>
 		 
 	<!-- Test purchasables -->

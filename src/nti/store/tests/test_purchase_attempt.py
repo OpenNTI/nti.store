@@ -32,8 +32,8 @@ from nti.store.interfaces import PA_STATE_SUCCESS
 from nti.store.interfaces import PA_STATE_UNKNOWN
 
 from nti.store.interfaces import IPurchaseHistory
-from nti.store.metadata_index import _PurchaseAttemptPrincipalObjectsIntIds
-from nti.store.metadata_index import _GiftPurchaseAttemptPrincipalObjectsIntIds
+from nti.store.metadata_predicates import _PurchaseAttemptPrincipalObjects
+from nti.store.metadata_predicates import _GiftPurchaseAttemptPrincipalObjects
 
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
@@ -119,7 +119,7 @@ class TestPurchaseAttempt(unittest.TestCase):
 		assert_that(purchase, has_property('profile', is_not(none())))
 		assert_that(purchase, has_property('Profile', is_not(none())))
 
-		predicate = _PurchaseAttemptPrincipalObjectsIntIds(user)
+		predicate = _PurchaseAttemptPrincipalObjects(user)
 		ids = list(predicate.iter_intids())
 		assert_that(ids, has_length(1))
 
@@ -150,6 +150,6 @@ class TestPurchaseAttempt(unittest.TestCase):
 	
 		assert_that(attempt, has_property('DeliveryDate', is_not(none())) )
 		
-		predicate = _GiftPurchaseAttemptPrincipalObjectsIntIds()
+		predicate = _GiftPurchaseAttemptPrincipalObjects()
 		ids = list(predicate.iter_intids())
 		assert_that(ids, has_length(1))
