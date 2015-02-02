@@ -32,8 +32,8 @@ from nti.store.interfaces import PA_STATE_SUCCESS
 from nti.store.interfaces import PA_STATE_UNKNOWN
 
 from nti.store.interfaces import IPurchaseHistory
-from nti.store.metadata_predicates import _PurchaseAttemptPrincipalObjects
-from nti.store.metadata_predicates import _GiftPurchaseAttemptPrincipalObjects
+from nti.store.predicates import _PurchaseAttemptPrincipalObjects
+from nti.store.predicates import _GiftPurchaseAttemptPrincipalObjects
 
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
