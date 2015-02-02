@@ -22,8 +22,7 @@ from nti.metadata import get_uid
 from nti.metadata.interfaces import IMetadataQueue
 
 from ..store import get_purchase_history
-
-from nti.store.predicates import _GiftPurchaseAttemptPrincipalObjects as gift_source
+from ..predicates import _GiftPurchaseAttemptPrincipalObjects as gift_source
 
 def do_evolve(context):
 	setHooks()
