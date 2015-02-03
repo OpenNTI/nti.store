@@ -28,16 +28,15 @@ from ZODB.interfaces import IConnection
 
 from persistent import Persistent
 
+from nti.common.property import Lazy
+from nti.common.time import time_to_64bit_int
+
 from nti.dataserver.interfaces import IUser
 
 from nti.externalization.oids import to_external_ntiid_oid
 from nti.externalization.interfaces import LocatedExternalList
 
 from nti.ntiids import ntiids
-
-from nti.utils.property import Lazy
-
-from nti.zodb.containers import time_to_64bit_int
 
 from . import get_user
 

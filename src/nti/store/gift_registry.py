@@ -24,6 +24,9 @@ from ZODB.interfaces import IConnection
 
 from persistent import Persistent
 
+from nti.common.property import Lazy
+from nti.common.time import time_to_64bit_int
+
 from nti.dataserver.interfaces import ACE_DENY_ALL
 from nti.dataserver.interfaces import ALL_PERMISSIONS
 from nti.dataserver.containers import CaseInsensitiveCheckingLastModifiedBTreeContainer
@@ -35,10 +38,6 @@ from nti.dataserver.authorization_acl import acl_from_aces
 from nti.externalization.oids import to_external_ntiid_oid
 
 from nti.ntiids.ntiids import find_object_with_ntiid
-
-from nti.utils.property import Lazy
-
-from nti.zodb.containers import time_to_64bit_int
 
 from .utils import to_frozenset
 
