@@ -3,6 +3,7 @@
 """
 .. $Id$
 """
+
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
 
@@ -23,6 +24,8 @@ from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from persistent.mapping import PersistentMapping
 
+from nti.common.property import alias
+
 from nti.dataserver.interfaces import ICreated
 from nti.dataserver.datastructures import ModDateTrackingObject
 
@@ -37,8 +40,6 @@ from nti.mimetype.mimetype import MIME_BASE
 from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
-
-from nti.utils.property import alias
 
 from nti.zodb import minmax
 from nti.zodb.persistentproperty import PersistentPropertyHolder

@@ -5,6 +5,7 @@ Defines purchase order.
 
 .. $Id$
 """
+
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
 
@@ -16,9 +17,9 @@ from zope import interface
 from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
-from nti.externalization.representation import WithRepr
+from nti.common.property import Lazy
 
-from nti.utils.property import Lazy
+from nti.externalization.representation import WithRepr
 
 from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured

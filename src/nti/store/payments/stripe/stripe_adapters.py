@@ -19,9 +19,9 @@ from zope.annotation import factory as an_factory
 
 from persistent import Persistent
 
-from nti.dataserver.interfaces import IUser
+from nti.common.property import alias
 
-from nti.utils.property import alias
+from nti.dataserver.interfaces import IUser
 
 from .utils import makenone
 

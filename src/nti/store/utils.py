@@ -10,7 +10,6 @@ logger = __import__('logging').getLogger(__name__)
 
 import re
 import six
-import sys
 
 from nti.mimetype.mimetype import MIME_BASE
 
@@ -48,18 +47,6 @@ def to_list(items=None, delim=' '):
 
 def to_frozenset(items=None, delim=' '):
 	return to_collection(items, frozenset, delim)
-
-# True if we are running on Python 3.
-PY3 = sys.version_info[0] == 3
-
-if PY3: # pragma: no cover
-	def is_nonstr_iter(v):
-		if isinstance(v, str):
-			return False
-		return hasattr(v, '__iter__')
-else:
-	def is_nonstr_iter(v):
-		return hasattr(v, '__iter__')
 
 # meta classes
 

@@ -5,10 +5,13 @@ Stripe Payment interfaces
 
 .. $Id$
 """
+
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 from zope import interface
+
+from nti.common.property import alias as _alias
 
 from nti.dataserver import interfaces as nti_interfaces
 
@@ -17,8 +20,6 @@ from nti.schema.field import Set
 from nti.schema.field import Bool
 from nti.schema.field import Object
 from nti.schema.field import ValidTextLine
-
-from nti.utils.property import alias as _alias
 
 from ..interfaces import RegisterPurchaseData
 from ..interfaces import IRegisterPurchaseData

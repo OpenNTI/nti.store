@@ -17,6 +17,9 @@ from zope import interface
 from zope.container.contained import Contained
 from zope.mimetype.interfaces import IContentTypeAware
 
+from nti.common.property import Lazy
+from nti.common.property import alias
+
 from nti.dataserver import authorization
 from nti.dataserver.authorization_acl import ace_allowing
 
@@ -29,9 +32,6 @@ from nti.externalization.representation import WithRepr
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import LocatedExternalList
 from nti.externalization.interfaces import IInternalObjectExternalizer
-
-from nti.utils.property import Lazy
-from nti.utils.property import alias
 
 from nti.schema.schema import EqHash
 from nti.schema.fieldproperty import AdaptingFieldProperty

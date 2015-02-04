@@ -5,6 +5,7 @@ Stripe event functionalilty.
 
 .. $Id$
 """
+
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
 
@@ -15,7 +16,7 @@ import simplejson
 
 from zope.event import notify
 
-from nti.utils.maps import CaseInsensitiveDict
+from nti.common.maps import CaseInsensitiveDict
 
 from ....store import get_purchase_attempt
 

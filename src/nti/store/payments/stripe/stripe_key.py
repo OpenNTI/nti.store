@@ -16,13 +16,13 @@ from zope import interface
 
 from zope.mimetype.interfaces import IContentTypeAware
 
+from nti.common.property import alias as _
+
 from nti.externalization.representation import WithRepr
 
 from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
-
-from nti.utils.property import alias as _
 
 from ...utils import MetaStoreObject
 
