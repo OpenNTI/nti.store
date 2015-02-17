@@ -18,5 +18,3 @@ class _BasePaymentProcessor(object):
 
     def apply_coupon(self, amount, coupon=None):
         return amount
-
-

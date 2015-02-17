@@ -57,7 +57,6 @@
 			 for=".interfaces.IInvalidStripeCoupon" /> 	 
 
 	<!-- Externalization -->
-	
 	<adapter factory=".externalization.StripeCouponExternalizer" />
 		
 	<include package="nti.externalization" file="meta.zcml" />
@@ -72,7 +71,6 @@
 		modules=".stripe_purchase .stripe_key .stripe_error" />
 
 	<!-- Test keys -->
-
 	<configure zcml:condition="have devmode">
 		<include file="stripe_keys.zcml" />
 	</configure>
