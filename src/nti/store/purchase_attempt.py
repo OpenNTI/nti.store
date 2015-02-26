@@ -370,7 +370,7 @@ class DefaultPurchaseAttemptFactory(object):
 # deprecated 
 from zope.deprecation import deprecated
 
-from nti.deprecated import hiding_warnings
+from nti.common.deprecated import hiding_warnings
 with hiding_warnings():
 	from .interfaces import IEnrollmentPurchaseAttempt
 

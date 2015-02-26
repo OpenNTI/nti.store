@@ -18,6 +18,7 @@ from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
 
 from .utils import MetaStoreObject
+
 from .interfaces import IPricingError
 
 @interface.implementer(IPricingError)
