@@ -6,9 +6,6 @@ VERSION = '0.0.0'
 entry_points = {
 	'console_scripts': [
 	],
-	'z3c.autoinclude.plugin': [
-		'target = nti.dataserver',
-	],
 }
 
 setup(
