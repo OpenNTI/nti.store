@@ -26,7 +26,7 @@ from ..interfaces import IPurchaseHistory
 from ..purchase_history import _check_valid
 from ..purchase_history import PurchaseHistory
 
-from nti.deprecated import hiding_warnings
+from nti.common.deprecated import hiding_warnings
 with hiding_warnings():
 	from ..interfaces import IEnrollmentAttempt
 	
