@@ -28,7 +28,7 @@ from nti.store.interfaces import IPurchaseHistory
 from nti.store.purchase_history import get_purchase_attempt
 from nti.store.generations.evolve2 import update_user_purchase_data
 
-from nti.deprecated import hiding_warnings
+from nti.common.deprecated import hiding_warnings
 with hiding_warnings():
 	from nti.store.interfaces import IEnrollmentAttempt
 	
