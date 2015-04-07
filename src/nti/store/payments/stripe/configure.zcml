@@ -66,6 +66,7 @@
 		root_interfaces=".interfaces.IStripePriceable
 						 .interfaces.IStripePricedItem
 						 .interfaces.IStripeConnectKey
+						 .interfaces.IStripePurchaseOrder
 						 .interfaces.IStripePurchaseError
 						 .interfaces.IStripeOperationError"
 		modules=".stripe_purchase .stripe_key .stripe_error" />

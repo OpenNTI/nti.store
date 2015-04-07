@@ -27,7 +27,7 @@ from nti.contentfragments.schema import HTMLContentFragment
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.users.interfaces import checkEmailAddress
 
-from nti.schema.field import Int
+from nti.schema.field import Int, ListOrTuple
 from nti.schema.field import Bool
 from nti.schema.field import List
 from nti.schema.field import Float
@@ -159,13 +159,13 @@ class IPurchaseItem(IPriceable):
 
 class IPurchaseOrder(IMinimalSequence):
 
-	Items = Tuple(value_type=Object(IPriceable), title='The items',
-				  required=True, min_length=1)
+	Items = ListOrTuple(value_type=Object(IPriceable), title='The items',
+				  		required=True, min_length=1)
 
 	Quantity = Int(title='Purchase bulk quantity (overwrites-item quantity)',
 				   required=False)
 
-	NTIIDs = IndexedIterable(title="Purchasable NTIIDs", required=True, readonly=True)
+	NTIIDs = interface.Attribute("Purchasable NTIIDs")
 	NTIIDs.setTaggedValue('_ext_excluded_out', True)
 
 	def copy(purchasables=None):

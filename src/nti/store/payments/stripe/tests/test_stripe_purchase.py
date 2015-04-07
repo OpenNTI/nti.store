@@ -10,10 +10,16 @@ __docformat__ = "restructuredtext en"
 from hamcrest import is_
 from hamcrest import none
 from hamcrest import is_not
+from hamcrest import has_entry
 from hamcrest import has_length
 from hamcrest import assert_that
+from hamcrest import has_property
 
 import unittest
+
+from nti.externalization.internalization import find_factory_for 
+from nti.externalization.externalization import to_external_object
+from nti.externalization.internalization import update_from_external_object 
 
 from nti.store.payments.stripe import stripe_purchase
 
@@ -48,3 +54,20 @@ class TestStripePurchase(unittest.TestCase):
 		# check order
 		assert_that(cp.Coupon, is_('mycoupon'))
 		assert_that(cp.Quantity, is_(2))
+		
+	@WithMockDSTrans
+	def test_externalize(self):
+		po = self._create_purchase_order(self.book_id, quantity=2,
+										 coupon='mycoupon')
+		ext_obj = to_external_object(po)
+		assert_that(ext_obj, has_entry('Class', 'StripePurchaseOrder'))
+		assert_that(ext_obj, has_entry('MimeType', 'application/vnd.nextthought.store.stripepurchaseorder'))
+
+		factory = find_factory_for(ext_obj)
+		assert_that(factory, is_not(none()))
+		
+		new_po = factory()
+		update_from_external_object(new_po, ext_obj)
+		
+		assert_that(new_po, has_property('Coupon', 'mycoupon'))
+		assert_that(new_po.Items, has_length(1))
