@@ -55,12 +55,17 @@ class PurchaseOrder(SchemaConfigured):
 
 	@Lazy
 	def NTIIDs(self):
-		result = [x.NTIID for x in self.Items]
+		result = tuple(x.NTIID for x in self.Items)
 		return result
 
-	def copy(self):
-		items = tuple(item.copy() for item in self.Items)
-		return self.__class__(Items=items, Quantity=self.Quantity)
+	def copy(self, *purchasables):
+		purchasables = set(purchasables or ())
+		purchasables.discard(None)
+		
+		items = tuple( item.copy() for item in self.Items \
+					   if not purchasables or item.NTIID in purchasables)
+		result = self.__class__(Items=items, Quantity=self.Quantity)
+		return result
 
 	def __str__(self):
 		return "(%s,%s)" % (self.Items, self.Quantity)

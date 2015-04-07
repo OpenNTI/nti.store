@@ -145,10 +145,14 @@ class IPriceable(interface.Interface):
 	Quantity = Int(title="Quantity", required=False, default=1, min=0)
 
 	def copy():
-		"""makes a new copy of this priceable"""
+		"""
+		makes a new copy of this priceable
+		"""
 
 class IPurchaseItem(IPriceable):
-	"""marker interface for a purchase order item"""
+	"""
+	marker interface for a purchase order item
+	"""
 
 class IPurchaseOrder(IMinimalSequence):
 	Items = Tuple(value_type=Object(IPriceable), title='The items',
@@ -160,8 +164,12 @@ class IPurchaseOrder(IMinimalSequence):
 	NTIIDs = IndexedIterable(title="Purchasable NTIIDs", required=True, readonly=True)
 	NTIIDs.setTaggedValue('_ext_excluded_out', True)
 
-	def copy():
-		"""makes a new copy of this purchase order"""
+	def copy(*purchasables):
+		"""
+		makes a new copy of this purchase order
+		
+		:param purchasables list of purchasables to copy. None/Empty copy all
+		"""
 
 class IPricedItem(IPriceable):
 	PurchaseFee = Float(title="Fee Amount", required=False)
@@ -395,8 +403,8 @@ class IGiftPurchaseAttempt(IPurchaseAttempt):
 	Creator = ValidTextLine(title="Gift creator Email", required=True)
 	SenderName = ValidTextLine(title='Sender name', required=False)
 	Receiver = ValidTextLine(title='Receiver Email/username',
-							  required=False,
-							  constraint=checkEmailAddress)
+							 required=False,
+							 constraint=checkEmailAddress)
 	ReceiverName = ValidTextLine(title='Receiver name', required=False)
 	Message = ValidText(title='Gift message', required=False)
 	TargetPurchaseID = ValidTextLine(title='NTIID of target purchase', required=False)
@@ -404,6 +412,14 @@ class IGiftPurchaseAttempt(IPurchaseAttempt):
 
 	DeliveryDate = Datetime(title="The gift delivery date", required=False)
 
+	IsChoiceRedeemable = Bool(title="Choice redeemable flag",
+							  description="""
+							  if set to True this this gift purchase can be redeemed for 
+							  any (only one) of the purchase/order items
+							  """,
+							  required=False,
+							  default=False)
+	
 	Sender = interface.Attribute("Alias for Sender name")
 	Sender.setTaggedValue('_ext_excluded_out', True)
 
@@ -472,6 +488,7 @@ class IPurchaseAttemptFailed(IPurchaseAttemptStateEvent):
 class IGiftPurchaseAttemptRedeemed(IPurchaseAttemptEvent):
 	user = Object(IUser, title="The gift receiver")
 	request = interface.Attribute('Purchase pyramid request')
+	purchasable = ValidTextLine(title="The purchasable NTIID", required=False)
 
 @interface.implementer(IPurchaseAttemptEvent)
 class PurchaseAttemptEvent(ObjectEvent):
@@ -534,10 +551,12 @@ class GiftPurchaseAttemptRedeemed(PurchaseAttemptEvent):
 
 	state = PA_STATE_REDEEMED
 
-	def __init__(self, purchase, user, request=None):
+	def __init__(self, purchase, user, purchasable=None, request=None):
 		super(GiftPurchaseAttemptRedeemed, self).__init__(purchase)
 		self.user = user
 		self.request = request
+		self.purchasable = purchasable
+		assert not purchasable or purchasable in purchase.Items
 
 class IPurchaseHistory(IIterable):
 

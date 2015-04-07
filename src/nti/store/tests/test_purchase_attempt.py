@@ -77,7 +77,6 @@ class TestPurchaseAttempt(unittest.TestCase):
 										  	  delivery_date=datetime.now())
 		return result
 
-
 	@WithMockDSTrans
 	def test_simple_purchase_attempt(self):
 		purchase = self._create_purchase_attempt(state=PA_STATE_SUCCESS, 
@@ -94,12 +93,12 @@ class TestPurchaseAttempt(unittest.TestCase):
 		assert_that(purchase, has_property('context', has_length(1)))
 		assert_that(purchase, has_property('Context', has_length(1)))
 		
-		assert_that(purchase, has_property('Items', is_([u'xyz'])))
+		assert_that(purchase, has_property('Items', is_((u'xyz',))))
 		
 		order = purchase.Order
 		assert_that(order, has_length(1))
 		assert_that(order, has_property('Quantity', is_(none())))
-		assert_that(order, has_property('NTIIDs', is_([u'xyz'])))
+		assert_that(order, has_property('NTIIDs', is_((u'xyz',))))
 		
 		iterable = list(order)
 		assert_that(iterable, has_length(1))
