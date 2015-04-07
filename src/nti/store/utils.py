@@ -42,8 +42,11 @@ def to_collection(items=None, factory=list, delim=' '):
 		result = factory(items)
 	return result
 
+def to_set(items=None, delim=' '):
+	return to_collection(items, set, delim)
+
 def to_list(items=None, delim=' '):
-	return to_collection(items, list)
+	return to_collection(items, list, delim)
 
 def to_frozenset(items=None, delim=' '):
 	return to_collection(items, frozenset, delim)

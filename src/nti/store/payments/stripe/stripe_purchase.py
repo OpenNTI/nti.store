@@ -78,8 +78,8 @@ class StripePurchaseOrder(PurchaseOrder):
 
 	Coupon = FP(IStripePurchaseOrder['Coupon'])  # overide items coupon
 
-	def copy(self, *purchasables):
-		result = super(StripePurchaseOrder, self).copy(*purchasables)
+	def copy(self, purchasables=None):
+		result = super(StripePurchaseOrder, self).copy(purchasables)
 		result.Coupon = self.Coupon
 		return result
 

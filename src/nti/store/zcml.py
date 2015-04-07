@@ -65,4 +65,3 @@ def registerPurchasable(_context, ntiid, provider, title, description=None, amou
 					  redeemable=redeemable, giftable=giftable)
 	utility(_context, provides=IPurchasable, factory=factory, name=ntiid)
 	logger.debug("Purchasable '%s' has been registered", ntiid)
-

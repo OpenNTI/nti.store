@@ -94,6 +94,7 @@ class IPurchasableVendorInfo(IEnumerableMapping):
 	"""
 
 class IPurchasable(IItemBundle):
+
 	Amount = Float(title="Cost amount", required=True, min=0.0)
 	Currency = ValidTextLine(title='Currency amount', required=True, default='USD')
 	Discountable = Bool(title="Discountable flag", required=True, default=False)
@@ -110,6 +111,7 @@ class IPurchasable(IItemBundle):
 	VendorInfo.setTaggedValue('_ext_excluded_out', True)
 
 class IPurchasableCourse(IPurchasable):
+
 	Name = ValidTextLine(title='Course Name', required=False)
 
 	# overrides
@@ -141,6 +143,7 @@ class IPurchasableCourse(IPurchasable):
 ICourse = IPurchasableCourse # alias BWC
 
 class IPriceable(interface.Interface):
+
 	NTIID = ValidTextLine(title='Purchasable item NTTID', required=True)
 	Quantity = Int(title="Quantity", required=False, default=1, min=0)
 
@@ -155,6 +158,7 @@ class IPurchaseItem(IPriceable):
 	"""
 
 class IPurchaseOrder(IMinimalSequence):
+
 	Items = Tuple(value_type=Object(IPriceable), title='The items',
 				  required=True, min_length=1)
 
@@ -164,14 +168,15 @@ class IPurchaseOrder(IMinimalSequence):
 	NTIIDs = IndexedIterable(title="Purchasable NTIIDs", required=True, readonly=True)
 	NTIIDs.setTaggedValue('_ext_excluded_out', True)
 
-	def copy(*purchasables):
+	def copy(purchasables=None):
 		"""
 		makes a new copy of this purchase order
 		
-		:param purchasables list of purchasables to copy. None/Empty copy all
+		:param purchasables Collection of purchasables to copy. None/Empty copy all
 		"""
 
 class IPricedItem(IPriceable):
+
 	PurchaseFee = Float(title="Fee Amount", required=False)
 	PurchaseFee.setTaggedValue('_ext_excluded_out', True)
 
@@ -180,6 +185,7 @@ class IPricedItem(IPriceable):
 	Currency = ValidTextLine(title='Currency ISO code', required=True, default='USD')
 
 class IPricingResults(interface.Interface):
+
 	Items = List(value_type=Object(IPricedItem), title='The priced items',
 				 required=True, min_length=0)
 
@@ -191,6 +197,7 @@ class IPricingResults(interface.Interface):
 	Currency = ValidTextLine(title='Currency ISO code', required=True, default='USD')
 
 class IUserAddress(interface.Interface):
+
 	Street = ValidText(title='Street address', required=False)
 	City = ValidTextLine(title='The city name', required=False)
 	State = ValidTextLine(title='The state', required=False)
@@ -198,6 +205,7 @@ class IUserAddress(interface.Interface):
 	Country = ValidTextLine(title='The country', required=False, default='USA')
 
 class IPaymentCharge(interface.Interface):
+
 	Amount = Float(title="Change amount", required=True)
 	Created = Float(title="Created timestamp", required=True)
 	Currency = ValidTextLine(title='Currency amount', required=True, default='USD')
@@ -206,6 +214,7 @@ class IPaymentCharge(interface.Interface):
 	Address = Object(IUserAddress, title='User address', required=False)
 
 class IOperationError(interface.Interface):
+
 	Type = ValidTextLine(title='Error type', required=True)
 	Code = ValidTextLine(title='Error code', required=False)
 	Message = ValidText(title='Error message', required=True)

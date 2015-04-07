@@ -24,6 +24,7 @@ from nti.externalization.representation import WithRepr
 from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 
+from .utils import to_set
 from .utils import MetaStoreObject
 
 from .priceable import Priceable
@@ -58,10 +59,8 @@ class PurchaseOrder(SchemaConfigured):
 		result = tuple(x.NTIID for x in self.Items)
 		return result
 
-	def copy(self, *purchasables):
-		purchasables = set(purchasables or ())
-		purchasables.discard(None)
-		
+	def copy(self, purchasables=None):
+		purchasables = to_set(purchasables)		
 		items = tuple( item.copy() for item in self.Items \
 					   if not purchasables or item.NTIID in purchasables)
 		result = self.__class__(Items=items, Quantity=self.Quantity)
