@@ -11,8 +11,6 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-import six
-
 from zope import component
 from zope import interface
 from zope.container.contained import Contained
@@ -30,15 +28,12 @@ from nti.dataserver.interfaces import EVERYONE_USER_NAME
 from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
 from nti.externalization.representation import WithRepr
-from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import LocatedExternalList
 from nti.externalization.interfaces import IInternalObjectExternalizer
 
 from nti.schema.schema import EqHash
 from nti.schema.fieldproperty import AdaptingFieldProperty
 from nti.schema.fieldproperty import createDirectFieldProperties
-
-from . import get_user
 
 from .utils import to_frozenset
 from .utils import to_collection
@@ -47,7 +42,6 @@ from .utils import MetaStoreObject
 from .item_bundle import ItemBundle
 
 from .interfaces import IPurchasable
-from .interfaces import IPurchaseHistory
 from .interfaces import IPurchasableVendorInfo
 
 @interface.implementer(IPurchasableVendorInfo, IInternalObjectExternalizer)
@@ -85,19 +79,19 @@ def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=No
 					   title=None, license_=None, author=None, description=None,
 					   icon=None, thumbnail=None, discountable=False, giftable=False,
 					   redeemable=False, bulk_purchase=True, public=True, 
-					   vendor_info=None, **kwargs):
+					   vendor_info=None, factory=Purchasable, **kwargs):
 	
 	fee = float(fee) if fee is not None else None
 	amount = float(amount) if amount is not None else amount
 	items = to_frozenset(items) if items else frozenset((ntiid,))
 	vendor = IPurchasableVendorInfo(vendor_info, None)
 	
-	result = Purchasable(NTIID=ntiid, Provider=provider, Title=title, Author=author,
-						 Items=items, Description=description, Amount=amount,
-						 Currency=currency, Fee=fee, License=license_, Giftable=giftable,
-						 Redeemable=redeemable, Discountable=discountable, 
-						 BulkPurchase=bulk_purchase, Icon=icon, Thumbnail=thumbnail, 
-						 Public=public, VendorInfo=vendor)
+	result = factory(NTIID=ntiid, Provider=provider, Title=title, Author=author,
+					 Items=items, Description=description, Amount=amount,
+					 Currency=currency, Fee=fee, License=license_, Giftable=giftable,
+					 Redeemable=redeemable, Discountable=discountable, 
+					 BulkPurchase=bulk_purchase, Icon=icon, Thumbnail=thumbnail, 
+					 Public=public, VendorInfo=vendor)
 	return result
 
 def get_purchasable(pid, registry=component):
@@ -116,37 +110,14 @@ def get_purchasable_ids(registry=component):
 		result.append(pid)
 	return result
 
-def get_available_items(user, registry=component):
+def expand_purchase_item_ids(context, registry=component):
 	"""
-	Return all item that can be purchased
+	return the ids of the items that were purchased
 	"""
-	all_ids = set(get_purchasable_ids(registry=registry))
-	if not all_ids:
-		return {}
-
-	# get purchase history
-	purchased = set()
-	user = get_user(user)
-	
-	history = IPurchaseHistory(user)
-	for p in history:
-		if p.has_succeeded() or p.is_pending():
-			purchased.update(p.Items)
-
-	available = all_ids - purchased
-	result = LocatedExternalDict(
-				{key:get_purchasable(key, registry=registry) for key in available})
-	return result
-
-def get_content_items(purchased_items, registry=component):
-	"""
-	return the nttids of the library items that were purchased
-	"""
-	if isinstance(purchased_items, six.string_types):
-		purchased_items = to_collection(purchased_items)
-
 	result = set()
-	for item in purchased_items:
+	context = getattr(context, 'Items', context)
+	purchasables_ids = to_collection(context)
+	for item in purchasables_ids:
 		p = get_purchasable(item, registry=registry)
 		if p is not None:
 			result.update(p.Items)

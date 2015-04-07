@@ -49,7 +49,7 @@ from .interfaces import IGiftPurchaseAttemptRedeemed
 from .content_roles import add_users_content_roles
 from .content_roles import remove_users_content_roles
 
-from .purchasable import get_content_items
+from .purchasable import expand_purchase_item_ids
 
 from .purchase_attempt import create_redeemed_purchase_attempt
 
@@ -79,7 +79,7 @@ def _activate_items(purchase, user=None, add_roles=True):
 	user = user or purchase.creator
 	activate_items(user, purchase.Items)
 	if add_roles:
-		lib_items = get_content_items(purchase.Items)
+		lib_items = expand_purchase_item_ids(purchase.Items)
 		add_users_content_roles(user, lib_items)
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptSuccessful)
@@ -98,7 +98,7 @@ def _return_items(purchase, user=None, remove_roles=True):
 		user = user or purchase.creator
 		deactivate_items(user, purchase.Items)
 		if remove_roles:
-			lib_items = get_content_items(purchase.Items)
+			lib_items = expand_purchase_item_ids(purchase.Items)
 			remove_users_content_roles(user, lib_items)
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptRefunded)
@@ -158,7 +158,7 @@ def _make_redeem_purchase_attempt(user, original, code, activate_roles=True):
 	result = register_purchase_attempt(redeemed, user)
 	activate_items(user, redeemed.Items)
 	if activate_roles:
-		lib_items = get_content_items(original.Items)
+		lib_items = expand_purchase_item_ids(original.Items)
 		add_users_content_roles(user, lib_items)
 	return result
 

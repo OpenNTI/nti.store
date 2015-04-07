@@ -29,7 +29,6 @@ from nti.dataserver.users.interfaces import checkEmailAddress
 
 from nti.schema.field import Int
 from nti.schema.field import Bool
-from nti.schema.field import List
 from nti.schema.field import Float
 from nti.schema.field import Choice
 from nti.schema.field import Number

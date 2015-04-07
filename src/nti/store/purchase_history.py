@@ -34,16 +34,22 @@ from nti.common.time import time_to_64bit_int
 from nti.dataserver.interfaces import IUser
 
 from nti.externalization.oids import to_external_ntiid_oid
+from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import LocatedExternalList
 
 from nti.ntiids import ntiids
 
 from . import get_user
 
+from .purchasable import get_purchasable
+from .purchasable import get_purchasable_ids
+
 from .utils import to_frozenset
 
 from .interfaces import IPurchaseAttempt
 from .interfaces import IPurchaseHistory
+
+## classes
 
 def _check_valid(p, uid, purchasable_id=None, intids=None, debug=True):
 	if not IPurchaseAttempt.providedBy(p):
@@ -322,6 +328,8 @@ class PurchaseHistory(Contained, Persistent):
 
 _PurchaseHistoryFactory = an_factory(PurchaseHistory)
 
+## functions
+
 def activate_items(user, items):
 	user = get_user(user)
 	if user is not None:
@@ -403,3 +411,23 @@ def register_purchase_attempt(purchase, user):
 		hist.register_purchase(purchase)
 		return purchase.id
 	return None
+
+def get_available_items(user, registry=component):
+	"""
+	Return all item that can be purchased
+	"""
+	result = LocatedExternalDict()
+	all_ids = set(get_purchasable_ids(registry=registry))
+	if all_ids:
+		# get purchase history
+		purchased = set()
+		user = get_user(user)
+		
+		history = IPurchaseHistory(user)
+		for p in history:
+			if p.has_succeeded() or p.is_pending():
+				purchased.update(p.Items)
+	
+		available = all_ids - purchased
+		result.update({key:get_purchasable(key, registry=registry) for key in available})
+	return result
