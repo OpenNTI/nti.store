@@ -408,14 +408,14 @@ class IGiftPurchaseAttempt(IPurchaseAttempt):
 
 	DeliveryDate = Datetime(title="The gift delivery date", required=False)
 
-	IsChoiceRedeemable = Bool(title="Choice redeemable flag",
-							  description="""
-							  If set to True this gift purchase can be redeemed for 
-							  any (only one) of the purchase/order items
-							  """,
-							  required=False,
-							  default=False)
-	
+# 	IsChoiceRedeemable = Bool(title="Choice redeemable flag",
+# 							  description="""
+# 							  If set to True this gift purchase can be redeemed for 
+# 							  any (only one) of the purchase/order items
+# 							  """,
+# 							  required=False,
+# 							  default=False)
+# 	
 	Sender = interface.Attribute("Alias for Sender name")
 	Sender.setTaggedValue('_ext_excluded_out', True)
 

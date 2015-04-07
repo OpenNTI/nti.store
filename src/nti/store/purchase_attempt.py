@@ -248,7 +248,8 @@ class GiftPurchaseAttempt(PurchaseAttempt):
 	ReceiverName = FP(IGiftPurchaseAttempt['ReceiverName'])
 	DeliveryDate =  FP(IGiftPurchaseAttempt['DeliveryDate'])
 	TargetPurchaseID = FP(IGiftPurchaseAttempt['TargetPurchaseID'])
-	IsChoiceRedeemable = FP(IGiftPurchaseAttempt['IsChoiceRedeemable'])
+
+#	IsChoiceRedeemable = FP(IGiftPurchaseAttempt['IsChoiceRedeemable'])
 
 	receiver = alias('Receiver')
 	to = To = alias('ReceiverName')
