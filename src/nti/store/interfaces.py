@@ -411,7 +411,7 @@ class IGiftPurchaseAttempt(IPurchaseAttempt):
 
 	IsChoiceRedeemable = Bool(title="Choice redeemable flag",
 							  description="""
-							  if set to True this this gift purchase can be redeemed for 
+							  If set to True this gift purchase can be redeemed for 
 							  any (only one) of the purchase/order items
 							  """,
 							  required=False,
