@@ -120,6 +120,6 @@ def adapt_to_purchase_error(e):
 		result.Message = message
 	return result
 
-def replace_coupon(context, coupon=None):
+def replace_items_coupon(context, coupon=None):
 	for item in getattr(context, 'Items', context):
 		item.Coupon = coupon

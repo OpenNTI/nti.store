@@ -27,7 +27,7 @@ from .interfaces import IStripePricedItem
 from .interfaces import IStripePurchaseItem
 from .interfaces import IStripePurchaseOrder
 
-from .utils import replace_coupon
+from .utils import replace_items_coupon as replace_coupon
 
 @interface.implementer(IStripePriceable)
 @EqHash('Coupon', 'NTIID', 'Quantity')
