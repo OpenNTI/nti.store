@@ -27,6 +27,8 @@ from .interfaces import IStripePricedItem
 from .interfaces import IStripePurchaseItem
 from .interfaces import IStripePurchaseOrder
 
+from .utils import replace_coupon
+
 @interface.implementer(IStripePriceable)
 @EqHash('Coupon', 'NTIID', 'Quantity')
 class StripePriceable(Priceable):
@@ -92,10 +94,6 @@ class StripePurchaseOrder(PurchaseOrder):
 		xhash = super(StripePurchaseOrder, self).__hash__()
 		xhash ^= hash(self.Coupon)
 		return xhash
-
-def replace_coupon(po_or_items, coupon=None):
-	for item in getattr(po_or_items, 'Items', po_or_items):
-		item.Coupon = coupon
 
 def create_stripe_purchase_order(items, quantity=None, coupon=None):
 	result = create_purchase_order(items, quantity, StripePurchaseOrder)
