@@ -24,6 +24,10 @@ PURCHASE_ATTEMPT_MIME_TYPES = \
 ALL_STORE_MIME_TYPES = list(PURCHASE_ATTEMPT_MIME_TYPES) 
 ALL_STORE_MIME_TYPES.append( MIME_BASE + b'.purchasable')
 ALL_STORE_MIME_TYPES.append( MIME_BASE + b'.purchasablecourse')
+ALL_STORE_MIME_TYPES.append( MIME_BASE + b'.purchasablechoicebundle')
+ALL_STORE_MIME_TYPES.append( MIME_BASE + b'.purchasablecoursechoicebundle')
+
+ALL_STORE_MIME_TYPES = tuple(ALL_STORE_MIME_TYPES)
 
 def from_delimited(value, delim=' '):
 	result = value.split(delim)
