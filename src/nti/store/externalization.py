@@ -18,6 +18,8 @@ from nti.externalization.datastructures import InterfaceObjectIO
 
 from .interfaces import IPurchasable
 from .interfaces import IPurchasableCourse
+from .interfaces import IPurchasableChoiceBundle
+from .interfaces import IPurchasableCourseChoiceBundle
 
 @component.adapter(IPurchasable)
 @interface.implementer(IInternalObjectExternalizer)
@@ -36,8 +38,11 @@ class _PurchasableSummaryExternalizer(object):
             result.pop(name, None)
         return result
 
+@component.adapter(IPurchasableChoiceBundle)
+class _PurchasableChoiceBundleSummaryExternalizer(_PurchasableSummaryExternalizer):
+    interface = IPurchasableChoiceBundle
+      
 @component.adapter(IPurchasableCourse)
-@interface.implementer(IInternalObjectExternalizer)
 class _PurchasableCourseSummaryExternalizer(_PurchasableSummaryExternalizer):
 
     fields_to_remove = _PurchasableSummaryExternalizer.fields_to_remove + \
@@ -45,3 +50,8 @@ class _PurchasableCourseSummaryExternalizer(_PurchasableSummaryExternalizer):
                          'Signature', 'Communities', 'Duration', 'EndDate')
 
     interface = IPurchasableCourse
+
+@component.adapter(IPurchasableCourseChoiceBundle)
+@interface.implementer(IInternalObjectExternalizer)
+class _PurchasableCourseChoiceBundleSummaryExternalizer(_PurchasableCourseSummaryExternalizer):
+    interface = IPurchasableCourseChoiceBundle

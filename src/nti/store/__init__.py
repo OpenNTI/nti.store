@@ -26,6 +26,8 @@ ROUND_DECIMAL = 2
 PURCHASABLE = 'purchasable'
 PURCHASABLE_COURSE = 'purchasable_course'
 PURCHASABLE_CONTENT = 'purchasable_content'
+PURCHASABLE_CHOICE_BUNDLE = 'purchasable_choice_bundle'
+PURCHASABLE_COURSE_CHOICE_BUNDLE = 'purchasable_course_choice_bundle'
 
 @interface.implementer(INTIStoreException)
 class NTIStoreException(Exception):

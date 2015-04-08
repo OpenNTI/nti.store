@@ -105,6 +105,8 @@
 	<utility factory=".ntiids._PurchasableResolver" name="purchasable" />
 	<utility factory=".ntiids._PurchasableResolver" name="purchasable_course" />
 	<utility factory=".ntiids._PurchasableResolver" name="purchasable_content" />
+	<utility factory=".ntiids._PurchasableResolver" name="purchasable_choice_bundle" />
+	<utility factory=".ntiids._PurchasableResolver" name="purchasable_course_choice_bundle" />
 	
 	<!-- Externalization -->
 	<include package="nti.externalization" file="meta.zcml" />
@@ -114,6 +116,9 @@
 		root_interfaces=".interfaces.IPriceable
 						 .interfaces.IPricedItem
 						 .interfaces.IPurchasable
+						 .interfaces.IPurchasableChoiceBundle
+						 .interfaces.IPurchasableCourse
+						 .interfaces.IPurchasableCourseChoiceBundle
 						 .interfaces.IPurchaseOrder
 						 .interfaces.IPurchaseItem
 						 .interfaces.IPricingError
@@ -129,18 +134,28 @@
 						 .interfaces.IInvitationPurchaseAttempt"
 		modules=".purchase_order .purchase_error .purchase_attempt 
 				 .purchasable .priceable .pricing .pricing_error
-				 .refund_error .redemption_error" />
+				 .refund_error .redemption_error .course" />
 
 	<adapter factory=".externalization._PurchasableSummaryExternalizer"
 			 for=".interfaces.IPurchasable"
 			 provides="nti.externalization.interfaces.IInternalObjectExternalizer"
 			 name="summary" />
 		
+	<adapter factory=".externalization._PurchasableChoiceBundleSummaryExternalizer"
+			 for=".interfaces.IPurchasableChoiceBundle"
+			 provides="nti.externalization.interfaces.IInternalObjectExternalizer"
+			 name="summary" />
+			 
 	<adapter factory=".externalization._PurchasableCourseSummaryExternalizer"
 			 for=".interfaces.IPurchasableCourse"
 			 provides="nti.externalization.interfaces.IInternalObjectExternalizer"
 			 name="summary" />
-			 	
+
+	<adapter factory=".externalization._PurchasableCourseChoiceBundleSummaryExternalizer"
+			 for=".interfaces.IPurchasableCourseChoiceBundle"
+			 provides="nti.externalization.interfaces.IInternalObjectExternalizer"
+			 name="summary" />
+		 	
 	<!-- Metadata -->
 	<configure zcml:condition="installed nti.metadata">
 		<subscriber	factory=".predicates._PurchaseAttemptPrincipalObjects"
