@@ -60,10 +60,13 @@ def to_frozenset(items=None, delim=' '):
 class MetaStoreObject(type):
 
 	def __new__(cls, name, bases, dct):
-		t = type.__new__(cls, name, bases, dct)
-		if not hasattr(cls, 'mimeType'):
-			clazzname = getattr(cls, '__external_class_name__', name)
-			clazzname = b'.' + clazzname.encode('ascii').lower()
-			t.mime_type = t.mimeType = STORE_MIME_BASE + clazzname
-		t.parameters = dict()
-		return t
+		cls = type.__new__(cls, name, bases, dct)
+		ancestor = object
+		for ancestor in cls.mro():
+			if 'mimeType' in ancestor.__dict__:
+				break
+		if ancestor is not cls:
+			clazzname = b'.' + name.encode('ascii').lower()
+			cls.mime_type = cls.mimeType = STORE_MIME_BASE + clazzname
+			cls.parameters = dict()
+		return cls
