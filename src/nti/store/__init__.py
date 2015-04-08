@@ -23,6 +23,9 @@ from .interfaces import INTIStoreException
 from .interfaces import IRedemptionException
 
 ROUND_DECIMAL = 2
+PURCHASABLE = 'purchasable'
+PURCHASABLE_COURSE = 'purchasable_course'
+PURCHASABLE_CONTENT = 'purchasable_content'
 
 @interface.implementer(INTIStoreException)
 class NTIStoreException(Exception):
