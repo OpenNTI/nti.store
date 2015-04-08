@@ -249,8 +249,6 @@ class GiftPurchaseAttempt(PurchaseAttempt):
 	DeliveryDate =  FP(IGiftPurchaseAttempt['DeliveryDate'])
 	TargetPurchaseID = FP(IGiftPurchaseAttempt['TargetPurchaseID'])
 
-#	IsChoiceRedeemable = FP(IGiftPurchaseAttempt['IsChoiceRedeemable'])
-
 	receiver = alias('Receiver')
 	to = To = alias('ReceiverName')
 	creator = From = alias('Creator')
@@ -337,8 +335,7 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, purchasables=(),
 def create_gift_purchase_attempt(creator, order, processor, state=None, description=None,
 								 start_time=None, sender=None, receiver=None, 
 								 receiver_name=None, message=None,  target=None,
-								 delivery_date=None, context=None, 
-								 is_choice_redeemable=False):
+								 delivery_date=None, context=None):
 
 	state = state or PA_STATE_UNKNOWN
 	context = to_purchase_attempt_context(context)
@@ -353,7 +350,7 @@ def create_gift_purchase_attempt(creator, order, processor, state=None, descript
 				StartTime=float(start_time), Context=context, SenderName=sender,
 				ReceiverName=receiver_name,	Message=message, 
 				DeliveryDate=delivery_date, Receiver=receiver,
-				TargetPurchaseID=target, IsChoiceRedeemable=is_choice_redeemable)
+				TargetPurchaseID=target)
 	return result
 
 @interface.implementer(IPurchaseAttemptFactory)
