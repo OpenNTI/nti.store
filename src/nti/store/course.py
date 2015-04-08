@@ -32,6 +32,7 @@ from .purchasable import get_purchasable
 from .purchasable import DefaultPurchasableVendorInfo
 
 from .interfaces import IPurchasableCourse
+from .interfaces import IPurchasableCourseChoiceBundle
 
 @interface.implementer(IPurchasableCourse)
 @WithRepr
@@ -39,9 +40,11 @@ from .interfaces import IPurchasableCourse
 class PurchasableCourse(Purchasable):
 	createDirectFieldProperties(IPurchasableCourse)
 	Description = AdaptingFieldProperty(IPurchasableCourse['Description'])
-	
-Course = PurchasableCourse # alias BWC
 
+@interface.implementer(IPurchasableCourseChoiceBundle)
+class PurchasableCourseChoiceBundle(PurchasableCourse):
+	__external_class_name__ = 'PurchasableCourse'
+	
 def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 				  items=(), fee=None, title=None, license_=None, author=None,
 				  description=None, icon=None, thumbnail=None, discountable=False,
@@ -113,3 +116,8 @@ def get_course(course_id, registry=component):
 	result = get_purchasable(course_id, registry=registry)
 	return result
 
+import zope.deferredimport
+zope.deferredimport.initialize()
+zope.deferredimport.deprecated(
+	"Use PurchasableCourse instead",
+	Course = 'nti.store.course:PurchasableCourse' )

@@ -25,8 +25,6 @@ from nti.dataserver.authorization_acl import ace_allowing
 from nti.dataserver.interfaces import IACLProvider
 from nti.dataserver.interfaces import EVERYONE_USER_NAME
 
-from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
-
 from nti.externalization.representation import WithRepr
 from nti.externalization.interfaces import LocatedExternalList
 from nti.externalization.interfaces import IInternalObjectExternalizer
@@ -43,6 +41,7 @@ from .item_bundle import ItemBundle
 
 from .interfaces import IPurchasable
 from .interfaces import IPurchasableVendorInfo
+from .interfaces import IPurchasableChoiceBundle
 
 @interface.implementer(IPurchasableVendorInfo, IInternalObjectExternalizer)
 class DefaultPurchasableVendorInfo(dict):
@@ -56,7 +55,7 @@ class DefaultPurchasableVendorInfo(dict):
 @interface.implementer(IPurchasable, IACLProvider, IContentTypeAware)
 @WithRepr
 @EqHash('NTIID',)
-class Purchasable(ItemBundle):
+class Purchasable(ItemBundle, Contained):
 
 	__metaclass__ = MetaStoreObject
 	
@@ -70,11 +69,10 @@ class Purchasable(ItemBundle):
 	def __acl__(self):
 		return (ace_allowing(EVERYONE_USER_NAME, authorization.ACT_READ, self),)
 
-class PesistentPurchasable(Contained, 
-						   Purchasable,
-						   PersistentCreatedModDateTrackingObject):
-	pass
-	
+@interface.implementer(IPurchasableChoiceBundle)
+class PurchasableChoiceBundle(Purchasable):
+	__external_class_name__ = 'Purchasable'
+
 def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=None,
 					   title=None, license_=None, author=None, description=None,
 					   icon=None, thumbnail=None, discountable=False, giftable=False,

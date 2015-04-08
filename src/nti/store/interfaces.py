@@ -107,6 +107,13 @@ class IPurchasable(IItemBundle):
 	VendorInfo = Object(IPurchasableVendorInfo, title="vendor info", required=False)
 	VendorInfo.setTaggedValue('_ext_excluded_out', True)
 
+class IPurchasableChoiceBundle(IPurchasable):
+	"""
+	marker interface for a purchasable choice bundle. 
+	
+	Buyers can buy/redeem one item from the Items list.
+	"""
+
 class IPurchasableCourse(IPurchasable):
 	Name = ValidTextLine(title='Course Name', required=False)
 
@@ -135,8 +142,10 @@ class IPurchasableCourse(IPurchasable):
 	# For purchaseables, we want to share this.
 	VendorInfo = Object(IPurchasableVendorInfo, title="vendor info", required=False)
 	VendorInfo.setTaggedValue('_ext_excluded_out', False)
-
 ICourse = IPurchasableCourse # alias BWC
+
+class IPurchasableCourseChoiceBundle(IPurchasableChoiceBundle, IPurchasableCourse):
+	pass
 
 class IPriceable(interface.Interface):
 	NTIID = ValidTextLine(title='Purchasable item NTTID', required=True)
@@ -408,14 +417,6 @@ class IGiftPurchaseAttempt(IPurchaseAttempt):
 
 	DeliveryDate = Datetime(title="The gift delivery date", required=False)
 
-# 	IsChoiceRedeemable = Bool(title="Choice redeemable flag",
-# 							  description="""
-# 							  If set to True this gift purchase can be redeemed for 
-# 							  any (only one) of the purchase/order items
-# 							  """,
-# 							  required=False,
-# 							  default=False)
-# 	
 	Sender = interface.Attribute("Alias for Sender name")
 	Sender.setTaggedValue('_ext_excluded_out', True)
 
@@ -484,7 +485,6 @@ class IPurchaseAttemptFailed(IPurchaseAttemptStateEvent):
 class IGiftPurchaseAttemptRedeemed(IPurchaseAttemptEvent):
 	user = Object(IUser, title="The gift receiver")
 	request = interface.Attribute('Purchase pyramid request')
-	purchasable = ValidTextLine(title="The purchasable NTIID", required=False)
 
 @interface.implementer(IPurchaseAttemptEvent)
 class PurchaseAttemptEvent(ObjectEvent):
@@ -547,12 +547,10 @@ class GiftPurchaseAttemptRedeemed(PurchaseAttemptEvent):
 
 	state = PA_STATE_REDEEMED
 
-	def __init__(self, purchase, user, purchasable=None, request=None):
+	def __init__(self, purchase, user, request=None):
 		super(GiftPurchaseAttemptRedeemed, self).__init__(purchase)
 		self.user = user
 		self.request = request
-		self.purchasable = purchasable
-		assert not purchasable or purchasable in purchase.Items
 
 class IPurchaseHistory(IIterable):
 
