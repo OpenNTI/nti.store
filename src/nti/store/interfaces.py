@@ -22,6 +22,8 @@ from zope.interface.interfaces import ObjectEvent, IObjectEvent
 
 from dolmen.builtins import IIterable
 
+from nti.common.property import alias
+
 from nti.contentfragments.schema import HTMLContentFragment
 
 from nti.dataserver.interfaces import IUser
@@ -485,9 +487,9 @@ class IPurchaseAttemptFailed(IPurchaseAttemptStateEvent):
 class IGiftPurchaseAttemptRedeemed(IPurchaseAttemptEvent):
 	user = Object(IUser, title="The gift receiver")
 	request = interface.Attribute('Purchase request')
-	items = ListOrTuple(title="The items to be redeemed.",
-						description="A subset of the purchased items",
-						required=False)
+	purchasables = ListOrTuple(	ValidTextLine(title="The purchasable NTIID"),
+								title="The subset of purchasables to be redeemed",
+								required=False)
 	
 @interface.implementer(IPurchaseAttemptEvent)
 class PurchaseAttemptEvent(ObjectEvent):
@@ -550,12 +552,14 @@ class GiftPurchaseAttemptRedeemed(PurchaseAttemptEvent):
 
 	state = PA_STATE_REDEEMED
 	
-	def __init__(self, purchase, user, items=None, request=None):
+	items = alias('purchasables')
+
+	def __init__(self, purchase, user, purchasables=None, request=None):
 		super(GiftPurchaseAttemptRedeemed, self).__init__(purchase)
 		self.user = user
-		self.items = items
 		self.request = request
-
+		self.purchasables = purchasables
+		
 class IPurchaseHistory(IIterable):
 
 	def add_purchase(purchase):

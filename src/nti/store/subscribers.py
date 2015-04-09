@@ -198,7 +198,7 @@ def _gift_purchase_attempt_redeemed(purchase, event):
 	new_pid = _make_redeem_purchase_attempt(user=event.user, 
 											original=purchase,
 											code=code,
-											purchasables=event.items)
+											purchasables=event.purchasables)
 
 	# change state
 	purchase.State = PA_STATE_REDEEMED
