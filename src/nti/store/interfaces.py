@@ -35,6 +35,7 @@ from nti.schema.field import Float
 from nti.schema.field import Choice
 from nti.schema.field import Number
 from nti.schema.field import Object
+from nti.schema.field import Variant
 from nti.schema.field import Datetime
 from nti.schema.field import FrozenSet
 from nti.schema.field import Timedelta
@@ -487,8 +488,9 @@ class IPurchaseAttemptFailed(IPurchaseAttemptStateEvent):
 class IGiftPurchaseAttemptRedeemed(IPurchaseAttemptEvent):
 	user = Object(IUser, title="The gift receiver")
 	request = interface.Attribute('Purchase request')
-	purchasables = ListOrTuple(	ValidTextLine(title="The purchasable NTIID"),
-								title="The subset of purchasables to be redeemed",
+	items = ListOrTuple( Variant( (ValidTextLine(title="The purchasable NTIID"),
+								   Object(IPriceable) )),
+								title="The purchasables to be redeemed",
 								required=False)
 	
 @interface.implementer(IPurchaseAttemptEvent)
@@ -552,13 +554,13 @@ class GiftPurchaseAttemptRedeemed(PurchaseAttemptEvent):
 
 	state = PA_STATE_REDEEMED
 	
-	items = alias('purchasables')
+	purchasables = alias('items')
 
-	def __init__(self, purchase, user, purchasables=None, request=None):
+	def __init__(self, purchase, user, items=None, request=None):
 		super(GiftPurchaseAttemptRedeemed, self).__init__(purchase)
 		self.user = user
+		self.items = items
 		self.request = request
-		self.purchasables = purchasables
 		
 class IPurchaseHistory(IIterable):
 

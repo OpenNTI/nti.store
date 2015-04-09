@@ -77,7 +77,10 @@ def create_stripe_purchase_item(ntiid, quantity=1, coupon=None):
 class StripePurchaseOrder(PurchaseOrder):
 
 	Coupon = FP(IStripePurchaseOrder['Coupon'])  # overide items coupon
-
+	
+	def item_factory(self, item):
+		return create_stripe_purchase_item(ntiid=item)
+	
 	def copy(self, purchasables=None):
 		result = super(StripePurchaseOrder, self).copy(purchasables)
 		result.Coupon = self.Coupon

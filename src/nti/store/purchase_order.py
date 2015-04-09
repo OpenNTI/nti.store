@@ -24,11 +24,12 @@ from nti.externalization.representation import WithRepr
 from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 
-from .utils import to_set
+from .utils import to_list
 from .utils import MetaStoreObject
 
 from .priceable import Priceable
 
+from .interfaces import IPriceable
 from .interfaces import IPurchaseItem
 from .interfaces import IPurchaseOrder
 
@@ -54,16 +55,28 @@ class PurchaseOrder(SchemaConfigured):
 	Items = FP(IPurchaseOrder['Items'])
 	Quantity = FP(IPurchaseOrder['Quantity'])  # override items quantity
 
+	def item_factory(self, item):
+		return create_purchase_item(ntiid=item)
+	
 	@Lazy
 	def NTIIDs(self):
 		result = tuple(x.NTIID for x in self.Items)
 		return result
 
-	def copy(self, purchasables=None):
-		purchasables = to_set(purchasables)		
-		items = tuple( item.copy() for item in self.Items \
-					   if not purchasables or item.NTIID in purchasables)
-		assert not purchasables or items, "no items in order"
+	def copy(self, items=None):
+		items = to_list(items)
+		if items:
+			result = []
+			for item in items:
+				if IPriceable.providedBy(item):
+					result.append(item.copy())
+				else:
+					item = self.item_factory(item)
+					result.append(item)
+			items = tuple(result)
+		else:
+			items = tuple(x.copy() for x in self.Items)
+
 		result = self.__class__(Items=items, Quantity=self.Quantity)
 		return result
 
