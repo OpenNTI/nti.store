@@ -22,8 +22,6 @@ from zope.interface.interfaces import ObjectEvent, IObjectEvent
 
 from dolmen.builtins import IIterable
 
-from nti.common.property import alias
-
 from nti.contentfragments.schema import HTMLContentFragment
 
 from nti.dataserver.interfaces import IUser
@@ -35,7 +33,6 @@ from nti.schema.field import Float
 from nti.schema.field import Choice
 from nti.schema.field import Number
 from nti.schema.field import Object
-from nti.schema.field import Variant
 from nti.schema.field import Datetime
 from nti.schema.field import FrozenSet
 from nti.schema.field import Timedelta
