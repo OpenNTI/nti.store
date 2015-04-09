@@ -63,6 +63,7 @@ class PurchaseOrder(SchemaConfigured):
 		purchasables = to_set(purchasables)		
 		items = tuple( item.copy() for item in self.Items \
 					   if not purchasables or item.NTIID in purchasables)
+		assert not purchasables or items, "no items in order"
 		result = self.__class__(Items=items, Quantity=self.Quantity)
 		return result
 

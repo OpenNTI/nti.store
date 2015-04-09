@@ -152,9 +152,10 @@ def _purchase_attempt_synced(purchase, event):
 	lifecycleevent.modified(purchase)
 	logger.info('%s has been synched', purchase.id)
 
-def _make_redeem_purchase_attempt(user, original, code, activate_roles=True):
+def _make_redeem_purchase_attempt(user, original, code, purchasables=(),
+								  activate_roles=True):
 	# create and register a purchase attempt for accepting user
-	redeemed = create_redeemed_purchase_attempt(original, code)
+	redeemed = create_redeemed_purchase_attempt(original, code, purchasables)
 	result = register_purchase_attempt(redeemed, user)
 	activate_items(user, redeemed.Items)
 	if activate_roles:
@@ -194,7 +195,10 @@ def _gift_purchase_attempt_redeemed(purchase, event):
 
 	# create  and register a purchase attempt for accepting user
 	code = get_invitation_code(purchase)
-	new_pid = _make_redeem_purchase_attempt(event.user, purchase, code)
+	new_pid = _make_redeem_purchase_attempt(user=event.user, 
+											original=purchase,
+											code=code,
+											purchasables=event.items)
 
 	# change state
 	purchase.State = PA_STATE_REDEEMED

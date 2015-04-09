@@ -315,7 +315,7 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, purchasables=(),
 	redemption_time = redemption_time if redemption_time else time.time()
 
 	# copy with order quantity none and item quantity to 1
-	new_order = purchase.Order.copy()
+	new_order = purchase.Order.copy(purchasables)
 	new_order.Quantity = None
 	replace_quantity(new_order, 1)
 
@@ -323,6 +323,7 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, purchasables=(),
 	context = purchase.Context
 	context = copy.copy(context) \
 			  if context is not None else empty_purchase_attempt_context()
+
 	result = RedeemedPurchaseAttempt(
 				Order=new_order, Processor=purchase.Processor,
 				Description=purchase.Description, State=purchase.State,
