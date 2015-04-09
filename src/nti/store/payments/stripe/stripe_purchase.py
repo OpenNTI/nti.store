@@ -35,9 +35,9 @@ class StripePriceable(Priceable):
 
 	Coupon = FP(IStripePriceable['Coupon'])
 
-	def copy(self):
-		result = super(StripePriceable, self).copy()
-		result.Coupon = self.Coupon
+	def copy(self, ntiid=None, quantity=None, coupon=None):
+		result = super(StripePriceable, self).copy(ntiid, quantity)
+		result.Coupon = coupon or self.Coupon
 		return result
 
 def create_stripe_priceable(ntiid, quantity=None, coupon=None):
@@ -81,9 +81,9 @@ class StripePurchaseOrder(PurchaseOrder):
 	def item_factory(self, item):
 		return create_stripe_purchase_item(ntiid=item)
 	
-	def copy(self, purchasables=None):
+	def copy(self, purchasables=None, coupon=None):
 		result = super(StripePurchaseOrder, self).copy(purchasables)
-		result.Coupon = self.Coupon
+		result.Coupon = coupon or self.Coupon
 		return result
 
 	def __eq__(self, other):

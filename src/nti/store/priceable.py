@@ -34,8 +34,10 @@ class Priceable(SchemaConfigured):
 	NTIID = FP(IPriceable['NTIID'])
 	Quantity = FP(IPriceable['Quantity'])
 
-	def copy(self):
-		result = self.__class__(NTIID=self.NTIID, Quantity=self.Quantity)
+	def copy(self, ntiid=None, quantity=None):
+		ntiid = ntiid or self.NTIID
+		quantity = self.Quantity if quantity is None else quantity
+		result = self.__class__(NTIID=ntiid, Quantity=quantity)
 		return result
 
 	@property
