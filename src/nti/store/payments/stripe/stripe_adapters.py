@@ -15,14 +15,18 @@ import BTrees
 
 from zope import component
 from zope import interface
-from zope.container.contained import Contained
+
 from zope.annotation import factory as an_factory
+
+from zope.container.contained import Contained
 
 from persistent import Persistent
 
 from nti.common.property import alias
 
 from nti.dataserver.interfaces import IUser
+
+from ...interfaces import IPurchaseAttempt
 
 from .utils import makenone
 
@@ -42,8 +46,6 @@ from .interfaces import IStripePurchaseAttempt
 from .interfaces import IStripeAPIConnectionError
 from .interfaces import IStripeAuthenticationError
 from .interfaces import IStripeInvalidRequestError
-
-from ...interfaces import IPurchaseAttempt
 
 @component.adapter(IUser)
 @interface.implementer(IStripeCustomer)

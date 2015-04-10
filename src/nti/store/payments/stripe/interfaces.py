@@ -13,7 +13,7 @@ from zope import interface
 
 from nti.common.property import alias as _alias
 
-from nti.dataserver import interfaces as nti_interfaces
+from nti.dataserver.interfaces import IUser
 
 from nti.schema.field import Int
 from nti.schema.field import Set
@@ -68,7 +68,7 @@ class IStripeAuthenticationError(IStripeError):
 # event interfaces
 
 class IStripeCustomerCreated(interface.Interface):
-	user = Object(nti_interfaces.IUser, title="The user")
+	user = Object(IUser, title="The user")
 	customer_id = ValidTextLine(title="The stripe customer identifier")
 
 @interface.implementer(IStripeCustomerCreated)

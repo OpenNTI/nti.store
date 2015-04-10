@@ -19,6 +19,7 @@ from zope import schema
 from z3c.schema.payments import isValidCreditCard
 from z3c.schema.payments import ISO7812CreditCard
 from z3c.schema.payments import NotValidISO7812CreditCard
+
 _cc = ISO7812CreditCard()
 
 def is_valid_creditcard_number(s):

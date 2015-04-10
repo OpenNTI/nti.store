@@ -14,8 +14,7 @@ from zope import interface
 from zope.mimetype.interfaces import IContentTypeAware
 
 from nti.common.property import alias as _
-
-from nti.externalization.representation import WithRepr
+from nti.common.representation import WithRepr
 
 from nti.utils.cypher import get_plaintext
 

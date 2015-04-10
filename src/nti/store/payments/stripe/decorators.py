@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Stripe decorators
-
 .. $Id$
 """
 
@@ -22,10 +20,10 @@ from ...decorators import PricedItemDecorator
 
 from ...interfaces import IPurchaseAttempt
 
-from . import STRIPE
-
 from .interfaces import IStripePricedItem
 from .interfaces import IStripePurchaseAttempt
+
+from . import STRIPE
 
 LINKS = StandardExternalFields.LINKS
 

@@ -14,17 +14,17 @@ import stripe
 
 from zope import component
 
-from . import NoSuchStripeCoupon
-from . import InvalidStripeCoupon
-
-from .interfaces import IStripeConnectKey
-
-from ... import PricingException
-
 from ...interfaces import IPaymentProcessor
 
 from ...pricing import create_pricing_results
 from ...pricing import DefaultPurchasablePricer
+
+from ... import PricingException
+
+from . import NoSuchStripeCoupon
+from . import InvalidStripeCoupon
+
+from .interfaces import IStripeConnectKey
 
 from .stripe_purchase import StripePricedPurchasable
 

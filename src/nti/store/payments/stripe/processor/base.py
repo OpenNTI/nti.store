@@ -17,13 +17,13 @@ from nti.common.maps import CaseInsensitiveDict
 
 from ....purchase_attempt import get_providers
 
-from .. import STRIPE
-
 from ..stripe_io import StripeIO
 from ..stripe_io import get_stripe_charges
 from ..stripe_io import create_stripe_token
 
 from ..interfaces import IStripeConnectKey
+
+from .. import STRIPE
 
 def get_api_key(purchase):
 	providers = get_providers(purchase)

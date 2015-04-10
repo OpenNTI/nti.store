@@ -11,12 +11,13 @@ logger = __import__('logging').getLogger(__name__)
 
 import six
 
-from zope import interface
 from zope import component
+from zope import interface
+
+from nti.externalization.datastructures import InterfaceObjectIO
 
 from nti.externalization.interfaces import IInternalObjectIO
 from nti.externalization.interfaces import LocatedExternalDict
-from nti.externalization.datastructures import InterfaceObjectIO
 from nti.externalization .interfaces import IInternalObjectExternalizer
 
 from .interfaces import IStripeCoupon

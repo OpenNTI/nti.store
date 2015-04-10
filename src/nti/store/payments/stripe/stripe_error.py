@@ -18,8 +18,9 @@ from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from ...utils import MetaStoreObject
 from ...purchase_error import PurchaseError
+
+from ...utils import MetaStoreObject
 
 from .interfaces import IStripePurchaseError
 from .interfaces import IStripeOperationError
