@@ -15,7 +15,8 @@ from zope import component
 from nti.externalization.interfaces import IInternalObjectExternalizer
 
 from nti.externalization.datastructures import InterfaceObjectIO
-
+from nti.externalization.interfaces import StandardExternalFields
+ 
 from .interfaces import IPurchasable
 from .interfaces import IPurchasableCourse
 from .interfaces import IPurchasableChoiceBundle
@@ -25,7 +26,9 @@ from .interfaces import IPurchasableCourseChoiceBundle
 @interface.implementer(IInternalObjectExternalizer)
 class _PurchasableSummaryExternalizer(object):
 
-    fields_to_remove = ('Icon', 'Thumbnail', 'License', 'Public', 'Description')
+    fields_to_remove = ('Icon', 'Thumbnail', 'License', 'Public', 'Description',
+                        StandardExternalFields.CREATED_TIME,
+                        StandardExternalFields.LAST_MODIFIED)
 
     interface = IPurchasable
 

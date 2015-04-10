@@ -25,6 +25,8 @@ from nti.dataserver.authorization_acl import ace_allowing
 from nti.dataserver.interfaces import IACLProvider
 from nti.dataserver.interfaces import EVERYONE_USER_NAME
 
+from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
+
 from nti.externalization.representation import WithRepr
 from nti.externalization.interfaces import LocatedExternalList
 from nti.externalization.interfaces import IInternalObjectExternalizer
@@ -55,7 +57,7 @@ class DefaultPurchasableVendorInfo(dict):
 @interface.implementer(IPurchasable, IACLProvider, IContentTypeAware)
 @WithRepr
 @EqHash('NTIID',)
-class Purchasable(ItemBundle, Contained):
+class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle, Contained):
 
 	__metaclass__ = MetaStoreObject
 	
