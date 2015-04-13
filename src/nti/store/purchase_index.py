@@ -32,14 +32,14 @@ from nti.zope_catalog.datetime import TimestampToNormalized64BitIntNormalizer
 from .interfaces import IPurchaseAttempt
 from .interfaces import IRedeemedPurchaseAttempt
 
+from . import CATALOG_NAME
+
 IX_ITEMS = 'items'
 IX_CREATOR = 'creator'
 IX_MIMETYPE = 'mimeType'
 IX_REV_ITEMS = 'revItems'
 IX_REDEMPTION_CODE = 'redemptionCode'
 IX_STARTTIME = IX_CREATEDTIME = 'startTime'
-
-CATALOG_NAME = 'nti.dataserver.++etc++purchase-catalog'
 
 class MimeTypeIndex(ValueIndex):
 	default_field_name = 'mimeType'
