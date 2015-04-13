@@ -13,11 +13,12 @@ from hamcrest import assert_that
 
 import unittest
 
-from nti.store.utils import from_delimited
-
 from nti.store.utils import ALL_STORE_MIME_TYPES
-from nti.store.utils import REGULAR_ATTEMPT_MIME_TYPES
 from nti.store.utils import PURCHASE_ATTEMPT_MIME_TYPES
+from nti.store.utils import GIFT_PURCHASE_ATTEMPT_MIME_TYPES
+from nti.store.utils import NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES
+
+from nti.store.utils import from_delimited
 
 class TestUtils(unittest.TestCase):
 
@@ -35,5 +36,6 @@ class TestUtils(unittest.TestCase):
 
 	def test_mime_types(self):
 		assert_that(ALL_STORE_MIME_TYPES, has_length(8))
-		assert_that(REGULAR_ATTEMPT_MIME_TYPES, has_length(3))
 		assert_that(PURCHASE_ATTEMPT_MIME_TYPES, has_length(4))
+		assert_that(GIFT_PURCHASE_ATTEMPT_MIME_TYPES, has_length(1))
+		assert_that(NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES, has_length(3))

@@ -15,13 +15,15 @@ from nti.mimetype.mimetype import MIME_BASE
 
 STORE_MIME_BASE = MIME_BASE + b'.store'
 
-REGULAR_ATTEMPT_MIME_TYPES = \
+NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES = \
 		tuple([STORE_MIME_BASE + x for x in (	b'.purchaseattempt',
 												b'.invitationpurchaseattempt',
 												b'.redeemedpurchaseattempt') ] )
 
+GIFT_PURCHASE_ATTEMPT_MIME_TYPES =  tuple([STORE_MIME_BASE + b'.giftpurchaseattempt'] )
+		
 PURCHASE_ATTEMPT_MIME_TYPES = \
-		REGULAR_ATTEMPT_MIME_TYPES + (STORE_MIME_BASE + b'.giftpurchaseattempt',)
+		NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES + GIFT_PURCHASE_ATTEMPT_MIME_TYPES
 
 ALL_STORE_MIME_TYPES = list(PURCHASE_ATTEMPT_MIME_TYPES) 
 ALL_STORE_MIME_TYPES.append( MIME_BASE + b'.purchasable')

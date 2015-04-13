@@ -50,8 +50,10 @@ from .purchasable import get_purchasable
 from .purchasable import get_purchasable_ids
 
 from .utils import to_frozenset
+from .utils import NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES
 
 from .purchase_index import IX_CREATOR
+from .purchase_index import IX_MIMETYPE
 from .purchase_index import IX_CREATEDTIME
 
 from .interfaces import IPurchaseAttempt
@@ -192,16 +194,6 @@ class _PurchaseIndex(Persistent):
 			if _check_valid(p, uid, purchasable_id, intids=self._intids):
 				yield p
 
-	def get_history_by_time(self, start_time=None, end_time=None):
-		catalog = get_catalog()
-		creator_intids = catalog[IX_CREATOR].apply({'any-of': (start_time, end_time)})
-		between_ids = catalog[IX_CREATEDTIME].apply({'between': (start_time, end_time)})
-		doc_ids = catalog.family.IF.intersection(between_ids, creator_intids )
-		for iid in doc_ids:
-			p = self._intids.queryObject(iid)
-			if _check_valid(p, iid, intids=self._intids):
-				yield p
-
 	def values(self):
 		for iid in self.purchases:
 			p = self._intids.queryObject(iid)
@@ -306,10 +298,12 @@ class PurchaseHistory(Contained, Persistent):
 
 	def get_purchase_history(self, start_time=None, end_time=None):
 		catalog = get_catalog()
-		user_ids = catalog[IX_CREATOR].apply({'any_of': (self.user.username,)})
 		time_ids = catalog[IX_CREATEDTIME].apply({'between': (start_time, end_time)})
-		intids_purchases = catalog.family.IF.intersection(user_ids, time_ids )
-		for iid in intids_purchases:
+		creator_intids = catalog[IX_CREATOR].apply({'any_of': (self.user.username,)})
+		mimetypes_intids = catalog[IX_MIMETYPE].apply({'any_of': NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES})
+		doc_ids = catalog.family.IF.intersection(time_ids, creator_intids)
+		doc_ids = catalog.family.IF.intersection(doc_ids, mimetypes_intids)
+		for iid in doc_ids:
 			p = self._intids.queryObject(iid)
 			if _check_valid(p, iid, intids=self._intids):
 				yield p
