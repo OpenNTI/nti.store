@@ -43,7 +43,7 @@ def do_evolve(context, generation=generation):
 			purchase_catalog.index_doc(uid, obj)
 			total += 1
 		except Exception:
-			logger.warn("Cannot index object with id %s", uid)
+			logger.debuh("Cannot index object with id %s", uid)
 	
 	logger.info('Store evolution %s done; %s items(s) indexed',
 				generation, total)
