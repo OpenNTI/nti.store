@@ -18,7 +18,10 @@ from zope.generations.generations import SchemaManager
 import zope.intid
 
 from ..interfaces import IGiftRegistry
+
 from ..gift_registry import GiftRegistry
+
+from ..purchase_index import install_purchase_catalog
 
 class _StoreSchemaManager(SchemaManager):
 	"""
@@ -31,8 +34,17 @@ class _StoreSchemaManager(SchemaManager):
 											package_name='nti.store.generations')
 
 def evolve(context):
+	install_catalog(context)
 	install_gift_registry(context)
-
+	
+def install_catalog(context):
+	conn = context.connection
+	root = conn.root()
+	dataserver_folder = root['nti.dataserver']
+	lsm = dataserver_folder.getSiteManager()
+	intids = lsm.getUtility(zope.intid.IIntIds)
+	install_purchase_catalog(dataserver_folder, intids)
+	
 def install_gift_registry(context):
 	conn = context.connection
 	root = conn.root()
@@ -46,4 +58,5 @@ def install_gift_registry(context):
 	registry.__name__ = '++etc++store++giftregistry'
 	intids.register(registry)
 	lsm.registerUtility(registry, provided=IGiftRegistry)
+
 	return registry
