@@ -49,13 +49,24 @@ class RedemptionCodeIndex(ValueIndex):
 	default_field_name = 'RedemptionCode'
 	default_interface = IRedeemedPurchaseAttempt
 	
-class CreatorRawIndex(RawValueIndex):
-	pass
+class ValidatingCreator(object):
+
+	__slots__ = (b'creator',)
+
+	def __init__(self, obj, default=None):
+		try:
+			if IPurchaseAttempt.providedBy(obj):
+				self.creator = ICreatedUsername(obj).creator_username
+		except (AttributeError, TypeError):
+			pass
+
+	def __reduce__(self):
+		raise TypeError()
 
 def CreatorIndex(family=None):
-	return NormalizationWrapper(field_name='creator_username',
-								interface=ICreatedUsername,
-								index=CreatorRawIndex(family=family),
+	return NormalizationWrapper(field_name='creator',
+								interface=ValidatingCreator,
+								index=RawValueIndex(family=family),
 								normalizer=StringTokenNormalizer())
 
 class ItemsRawIndex(RawSetIndex):
