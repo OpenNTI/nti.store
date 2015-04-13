@@ -300,9 +300,9 @@ class PurchaseHistory(Contained, Persistent):
 		catalog = get_catalog()
 		time_ids = catalog[IX_CREATEDTIME].apply({'between': (start_time, end_time)})
 		creator_intids = catalog[IX_CREATOR].apply({'any_of': (self.user.username,)})
-		mimetypes_intids = catalog[IX_MIMETYPE].apply({'any_of': NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES})
+		mimetype_intids = catalog[IX_MIMETYPE].apply({'any_of': NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES})
 		doc_ids = catalog.family.IF.intersection(time_ids, creator_intids)
-		doc_ids = catalog.family.IF.intersection(doc_ids, mimetypes_intids)
+		doc_ids = catalog.family.IF.intersection(doc_ids, mimetype_intids)
 		for iid in doc_ids:
 			p = self._intids.queryObject(iid)
 			if _check_valid(p, iid, intids=self._intids):
