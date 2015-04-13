@@ -15,6 +15,10 @@ import unittest
 
 from nti.store.utils import from_delimited
 
+from nti.store.utils import ALL_STORE_MIME_TYPES
+from nti.store.utils import REGULAR_ATTEMPT_MIME_TYPES
+from nti.store.utils import PURCHASE_ATTEMPT_MIME_TYPES
+
 class TestUtils(unittest.TestCase):
 
 	def test_from_delimited(self):
@@ -29,4 +33,7 @@ class TestUtils(unittest.TestCase):
 		assert_that(items, has_length(1))
 		assert_that(items[0], is_(a))
 
-
+	def test_mime_types(self):
+		assert_that(ALL_STORE_MIME_TYPES, has_length(8))
+		assert_that(REGULAR_ATTEMPT_MIME_TYPES, has_length(3))
+		assert_that(PURCHASE_ATTEMPT_MIME_TYPES, has_length(4))

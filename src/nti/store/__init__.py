@@ -64,4 +64,4 @@ def get_user(user):
 
 def get_purchase_index():
 	return component.getUtility(ICatalog, name=CATALOG_NAME)
-get_index = get_purchase_index
+get_catalog = get_purchase_index

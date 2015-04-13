@@ -15,18 +15,19 @@ from nti.mimetype.mimetype import MIME_BASE
 
 STORE_MIME_BASE = MIME_BASE + b'.store'
 
+REGULAR_ATTEMPT_MIME_TYPES = \
+		tuple([STORE_MIME_BASE + x for x in (	b'.purchaseattempt',
+												b'.invitationpurchaseattempt',
+												b'.redeemedpurchaseattempt') ] )
+
 PURCHASE_ATTEMPT_MIME_TYPES = \
-		[STORE_MIME_BASE + x for x in (	b'.purchaseattempt',
-										b'.invitationpurchaseattempt',
-										b'.redeemedpurchaseattempt',
-										b'.giftpurchaseattempt') ]
+		REGULAR_ATTEMPT_MIME_TYPES + (STORE_MIME_BASE + b'.giftpurchaseattempt',)
 
 ALL_STORE_MIME_TYPES = list(PURCHASE_ATTEMPT_MIME_TYPES) 
 ALL_STORE_MIME_TYPES.append( MIME_BASE + b'.purchasable')
 ALL_STORE_MIME_TYPES.append( MIME_BASE + b'.purchasablecourse')
 ALL_STORE_MIME_TYPES.append( MIME_BASE + b'.purchasablechoicebundle')
 ALL_STORE_MIME_TYPES.append( MIME_BASE + b'.purchasablecoursechoicebundle')
-
 ALL_STORE_MIME_TYPES = tuple(ALL_STORE_MIME_TYPES)
 
 def from_delimited(value, delim=' '):

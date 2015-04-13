@@ -19,10 +19,13 @@ import zope.intid
 from zope import component
 from zope import interface
 from zope import lifecycleevent
-from zope.location import locate
-from zope.container.contained import Contained
+
 from zope.annotation import factory as an_factory
+
+from zope.location import locate
 from zope.location.interfaces import ISublocations
+
+from zope.container.contained import Contained
 
 from ZODB.interfaces import IConnection
 
@@ -46,8 +49,13 @@ from .purchasable import get_purchasable_ids
 
 from .utils import to_frozenset
 
+from .purchase_index import IX_CREATOR
+from .purchase_index import IX_CREATEDTIME
+
 from .interfaces import IPurchaseAttempt
 from .interfaces import IPurchaseHistory
+
+from . import get_catalog
 
 ## classes
 
@@ -183,9 +191,11 @@ class _PurchaseIndex(Persistent):
 				yield p
 
 	def get_history_by_time(self, start_time=None, end_time=None):
-		end_time = time_to_64bit_int(end_time) if end_time is not None else None
-		start_time = time_to_64bit_int(start_time) if start_time is not None else None
-		for _, iid in self.time_index.iteritems(start_time, end_time):
+		catalog = get_catalog()
+		creator_intids = catalog[IX_CREATOR].apply({'any-of': (start_time, end_time)})
+		between_ids = catalog[IX_CREATEDTIME].apply({'between': (start_time, end_time)})
+		doc_ids = catalog.family.IF.intersection(between_ids, creator_intids )
+		for iid in doc_ids:
 			p = self._intids.queryObject(iid)
 			if _check_valid(p, iid, intids=self._intids):
 				yield p
@@ -293,7 +303,14 @@ class PurchaseHistory(Contained, Persistent):
 		return self._index.get_history_by_item(item)
 
 	def get_purchase_history(self, start_time=None, end_time=None):
-		return self._index.get_history_by_time(start_time, end_time)
+		catalog = get_catalog()
+		user_ids = catalog[IX_CREATOR].apply({'any_of': (self.user.username,)})
+		time_ids = catalog[IX_CREATEDTIME].apply({'between': (start_time, end_time)})
+		intids_purchases = catalog.family.IF.intersection(user_ids, time_ids )
+		for iid in intids_purchases:
+			p = self._intids.queryObject(iid)
+			if _check_valid(p, iid, intids=self._intids):
+				yield p
 
 	def has_history_by_item(self, purchasable_id):
 		return self._index.has_history_by_item(purchasable_id)

@@ -210,8 +210,7 @@ class TestPurchaseHistory(unittest.TestCase):
 
 	@mock_dataserver.WithMockDS
 	def test_purchase_history_check(self):
-		now = time.time()
-		t50 = 0
+		start = time.time()
 		with mock_dataserver.mock_db_trans(self.ds):
 			user = self._create_user()
 			username = user.username
@@ -223,8 +222,6 @@ class TestPurchaseHistory(unittest.TestCase):
 
 		for i in range(0, 100):
 			item = unicode(i)
-			if i == 50:
-				t50 = time.time()
 			with mock_dataserver.mock_db_trans(self.ds):
 				hist = _get_hist()
 				pa = self._create_purchase_attempt(item)
@@ -244,24 +241,24 @@ class TestPurchaseHistory(unittest.TestCase):
 			lst = list(hist.get_purchase_history())
 			assert_that(lst, has_length(100))
 
-			lst = list(hist.get_purchase_history(end_time=now))
-			assert_that(lst, has_length(0))
-
-			lst = list(hist.get_purchase_history(start_time=now))
+			lst = list(hist.get_purchase_history(end_time=start+1000))
 			assert_that(lst, has_length(100))
 
-			lst = list(hist.get_purchase_history(start_time=now, end_time=t50))
-			assert_that(lst, has_length(50))
+			lst = list(hist.get_purchase_history(start_time=start-1000))
+			assert_that(lst, has_length(100))
 
-			lst = list(hist.get_purchase_history(start_time=now, end_time=t50))
-			assert_that(lst, has_length(50))
-
+			lst = list(hist.get_purchase_history(start_time=start, end_time=100))
+			assert_that(lst, has_length(0))
+			
 			lst = list(hist.get_purchase_history_by_item(u'10'))
 			assert_that(lst, has_length(1))
 			
 			assert_that(hist.clear(), is_(100))
 			assert_that(hist, has_length(0))
 			hist._v_check()
+
+			lst = list(hist.get_purchase_history(start_time=start-1000))
+			assert_that(lst, has_length(0))
 
 	@WithMockDSTrans
 	def test_available(self):
