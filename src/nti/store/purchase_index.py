@@ -127,7 +127,7 @@ def install_purchase_catalog( site_manager_container, intids=None ):
 						 (IX_MIMETYPE, MimeTypeIndex),
 						 (IX_REV_ITEMS, RevItemsIndex),
 						 (IX_CREATEDTIME, StartTimeIndex),
-						 (IX_REDEMPTION_CODE), RedemptionCodeIndex):
+						 (IX_REDEMPTION_CODE, RedemptionCodeIndex)):
 		index = clazz( family=intids.family )
 		assert ICatalogIndex.providedBy(index)
 		intids.register( index )
