@@ -42,6 +42,8 @@ from nti.externalization.interfaces import LocatedExternalList
 
 from nti.ntiids import ntiids
 
+from nti.zope_catalog.catalog import is_broken
+
 from . import get_user
 
 from .purchasable import get_purchasable
@@ -60,7 +62,7 @@ from . import get_catalog
 ## classes
 
 def _check_valid(p, uid, purchasable_id=None, intids=None, debug=True):
-	if not IPurchaseAttempt.providedBy(p):
+	if p is None or is_broken(p) or not IPurchaseAttempt.providedBy(p):
 		return False
 
 	# they exist in the backward index so that queryObject works,

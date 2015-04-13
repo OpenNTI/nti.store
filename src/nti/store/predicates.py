@@ -24,6 +24,7 @@ class _PurchaseAttemptPrincipalObjects(BasePrincipalObjects):
 
 	def iter_objects(self):
 		user = self.user
+		#TODO: Don't use index
 		for purchase in get_user_purchase_history(user):
 			yield purchase
 
