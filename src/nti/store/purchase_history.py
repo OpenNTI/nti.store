@@ -50,7 +50,7 @@ from .purchasable import get_purchasable
 from .purchasable import get_purchasable_ids
 
 from .utils import to_frozenset
-from .utils import NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES
+from .utils import NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES as NONGIFT_MIME_TYPES
 
 from .purchase_index import IX_CREATOR
 from .purchase_index import IX_MIMETYPE
@@ -297,16 +297,8 @@ class PurchaseHistory(Contained, Persistent):
 		return self._index.get_history_by_item(item)
 
 	def get_purchase_history(self, start_time=None, end_time=None):
-		catalog = get_catalog()
-		time_ids = catalog[IX_CREATEDTIME].apply({'between': (start_time, end_time)})
-		creator_intids = catalog[IX_CREATOR].apply({'any_of': (self.user.username,)})
-		mimetype_intids = catalog[IX_MIMETYPE].apply({'any_of': NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES})
-		doc_ids = catalog.family.IF.intersection(time_ids, creator_intids)
-		doc_ids = catalog.family.IF.intersection(doc_ids, mimetype_intids)
-		for iid in doc_ids:
-			p = self._intids.queryObject(iid)
-			if _check_valid(p, iid, intids=self._intids):
-				yield p
+		result = get_purchase_history(self.user, start_time, end_time)
+		return iter(result)
 
 	def has_history_by_item(self, purchasable_id):
 		return self._index.has_history_by_item(purchasable_id)
@@ -395,11 +387,22 @@ def get_pending_purchases(user, items=None):
 
 def get_purchase_history(user, start_time=None, end_time=None):
 	user = get_user(user)
-	if user is not None:
-		hist = IPurchaseHistory(user)
-		result = LocatedExternalList(hist.get_purchase_history(start_time, end_time))
-		return result
-	return ()
+	if user is None:
+		result = ()
+	else:
+		catalog = get_catalog()
+		result = LocatedExternalList()
+		intids = component.getUtility(zope.intid.IIntIds)
+		creator_intids = catalog[IX_CREATOR].apply({'any_of': (user.username,)})
+		mimetype_intids = catalog[IX_MIMETYPE].apply({'any_of': NONGIFT_MIME_TYPES})
+		time_ids = catalog[IX_CREATEDTIME].apply({'between': (start_time, end_time)})
+		doc_ids = catalog.family.IF.intersection(time_ids, creator_intids)
+		doc_ids = catalog.family.IF.intersection(doc_ids, mimetype_intids)
+		for iid in doc_ids:
+			p = intids.queryObject(iid)
+			if _check_valid(p, iid, intids=intids):
+				result.append(p)
+	return result
 
 def has_history_by_item(user, purchasable_id):
 	user = get_user(user)
