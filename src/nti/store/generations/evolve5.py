@@ -19,9 +19,23 @@ from nti.dataserver.metadata_index import CATALOG_NAME as METADATA_CATALOG_NAME
 
 from nti.zope_catalog.catalog import ResultSet
 
+from ..purchase_index import IX_MIMETYPE
 from ..purchase_index import install_purchase_catalog
 
 from ..utils import PURCHASE_ATTEMPT_MIME_TYPES
+
+def index_purchases(metadata_catalog, purchase_catalog, intids):
+	result = 0
+	mimetype_index = metadata_catalog[IX_MIMETYPE]
+	item_intids = mimetype_index.apply({'any_of': PURCHASE_ATTEMPT_MIME_TYPES})
+	results = ResultSet(item_intids, intids, True)
+	for uid, obj in results.iter_pairs():
+		try:
+			purchase_catalog.index_doc(uid, obj)
+			result += 1
+		except Exception:
+			logger.debug("Cannot index object with id %s", uid)
+	return result
 
 def do_evolve(context, generation=generation):
 	logger.info("Store evolution %s started", generation);
@@ -31,19 +45,9 @@ def do_evolve(context, generation=generation):
 	lsm = dataserver_folder.getSiteManager()
 	intids = lsm.getUtility(zope.intid.IIntIds)
 	
-	total = 0
 	metadata_catalog = lsm.getUtility(ICatalog, METADATA_CATALOG_NAME)
 	purchase_catalog = install_purchase_catalog(dataserver_folder, intids)
-	
-	mimetype_index = metadata_catalog['mimeType']
-	item_intids = mimetype_index.apply({'any_of': PURCHASE_ATTEMPT_MIME_TYPES})
-	results = ResultSet(item_intids, intids, True)
-	for uid, obj in results.iter_pairs():
-		try:
-			purchase_catalog.index_doc(uid, obj)
-			total += 1
-		except Exception:
-			logger.debuh("Cannot index object with id %s", uid)
+	total = index_purchases(metadata_catalog, purchase_catalog, intids)
 	
 	logger.info('Store evolution %s done; %s items(s) indexed',
 				generation, total)
