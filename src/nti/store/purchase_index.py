@@ -35,6 +35,7 @@ from .interfaces import IRedeemedPurchaseAttempt
 from . import CATALOG_NAME
 
 IX_ITEMS = 'items'
+IX_STATE = 'state'
 IX_CREATOR = 'creator'
 IX_MIMETYPE = 'mimeType'
 IX_REV_ITEMS = 'revItems'
@@ -89,6 +90,15 @@ def StartTimeIndex(family=None):
 								normalizer=TimestampToNormalized64BitIntNormalizer())
 
 
+class StateRawIndex(RawValueIndex):
+	pass
+
+def StateIndex(family=None):
+	return NormalizationWrapper(field_name='State',
+								interface=IPurchaseAttempt,
+								index=StateRawIndex(family=family),
+								normalizer=StringTokenNormalizer())
+	
 class RevItems(object):
 	
 	__slots__ = (b'context',)
@@ -123,6 +133,7 @@ def install_purchase_catalog( site_manager_container, intids=None ):
 	lsm.registerUtility( catalog, provided=ICatalog, name=CATALOG_NAME )
 
 	for name, clazz in ( (IX_ITEMS, ItemsIndex),
+						 (IX_STATE, StateIndex),
 						 (IX_CREATOR, CreatorIndex),
 						 (IX_MIMETYPE, MimeTypeIndex),
 						 (IX_REV_ITEMS, RevItemsIndex),

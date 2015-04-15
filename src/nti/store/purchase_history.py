@@ -42,6 +42,7 @@ from nti.externalization.interfaces import LocatedExternalList
 
 from nti.ntiids import ntiids
 
+from nti.zope_catalog.catalog import ResultSet
 from nti.zope_catalog.catalog import is_broken
 
 from . import get_user
@@ -180,20 +181,6 @@ class _PurchaseIndex(Persistent):
 		self._removeFromItemIndex(purchase.Items, iid)
 		result = self._removeFromIntIdIndex(iid)
 		return result
-
-	# retrieve
-
-	def has_history_by_item(self, purchasable_id):
-		# Actually load the history to perform consistency checks
-		items = list(self.get_history_by_item(purchasable_id))
-		return len(items) > 0
-
-	def get_history_by_item(self, purchasable_id):
-		item_set = self.item_index.get(purchasable_id) or ()
-		for uid in item_set:
-			p = self._intids.queryObject(uid)
-			if _check_valid(p, uid, purchasable_id, intids=self._intids):
-				yield p
 
 	def values(self):
 		for iid in self.purchases:
@@ -386,23 +373,19 @@ def get_pending_purchases(user, items=None):
 		return result
 	return ()
 
-def get_purchase_history(user, start_time=None, end_time=None):
+def get_purchase_history(user, start_time=None, end_time=None, catalog=None):
 	user = get_user(user)
 	if user is None:
 		result = ()
 	else:
-		catalog = get_catalog()
-		result = LocatedExternalList()
 		intids = component.getUtility(zope.intid.IIntIds)
+		catalog = get_catalog() if catalog is None else catalog
 		creator_intids = catalog[IX_CREATOR].apply({'any_of': (user.username,)})
 		mimetype_intids = catalog[IX_MIMETYPE].apply({'any_of': NONGIFT_MIME_TYPES})
 		time_ids = catalog[IX_CREATEDTIME].apply({'between': (start_time, end_time)})
 		doc_ids = catalog.family.IF.intersection(time_ids, creator_intids)
 		doc_ids = catalog.family.IF.intersection(doc_ids, mimetype_intids)
-		for iid in doc_ids:
-			p = intids.queryObject(iid)
-			if _check_valid(p, iid, intids=intids):
-				result.append(p)
+		result = LocatedExternalList(ResultSet(doc_ids, intids, ignore_invalid=True))
 	return result
 
 def get_purchase_ids_by_items(user, *purchasables):
@@ -419,13 +402,9 @@ def get_purchase_history_by_item(user, purchasable_id):
 	if user is None:
 		result = ()
 	else:
-		result = LocatedExternalList()
 		intids = component.getUtility(zope.intid.IIntIds)
 		doc_ids = get_purchase_ids_by_items(user, purchasable_id)
-		for iid in doc_ids:
-			p = intids.queryObject(iid)
-			if _check_valid(p, iid, intids=intids):
-				result.append(p)
+		result = LocatedExternalList(ResultSet(doc_ids, intids, ignore_invalid=True))
 	return result
 
 def has_history_by_item(user, purchasable_id):
