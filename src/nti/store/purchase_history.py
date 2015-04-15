@@ -52,6 +52,7 @@ from .purchasable import get_purchasable_ids
 from .utils import to_frozenset
 from .utils import NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES as NONGIFT_MIME_TYPES
 
+from .purchase_index import IX_ITEMS
 from .purchase_index import IX_CREATOR
 from .purchase_index import IX_MIMETYPE
 from .purchase_index import IX_CREATEDTIME
@@ -294,14 +295,14 @@ class PurchaseHistory(Contained, Persistent):
 				yield p
 
 	def get_purchase_history_by_item(self, item):
-		return self._index.get_history_by_item(item)
+		return get_purchase_history_by_item(self.user, item)
 
 	def get_purchase_history(self, start_time=None, end_time=None):
 		result = get_purchase_history(self.user, start_time, end_time)
 		return iter(result)
 
 	def has_history_by_item(self, purchasable_id):
-		return self._index.has_history_by_item(purchasable_id)
+		return has_history_by_item(self.user, purchasable_id)
 
 	def clear(self):
 		result = 0
@@ -404,21 +405,35 @@ def get_purchase_history(user, start_time=None, end_time=None):
 				result.append(p)
 	return result
 
-def has_history_by_item(user, purchasable_id):
-	user = get_user(user)
-	if user is not None:
-		hist = IPurchaseHistory(user)
-		result = hist.has_history_by_item(purchasable_id)
-		return result
-	return False
+def get_purchase_ids_by_items(user, *purchasables):
+	catalog = get_catalog()
+	items_ids = catalog[IX_ITEMS].apply({'any_of': purchasables})
+	creator_intids = catalog[IX_CREATOR].apply({'any_of': (user.username,)})
+	mimetype_intids = catalog[IX_MIMETYPE].apply({'any_of': NONGIFT_MIME_TYPES})
+	result = catalog.family.IF.intersection(items_ids, creator_intids)
+	result = catalog.family.IF.intersection(result, mimetype_intids)
+	return result
 
 def get_purchase_history_by_item(user, purchasable_id):
 	user = get_user(user)
+	if user is None:
+		result = ()
+	else:
+		result = LocatedExternalList()
+		intids = component.getUtility(zope.intid.IIntIds)
+		doc_ids = get_purchase_ids_by_items(user, purchasable_id)
+		for iid in doc_ids:
+			p = intids.queryObject(iid)
+			if _check_valid(p, iid, intids=intids):
+				result.append(p)
+	return result
+
+def has_history_by_item(user, purchasable_id):
+	user = get_user(user)
 	if user is not None:
-		hist = IPurchaseHistory(user)
-		result = LocatedExternalList(hist.get_purchase_history_by_item(purchasable_id))
-		return result
-	return ()
+		doc_ids = get_purchase_ids_by_items(user, purchasable_id)
+		return bool(doc_ids)
+	return False
 
 def register_purchase_attempt(purchase, user):
 	user = get_user(user)
