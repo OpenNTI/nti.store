@@ -159,7 +159,7 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 	def Items(self):
 		return dict(self)
 	
-	@Lazy
+	@property
 	def intids(self):
 		result = component.getUtility(zope.intid.IIntIds)
 		return result

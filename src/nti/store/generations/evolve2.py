@@ -25,12 +25,9 @@ from ..interfaces import IPurchaseAttempt
 from ..interfaces import IPurchaseHistory
 
 from ..purchase_history import _check_valid
-from ..purchase_history import PurchaseHistory
-
-from nti.common.deprecated import hiding_warnings
-with hiding_warnings():
-	from ..interfaces import IEnrollmentAttempt
 	
+from ..store import get_purchase_history_annotation_key
+
 def _hard_removal(index, iid, intids):
 	if iid is None:
 		return False
@@ -71,11 +68,11 @@ def update_user_purchase_data(user, intids=None):
 	
 	# check if user has purchase history
 	annotations = IAnnotations(user)
-	annotation_key = "%s.%s" % (PurchaseHistory.__module__, PurchaseHistory.__name__)
+	annotation_key = get_purchase_history_annotation_key()
 	if not annotation_key in annotations:
 		return (update_count, removed_count) 
 		
-	intids = intids or component.getUtility(zope.intid.IIntIds)
+	intids = intids if intids is not None else component.getUtility(zope.intid.IIntIds)
 	history = IPurchaseHistory(user)
 	if len(history) == 0: # no history remove
 		del annotations[annotation_key]
@@ -125,3 +122,6 @@ def evolve(context):
 				update_user_purchase_data(user, intids)
 	logger.info("Store generation %s completed", generation)
 	
+from nti.common.deprecated import hiding_warnings
+with hiding_warnings():
+	from ..interfaces import IEnrollmentAttempt

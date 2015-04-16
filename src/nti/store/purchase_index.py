@@ -121,16 +121,19 @@ def RevItemsIndex(family=None):
 class StoreCatalog(Catalog):
 	pass
 
-def install_purchase_catalog( site_manager_container, intids=None ):
+def install_purchase_catalog(site_manager_container, intids=None ):
 	lsm = site_manager_container.getSiteManager()
-	if intids is None:
-		intids = lsm.getUtility(IIntIds)
+	intids = intids if intids is not None else lsm.getUtility(IIntIds)
+	
+	catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME )
+	if catalog is not None:
+		return catalog
 
 	catalog = StoreCatalog(family=intids.family)
 	catalog.__name__ = CATALOG_NAME
 	catalog.__parent__ = site_manager_container
 	intids.register( catalog )
-	lsm.registerUtility( catalog, provided=ICatalog, name=CATALOG_NAME )
+	lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_NAME )
 
 	for name, clazz in ( (IX_ITEMS, ItemsIndex),
 						 (IX_STATE, StateIndex),
