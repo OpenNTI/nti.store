@@ -36,14 +36,24 @@ from nti.dataserver.authorization_acl import ace_allowing
 from nti.dataserver.authorization_acl import acl_from_aces
 
 from nti.externalization.oids import to_external_ntiid_oid
+from nti.externalization.interfaces import LocatedExternalList
 
 from nti.ntiids.ntiids import find_object_with_ntiid
 
+from nti.zope_catalog.catalog import ResultSet
+
 from .utils import to_frozenset
+from .utils import GIFT_PURCHASE_ATTEMPT_MIME_TYPES
+
+from .purchase_index import IX_CREATOR
+from .purchase_index import IX_MIMETYPE
+from .purchase_index import IX_CREATEDTIME
 
 from .interfaces import IGiftRegistry
 from .interfaces import IUserGiftHistory
 from .interfaces import IGiftPurchaseAttempt
+
+from . import get_catalog
 
 @interface.implementer(IUserGiftHistory)
 class UserGiftHistory(Contained, Persistent):
@@ -235,9 +245,15 @@ def get_gift_pending_purchases(username, items=None):
 	result = registry.get_pending_purchases(username, items)
 	return result
 
-def get_gift_purchase_history(username, start_time=None, end_time=None):
-	registry = get_gift_registry()
-	result = registry.get_purchase_history(username, start_time, end_time)
+def get_gift_purchase_history(username, start_time=None, end_time=None, catalog=None):
+	intids = component.getUtility(zope.intid.IIntIds)
+	catalog = get_catalog() if catalog is None else catalog
+	creator_intids = catalog[IX_CREATOR].apply({'any_of': (username,)})
+	time_ids = catalog[IX_CREATEDTIME].apply({'between': (start_time, end_time)})
+	mimetype_intids = catalog[IX_MIMETYPE].apply({'any_of': GIFT_PURCHASE_ATTEMPT_MIME_TYPES})
+	doc_ids = catalog.family.IF.intersection(time_ids, creator_intids)
+	doc_ids = catalog.family.IF.intersection(doc_ids, mimetype_intids)
+	result = LocatedExternalList(ResultSet(doc_ids, intids, ignore_invalid=True))
 	return result
 
 def register_gift_purchase_attempt(username, purchase):
