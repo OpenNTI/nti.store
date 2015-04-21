@@ -11,9 +11,6 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-import BTrees
-from BTrees.Length import Length
-
 import zope.intid
 
 from zope import component
@@ -22,6 +19,8 @@ from zope import lifecycleevent
 
 from zope.annotation import factory as an_factory
 
+from zope.deprecation import deprecated
+
 from zope.location import locate
 from zope.location.interfaces import ISublocations
 
@@ -29,10 +28,9 @@ from zope.container.contained import Contained
 
 from ZODB.interfaces import IConnection
 
-from persistent import Persistent
+import BTrees
 
-from nti.common.property import Lazy
-from nti.common.time import time_to_64bit_int
+from persistent import Persistent
 
 from nti.dataserver.interfaces import IUser
 
@@ -43,7 +41,6 @@ from nti.externalization.interfaces import LocatedExternalList
 from nti.ntiids import ntiids
 
 from nti.zope_catalog.catalog import ResultSet
-from nti.zope_catalog.catalog import is_broken
 
 from . import get_user
 
@@ -64,142 +61,10 @@ from .interfaces import IPurchaseHistory
 from . import get_catalog
 
 ## classes
-
-def _check_valid(p, uid, purchasable_id=None, intids=None, debug=True):
-	if p is None or is_broken(p) or not IPurchaseAttempt.providedBy(p):
-		return False
-
-	# they exist in the backward index so that queryObject works,
-	# but they do not actually have an intid that matches
-	# (_ds_intid). This means that removal cannot work for
-	# those cases that allow removal (courses). We think (hope) this is a
-	# rare problem, so we pretend it doesn't exist, only logging loudly.
-	# This could also be a corruption in our internal indexes.
-	if intids is None:
-		intids = component.getUtility(zope.intid.IIntIds)
-	queried = intids.queryId(p)
-	if queried != uid:
-		try:
-			p._p_activate()
-		except KeyError:
-			# It looks like queryId can hide the POSKeyError
-			# by generally catching KeyError
-			if debug:
-				logger.exception("Broken object %r", p)
-			else:
-				logger.error("Broken object %r", p)
-		logger.warn("Found inconsistent purchase attempt for " +
-					"purchasable %s, ignoring: %r (%s %s). ids (%s, %s)",
-					purchasable_id, p, getattr(p, '__class__', None),
-					type(p), queried, uid)
-		return False
-	return True
-
-def _check_index(index):
-	import BTrees.check
-	index.purchases._check()
-	index.item_index._check()
-	index.time_index._check()
-	BTrees.check.check(index.purchases)
-	BTrees.check.check(index.item_index)
-	BTrees.check.check(index.time_index)
-
+	
+deprecated('_PurchaseIndex', 'Use new purchase storage')
 class _PurchaseIndex(Persistent):
-
-	family = BTrees.family64
-
-	def __init__(self):
-		self.__len = Length()
-		self.item_index = self.family.OO.OOBTree()
-		self.time_index = self.family.II.LLBTree()
-		self.purchases = self.family.II.LLTreeSet()
-
-	@Lazy
-	def _intids(self):
-		return component.getUtility(zope.intid.IIntIds)
-
-	# addition
-
-	def _addToIntIdIndex(self, iid=None):
-		if iid is not None:
-			self.purchases.add(iid)
-			self.__len.change(1)
-			return True
-		return False
-
-	def _addToTimeIndex(self, startTime, iid=None):
-		if iid is not None and startTime:
-			map_key = time_to_64bit_int(startTime)
-			self.time_index[map_key] = iid
-			return True
-		return False
-
-	def _addToItemIndex(self, items=(), iid=None):
-		if iid is not None:
-			for item in  items or ():
-				item_set = self.item_index.get(item)
-				if item_set is None:
-					item_set = self.item_index[item] = self.family.II.LLTreeSet()
-				item_set.add(iid)
-			return True
-		return False
-
-	def add(self, purchase):
-		iid = self._intids.getId(purchase)
-		result = self._addToIntIdIndex(iid)
-		self._addToItemIndex(purchase.Items, iid)
-		self._addToTimeIndex(purchase.StartTime, iid)
-		return result
-
-	# removal
-
-	def _removeFromIntIdIndex(self, iid):
-		if iid is not None and iid in self.purchases:
-			self.__len.change(-1)
-			self.purchases.remove(iid)
-			return True
-		return False
-
-	def _removeFromTimeIndex(self, startTime):
-		if startTime is not None:
-			result = self.time_index.pop(time_to_64bit_int(startTime), None)
-			return result is not None
-		return False
-
-	def _removeFromItemIndex(self, items=(), iid=None):
-		if iid is not None:
-			for item in items or ():
-				item_set = self.item_index.get(item)
-				if item_set and item_set.has_key(iid):
-					item_set.remove(iid)
-			return True
-		return False
-
-	def remove(self, purchase):
-		iid = self._intids.queryId(purchase)
-		self._removeFromTimeIndex(purchase.StartTime)
-		self._removeFromItemIndex(purchase.Items, iid)
-		result = self._removeFromIntIdIndex(iid)
-		return result
-
-	def values(self):
-		for iid in self.purchases:
-			p = self._intids.queryObject(iid)
-			if _check_valid(p, iid, intids=self._intids):
-				yield p
-
-	def __iter__(self):
-		return self.values()
-
-	def __len__(self):
-		return self.__len.value
-
-	def __nonzero__(self):
-		return True
-	__bool__ = __nonzero__
-
-	def _v_check(self):
-		_check_index(self)
+	pass
 
 @component.adapter(IUser)
 @interface.implementer(IPurchaseHistory, ISublocations)
@@ -208,18 +73,17 @@ class PurchaseHistory(Contained, Persistent):
 	family = BTrees.family64
 
 	def __init__(self):
-		self._index = _PurchaseIndex()
-		self._items_activated = self.family.OO.OOTreeSet()
+		self.reset()
 
-	@property
-	def index(self):
-		return self._index
+	def reset(self):
+		self._purchases = self.family.OO.OOBTree()
+		self._items_activated = self.family.OO.OOTreeSet()
 
 	@property
 	def user(self):
 		return self.__parent__
 
-	@Lazy
+	@property
 	def _intids(self):
 		return component.getUtility(zope.intid.IIntIds)
 
@@ -245,34 +109,42 @@ class PurchaseHistory(Contained, Persistent):
 	def is_item_activated(self, item):
 		return item in self._items_activated
 
-	def register_purchase(self, purchase):
-		# locate before firing events
+	def add_purchase(self, purchase):
+		## locate before firing events
 		locate(purchase, self)
-		# add to connection before firing event
+		## add to connection and firing event
 		IConnection(self).add(purchase)
-		# fire events
 		lifecycleevent.created(purchase)
 		lifecycleevent.added(purchase)  # get an iid
-		self._index.add(purchase)
-		# set id/__name__
-		purchase.id = unicode(to_external_ntiid_oid(purchase))
-		return purchase.id
-	add = add_purchase = register_purchase
+		## we have now and id
+		result = purchase.id = unicode(to_external_ntiid_oid(purchase))
+		self._purchases[purchase.id] = purchase
+		return result
+	add = append = add_purchase
 
 	def remove_purchase(self, purchase):
-		if self._index.remove(purchase):
+		try:
+			pid = getattr(purchase, 'id', purchase)
+			del self._purchases[pid]
 			lifecycleevent.removed(purchase) # remove iid
-			return True
-		return False
-
-	@classmethod
-	def get_purchase(cls, pid):
-		result = ntiids.find_object_with_ntiid(pid)
+			result = True
+		except KeyError:
+			result = False
 		return result
-
+	remove = remove_purchase
+	
+	def get_purchase(self, pid):
+		try:
+			pid = getattr(pid, 'id', pid)
+			result = self._purchases[pid]
+		except KeyError:
+			result = None
+		return result
+	get = get_purchasable
+	
 	def get_purchase_state(self, pid):
 		p = self.get_purchase(pid)
-		return p.State if p else None
+		return p.State if p is not None else None
 
 	def get_pending_purchases(self, items=None):
 		items = to_frozenset(items) if items else None
@@ -299,25 +171,23 @@ class PurchaseHistory(Contained, Persistent):
 		return result
 				
 	def values(self):
-		return self._index.values()
+		return self._purchases.values()
 
 	def __iter__(self):
-		return self._index.values()
+		return iter(self._purchases.values())
 
 	def __len__(self):
-		return len(self._index)
+		return len(self._purchases)
 
 	def sublocations(self):
-		for iid in self._index.purchases:
-			purchase = self._intids.queryObject(iid)
-			if getattr(purchase, '__parent__',None) is self:
-				yield purchase
+		for purchase in self.values():
+			yield purchase
 
 	def _v_check(self):
 		import BTrees.check
-		self._index._v_check()
-		self._items_activated._check()
-		BTrees.check.check(self._items_activated)
+		for item in (self._items_activated, self._purchases):
+			item._check()
+			BTrees.check.check(item)
 
 _PurchaseHistoryFactory = an_factory(PurchaseHistory)
 
@@ -418,9 +288,10 @@ def register_purchase_attempt(purchase, user):
 	user = get_user(user)
 	if user is not None:
 		hist = IPurchaseHistory(user)
-		hist.register_purchase(purchase)
+		hist.add_purchase(purchase)
 		return purchase.id
 	return None
+add_purchase_attempt = register_purchase_attempt
 
 def get_available_items(user, registry=component):
 	"""

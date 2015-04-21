@@ -579,6 +579,7 @@ class IPurchaseHistory(IIterable):
 		"""
 		Return all purchase attempts
 		"""
+
 class IStorePurchaseInvitation(interface.Interface):
 	pass
 

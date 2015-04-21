@@ -21,12 +21,41 @@ from nti.dataserver.interfaces import IUser
 
 from nti.externalization.oids import to_external_ntiid_oid
 
+from nti.zope_catalog.catalog import is_broken
+
 from ..interfaces import IPurchaseAttempt
 from ..interfaces import IPurchaseHistory
-
-from ..purchase_history import _check_valid
 	
 from ..store import get_purchase_history_annotation_key
+
+def _check_valid(p, uid, purchasable_id=None, intids=None, debug=True):
+	if p is None or is_broken(p) or not IPurchaseAttempt.providedBy(p):
+		return False
+	# they exist in the backward index so that queryObject works,
+	# but they do not actually have an intid that matches
+	# (_ds_intid). This means that removal cannot work for
+	# those cases that allow removal (courses). We think (hope) this is a
+	# rare problem, so we pretend it doesn't exist, only logging loudly.
+	# This could also be a corruption in our internal indexes.
+	if intids is None:
+		intids = component.getUtility(zope.intid.IIntIds)
+	queried = intids.queryId(p)
+	if queried != uid:
+		try:
+			p._p_activate()
+		except KeyError:
+			# It looks like queryId can hide the POSKeyError
+			# by generally catching KeyError
+			if debug:
+				logger.exception("Broken object %r", p)
+			else:
+				logger.error("Broken object %r", p)
+		logger.warn("Found inconsistent purchase attempt for " +
+					"purchasable %s, ignoring: %r (%s %s). ids (%s, %s)",
+					purchasable_id, p, getattr(p, '__class__', None),
+					type(p), queried, uid)
+		return False
+	return True
 
 def _hard_removal(index, iid, intids):
 	if iid is None:
@@ -78,23 +107,24 @@ def update_user_purchase_data(user, intids=None):
 		del annotations[annotation_key]
 		return (update_count, removed_count) 
 		
-	index = history.index
-	for iid in list(index.purchases):
-		p = intids.queryObject(iid)
-		if _check_valid(p, iid, intids=intids, debug=False):
-			if IEnrollmentAttempt.providedBy(p):
-				history.remove_purchase(p)	
-				removed_count +=1
+	index = getattr(history, 'index', None)
+	if index is not None:
+		for iid in list(index.purchases):
+			p = intids.queryObject(iid)
+			if _check_valid(p, iid, intids=intids, debug=False):
+				if IEnrollmentAttempt.providedBy(p):
+					history.remove_purchase(p)	
+					removed_count +=1
+				else:
+					p.id = to_external_ntiid_oid(p)
+					update_count += 1
 			else:
-				p.id = to_external_ntiid_oid(p)
-				update_count += 1
-		else:
-			# attempt to remove broken objects
-			queried = intids.queryId(p)
-			if _hard_removal(index, iid, intids):
-				removed_count += 1
-			if _hard_removal(index, queried, intids):
-				removed_count += 1
+				# attempt to remove broken objects
+				queried = intids.queryId(p)
+				if _hard_removal(index, iid, intids):
+					removed_count += 1
+				if _hard_removal(index, queried, intids):
+					removed_count += 1
 
 	history = IPurchaseHistory(user)
 	if len(history) == 0: # no history remove
