@@ -118,14 +118,6 @@ class UserGiftHistory(Contained, Persistent):
 		return result
 
 	# retrieval
-	
-	def get_history_by_time(self, start_time=None, end_time=None):
-		end_time = time_to_64bit_int(end_time) if end_time is not None else None
-		start_time = time_to_64bit_int(start_time) if start_time is not None else None
-		for _, iid in self.time_index.iteritems(start_time, end_time):
-			p = self._intids.queryObject(iid)
-			if IGiftPurchaseAttempt.providedBy(p):
-				yield p
 
 	def get_pending_purchases(self, items=None):
 		items = to_frozenset(items) if items else None
