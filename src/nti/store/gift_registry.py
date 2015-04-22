@@ -162,9 +162,11 @@ class UserGiftHistory(Contained, Persistent):
 @interface.implementer(IGiftRegistry)
 class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 	
+	family = BTrees.family64
+	
 	def __init__(self):
 		super(GiftRegistry,self).__init__()
-
+	
 	@property
 	def Items(self):
 		return dict(self)
@@ -195,7 +197,7 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 		purchase.creator = username
 		purchase.id = unicode(to_external_ntiid_oid(purchase))
 		return purchase
-	add = register_purchase
+	add = add_purchase = register_purchase
 	
 	def remove_purchase(self, username, purchase):
 		assert IGiftPurchaseAttempt.providedBy(purchase)
@@ -215,11 +217,8 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 			return ()
 		
 	def get_purchase_history(self, username, start_time=None, end_time=None):
-		try:
-			index = self[username]
-			return list(index.get_history_by_time(start_time, end_time))
-		except KeyError:
-			return ()
+		result = get_gift_purchase_history(username, start_time, end_time)
+		return result
 
 def get_gift_registry(registry=component):
 	result = registry.getUtility(IGiftRegistry)
@@ -248,12 +247,15 @@ def get_gift_pending_purchases(username, items=None):
 def get_gift_purchase_history(username, start_time=None, end_time=None, catalog=None):
 	intids = component.getUtility(zope.intid.IIntIds)
 	catalog = get_catalog() if catalog is None else catalog
-	creator_intids = catalog[IX_CREATOR].apply({'any_of': (username,)})
-	time_ids = catalog[IX_CREATEDTIME].apply({'between': (start_time, end_time)})
 	mimetype_intids = catalog[IX_MIMETYPE].apply({'any_of': GIFT_PURCHASE_ATTEMPT_MIME_TYPES})
-	doc_ids = catalog.family.IF.intersection(time_ids, creator_intids)
-	doc_ids = catalog.family.IF.intersection(doc_ids, mimetype_intids)
-	result = LocatedExternalList(ResultSet(doc_ids, intids, ignore_invalid=True))
+	if mimetype_intids:
+		creator_intids = catalog[IX_CREATOR].apply({'any_of': (username,)})
+		time_ids = catalog[IX_CREATEDTIME].apply({'between': (start_time, end_time)})
+		doc_ids = catalog.family.IF.intersection(mimetype_intids, creator_intids)
+		doc_ids = catalog.family.IF.intersection(doc_ids, time_ids) 
+		result = LocatedExternalList(ResultSet(doc_ids, intids, ignore_invalid=True))
+	else:
+		result = ()
 	return result
 
 def register_gift_purchase_attempt(username, purchase):

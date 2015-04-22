@@ -116,7 +116,7 @@ class PurchaseHistory(Contained, Persistent):
 		IConnection(self).add(purchase)
 		lifecycleevent.created(purchase)
 		lifecycleevent.added(purchase)  # get an iid
-		## we have now and id
+		## we can get an OID/NTIID
 		result = purchase.id = unicode(to_external_ntiid_oid(purchase))
 		self._purchases[purchase.id] = purchase
 		return result
