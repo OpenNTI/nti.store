@@ -135,9 +135,10 @@ class TestStoreExternal(unittest.TestCase):
 		assert_that(ext, has_entry('Description', u'Intro to Risk'))
 		assert_that(ext, has_entry('Giftable', True))
 		assert_that(ext, has_entry('Redeemable', True))
+		assert_that(ext, has_entry('IsPurchasable', True))
 		
 		ext = to_external_object(ps, name="summary")
-		assert_that(ext, has_length(15))
+		assert_that(ext, has_length(16))
 		assert_that(ext, does_not(has_key('Icon')))
 		assert_that(ext, does_not(has_key('Public')))
 		assert_that(ext, does_not(has_key('License')))
