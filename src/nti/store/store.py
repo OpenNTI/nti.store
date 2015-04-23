@@ -29,7 +29,7 @@ from .invitations import get_invitation_code
 from .invitations import get_purchase_by_code
 
 from .purchasable import get_purchasable
-from .purchasable import get_all_purchasables
+from .purchasable import get_purchasables
 
 from .purchase_history import PurchaseHistory
 
@@ -48,7 +48,7 @@ from .purchase_attempt import create_gift_purchase_attempt
 
 # rexport
 get_purchasable = get_purchasable
-get_all_purchasables = get_all_purchasables
+get_all_purchasables = get_purchasables
 
 get_gift_code = get_invitation_code
 get_transaction_code = get_invitation_code

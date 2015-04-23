@@ -45,7 +45,7 @@ from nti.zope_catalog.catalog import ResultSet
 from . import get_user
 
 from .purchasable import get_purchasable
-from .purchasable import get_purchasable_ids
+from .purchasable import get_purchasables
 
 from .utils import to_frozenset
 from .utils import NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES as NONGIFT_MIME_TYPES
@@ -292,6 +292,12 @@ def register_purchase_attempt(purchase, user):
 		return purchase.id
 	return None
 add_purchase_attempt = register_purchase_attempt
+
+def get_purchasable_ids(registry=component):
+	result = []
+	for p in get_purchasables(registry):
+		result.append(p.NTIID)
+	return result
 
 def get_available_items(user, registry=component):
 	"""

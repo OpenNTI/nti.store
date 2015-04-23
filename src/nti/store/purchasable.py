@@ -98,17 +98,15 @@ def get_purchasable(pid, registry=component):
 	result = registry.queryUtility(IPurchasable, pid)
 	return result
 
-def get_all_purchasables(registry=component):
+def get_purchasables(registry=component, provided=IPurchasable):
 	result = LocatedExternalList()
 	for _, purchasable in registry.getUtilitiesFor(IPurchasable):
 		result.append(purchasable)
 	return result
+get_all_purchasables = get_purchasables
 
-def get_purchasable_ids(registry=component):
-	result = LocatedExternalList()
-	for pid, _ in registry.getUtilitiesFor(IPurchasable):
-		result.append(pid)
-	return result
+def get_purchasable_choice_bundles(registry=component):
+	return get_purchasables(registry=registry, provided=IPurchasableChoiceBundle)
 
 def expand_purchase_item_ids(context, registry=component):
 	"""
