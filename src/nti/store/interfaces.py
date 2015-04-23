@@ -104,6 +104,7 @@ class IPurchasable(IItemBundle):
 	Public = Bool(title="Public flag", required=False, default=False)
 	Giftable = Bool(title="Giftable flag", required=False, default=False)
 	Redeemable = Bool(title="Redeemable flag", required=False, default=False)
+	IsPurchasable = Bool(title="Can be purchased", required=True, default=True,readonly=True)
 	VendorInfo = Object(IPurchasableVendorInfo, title="vendor info", required=False)
 	VendorInfo.setTaggedValue('_ext_excluded_out', True)
 

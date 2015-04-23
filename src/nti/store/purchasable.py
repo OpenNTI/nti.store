@@ -66,6 +66,7 @@ class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle, Contained)
 
 	isPublic = alias('Public')
 	isGiftable = alias('Giftable')
+	isPurchasable = True
 
 	@Lazy
 	def __acl__(self):
@@ -74,6 +75,7 @@ class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle, Contained)
 @interface.implementer(IPurchasableChoiceBundle)
 class PurchasableChoiceBundle(Purchasable):
 	__external_class_name__ = 'Purchasable'
+	isPurchasable = False
 
 def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=None,
 					   title=None, license_=None, author=None, description=None,
