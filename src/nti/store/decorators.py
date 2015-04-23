@@ -21,9 +21,11 @@ from .store import get_invitation_code
 from .store import get_transaction_code
 
 from .interfaces import IPricedItem
+from .interfaces import IPurchasable
 from .interfaces import IPurchaseAttempt
 from .interfaces import IPurchasableCourse
 from .interfaces import IGiftPurchaseAttempt
+from .interfaces import IPurchasableChoiceBundle
 from .interfaces import IInvitationPurchaseAttempt
 
 LINKS = StandardExternalFields.LINKS
@@ -78,6 +80,15 @@ class PricedItemDecorator(object):
 		external['Amount'] = original.Amount
 		external['Currency'] = original.Currency
 
+@component.adapter(IPurchasable)
+@interface.implementer(IExternalObjectDecorator)
+class PurchasableDecorator(object):
+
+	__metaclass__ = SingletonDecorator
+
+	def decorateExternalObject(self, original, external):
+		external['IsPurchasable'] = not IPurchasableChoiceBundle.providedBy(original)
+				
 @component.adapter(IPurchasableCourse)
 @interface.implementer(IExternalObjectDecorator)
 class PurchasableCourseDecorator(object):

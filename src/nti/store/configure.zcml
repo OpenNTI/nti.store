@@ -93,6 +93,10 @@
 				for=".interfaces.IPricedItem"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
 
+	<subscriber factory=".decorators.PurchasableDecorator"
+				for=".interfaces.IPurchasable"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
+				
 	<subscriber factory=".decorators.PurchasableCourseDecorator"
 				for=".interfaces.IPurchasableCourse"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
