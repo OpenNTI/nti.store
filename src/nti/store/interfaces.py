@@ -587,16 +587,13 @@ class IStorePurchaseInvitation(interface.Interface):
 # gift registry
 
 class IUserGiftHistory(IContained):
-	"""
-	marker interface to store gifts given by a user
-	"""
+	pass
 
 class IGiftRegistry(IContainer, IContained):
 	"""
 	marker interface for gift registry.
 	This object is registerd as a persistent utility
 	"""
-	contains(b'.IUserGiftHistory')
 
 	def register_purchase(username, purchase):
 		pass

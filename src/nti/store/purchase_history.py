@@ -112,11 +112,11 @@ class PurchaseHistory(Contained, Persistent):
 	def add_purchase(self, purchase):
 		## locate before firing events
 		locate(purchase, self)
-		## add to connection and firing event
+		## add to connection and fire event
 		IConnection(self).add(purchase)
 		lifecycleevent.created(purchase)
 		lifecycleevent.added(purchase)  # get an iid
-		## we can get an OID/NTIID
+		## now we can get an OID/NTIID
 		result = purchase.id = unicode(to_external_ntiid_oid(purchase))
 		self._purchases[purchase.id] = purchase
 		return result

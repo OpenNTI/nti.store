@@ -9,31 +9,26 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-import BTrees
-from BTrees.Length import Length
-
 import zope.intid
 
 from zope import component
 from zope import interface
 from zope import lifecycleevent
-from zope.location import locate
+
 from zope.container.contained import Contained
+
+from zope.deprecation import deprecated
+
+from zope.location import locate
 
 from ZODB.interfaces import IConnection
 
+import BTrees
+
 from persistent import Persistent
 
-from nti.common.property import Lazy
-from nti.common.time import time_to_64bit_int
-
-from nti.dataserver.interfaces import ACE_DENY_ALL
-from nti.dataserver.interfaces import ALL_PERMISSIONS
+from nti.dataserver.dicts import LastModifiedDict
 from nti.dataserver.containers import CaseInsensitiveCheckingLastModifiedBTreeContainer
-
-from nti.dataserver.authorization import ROLE_ADMIN
-from nti.dataserver.authorization_acl import ace_allowing
-from nti.dataserver.authorization_acl import acl_from_aces
 
 from nti.externalization.oids import to_external_ntiid_oid
 from nti.externalization.interfaces import LocatedExternalList
@@ -55,101 +50,16 @@ from .interfaces import IGiftPurchaseAttempt
 
 from . import get_catalog
 
+deprecated('UserGiftHistory', 'Use new gift purchase storage')
 @interface.implementer(IUserGiftHistory)
 class UserGiftHistory(Contained, Persistent):
+	pass
 
-	family = BTrees.family64
+class GiftRecordMap(LastModifiedDict, Contained):
 
-	def __init__(self):
-		self.__len = Length()
-		self.time_index = self.family.II.LLBTree()
-		self.purchases = self.family.II.LLTreeSet()
-
-	@property
-	def creator(self):
-		return self.__parent__.__name__
-	
-	@Lazy
-	def _intids(self):
-		return component.getUtility(zope.intid.IIntIds)
-
-	# addition
-	
-	def _addToPurchaseIndex(self, iid=None):
-		if iid is not None:
-			self.purchases.add(iid)
-			self.__len.change(1)
-			return True
-		return False
-		
-	def _addToTimeIndex(self, startTime, iid=None):
-		if iid is not None and startTime:
-			map_key = time_to_64bit_int(startTime)
-			self.time_index[map_key] = iid
-			return True
-		return False
-	
-	def add(self, purchase):
-		iid = self._intids.getId(purchase)
-		result = self._addToPurchaseIndex(iid)
-		self._addToTimeIndex(purchase.StartTime, iid)
-		return result
-	register_purchase = add
-
-	# removal
-	
-	def _removeFromPurchaseIndex(self, iid):
-		if iid is not None and iid in self.purchases:
-			self.__len.change(-1)
-			self.purchases.remove(iid)
-			return True
-		return False
-	
-	def _removeFromTimeIndex(self, startTime):
-		if startTime is not None:
-			result = self.time_index.pop(time_to_64bit_int(startTime), None)
-			return result is not None
-		return False
-		
-	def remove(self, purchase):
-		iid = self._intids.queryId(purchase)
-		self._removeFromTimeIndex(purchase.StartTime)
-		result = self._removeFromPurchaseIndex(iid)
-		return result
-
-	# retrieval
-
-	def get_pending_purchases(self, items=None):
-		items = to_frozenset(items) if items else None
-		for p in self.values():
-			if 	(p.is_pending() or p.is_unknown()) and \
-				(not items or to_frozenset(p.Items).intersection(items)):
-				yield p
-	
-	def values(self):
-		for iid in self.purchases:
-			p = self._intids.queryObject(iid)
-			if IGiftPurchaseAttempt.providedBy(p):
-				yield p
-
-	def __iter__(self):
-		return self.values()
-
-	def __len__(self):
-		return self.__len.value
-
-	def __nonzero__(self):
-		return True
-	__bool__ = __nonzero__
-	
-	@property
-	def __acl__(self):
-		aces = [ace_allowing(ROLE_ADMIN, ALL_PERMISSIONS, UserGiftHistory)]
-		creator = self.creator
-		if creator is not None:
-			aces.append(ace_allowing(creator, ALL_PERMISSIONS, UserGiftHistory))
-		aces.append(ACE_DENY_ALL)
-		return acl_from_aces(aces)
+	def __init__( self, username=None ):
+		LastModifiedDict.__init__(self)
+		self.username = username
 
 @interface.implementer(IGiftRegistry)
 class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
@@ -174,39 +84,46 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 		try:
 			index = self[username]
 		except KeyError:
-			index = UserGiftHistory()
-			lifecycleevent.created(index)
+			index = GiftRecordMap(username)
 			self[username] = index
 			
-		# register
+		## locate before firing events
 		locate(purchase, index)
+		## add to connection and fire events
 		IConnection(self).add(purchase)
 		lifecycleevent.created(purchase)
-		lifecycleevent.added(purchase)
-		index.add(purchase)
-		
-		# set idens
+		lifecycleevent.added(purchase)  # get an iid
+		## now we can get an OID/NTIID and set creator
 		purchase.creator = username
 		purchase.id = unicode(to_external_ntiid_oid(purchase))
+		index[purchase.id] = purchase
+
 		return purchase
 	add = add_purchase = register_purchase
 	
 	def remove_purchase(self, username, purchase):
-		assert IGiftPurchaseAttempt.providedBy(purchase)
 		if username in self:
 			index = self[username]
-			if index.remove(purchase):
+			pid = getattr(purchase, 'id', purchase)
+			if index.pop(pid) is not None:
 				lifecycleevent.removed(purchase) # remove iid
 				locate(purchase, None)
 				return True
 		return False
+	remove = remove_purchase
 	
 	def get_pending_purchases(self, username, items=None):
+		result = []
 		try:
 			index = self[username]
-			return list(index.get_pending_purchases(items))
+			items = to_frozenset(items) if items else None
+			for p in index.values():
+				if 	(p.is_pending() or p.is_unknown()) and \
+					(not items or to_frozenset(p.Items).intersection(items)):
+					result.append(p)
 		except KeyError:
-			return ()
+			pass
+		return result or ()
 		
 	def get_purchase_history(self, username, start_time=None, end_time=None):
 		result = get_gift_purchase_history(username, start_time, end_time)
