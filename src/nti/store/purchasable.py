@@ -102,7 +102,7 @@ def get_purchasable(pid, registry=component):
 
 def get_purchasables(registry=component, provided=IPurchasable):
 	result = LocatedExternalList()
-	for _, purchasable in registry.getUtilitiesFor(IPurchasable):
+	for _, purchasable in registry.getUtilitiesFor(provided):
 		result.append(purchasable)
 	return result
 get_all_purchasables = get_purchasables
