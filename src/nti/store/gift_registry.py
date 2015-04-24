@@ -112,6 +112,13 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 		return False
 	remove = remove_purchase
 	
+	def get_purchases(self, username):
+		try:
+			index = self[username]
+			return list(index.values())
+		except KeyError:
+			return ()
+
 	def get_pending_purchases(self, username, items=None):
 		result = []
 		try:
