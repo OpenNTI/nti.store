@@ -12,7 +12,6 @@ from zope import interface
 from zope.schema import vocabulary
 from zope.deprecation import deprecated
 
-from zope.container.constraints import contains
 from zope.container.interfaces import IContained
 from zope.container.interfaces import IContainer
 
@@ -147,6 +146,16 @@ ICourse = IPurchasableCourse # alias BWC
 
 class IPurchasableCourseChoiceBundle(IPurchasableChoiceBundle, IPurchasableCourse):
 	pass
+
+class ICopier(interface.Interface):
+	"""
+	An adapter to an object that is being copied
+	"""
+	
+	def __call__(source, *args, **kwargs):
+		"""
+		Given the source object return a new copy.
+		"""
 
 class IPriceable(interface.Interface):
 	NTIID = ValidTextLine(title='Purchasable item NTTID', required=True)
@@ -601,6 +610,22 @@ class IGiftRegistry(IContainer, IContained):
 		pass
 
 	def get_pending_purchases(username, items=None):
+		pass
+
+# transformer
+
+class IObjectTransformer(interface.Interface):
+	"""
+	Called to transform an object
+
+	These are typically found as adapters, registered on the
+	context object. 
+
+	The context object is passed to the ``__call__`` method to allow the adapter
+	factories to return singleton objects such as a function.
+	"""
+
+	def __call__( context, user=None ):
 		pass
 
 # depreecated interfaces

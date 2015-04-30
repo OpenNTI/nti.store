@@ -13,6 +13,8 @@ import six
 
 from nti.mimetype.mimetype import MIME_BASE
 
+from .interfaces import ICopier
+
 STORE_MIME_BASE = MIME_BASE + b'.store'
 
 NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES = \
@@ -57,6 +59,14 @@ def to_list(items=None, delim=' '):
 
 def to_frozenset(items=None, delim=' '):
 	return to_collection(items, frozenset, delim)
+
+def copy_object(source, *args, **kwargs):
+	copier = ICopier(source, None)
+	if copier is not None:
+		result = copier(source, *args, **kwargs)
+	else:
+		result = source.copy(*args, **kwargs)
+	return result
 
 # meta classes
 

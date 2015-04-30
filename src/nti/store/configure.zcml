@@ -61,6 +61,14 @@
 			 provides=".interfaces.IRedemptionError"
 			 for=".interfaces.IRedemptionException" />
 
+	<adapter factory=".priceable._priceable_copier"
+			 provides=".interfaces.ICopier"
+			 for=".interfaces.IPriceable" />
+
+	<adapter factory=".purchase_order._purchase_order_copier"
+			 provides=".interfaces.ICopier"
+			 for=".interfaces.IPurchaseOrder" />
+
 	<!-- Subscribers -->
 	<subscriber handler=".subscribers._on_user_removed" />
 	<subscriber handler=".subscribers._purchase_attempt_failed" />

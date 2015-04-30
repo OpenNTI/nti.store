@@ -25,6 +25,18 @@
 			 for="...interfaces.IPurchaseAttempt"
 			 provides=".interfaces.IStripePurchaseAttempt" />
 
+	<adapter factory=".stripe_purchase._stripe_priceable_copier"
+			 provides="...interfaces.ICopier"
+			 for=".interfaces.IStripePriceable" />
+
+	<adapter factory=".stripe_purchase._stripe_priced_item_copier"
+			 provides="...interfaces.ICopier"
+			 for=".interfaces.IStripePricedItem" />
+
+	<adapter factory=".stripe_purchase._stripe_purchase_order_copier"
+			 provides="...interfaces.ICopier"
+			 for=".interfaces.IStripePurchaseOrder" />
+
 	<utility factory=".stripe_pricing.StripePurchasablePricer"
 			 name="stripe" />
 	

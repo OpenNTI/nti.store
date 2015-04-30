@@ -17,9 +17,13 @@ import BTrees
 
 from zope import component
 from zope import interface
-from zope.container.contained import Contained
-from zope.mimetype.interfaces import IContentTypeAware
+
 from zope.annotation.interfaces import IAttributeAnnotatable
+
+from zope.container.contained import Contained
+
+from zope.mimetype.interfaces import IContentTypeAware
+
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from persistent.mapping import PersistentMapping
@@ -44,6 +48,7 @@ from nti.schema.fieldproperty import createDirectFieldProperties
 from nti.zodb import minmax
 from nti.zodb.persistentproperty import PersistentPropertyHolder
 
+from .utils import copy_object
 from .utils import MetaStoreObject
 
 from .purchase_order import replace_quantity
@@ -309,17 +314,17 @@ def create_purchase_attempt(order, processor, state=None, description=None,
 								context=context)
 	return result
 
-def create_redeemed_purchase_attempt(purchase, redemption_code, purchasables=(),
+def create_redeemed_purchase_attempt(purchase, redemption_code, items=(),
 									 redemption_time=None):
 
 	redemption_time = redemption_time if redemption_time else time.time()
 
-	# copy with order quantity none and item quantity to 1
-	new_order = purchase.Order.copy(purchasables)
+	## copy with order quantity none and item quantity to 1
+	new_order = copy_object(purchase.Order, items=items)
 	new_order.Quantity = None
 	replace_quantity(new_order, 1)
 
-	# copy context
+	## copy context
 	context = purchase.Context
 	context = copy.copy(context) \
 			  if context is not None else empty_purchase_attempt_context()

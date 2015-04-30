@@ -52,11 +52,11 @@ class TestPurchaseOrder(unittest.TestCase):
 		assert_that(order, has_length(2))
 		assert_that(order, has_property('NTIIDs', is_((u'ichigo', u'aizen'))))
 		
-		order = order.copy(None)
+		order = order.copy(items=None)
 		assert_that(order, has_length(2))
 		assert_that(order, has_property('NTIIDs', is_((u'ichigo', u'aizen'))))
 		
-		order = order.copy('aizen')
+		order = order.copy(items='aizen')
 		assert_that(order, has_length(1))
 		assert_that(order, has_property('NTIIDs', is_((u'aizen',))))
 		

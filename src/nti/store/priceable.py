@@ -12,7 +12,9 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
+
 from zope.mimetype.interfaces import IContentTypeAware
+
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from nti.externalization.representation import WithRepr
@@ -21,7 +23,9 @@ from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 
 from .utils import MetaStoreObject
+
 from .interfaces import IPriceable
+
 from .purchasable import get_purchasable
 
 @interface.implementer(IPriceable, IContentTypeAware)
@@ -34,11 +38,8 @@ class Priceable(SchemaConfigured):
 	NTIID = FP(IPriceable['NTIID'])
 	Quantity = FP(IPriceable['Quantity'])
 
-	def copy(self, ntiid=None, quantity=None):
-		ntiid = ntiid or self.NTIID
-		quantity = self.Quantity if quantity is None else quantity
-		result = self.__class__(NTIID=ntiid, Quantity=quantity)
-		return result
+	def copy(self, *args, **kwargs):
+		return copy_priceable(self, *args, **kwargs)
 
 	@property
 	def purchasable(self):
@@ -72,3 +73,13 @@ def create_priceable(ntiid, quantity=1):
 	quantity = 1 if quantity is None else int(quantity)
 	result = Priceable(NTIID=unicode(ntiid), Quantity=quantity)
 	return result
+
+def copy_priceable(source, *args, **kwargs):
+	quantity = kwargs.get('quantity') 
+	ntiid = kwargs.get('ntiid') or source.NTIID
+	quantity = source.Quantity if quantity is None else quantity
+	result = source.__class__(NTIID=ntiid, Quantity=quantity)
+	return result
+
+def _priceable_copier(context):
+	return copy_priceable

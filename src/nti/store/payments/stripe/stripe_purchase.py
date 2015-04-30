@@ -18,8 +18,10 @@ from nti.schema.schema import EqHash
 
 from ...pricing import PricedItem
 from ...priceable import Priceable
+from ...priceable import copy_priceable
 from ...purchase_order import PurchaseItem
 from ...purchase_order import PurchaseOrder
+from ...purchase_order import copy_purchase_order
 from ...purchase_order import create_purchase_order
 
 from .interfaces import IStripePriceable
@@ -35,15 +37,21 @@ class StripePriceable(Priceable):
 
 	Coupon = FP(IStripePriceable['Coupon'])
 
-	def copy(self, ntiid=None, quantity=None, coupon=None):
-		result = super(StripePriceable, self).copy(ntiid, quantity)
-		result.Coupon = coupon or self.Coupon
-		return result
+	def copy(self, *args, **kwargs):
+		return copy_stripe_priceable(self, *args, **kwargs)
 
 def create_stripe_priceable(ntiid, quantity=None, coupon=None):
 	quantity = 1 if quantity is None else int(quantity)
 	result = StripePriceable(NTIID=unicode(ntiid), Quantity=quantity, Coupon=coupon)
 	return result
+
+def copy_stripe_priceable(source, *args, **kwargs):
+	result = copy_priceable(source, *args, **kwargs)
+	result.Coupon = kwargs.get('coupon') or source.Coupon
+	return result
+
+def _stripe_priceable_copier(context):
+	return copy_stripe_priceable
 
 @interface.implementer(IStripePricedItem)
 @EqHash('Coupon', 'NTIID')
@@ -53,13 +61,20 @@ class StripePricedItem(PricedItem):
 
 	@classmethod
 	def copy(cls, priced):
-		result = cls(NTIID=priced.NTIID,
-					 Quantity=priced.Quantity,
-					 PurchaseFee=priced.PurchaseFee,
-					 PurchasePrice=priced.PurchasePrice,
-					 NonDiscountedPrice=priced.NonDiscountedPrice)
-		result.Coupon = getattr(priced, 'Coupon', None)
-		return result
+		return copy_stripe_priced_item(priced, cls=cls)
+
+def copy_stripe_priced_item(priced, *args, **kwargs):
+	cls = kwargs.get('cls') or priced.__class__
+	result = cls(NTIID=priced.NTIID,
+				 Quantity=priced.Quantity,
+				 PurchaseFee=priced.PurchaseFee,
+				 PurchasePrice=priced.PurchasePrice,
+				 NonDiscountedPrice=priced.NonDiscountedPrice)
+	result.Coupon = getattr(priced, 'Coupon', None)
+	return result
+
+def _stripe_priced_item_copier(context):
+	return copy_stripe_priced_item
 
 # alias bwc
 class StripePricedPurchasable(StripePricedItem):
@@ -81,9 +96,8 @@ class StripePurchaseOrder(PurchaseOrder):
 	def item_factory(self, item):
 		return create_stripe_purchase_item(ntiid=item)
 	
-	def copy(self, purchasables=None, coupon=None):
-		result = super(StripePurchaseOrder, self).copy(purchasables)
-		result.Coupon = coupon or self.Coupon
+	def copy(self, *args, **kwargs):
+		result = copy_stripe_purchase_order(self, *args, **kwargs)
 		return result
 
 	def __eq__(self, other):
@@ -104,3 +118,12 @@ def create_stripe_purchase_order(items, quantity=None, coupon=None):
 		replace_coupon(result, None)
 		result.Coupon = coupon
 	return result
+
+def copy_stripe_purchase_order(source, *args, **kwargs):
+	coupon = kwargs.pop('coupon', None)
+	result = copy_purchase_order(source, *args, **kwargs)
+	result.Coupon = coupon or source.Coupon
+	return result
+
+def _stripe_purchase_order_copier(context):
+	return copy_stripe_purchase_order
