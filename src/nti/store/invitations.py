@@ -18,6 +18,8 @@ import zc.intid as zc_intid
 from zope import component
 from zope import interface
 
+from zope.proxy import removeAllProxies
+
 # TODO: remove dep from nti.appserver
 from nti.appserver.invitations.interfaces import IInvitation
 from nti.appserver.invitations.invitation import JoinEntitiesInvitation
@@ -77,7 +79,7 @@ class _StorePurchaseInvitation(JoinEntitiesInvitation):
 
 def get_invitation_code(purchase, registry=component):
 	if purchase is not None:
-		iid = registry.getUtility(zc_intid.IIntIds).getId(purchase)
+		iid = registry.getUtility(zc_intid.IIntIds).getId(removeAllProxies(purchase))
 		__traceback_info__ = purchase, iid
 		result = to_external_string(iid)
 		return result
