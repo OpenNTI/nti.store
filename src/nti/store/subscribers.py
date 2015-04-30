@@ -21,6 +21,8 @@ from zope.event import notify
 
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 
+from zope.proxy import removeAllProxies
+
 # TODO: break this dep
 from nti.appserver.invitations.interfaces import IInvitationAcceptedEvent
 
@@ -69,6 +71,7 @@ from .store import get_transaction_code
 
 def _update_state(purchase, state):
 	if purchase is not None:
+		purchase = removeAllProxies(purchase)
 		purchase.updateLastMod()
 		purchase.State = state
 		lifecycleevent.modified(purchase)
@@ -150,6 +153,7 @@ def _purchase_attempt_failed(purchase, event):
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptSynced)
 def _purchase_attempt_synced(purchase, event):
+	purchase = removeAllProxies(purchase)
 	purchase.Synced = True
 	purchase.updateLastMod()
 	lifecycleevent.modified(purchase)
@@ -201,6 +205,7 @@ def _gift_purchase_attempt_redeemed(purchase, event):
 											code=code)
 
 	## change state
+	purchase = removeAllProxies(purchase)
 	purchase.State = PA_STATE_REDEEMED
 	purchase.TargetPurchaseID = new_pid
 	purchase.updateLastMod()
