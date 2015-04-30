@@ -14,8 +14,13 @@ logger = __import__('logging').getLogger(__name__)
 import time
 
 from zope import component
-from zope.event import notify
+
 from zope import lifecycleevent
+
+from zope.event import notify
+
+from zope.proxy import removeAllProxies
+
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 
 # TODO: break this dep
@@ -192,13 +197,12 @@ def _gift_purchase_attempt_redeemed(purchase, event):
 	if purchase.is_redeemed():
 		raise RedemptionException("Gift purchase already redeemed")
 
-	# create  and register a purchase attempt for accepting user
-	code = get_invitation_code(purchase)
+	code = event.code or get_invitation_code(removeAllProxies(purchase))
 	new_pid = _make_redeem_purchase_attempt(user=event.user, 
 											original=purchase,
 											code=code)
 
-	# change state
+	## change state
 	purchase.State = PA_STATE_REDEEMED
 	purchase.TargetPurchaseID = new_pid
 	purchase.updateLastMod()
