@@ -69,7 +69,6 @@ class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle, Contained)
 	isPublic = alias('Public')
 	isGiftable = alias('Giftable')
 	
-
 	@Lazy
 	def __acl__(self):
 		return (ace_allowing(EVERYONE_USER_NAME, authorization.ACT_READ, self),)

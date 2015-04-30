@@ -17,7 +17,7 @@ from zope import interface
 from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
-from nti.common.property import Lazy
+from nti.common.property import CachedProperty
 
 from nti.externalization.representation import WithRepr
 
@@ -58,7 +58,7 @@ class PurchaseOrder(SchemaConfigured):
 	def item_factory(self, item):
 		return create_purchase_item(ntiid=item)
 	
-	@Lazy
+	@CachedProperty('Items')
 	def NTIIDs(self):
 		result = tuple(x.NTIID for x in self.Items)
 		return result
