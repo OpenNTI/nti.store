@@ -18,13 +18,13 @@ from nti.externalization.datastructures import InterfaceObjectIO
 
 from nti.externalization.interfaces import IInternalObjectIO
 from nti.externalization.interfaces import LocatedExternalDict
-from nti.externalization .interfaces import IInternalObjectExternalizer
+from nti.externalization.interfaces import IInternalObjectExternalizer
 
 from .interfaces import IStripeCoupon
 from .interfaces import IStripePurchaseError
 
 def _makenone(s):
-	if isinstance(s, six.string_types) and s == 'None':
+	if isinstance(s, six.string_types) and s.lower() == 'none':
 		s = None
 	return s
 
