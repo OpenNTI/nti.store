@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, unicode_literals, absolute_import, division
-from hamcrest.library.object.hasproperty import has_property
+from nti.store.interfaces import IPurchasable, IPurchasableChoiceBundle
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -15,7 +15,7 @@ from hamcrest import is_not
 from hamcrest import contains
 from hamcrest import has_length
 from hamcrest import assert_that
-
+from hamcrest import has_property
 import unittest
 
 from nti.dataserver.users import User
@@ -25,7 +25,10 @@ from nti.externalization.internalization import update_from_external_object
 
 from nti.ntiids.ntiids import find_object_with_ntiid
 
+from nti.schema.interfaces import find_most_derived_interface
+
 from nti.store.purchasable import get_purchasable
+from nti.store.purchasable import PurchasableChoiceBundle
 from nti.store.purchasable import expand_purchase_item_ids
 
 from nti.store.purchase_order import create_purchase_item
@@ -76,7 +79,6 @@ class TestPurchasable(unittest.TestCase):
 		assert_that('volatility', is_in(items))
 
 	def test_internalization(self):
-		
 		ext_obj = {
 			'Amount': 300.0,
 			'Author': u'CMU',
@@ -119,3 +121,8 @@ class TestPurchasable(unittest.TestCase):
 		assert_that(result, has_property('Items', has_length(1)))
 		assert_that(result, has_property('Items', contains('tag:nextthought.com,2011-10:CMU-HTML-04630_main.04_630:_computer_science_for_practicing_engineers')))
 		
+	def test_interface(self):
+		from IPython.core.debugger import Tracer; Tracer()()
+		p = PurchasableChoiceBundle()
+		iface = find_most_derived_interface(p, IPurchasable)
+		assert_that(iface, is_(IPurchasableChoiceBundle))
