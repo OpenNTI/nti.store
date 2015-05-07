@@ -164,6 +164,11 @@
 			 provides="nti.externalization.interfaces.IInternalObjectExternalizer"
 			 name="summary" />
 		 	
+	<!-- Internalization -->
+	<adapter factory=".internalization._PurchasableUpdater"
+			 for=".interfaces.IPurchasable"
+			 provides="nti.externalization.interfaces.IInternalObjectUpdater" />
+			 
 	<!-- Metadata -->
 	<configure zcml:condition="installed nti.metadata">
 		<subscriber	factory=".predicates._PurchaseAttemptPrincipalObjects"

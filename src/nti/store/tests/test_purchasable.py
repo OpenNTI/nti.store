@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, unicode_literals, absolute_import, division
+from hamcrest.library.object.hasproperty import has_property
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -11,12 +12,16 @@ from hamcrest import is_
 from hamcrest import none
 from hamcrest import is_in
 from hamcrest import is_not
+from hamcrest import contains
 from hamcrest import has_length
 from hamcrest import assert_that
 
 import unittest
 
 from nti.dataserver.users import User
+
+from nti.externalization.internalization import find_factory_for
+from nti.externalization.internalization import update_from_external_object
 
 from nti.ntiids.ntiids import find_object_with_ntiid
 
@@ -69,3 +74,48 @@ class TestPurchasable(unittest.TestCase):
 		assert_that(items, has_length(2))
 		assert_that('var-risk', is_in(items))
 		assert_that('volatility', is_in(items))
+
+	def test_internalization(self):
+		
+		ext_obj = {
+			'Amount': 300.0,
+			'Author': u'CMU',
+			'BulkPurchase': True,
+			'Class': 'Purchasable',
+			'Currency': u'USD',
+			'Description': u'04-630: Computer Science for Practicing Engineers',
+			'Discountable': True,
+			'Fee': None,
+			'Giftable': False,
+			'Icon': u'http://cmu.edu/',
+			'IsPurchasable': True,
+			'Items': [u'tag:nextthought.com,2011-10:CMU-HTML-04630_main.04_630:_computer_science_for_practicing_engineers'],
+			'License': u'1 Year License',
+			'MimeType': 'application/vnd.nextthought.store.purchasable',
+			'NTIID': u'tag:nextthought.com,2011-10:CMU-purchasable-computer_science_for_practicing_engineer',
+			'Provider': u'CMU',
+			'Public': True,
+			'Redeemable': False}
+			
+		factory = find_factory_for(ext_obj)
+		assert_that(factory, is_not(none()))
+		result = factory()
+		update_from_external_object(result, ext_obj)
+		
+		assert_that(result, has_property('Fee', is_(none())))
+		assert_that(result, has_property('Public', is_(True)))
+		assert_that(result, has_property('Amount', is_(300.0)))
+		assert_that(result, has_property('Author', is_('CMU')))
+		assert_that(result, has_property('Provider', is_('CMU')))
+		assert_that(result, has_property('Currency', is_('USD')))
+		assert_that(result, has_property('Giftable', is_(False)))
+		assert_that(result, has_property('Redeemable', is_(False)))
+		assert_that(result, has_property('BulkPurchase', is_(True)))
+		assert_that(result, has_property('Discountable', is_(True)))
+		assert_that(result, has_property('Icon', is_('http://cmu.edu/')))
+		assert_that(result, has_property('License', is_(u'1 Year License')))
+		assert_that(result, has_property('Description', is_(u'04-630: Computer Science for Practicing Engineers')))
+		assert_that(result, has_property('NTIID', is_( u'tag:nextthought.com,2011-10:CMU-purchasable-computer_science_for_practicing_engineer')))
+		assert_that(result, has_property('Items', has_length(1)))
+		assert_that(result, has_property('Items', contains('tag:nextthought.com,2011-10:CMU-HTML-04630_main.04_630:_computer_science_for_practicing_engineers')))
+		
