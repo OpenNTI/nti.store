@@ -13,17 +13,12 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import component
 from zope import interface
+
 from zope.container.contained import Contained
+
 from zope.mimetype.interfaces import IContentTypeAware
 
-from nti.common.property import Lazy
 from nti.common.property import alias
-
-from nti.dataserver import authorization
-from nti.dataserver.authorization_acl import ace_allowing
-
-from nti.dataserver.interfaces import IACLProvider
-from nti.dataserver.interfaces import EVERYONE_USER_NAME
 
 from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
@@ -54,7 +49,7 @@ class DefaultPurchasableVendorInfo(dict):
 	def toExternalObject(self, *args, **kwargs):
 		return dict(self)
 	
-@interface.implementer(IPurchasable, IACLProvider, IContentTypeAware)
+@interface.implementer(IPurchasable, IContentTypeAware)
 @WithRepr
 @EqHash('NTIID',)
 class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle, Contained):
@@ -68,10 +63,6 @@ class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle, Contained)
 	
 	isPublic = alias('Public')
 	isGiftable = alias('Giftable')
-	
-	@Lazy
-	def __acl__(self):
-		return (ace_allowing(EVERYONE_USER_NAME, authorization.ACT_READ, self),)
 
 @interface.implementer(IPurchasableChoiceBundle)
 class PurchasableChoiceBundle(Purchasable):
