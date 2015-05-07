@@ -122,7 +122,6 @@ class TestPurchasable(unittest.TestCase):
 		assert_that(result, has_property('Items', contains('tag:nextthought.com,2011-10:CMU-HTML-04630_main.04_630:_computer_science_for_practicing_engineers')))
 		
 	def test_interface(self):
-		from IPython.core.debugger import Tracer; Tracer()()
 		p = PurchasableChoiceBundle()
 		iface = find_most_derived_interface(p, IPurchasable)
 		assert_that(iface, is_(IPurchasableChoiceBundle))
