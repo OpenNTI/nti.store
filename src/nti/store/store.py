@@ -61,26 +61,24 @@ from .purchase_history import remove_purchase_attempt as remove_hist_purchase_at
 get_purchasable = get_purchasable
 get_all_purchasables = get_purchasables
 
-def register_purchasable(purchasable, name=None, registry=None):
-	name = name or purchasable.NTIID
+def register_purchasable(item, name=None, registry=None):
+	name = name or item.NTIID
 	registry = registry if registry is not None else component.getSiteManager()
-	provided = find_most_derived_interface(purchasable, IPurchasable)
-	registerUtility(component,
-					provided=provided,
-					name=name)
-
-	## try to add the purchasable to the current connection
+	provided = find_most_derived_interface(item, IPurchasable)
+	registerUtility(registry, item, provided=provided, name=name)
 	connection = IConnection(registry, None)
 	if connection is not None:
-		lifecycleevent.added(purchasable)
+		connection.add(item)
+		lifecycleevent.added(item)
+	return item
 
-def remove_purchasable(purchasable, registry=None):
-	name = getattr(purchasable, 'NTIID', purchasable)
+def remove_purchasable(item, registry=None):
+	name = getattr(item, 'NTIID', item)
 	registry = registry if registry is not None else component.getSiteManager()
-	provided =  find_most_derived_interface(purchasable, IPurchasable) \
-				if IPurchasable.providedBy(purchasable) else IPurchasable
-	unregisterUtility(provided=provided, name=name)
-	lifecycleevent.removed(purchasable)
+	provided =  find_most_derived_interface(item, IPurchasable) \
+				if IPurchasable.providedBy(item) else IPurchasable
+	unregisterUtility(registry, provided=provided, name=name)
+	lifecycleevent.removed(item)
 
 ## Transaction codes
 
