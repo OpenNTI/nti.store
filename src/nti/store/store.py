@@ -9,12 +9,23 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from zope import component
+from zope import lifecycleevent
+
 from zope.annotation import IAnnotations
+
+from ZODB.interfaces import IConnection
 
 from nti.ntiids.ntiids import find_object_with_ntiid
 
+from nti.schema.interfaces import find_most_derived_interface
+
+from nti.site.utils import registerUtility
+from nti.site.utils import unregisterUtility
+
 from . import get_user
 
+from .interfaces import IPurchasable
 from .interfaces import IPurchaseAttempt
 from .interfaces import IPurchaseHistory
 from .interfaces import IGiftPurchaseAttempt
@@ -31,9 +42,12 @@ from .invitations import get_purchase_by_code
 from .purchasable import get_purchasable
 from .purchasable import get_purchasables
 
-from .purchase_history import PurchaseHistory
+from .purchase_attempt import create_purchase_attempt
+from .purchase_attempt import create_gift_purchase_attempt
+from .purchase_attempt import get_purchasables as get_purchase_purchasables
 
 from .purchase_history import activate_items
+from .purchase_history import PurchaseHistory
 from .purchase_history import deactivate_items
 from .purchase_history import is_item_activated
 from .purchase_history import has_history_by_item
@@ -43,36 +57,51 @@ from .purchase_history import get_purchase_history_by_item
 from .purchase_history import get_purchase_history as get_user_purchase_history
 from .purchase_history import remove_purchase_attempt as remove_hist_purchase_attempt
 
-from .purchase_attempt import create_purchase_attempt
-from .purchase_attempt import create_gift_purchase_attempt
-from .purchase_attempt import get_purchasables as get_purchase_purchasables
-
-# rexport
+## Purchasables
 get_purchasable = get_purchasable
 get_all_purchasables = get_purchasables
+
+def register_purchasable(purchasable, name=None, registry=None):
+	name = name or purchasable.NTIID
+	registry = registry if registry is not None else component.getSiteManager()
+	provided = find_most_derived_interface(purchasable, IPurchasable)
+	registerUtility(component,
+					provided=provided,
+					name=name)
+
+	## try to add the purchasable to the current connection
+	connection = IConnection(registry, None)
+	if connection is not None:
+		lifecycleevent.added(purchasable)
+
+def remove_purchasable(purchasable, registry=None):
+	name = getattr(purchasable, 'NTIID', purchasable)
+	registry = registry if registry is not None else component.getSiteManager()
+	provided =  find_most_derived_interface(purchasable, IPurchasable) \
+				if IPurchasable.providedBy(purchasable) else IPurchasable
+	unregisterUtility(provided=provided, name=name)
+	lifecycleevent.removed(purchasable)
+
+## Transaction codes
 
 get_gift_code = get_invitation_code
 get_transaction_code = get_invitation_code
 get_purchase_by_code = get_purchase_by_code
 
+## Item activation
+
 activate_items = activate_items
 deactivate_items = deactivate_items
 is_item_activated = is_item_activated
-has_history_by_item = has_history_by_item
+
+## Purchase attempt
+
 get_pending_purchases = get_pending_purchases
+create_purchase_attempt = create_purchase_attempt
 register_purchase_attempt = register_purchase_attempt
 get_purchase_purchasables = get_purchase_purchasables
 get_user_purchase_history = get_user_purchase_history
 get_purchase_history_by_item = get_purchase_history_by_item
-
-get_gift_registry = get_gift_registry
-get_gift_purchase_history = get_gift_purchase_history
-get_gift_pending_purchases = get_gift_pending_purchases
-register_gift_purchase_attempt = register_gift_purchase_attempt
-
-create_purchase_attempt = create_purchase_attempt
-create_gift_purchase_attempt = create_gift_purchase_attempt
-
 
 def get_purchase_attempt(purchase_id, user=None):
 	result = find_object_with_ntiid(purchase_id) if purchase_id else None
@@ -100,6 +129,18 @@ def remove_purchase_attempt(purchase, user=None):
 	else:
 		result = False
 	return result
+
+## Gift registry
+
+get_gift_registry = get_gift_registry
+get_gift_purchase_history = get_gift_purchase_history
+get_gift_pending_purchases = get_gift_pending_purchases
+create_gift_purchase_attempt = create_gift_purchase_attempt
+register_gift_purchase_attempt = register_gift_purchase_attempt
+
+## Purchase history
+
+has_history_by_item = has_history_by_item
 
 def get_purchase_history_annotation_key():
 	annotation_key = "%s.%s" % (PurchaseHistory.__module__, PurchaseHistory.__name__)
