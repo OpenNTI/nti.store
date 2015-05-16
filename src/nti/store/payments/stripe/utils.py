@@ -14,6 +14,8 @@ logger = __import__('logging').getLogger(__name__)
 import six
 import time
 
+from nti.common.string import safestr
+
 from nti.externalization.externalization import to_external_object
 
 from ...payment_charge import UserAddress
@@ -27,13 +29,9 @@ from .interfaces import IStripeError
 from .interfaces import IStripePurchaseError
 from .interfaces import IStripeOperationError
 
-def safestr(s):
-	s = s.decode("utf-8") if isinstance(s, bytes) else s
-	return unicode(s) if s is not None else None
-
 def makenone(s, default=None):
 	if isinstance(s, six.string_types):
-		s = default if s == 'None' else unicode(s)		
+		s = default if s == 'None' else unicode(s)
 	return s
 
 def flatten_context(context=None):
@@ -46,21 +44,21 @@ def flatten_context(context=None):
 		v = safestr(v) if v else v
 		if not v:
 			continue
-		result[k] = v[:500] # stripe requirement
+		result[k] = v[:500]  # stripe requirement
 	return result
 
-def get_charge_metata(purchase_id, username=None, 
+def get_charge_metata(purchase_id, username=None,
 					  customer_id=None, context=None):
 	"""
 	proceduce a json object for a stripe charge description
 	"""
-	context = to_external_object(context) if context else None 
+	context = to_external_object(context) if context else None
 	data = {'PurchaseID': purchase_id}
 	if username:
 		data['Username'] = username
 	if customer_id:
 		data['CustomerID'] = customer_id
-	
+
 	context = flatten_context(context)
 	if context:
 		data.update(flatten_context(context))
