@@ -57,7 +57,7 @@ from .purchase_history import get_purchase_history_by_item
 from .purchase_history import get_purchase_history as get_user_purchase_history
 from .purchase_history import remove_purchase_attempt as remove_hist_purchase_attempt
 
-## Purchasables
+# Purchasables
 get_purchasable = get_purchasable
 get_all_purchasables = get_purchasables
 
@@ -75,24 +75,26 @@ def register_purchasable(item, name=None, registry=None):
 def remove_purchasable(item, registry=None):
 	name = getattr(item, 'NTIID', item)
 	registry = registry if registry is not None else component.getSiteManager()
-	provided =  find_most_derived_interface(item, IPurchasable) \
-				if IPurchasable.providedBy(item) else IPurchasable
+	if IPurchasable.providedBy(item):
+		provided = find_most_derived_interface(item, IPurchasable)
+	else:
+		provided = IPurchasable
 	unregisterUtility(registry, provided=provided, name=name)
 	lifecycleevent.removed(item)
 
-## Transaction codes
+# Transaction codes
 
 get_gift_code = get_invitation_code
 get_transaction_code = get_invitation_code
 get_purchase_by_code = get_purchase_by_code
 
-## Item activation
+# Item activation
 
 activate_items = activate_items
 deactivate_items = deactivate_items
 is_item_activated = is_item_activated
 
-## Purchase attempt
+# Purchase attempt
 
 get_pending_purchases = get_pending_purchases
 create_purchase_attempt = create_purchase_attempt
@@ -117,7 +119,7 @@ def get_purchase_attempt(purchase_id, user=None):
 def remove_purchase_attempt(purchase, user=None):
 	if not IPurchaseAttempt.providedBy(purchase):
 		purchase = get_purchase_attempt(purchase, user)
-	
+
 	if IGiftPurchaseAttempt.providedBy(purchase):
 		username = user or purchase.creator
 		result = remove_gift_purchase_attempt(purchase, username)
@@ -128,7 +130,7 @@ def remove_purchase_attempt(purchase, user=None):
 		result = False
 	return result
 
-## Gift registry
+# Gift registry
 
 get_gift_registry = get_gift_registry
 get_gift_purchase_history = get_gift_purchase_history
@@ -136,7 +138,7 @@ get_gift_pending_purchases = get_gift_pending_purchases
 create_gift_purchase_attempt = create_gift_purchase_attempt
 register_gift_purchase_attempt = register_gift_purchase_attempt
 
-## Purchase history
+# Purchase history
 
 has_history_by_item = has_history_by_item
 
