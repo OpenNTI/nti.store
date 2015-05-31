@@ -14,7 +14,9 @@ logger = __import__('logging').getLogger(__name__)
 from functools import total_ordering
 
 from zope import interface
+
 from zope.mimetype.interfaces import IContentTypeAware
+
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from nti.externalization.representation import WithRepr
@@ -27,9 +29,9 @@ from .utils import MetaStoreObject
 from .interfaces import IUserAddress
 from .interfaces import IPaymentCharge
 
-@interface.implementer(IUserAddress, IContentTypeAware)
 @WithRepr
 @EqHash('Zip', 'City', 'State', 'Street', 'Country')
+@interface.implementer(IUserAddress, IContentTypeAware)
 class UserAddress(SchemaConfigured):
 
 	__metaclass__ = MetaStoreObject
@@ -87,4 +89,3 @@ class PaymentCharge(SchemaConfigured):
 			return self.Created > other.Created
 		except AttributeError:
 			return NotImplemented
-

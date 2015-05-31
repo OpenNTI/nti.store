@@ -24,9 +24,6 @@ from nti.schema.fieldproperty import createDirectFieldProperties
 
 from .utils import MetaStoreObject
 
-from . import PricingException
-from . import InvalidPurchasable
-
 from .priceable import Priceable
 
 from .interfaces import IPricedItem
@@ -34,6 +31,8 @@ from .interfaces import IPricingResults
 from .interfaces import IPurchasablePricer
 
 from . import ROUND_DECIMAL
+from . import PricingException
+from . import InvalidPurchasable
 
 @interface.implementer(IPricedItem, IContentTypeAware)
 @WithRepr

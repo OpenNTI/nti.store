@@ -37,7 +37,7 @@ class PurchaseAttemptDecorator(object):
 	def decorateExternalObject(self, original, external):
 		code = get_transaction_code(original)
 		external['TransactionID'] = code
-			
+
 @component.adapter(IInvitationPurchaseAttempt)
 @interface.implementer(IExternalObjectDecorator)
 class InvitationPurchaseAttemptDecorator(object):
@@ -63,7 +63,7 @@ class GiftPurchaseAttemptDecorator(object):
 		external['Sender'] = original.SenderName
 		if original.has_succeeded():
 			external['RedemptionCode'] = external['GiftCode'] = code
-		
+
 @component.adapter(IPricedItem)
 @interface.implementer(IExternalObjectDecorator)
 class PricedItemDecorator(object):
@@ -77,7 +77,7 @@ class PricedItemDecorator(object):
 		external['Provider'] = original.Provider
 		external['Amount'] = original.Amount
 		external['Currency'] = original.Currency
-				
+
 @component.adapter(IPurchasableCourse)
 @interface.implementer(IExternalObjectDecorator)
 class PurchasableCourseDecorator(object):
@@ -86,7 +86,7 @@ class PurchasableCourseDecorator(object):
 
 	def decorateExternalObject(self, original, external):
 		# remove deprecated / legacy if no value is specified
-		for name in ('Featured', 'Preview', 'StartDate', 'Department', 
+		for name in ('Featured', 'Preview', 'StartDate', 'Department',
 					 'Signature', 'Communities', 'Duration', 'EndDate'):
 			value = external.get(name)
 			if value is None:

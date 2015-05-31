@@ -73,9 +73,9 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 
 	vendor = DefaultPurchasableVendorInfo(vendor_info) \
 			 if vendor_info and isinstance(vendor_info, Mapping) else None
-	
+
 	result = factory()
-	
+
 	# basic info
 	result.Name = name
 	result.NTIID = ntiid
@@ -84,24 +84,24 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 	result.Author = author
 	result.Provider = provider
 	result.Description = description
-	
+
 	# cost
 	result.Fee = fee
 	result.Amount = amount
 	result.Currency = currency
-	
+
 	# flags
 	result.Public = public
 	result.Giftable = giftable
 	result.Redeemable = redeemable
 	result.Discountable = discountable
 	result.BulkPurchase = bulk_purchase
-	
+
 	# extras
 	result.Icon = icon
 	result.VendorInfo = vendor
 	result.Thumbnail = thumbnail
-	
+
 	# deprecated / legacy
 	result.Preview = preview
 	result.License = license_
@@ -110,7 +110,7 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 	result.Signature = signature
 	result.Department = department
 	result.Communities = communities
-	
+
 	return result
 
 def get_course(course_id, registry=component):
@@ -121,4 +121,4 @@ import zope.deferredimport
 zope.deferredimport.initialize()
 zope.deferredimport.deprecated(
 	"Use PurchasableCourse instead",
-	Course = 'nti.store.course:PurchasableCourse' )
+	Course='nti.store.course:PurchasableCourse')

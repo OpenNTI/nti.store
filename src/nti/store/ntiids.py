@@ -21,14 +21,13 @@ from .purchasable import get_purchasable
 class _PurchasableResolver(object):
 
 	singleton = None
-	
+
 	def __new__(cls, *args, **kwargs):
 		if not cls.singleton:
 			cls.singleton = super(_PurchasableResolver, cls).__new__(cls)
 		return cls.singleton
-	
+
 	def resolve(self, ntiid_string):
 		return get_purchasable(ntiid_string)
 
-_CourseResolver = _PurchasableResolver # alias BWC
-
+_CourseResolver = _PurchasableResolver  # alias BWC

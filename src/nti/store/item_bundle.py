@@ -14,7 +14,7 @@ logger = __import__('logging').getLogger(__name__)
 from zope import interface
 from zope.annotation.interfaces import IAttributeAnnotatable
 
-from nti.externalization.representation import WithRepr
+from nti.common.representation import WithRepr
 
 from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
@@ -37,4 +37,4 @@ class ItemBundle(SchemaConfigured):
 
 	def __str__(self):
 		return self.NTIID
-ContentBundle = ItemBundle # BWC
+ContentBundle = ItemBundle  # BWC

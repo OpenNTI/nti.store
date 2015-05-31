@@ -27,9 +27,9 @@ from nti.appserver.invitations.invitation import JoinEntitiesInvitation
 from nti.externalization.integer_strings import to_external_string
 from nti.externalization.integer_strings import from_external_string
 
-from . import get_user
-
 from .interfaces import IStorePurchaseInvitation
+
+from . import get_user
 
 interface.alsoProvides(IStorePurchaseInvitation, IInvitation)
 
@@ -51,7 +51,7 @@ class InvitationExpired(Exception):
 	Raised when a user is attempting to accept an expired invitation
 	"""
 	i18n_message = _("Invitation expired")
-	
+
 @interface.implementer(IStorePurchaseInvitation)
 class _StorePurchaseInvitation(JoinEntitiesInvitation):
 
@@ -66,7 +66,7 @@ class _StorePurchaseInvitation(JoinEntitiesInvitation):
 	def register(self, user, linked_purchase_id=None, now=None):
 		if self.purchase.isExpired(now=now):
 			raise InvitationExpired()
-			
+
 		if not self.purchase.register(user, linked_purchase_id):
 			raise InvitationAlreadyAccepted()
 

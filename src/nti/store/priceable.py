@@ -28,9 +28,9 @@ from .interfaces import IPriceable
 
 from .purchasable import get_purchasable
 
-@interface.implementer(IPriceable, IContentTypeAware)
 @WithRepr
 @EqHash('NTIID', 'Quantity')
+@interface.implementer(IPriceable, IContentTypeAware)
 class Priceable(SchemaConfigured):
 
 	__metaclass__ = MetaStoreObject
@@ -75,7 +75,7 @@ def create_priceable(ntiid, quantity=1):
 	return result
 
 def copy_priceable(source, *args, **kwargs):
-	quantity = kwargs.get('quantity') 
+	quantity = kwargs.get('quantity')
 	ntiid = kwargs.get('ntiid') or source.NTIID
 	quantity = source.Quantity if quantity is None else quantity
 	result = source.__class__(NTIID=ntiid, Quantity=quantity)

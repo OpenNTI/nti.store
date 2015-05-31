@@ -37,12 +37,12 @@ from .purchase_attempt import DefaultPurchaseAttemptContext
 @interface.implementer(IPurchasableVendorInfo)
 def _mapping_to_vendorinfo(data):
 	return DefaultPurchasableVendorInfo(**data)
-	
+
 @component.adapter(IDict)
 @interface.implementer(IPurchaseAttemptContext)
 def _mapping_to_purchase_attempt_context(data):
 	return DefaultPurchaseAttemptContext(**data)
-	
+
 @component.adapter(IString)
 @interface.implementer(IPurchaseError)
 def _string_purchase_error(message):

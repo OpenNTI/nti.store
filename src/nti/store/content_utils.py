@@ -14,25 +14,25 @@ from zope import component
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
 def get_library(library=None, registry=component):
-    if library is None:
-        return registry.queryUtility(IContentPackageLibrary)
-    return library
-                     
+	if library is None:
+		return registry.queryUtility(IContentPackageLibrary)
+	return library
+
 def get_paths(ntiid, library=None, registry=component):
-    library = get_library(registry=registry)
-    paths = library.pathToNTIID(ntiid) if library and ntiid else ()
-    return paths or ()
+	library = get_library(registry=registry)
+	paths = library.pathToNTIID(ntiid) if library and ntiid else ()
+	return paths or ()
 
 def get_ntiid_path(ntiid, library=None, registry=component):
-    result = get_paths(ntiid, library, registry)
-    result = tuple([p.ntiid for p in result]) if result else ()
-    return result
+	result = get_paths(ntiid, library, registry)
+	result = tuple([p.ntiid for p in result]) if result else ()
+	return result
 
 def get_collection_root(ntiid, library=None, registry=component):
-    paths = get_paths(ntiid, library, registry)
-    return paths[0] if paths else None
+	paths = get_paths(ntiid, library, registry)
+	return paths[0] if paths else None
 
 def get_collection_root_ntiid(ntiid, library=None, registry=component):
-    croot = get_collection_root(ntiid, library, registry)
-    result = croot.ntiid if croot else None
-    return result
+	croot = get_collection_root(ntiid, library, registry)
+	result = croot.ntiid if croot else None
+	return result

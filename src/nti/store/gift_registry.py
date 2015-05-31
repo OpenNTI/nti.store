@@ -57,61 +57,61 @@ class UserGiftHistory(Contained, Persistent):
 
 class GiftRecordMap(LastModifiedDict, Contained):
 
-	def __init__( self, username=None ):
+	def __init__(self, username=None):
 		LastModifiedDict.__init__(self)
 		self.username = username
 
 @interface.implementer(IGiftRegistry)
 class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
-	
+
 	family = BTrees.family64
-	
+
 	def __init__(self):
-		super(GiftRegistry,self).__init__()
-	
+		super(GiftRegistry, self).__init__()
+
 	@property
 	def Items(self):
 		return dict(self)
-	
+
 	@property
 	def intids(self):
 		result = component.getUtility(zope.intid.IIntIds)
 		return result
-		
+
 	def register_purchase(self, username, purchase):
 		assert IGiftPurchaseAttempt.providedBy(purchase)
-		
+
 		try:
 			index = self[username]
 		except KeyError:
 			index = GiftRecordMap(username)
 			self[username] = index
-			
-		## locate before firing events
+
+		# # locate before firing events
 		locate(purchase, index)
-		## add to connection and fire events
+		# # add to connection and fire events
 		IConnection(self).add(purchase)
 		lifecycleevent.created(purchase)
 		lifecycleevent.added(purchase)  # get an iid
-		## now we can get an OID/NTIID and set creator
+		# # now we can get an OID/NTIID and set creator
 		purchase.creator = username
 		purchase.id = unicode(to_external_ntiid_oid(purchase))
 		index[purchase.id] = purchase
 
 		return purchase
 	add = add_purchase = register_purchase
-	
+
 	def remove_purchase(self, username, purchase):
 		if username in self:
 			index = self[username]
 			pid = getattr(purchase, 'id', purchase)
 			if index.pop(pid) is not None:
-				lifecycleevent.removed(purchase) # remove iid
+				lifecycleevent.removed(purchase)  # remove iid
 				locate(purchase, None)
 				return True
 		return False
 	remove = remove_purchase
-	
+
 	def get_purchases(self, username):
 		try:
 			index = self[username]
@@ -131,7 +131,7 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 		except KeyError:
 			pass
 		return result or ()
-		
+
 	def get_purchase_history(self, username, start_time=None, end_time=None):
 		result = get_gift_purchase_history(username, start_time, end_time)
 		return result
@@ -168,7 +168,7 @@ def get_gift_purchase_history(username, start_time=None, end_time=None, catalog=
 		creator_intids = catalog[IX_CREATOR].apply({'any_of': (username,)})
 		time_ids = catalog[IX_CREATEDTIME].apply({'between': (start_time, end_time)})
 		doc_ids = catalog.family.IF.intersection(mimetype_intids, creator_intids)
-		doc_ids = catalog.family.IF.intersection(doc_ids, time_ids) 
+		doc_ids = catalog.family.IF.intersection(doc_ids, time_ids)
 		result = LocatedExternalList(ResultSet(doc_ids, intids, ignore_invalid=True))
 	else:
 		result = ()

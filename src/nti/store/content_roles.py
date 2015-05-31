@@ -22,9 +22,9 @@ from nti.dataserver.interfaces import IMutableGroupMember
 
 from nti.ntiids import ntiids
 
-from . import get_user
-
 from .content_utils import get_collection_root_ntiid
+
+from . import get_user
 
 def get_descendants(unit):
 	yield unit
@@ -117,7 +117,7 @@ def remove_users_content_roles(user, items, library=None, registry=component):
 
 def get_users_content_roles(user, registry=component):
 	"""
-	Return a list of tuples with the user content roles 
+	Return a list of tuples with the user content roles
 
 	:param user: The user object
 	"""
@@ -135,7 +135,7 @@ def get_users_content_roles(user, registry=component):
 def get_user_accessible_content(user, library=None, registry=component):
 	user = get_user(user)
 	member = registry.getAdapter(user, IMutableGroupMember, nauth.CONTENT_ROLE_PREFIX)
-	
+
 	if library is None:
 		library = registry.queryUtility(IContentPackageLibrary)
 
