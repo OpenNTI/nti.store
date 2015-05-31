@@ -23,8 +23,6 @@ from nti.schema.interfaces import find_most_derived_interface
 from nti.site.utils import registerUtility
 from nti.site.utils import unregisterUtility
 
-from . import get_user
-
 from .interfaces import IPurchasable
 from .interfaces import IPurchaseAttempt
 from .interfaces import IPurchaseHistory
@@ -56,6 +54,8 @@ from .purchase_history import register_purchase_attempt
 from .purchase_history import get_purchase_history_by_item
 from .purchase_history import get_purchase_history as get_user_purchase_history
 from .purchase_history import remove_purchase_attempt as remove_hist_purchase_attempt
+
+from . import get_user
 
 # Purchasables
 get_purchasable = get_purchasable

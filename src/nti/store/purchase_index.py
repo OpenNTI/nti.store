@@ -45,11 +45,11 @@ IX_STARTTIME = IX_CREATEDTIME = 'startTime'
 class MimeTypeIndex(ValueIndex):
 	default_field_name = 'mimeType'
 	default_interface = IPurchaseAttempt
-	
+
 class RedemptionCodeIndex(ValueIndex):
 	default_field_name = 'RedemptionCode'
 	default_interface = IRedeemedPurchaseAttempt
-	
+
 class ValidatingCreator(object):
 
 	__slots__ = (b'creator',)
@@ -78,7 +78,7 @@ def ItemsIndex(family=None):
 								interface=IPurchaseAttempt,
 								normalizer=StringTokenNormalizer(),
 								index=ItemsRawIndex(family=family),
-								is_collection=True )
+								is_collection=True)
 
 class StartTimeRawIndex(RawIntegerValueIndex):
 	pass
@@ -98,12 +98,12 @@ def StateIndex(family=None):
 								interface=IPurchaseAttempt,
 								index=StateRawIndex(family=family),
 								normalizer=StringTokenNormalizer())
-	
+
 class RevItems(object):
-	
+
 	__slots__ = (b'context',)
 
-	def __init__( self, context, default=None):
+	def __init__(self, context, default=None):
 		self.context = context
 
 	@property
@@ -111,40 +111,39 @@ class RevItems(object):
 		if IPurchaseAttempt.providedBy(self.context):
 			result = self.context.Items
 			return result
-	
+
 def RevItemsIndex(family=None):
-	return AttributeKeywordIndex(field_name='items', 
+	return AttributeKeywordIndex(field_name='items',
 								 interface=RevItems,
 								 family=family)
-
 
 class StoreCatalog(Catalog):
 	pass
 
-def install_purchase_catalog(site_manager_container, intids=None ):
+def install_purchase_catalog(site_manager_container, intids=None):
 	lsm = site_manager_container.getSiteManager()
 	intids = intids if intids is not None else lsm.getUtility(IIntIds)
-	
-	catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME )
+
+	catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME)
 	if catalog is not None:
 		return catalog
 
 	catalog = StoreCatalog(family=intids.family)
 	catalog.__name__ = CATALOG_NAME
 	catalog.__parent__ = site_manager_container
-	intids.register( catalog )
-	lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_NAME )
+	intids.register(catalog)
+	lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_NAME)
 
-	for name, clazz in ( (IX_ITEMS, ItemsIndex),
+	for name, clazz in ((IX_ITEMS, ItemsIndex),
 						 (IX_STATE, StateIndex),
 						 (IX_CREATOR, CreatorIndex),
 						 (IX_MIMETYPE, MimeTypeIndex),
 						 (IX_REV_ITEMS, RevItemsIndex),
 						 (IX_CREATEDTIME, StartTimeIndex),
 						 (IX_REDEMPTION_CODE, RedemptionCodeIndex)):
-		index = clazz( family=intids.family )
+		index = clazz(family=intids.family)
 		assert ICatalogIndex.providedBy(index)
-		intids.register( index )
+		intids.register(index)
 		locate(index, catalog, name)
 		catalog[name] = index
 

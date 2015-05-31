@@ -45,22 +45,22 @@ class DefaultPurchasableVendorInfo(dict):
 	"""
 	The default representation of vendor info.
 	"""
-	
+
 	def toExternalObject(self, *args, **kwargs):
 		return dict(self)
-	
+
 @interface.implementer(IPurchasable, IContentTypeAware)
 @WithRepr
 @EqHash('NTIID',)
 class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle, Contained):
 
 	__metaclass__ = MetaStoreObject
-	
+
 	createDirectFieldProperties(IPurchasable)
 	Description = AdaptingFieldProperty(IPurchasable['Description'])
 
 	IsPurchasable = True
-	
+
 	isPublic = alias('Public')
 	isGiftable = alias('Giftable')
 
@@ -72,19 +72,19 @@ class PurchasableChoiceBundle(Purchasable):
 def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=None,
 					   title=None, license_=None, author=None, description=None,
 					   icon=None, thumbnail=None, discountable=False, giftable=False,
-					   redeemable=False, bulk_purchase=True, public=True, 
+					   redeemable=False, bulk_purchase=True, public=True,
 					   vendor_info=None, factory=Purchasable, **kwargs):
-	
+
 	fee = float(fee) if fee is not None else None
 	amount = float(amount) if amount is not None else amount
 	items = to_frozenset(items) if items else frozenset((ntiid,))
 	vendor = IPurchasableVendorInfo(vendor_info, None)
-	
+
 	result = factory(NTIID=ntiid, Provider=provider, Title=title, Author=author,
 					 Items=items, Description=description, Amount=amount,
 					 Currency=currency, Fee=fee, License=license_, Giftable=giftable,
-					 Redeemable=redeemable, Discountable=discountable, 
-					 BulkPurchase=bulk_purchase, Icon=icon, Thumbnail=thumbnail, 
+					 Redeemable=redeemable, Discountable=discountable,
+					 BulkPurchase=bulk_purchase, Icon=icon, Thumbnail=thumbnail,
 					 Public=public, VendorInfo=vendor)
 	return result
 

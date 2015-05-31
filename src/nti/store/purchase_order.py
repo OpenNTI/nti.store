@@ -60,7 +60,7 @@ class PurchaseOrder(SchemaConfigured):
 
 	def item_factory(self, item):
 		return create_purchase_item(ntiid=item)
-	
+
 	@CachedProperty('Items')
 	def NTIIDs(self):
 		result = tuple(x.NTIID for x in self.Items)
@@ -77,7 +77,7 @@ class PurchaseOrder(SchemaConfigured):
 
 	def __iter__(self):
 		return iter(self.Items)
-	
+
 	def __len__(self):
 		return len(self.Items)
 
@@ -139,4 +139,4 @@ def copy_purchase_order(source, *args, **kwargs):
 	return result
 
 def _purchase_order_copier(context):
-	return copy_purchase_order 
+	return copy_purchase_order

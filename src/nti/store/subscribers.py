@@ -92,8 +92,8 @@ def _activate_items(purchase, user=None, add_roles=True):
 def _purchase_attempt_successful(purchase, event):
 	purchase.EndTime = time.time()
 	_update_state(purchase, PA_STATE_SUCCESS)
-	## CS: We are assuming a non null quantity is for a bulk purchase
-	## Therefore we don't activate items
+	# CS: We are assuming a non null quantity is for a bulk purchase
+	# Therefore we don't activate items
 	if not purchase.Quantity:
 		_activate_items(purchase)
 	logger.info('%s completed successfully. Transaction code %s',
@@ -160,7 +160,7 @@ def _purchase_attempt_synced(purchase, event):
 	logger.info('%s has been synched', purchase.id)
 
 def _make_redeem_purchase_attempt(user, original, code, activate_roles=True):
-	## create and register a purchase attempt for accepting user
+	# create and register a purchase attempt for accepting user
 	redeemed = create_redeemed_purchase_attempt(original, code)
 	result = register_purchase_attempt(redeemed, user)
 	activate_items(user, redeemed.Items)
@@ -200,11 +200,11 @@ def _gift_purchase_attempt_redeemed(purchase, event):
 		raise RedemptionException("Gift purchase already redeemed")
 
 	code = event.code or get_invitation_code(purchase)
-	new_pid = _make_redeem_purchase_attempt(user=event.user, 
+	new_pid = _make_redeem_purchase_attempt(user=event.user,
 											original=purchase,
 											code=code)
 
-	## change state
+	# change state
 	purchase = removeAllProxies(purchase)
 	purchase.State = PA_STATE_REDEEMED
 	purchase.TargetPurchaseID = new_pid

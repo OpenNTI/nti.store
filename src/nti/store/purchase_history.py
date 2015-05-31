@@ -19,12 +19,12 @@ from zope import lifecycleevent
 
 from zope.annotation import factory as an_factory
 
+from zope.container.contained import Contained
+
 from zope.deprecation import deprecated
 
 from zope.location import locate
 from zope.location.interfaces import ISublocations
-
-from zope.container.contained import Contained
 
 from ZODB.interfaces import IConnection
 
@@ -60,8 +60,8 @@ from .interfaces import IPurchaseHistory
 
 from . import get_catalog
 
-## classes
-	
+# # classes
+
 deprecated('_PurchaseIndex', 'Use new purchase storage')
 class _PurchaseIndex(Persistent):
 	pass
@@ -110,13 +110,13 @@ class PurchaseHistory(Contained, Persistent):
 		return item in self._items_activated
 
 	def add_purchase(self, purchase):
-		## locate before firing events
+		# # locate before firing events
 		locate(purchase, self)
-		## add to connection and fire event
+		# # add to connection and fire event
 		IConnection(self).add(purchase)
 		lifecycleevent.created(purchase)
 		lifecycleevent.added(purchase)  # get an iid
-		## now we can get an OID/NTIID
+		# # now we can get an OID/NTIID
 		result = purchase.id = unicode(to_external_ntiid_oid(purchase))
 		self._purchases[purchase.id] = purchase
 		return result
@@ -126,13 +126,13 @@ class PurchaseHistory(Contained, Persistent):
 		try:
 			pid = getattr(purchase, 'id', purchase)
 			del self._purchases[pid]
-			lifecycleevent.removed(purchase) # remove iid
+			lifecycleevent.removed(purchase)  # remove iid
 			result = True
 		except KeyError:
 			result = False
 		return result
 	remove = remove_purchase
-	
+
 	def get_purchase(self, pid):
 		try:
 			pid = getattr(pid, 'id', pid)
@@ -141,7 +141,7 @@ class PurchaseHistory(Contained, Persistent):
 			result = None
 		return result
 	get = get_purchasable
-	
+
 	def get_purchase_state(self, pid):
 		p = self.get_purchase(pid)
 		return p.State if p is not None else None
@@ -167,9 +167,9 @@ class PurchaseHistory(Contained, Persistent):
 		result = 0
 		for p in list(self.values()):
 			self.remove_purchase(p)
-			result +=1
+			result += 1
 		return result
-				
+
 	def values(self):
 		return self._purchases.values()
 
@@ -191,7 +191,7 @@ class PurchaseHistory(Contained, Persistent):
 
 _PurchaseHistoryFactory = an_factory(PurchaseHistory)
 
-## functions
+# # functions
 
 def activate_items(user, items):
 	user = get_user(user)
@@ -309,12 +309,12 @@ def get_available_items(user, registry=component):
 		# get purchase history
 		purchased = set()
 		user = get_user(user)
-		
+
 		history = IPurchaseHistory(user)
 		for p in history:
 			if p.has_succeeded() or p.is_pending():
 				purchased.update(p.Items)
-	
+
 		available = all_ids - purchased
 		result.update({key:get_purchasable(key, registry=registry) for key in available})
 	return result

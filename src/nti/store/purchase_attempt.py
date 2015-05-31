@@ -9,10 +9,10 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import copy
 import time
 from functools import total_ordering
 
-import copy
 import BTrees
 
 from zope import component
@@ -78,11 +78,11 @@ from .interfaces import IInvitationPurchaseAttempt
 @interface.implementer(IPurchaseAttemptContext, IInternalObjectExternalizer)
 class DefaultPurchaseAttemptContext(PersistentMapping):
 	"""
-	The default representation of context info. 
+	The default representation of context info.
 	"""
 	def toExternalObject(self, *args, **kwargs):
 		return dict(self)
-	
+
 def to_purchase_attempt_context(context):
 	result = IPurchaseAttemptContext(context, None)
 	return result
@@ -108,7 +108,7 @@ class PurchaseAttempt(ModDateTrackingObject,
 	createDirectFieldProperties(IPurchaseAttempt)
 
 	Context = FP(IPurchaseAttempt['Context'])
-	
+
 	id = alias('__name__')
 	state = alias('State')
 	context = alias('Context')
@@ -180,9 +180,9 @@ class PurchaseAttempt(ModDateTrackingObject,
 
 @interface.implementer(IInvitationPurchaseAttempt)
 class InvitationPurchaseAttempt(PurchaseAttempt):
-	
+
 	ExpirationTime = FP(IInvitationPurchaseAttempt['ExpirationTime'])
-	
+
 	def __init__(self, *args, **kwargs):
 		super(InvitationPurchaseAttempt, self).__init__(*args, **kwargs)
 		self._consumers = BTrees.OOBTree.OOBTree()
@@ -200,7 +200,7 @@ class InvitationPurchaseAttempt(PurchaseAttempt):
 		result = bool(self.ExpirationTime and now > self.ExpirationTime)
 		return result
 	is_expired = isExpired
-	
+
 	def linked_purchase_id(self, user):
 		user = getattr(user, "username", user)
 		return self._consumers.get(user.lower()) if user else None
@@ -235,14 +235,14 @@ class InvitationPurchaseAttempt(PurchaseAttempt):
 class RedeemedPurchaseAttempt(PurchaseAttempt):
 	RedemptionCode = FP(IRedeemedPurchaseAttempt['RedemptionCode'])
 	RedemptionTime = FP(IRedeemedPurchaseAttempt['RedemptionTime'])
-	
+
 @interface.implementer(IUserProfile)
 class GiftPurchaseUserProfile(object):
 	avatarURL = email = realname = alias = None
-	
+
 	def get_searchable_realname_parts(self):
 		return get_searchable_realname_parts(self.realname)
-	
+
 @interface.implementer(IGiftPurchaseAttempt)
 class GiftPurchaseAttempt(PurchaseAttempt):
 
@@ -251,14 +251,14 @@ class GiftPurchaseAttempt(PurchaseAttempt):
 	Receiver = FP(IGiftPurchaseAttempt['Receiver'])
 	SenderName = FP(IGiftPurchaseAttempt['SenderName'])
 	ReceiverName = FP(IGiftPurchaseAttempt['ReceiverName'])
-	DeliveryDate =  FP(IGiftPurchaseAttempt['DeliveryDate'])
+	DeliveryDate = FP(IGiftPurchaseAttempt['DeliveryDate'])
 	TargetPurchaseID = FP(IGiftPurchaseAttempt['TargetPurchaseID'])
 
 	receiver = alias('Receiver')
 	to = To = alias('ReceiverName')
 	creator = From = alias('Creator')
 	sender = Sender = alias('SenderName')
-		
+
 	@property
 	def profile(self):
 		result = GiftPurchaseUserProfile()
@@ -266,13 +266,13 @@ class GiftPurchaseAttempt(PurchaseAttempt):
 		result.alias = result.realname = self.Sender or self.Creator
 		return result
 	Profile = profile
-	
+
 	def has_succeeded(self):
 		return self.State in (PA_STATE_SUCCESS, PA_STATE_REDEEMED)
-	
+
 	def is_redeemed(self):
 		return self.State == PA_STATE_REDEEMED
-	
+
 def get_providers(purchase):
 	return get_providers_from_order(purchase.Order)
 
@@ -289,27 +289,27 @@ def create_purchase_attempt(order, processor, state=None, description=None,
 	state = state or PA_STATE_UNKNOWN
 	context = to_purchase_attempt_context(context)
 	start_time = start_time if start_time else time.time()
-		
-	## if there is a quantity, it means it's an invitation purchase
+
+	# if there is a quantity, it means it's an invitation purchase
 	if order.Quantity:
 		expiration = float(expiration) if expiration else None
 		result = InvitationPurchaseAttempt(Order=order, Processor=processor,
-										   Description=description, State=state, 
+										   Description=description, State=state,
 										   StartTime=float(start_time), Context=context,
 										   ExpirationTime=expiration)
-	else: 
-		## try to find a factory based on the providers of the 
-		## purchasables in the order
+	else:
+		# try to find a factory based on the providers of the
+		# purchasables in the order
 		factory = None
 		providers = get_providers_from_order(order)
-		if providers and len(providers) ==1:
+		if providers and len(providers) == 1:
 			provider = providers[0].lower()
 			factory = component.queryUtility(IPurchaseAttemptFactory, name=provider)
-		
+
 		if factory is None:
 			factory = component.getUtility(IPurchaseAttemptFactory)
-			
-		result = factory.create(order=order, processor=processor, state=state, 
+
+		result = factory.create(order=order, processor=processor, state=state,
 								description=description, start_time=start_time,
 								context=context)
 	return result
@@ -319,12 +319,12 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, items=(),
 
 	redemption_time = redemption_time if redemption_time else time.time()
 
-	## copy with order quantity none and item quantity to 1
+	# copy with order quantity none and item quantity to 1
 	new_order = copy_object(purchase.Order, items=items)
 	new_order.Quantity = None
 	replace_quantity(new_order, 1)
 
-	## copy context
+	# copy context
 	context = purchase.Context
 	context = copy.copy(context) \
 			  if context is not None else empty_purchase_attempt_context()
@@ -339,8 +339,8 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, items=(),
 	return result
 
 def create_gift_purchase_attempt(creator, order, processor, state=None, description=None,
-								 start_time=None, sender=None, receiver=None, 
-								 receiver_name=None, message=None,  target=None,
+								 start_time=None, sender=None, receiver=None,
+								 receiver_name=None, message=None, target=None,
 								 delivery_date=None, context=None):
 
 	state = state or PA_STATE_UNKNOWN
@@ -352,9 +352,9 @@ def create_gift_purchase_attempt(creator, order, processor, state=None, descript
 	context = context if context is not None else empty_purchase_attempt_context()
 	result = GiftPurchaseAttempt(
 				Order=order, Processor=processor, Creator=creator.lower(),
-				Description=description, State=state, 
+				Description=description, State=state,
 				StartTime=float(start_time), Context=context, SenderName=sender,
-				ReceiverName=receiver_name,	Message=message, 
+				ReceiverName=receiver_name, 	Message=message,
 				DeliveryDate=delivery_date, Receiver=receiver,
 				TargetPurchaseID=target)
 	return result
@@ -362,20 +362,20 @@ def create_gift_purchase_attempt(creator, order, processor, state=None, descript
 @interface.implementer(IPurchaseAttemptFactory)
 class DefaultPurchaseAttemptFactory(object):
 
-	def create(	self, order, processor, state=None, description=None, 
+	def create(self, order, processor, state=None, description=None,
 				start_time=None, context=None, *args, **kwargs):
 		# set some defaults
 		state = state or PA_STATE_UNKNOWN
 		context = to_purchase_attempt_context(context)
 		context = context if context is not None else empty_purchase_attempt_context()
 		start_time = start_time if start_time else time.time()
-		# create 
-		result = PurchaseAttempt(Order=order, Processor=processor, 
-								 Description=description, State=state, 
+		# create
+		result = PurchaseAttempt(Order=order, Processor=processor,
+								 Description=description, State=state,
 								 StartTime=float(start_time), Context=context)
 		return result
 
-# deprecated 
+# deprecated
 from zope.deprecation import deprecated
 
 from nti.common.deprecated import hiding_warnings

@@ -18,20 +18,20 @@ from .interfaces import ICopier
 STORE_MIME_BASE = MIME_BASE + b'.store'
 
 NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES = \
-		tuple([STORE_MIME_BASE + x for x in (	b'.purchaseattempt',
-												b'.invitationpurchaseattempt',
-												b'.redeemedpurchaseattempt') ] )
+		tuple([STORE_MIME_BASE + x for x in (b'.purchaseattempt',
+											 b'.invitationpurchaseattempt',
+											 b'.redeemedpurchaseattempt') ])
 
-GIFT_PURCHASE_ATTEMPT_MIME_TYPES =  tuple([STORE_MIME_BASE + b'.giftpurchaseattempt'] )
-		
+GIFT_PURCHASE_ATTEMPT_MIME_TYPES = tuple([STORE_MIME_BASE + b'.giftpurchaseattempt'])
+
 PURCHASE_ATTEMPT_MIME_TYPES = \
 		NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES + GIFT_PURCHASE_ATTEMPT_MIME_TYPES
 
-ALL_STORE_MIME_TYPES = list(PURCHASE_ATTEMPT_MIME_TYPES) 
-ALL_STORE_MIME_TYPES.append( MIME_BASE + b'.purchasable')
-ALL_STORE_MIME_TYPES.append( MIME_BASE + b'.purchasablecourse')
-ALL_STORE_MIME_TYPES.append( MIME_BASE + b'.purchasablechoicebundle')
-ALL_STORE_MIME_TYPES.append( MIME_BASE + b'.purchasablecoursechoicebundle')
+ALL_STORE_MIME_TYPES = list(PURCHASE_ATTEMPT_MIME_TYPES)
+ALL_STORE_MIME_TYPES.append(MIME_BASE + b'.purchasable')
+ALL_STORE_MIME_TYPES.append(MIME_BASE + b'.purchasablecourse')
+ALL_STORE_MIME_TYPES.append(MIME_BASE + b'.purchasablechoicebundle')
+ALL_STORE_MIME_TYPES.append(MIME_BASE + b'.purchasablecoursechoicebundle')
 ALL_STORE_MIME_TYPES = tuple(ALL_STORE_MIME_TYPES)
 
 def from_delimited(value, delim=' '):
