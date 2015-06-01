@@ -65,12 +65,14 @@ def register_purchasable(item, name=None, registry=None):
 	name = name or item.NTIID
 	registry = registry if registry is not None else component.getSiteManager()
 	provided = find_most_derived_interface(item, IPurchasable)
-	registerUtility(registry, item, provided=provided, name=name)
-	connection = IConnection(registry, None)
-	if connection is not None:
-		connection.add(item)
-		lifecycleevent.added(item)
-	return item
+	if registry.queryUtility(provided, name=name) is None:
+		registerUtility(registry, item, provided=provided, name=name)
+		connection = IConnection(registry, None)
+		if connection is not None:
+			connection.add(item)
+			lifecycleevent.added(item)
+		return item
+	return None
 
 def remove_purchasable(item, registry=None):
 	name = getattr(item, 'NTIID', item)
