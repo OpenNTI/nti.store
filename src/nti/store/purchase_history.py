@@ -60,7 +60,7 @@ from .interfaces import IPurchaseHistory
 
 from . import get_catalog
 
-# # classes
+# classes
 
 deprecated('_PurchaseIndex', 'Use new purchase storage')
 class _PurchaseIndex(Persistent):
@@ -191,7 +191,7 @@ class PurchaseHistory(Contained, Persistent):
 
 _PurchaseHistoryFactory = an_factory(PurchaseHistory)
 
-# # functions
+# functions
 
 def activate_items(user, items):
 	user = get_user(user)
