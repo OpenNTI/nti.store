@@ -48,9 +48,9 @@ def create_purchase_item(ntiid, quantity=1, cls=PurchaseItem):
 	result = cls(NTIID=unicode(ntiid), Quantity=quantity)
 	return result
 
-@interface.implementer(IPurchaseOrder, IAttributeAnnotatable)
 @WithRepr
 @EqHash('Items', 'Quantity')
+@interface.implementer(IPurchaseOrder, IAttributeAnnotatable)
 class PurchaseOrder(SchemaConfigured):
 
 	__metaclass__ = MetaStoreObject

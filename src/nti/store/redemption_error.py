@@ -18,11 +18,12 @@ from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
 
 from .utils import MetaStoreObject
+
 from .interfaces import IRedemptionError
 
-@interface.implementer(IRedemptionError)
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
+@interface.implementer(IRedemptionError)
 class RedemptionError(SchemaConfigured):
 	__metaclass__ = MetaStoreObject
 	createDirectFieldProperties(IRedemptionError)

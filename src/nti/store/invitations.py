@@ -20,12 +20,11 @@ from zope import interface
 
 from zope.proxy import removeAllProxies
 
-# TODO: remove dep from nti.appserver
-from nti.appserver.invitations.interfaces import IInvitation
-from nti.appserver.invitations.invitation import JoinEntitiesInvitation
-
 from nti.externalization.integer_strings import to_external_string
 from nti.externalization.integer_strings import from_external_string
+
+from nti.invitations.interfaces import IInvitation
+from nti.invitations.invitation import JoinEntitiesInvitation
 
 from .interfaces import IStorePurchaseInvitation
 

@@ -23,10 +23,9 @@ from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 
 from zope.proxy import removeAllProxies
 
-# TODO: break this dep
-from nti.appserver.invitations.interfaces import IInvitationAcceptedEvent
-
 from nti.dataserver.interfaces import IUser
+
+from nti.invitations.interfaces import IInvitationAcceptedEvent
 
 from . import RedemptionException
 
