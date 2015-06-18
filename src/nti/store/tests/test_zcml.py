@@ -15,7 +15,7 @@ from hamcrest import has_property
 from zope import component
 from zope.component.hooks import site
 
-from nti.appserver.policies.sites import BASECOPPA
+from nti.appserver.policies.sites import BASECOPPA #TODO: Remove this
 
 from nti.site.transient import TrivialSite
 
