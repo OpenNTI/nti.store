@@ -72,6 +72,7 @@ class PurchasableChoiceBundle(Purchasable):
 def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=None,
 					   title=None, license_=None, author=None, description=None,
 					   icon=None, thumbnail=None, discountable=False, giftable=False,
+					   redeem_cutoff_date=None, purchase_cutoff_date=None,
 					   redeemable=False, bulk_purchase=True, public=True,
 					   vendor_info=None, factory=Purchasable, **kwargs):
 
@@ -85,7 +86,8 @@ def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=No
 					 Currency=currency, Fee=fee, License=license_, Giftable=giftable,
 					 Redeemable=redeemable, Discountable=discountable,
 					 BulkPurchase=bulk_purchase, Icon=icon, Thumbnail=thumbnail,
-					 Public=public, VendorInfo=vendor)
+					 Public=public, RedeemCutOffDate=redeem_cutoff_date,
+					 PurchaseCutOffDate=purchase_cutoff_date, VendorInfo=vendor)
 	return result
 
 def get_purchasable(pid, registry=component):

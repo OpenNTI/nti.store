@@ -8,7 +8,7 @@
 	<include package="zope.security" file="meta.zcml" />
 	<include package="zope.component" />
 	<include package="zope.security" />
-	
+
 	<include package="nti.store" file="meta.zcml" />
 
 	<pcs:registerPurchasable
@@ -23,7 +23,7 @@
 		discountable="False"
 		bulk_purchase="False"
 		items="prealgebra intro-algebra" />
-		
+
 	<pcs:registerPurchasable
 		ntiid="iid_1"
 		title="Law Cases"
@@ -35,7 +35,7 @@
 		discountable="False"
 		bulk_purchase="False"
 		items="cohen arizona" />
-		
+
 	<pcs:registerPurchasable
 		ntiid="iid_2"
 		title="Data Structures"
@@ -48,7 +48,7 @@
 		discountable="False"
 		bulk_purchase="True"
 		items="data-structures" />
-		
+
 	<pcs:registerPurchasable
 		ntiid="iid_3"
 		title="Risk Course"
@@ -63,6 +63,8 @@
 		bulk_purchase="False"
 		icon="http://prmia.org/"
 		license="1 Year License"
+		redeem_cutoff_date="2015-06-13T04:59:00+00:00"
+		purchase_cutoff_date="2015-06-13T04:59:00+00:00"
 		items="var-risk volatility" />
 
 </configure>

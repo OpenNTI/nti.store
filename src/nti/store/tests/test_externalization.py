@@ -11,6 +11,7 @@ from hamcrest import is_
 from hamcrest import none
 from hamcrest import is_not
 from hamcrest import has_key
+from hamcrest import not_none
 from hamcrest import has_entry
 from hamcrest import has_length
 from hamcrest import assert_that
@@ -82,7 +83,7 @@ class TestStoreExternal(unittest.TestCase):
 		assert_that( ext, has_entry( 'State', 'Unknown') )
 		assert_that( ext, has_entry( 'TransactionID',  is_not(none())) )
 		assert_that( ext, has_entry( 'ID', is_not(none())) )
-		assert_that( ext, has_entry( 'OID', is_not(none())) ) 
+		assert_that( ext, has_entry( 'OID', is_not(none())) )
 		assert_that( ext, has_entry( 'Last Modified', is_not(none())) )
 		assert_that( ext, has_entry( 'Processor', self.processor) )
 		assert_that( ext, has_entry( 'StartTime', is_not(none())) )
@@ -136,9 +137,11 @@ class TestStoreExternal(unittest.TestCase):
 		assert_that(ext, has_entry('Giftable', True))
 		assert_that(ext, has_entry('Redeemable', True))
 		assert_that(ext, has_entry('IsPurchasable', True))
-		
+		assert_that(ext, has_entry('RedeemCutOffDate', not_none() ))
+		assert_that(ext, has_entry('PurchaseCutOffDate', not_none() ))
+
 		ext = to_external_object(ps, name="summary")
-		assert_that(ext, has_length(16))
+		assert_that(ext, has_length(18))
 		assert_that(ext, does_not(has_key('Icon')))
 		assert_that(ext, does_not(has_key('Public')))
 		assert_that(ext, does_not(has_key('License')))
@@ -160,13 +163,15 @@ class TestStoreExternal(unittest.TestCase):
 		assert_that(ext, has_entry('Provider', u'PRMIA'))
 		assert_that(ext, has_entry('Title', u'Risk Course'))
 		assert_that(ext, has_entry('Author', u'Alan Laubsch'))
+		assert_that(ext, has_entry('RedeemCutOffDate', not_none() ))
+		assert_that(ext, has_entry('PurchaseCutOffDate', not_none() ))
 		assert_that(ext, does_not(has_key('Icon')))
 		assert_that(ext, does_not(has_key('Public')))
 		assert_that(ext, does_not(has_key('License')))
 		assert_that(ext, does_not(has_key('Thumbnail')))
 		assert_that(ext, does_not(has_key('VendorInfo')))
 		assert_that(ext, does_not(has_key('Description')))
-		
+
 	def test_priceable(self):
 		pp = create_priceable(u'iid_3', 1)
 		ext = to_external_object(pp)

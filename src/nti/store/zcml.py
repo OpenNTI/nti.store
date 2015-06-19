@@ -18,6 +18,8 @@ from zope import interface
 from zope.configuration import fields
 from zope.component.zcml import utility
 
+from .schema import DateTime
+
 from .purchasable import create_purchasable
 
 from .interfaces import IPurchasable
@@ -45,12 +47,15 @@ class IRegisterPurchasableDirective(interface.Interface):
 	public = fields.Bool(title="Public flag", required=False, default=True)
 	giftable = fields.Bool(title="Giftable flag", required=False, default=False)
 	redeemable = fields.Bool(title="Redeemable flag", required=False, default=False)
+	purchase_cutoff_date = DateTime(title="Purchase cutoff date", required=False, default=None)
+	redeem_cutoff_date = DateTime(title="Redeem cutoff date", required=False, default=None)
 	items = fields.Tokens(value_type=schema.TextLine(title='The item identifier'),
 						  title="Items to purchase", required=False)
 
 def registerPurchasable(_context, ntiid, provider, title, description=None, amount=None,
 						currency='USD', items=None, fee=None, author=None, icon=None,
 						thumbnail=None, license=None, discountable=False, giftable=False,
+						purchase_cutoff_date=None, redeem_cutoff_date=None,
 						redeemable=False, bulk_purchase=True, public=True):
 	"""
 	Register a purchasable
@@ -61,6 +66,8 @@ def registerPurchasable(_context, ntiid, provider, title, description=None, amou
 					  description=description, items=items, amount=amount,
 					  thumbnail=thumbnail, currency=currency, icon=icon,
 					  fee=fee, license_=license, discountable=discountable,
+					  redeem_cutoff_date=redeem_cutoff_date,
+					  purchase_cutoff_date=purchase_cutoff_date,
 					  bulk_purchase=bulk_purchase, public=public,
 					  redeemable=redeemable, giftable=giftable)
 	utility(_context, provides=IPurchasable, factory=factory, name=ntiid)

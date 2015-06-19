@@ -13,6 +13,7 @@ from hamcrest import none
 from hamcrest import is_in
 from hamcrest import is_not
 from hamcrest import contains
+from hamcrest import not_none
 from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import has_property
@@ -48,9 +49,9 @@ class TestPurchasable(unittest.TestCase):
 		return usr
 
 	def test_ntiids(self):
-		assert_that(find_object_with_ntiid('tag:nextthought.com,2011-10:NextThought-purchasable-HelpCenter'), 
+		assert_that(find_object_with_ntiid('tag:nextthought.com,2011-10:NextThought-purchasable-HelpCenter'),
 					is_not(none()))
-		
+
 	def test_zmcl(self):
 		assert_that(get_purchasable('iid_0'), is_not(none()))
 
@@ -97,13 +98,15 @@ class TestPurchasable(unittest.TestCase):
 			'NTIID': u'tag:nextthought.com,2011-10:CMU-purchasable-computer_science_for_practicing_engineer',
 			'Provider': u'CMU',
 			'Public': True,
+			'PurchaseCutOffDate': "2015-06-13T04:59:00+00:00",
+			'RedeemCutOffDate': "2015-06-13T04:59:00+00:00",
 			'Redeemable': False}
-			
+
 		factory = find_factory_for(ext_obj)
 		assert_that(factory, is_not(none()))
 		result = factory()
 		update_from_external_object(result, ext_obj)
-		
+
 		assert_that(result, has_property('Fee', is_(none())))
 		assert_that(result, has_property('Public', is_(True)))
 		assert_that(result, has_property('Amount', is_(300.0)))
@@ -114,13 +117,15 @@ class TestPurchasable(unittest.TestCase):
 		assert_that(result, has_property('Redeemable', is_(False)))
 		assert_that(result, has_property('BulkPurchase', is_(True)))
 		assert_that(result, has_property('Discountable', is_(True)))
+		assert_that(result, has_property('RedeemCutOffDate', not_none()))
+		assert_that(result, has_property('PurchaseCutOffDate', not_none()))
 		assert_that(result, has_property('Icon', is_('http://cmu.edu/')))
 		assert_that(result, has_property('License', is_(u'1 Year License')))
 		assert_that(result, has_property('Description', is_(u'04-630: Computer Science for Practicing Engineers')))
 		assert_that(result, has_property('NTIID', is_( u'tag:nextthought.com,2011-10:CMU-purchasable-computer_science_for_practicing_engineer')))
 		assert_that(result, has_property('Items', has_length(1)))
 		assert_that(result, has_property('Items', contains('tag:nextthought.com,2011-10:CMU-HTML-04630_main.04_630:_computer_science_for_practicing_engineers')))
-		
+
 	def test_interface(self):
 		p = PurchasableChoiceBundle()
 		iface = find_most_derived_interface(p, IPurchasable)

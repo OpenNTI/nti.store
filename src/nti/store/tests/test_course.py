@@ -17,6 +17,7 @@ from hamcrest import has_entries
 does_not = is_not
 
 import unittest
+import dateutil.parser
 
 from nti.externalization.externalization import to_external_object
 
@@ -29,8 +30,10 @@ class TestPurchasableCourse(unittest.TestCase):
 	layer = SharedConfiguringTestLayer
 
 	processor = 'stripe'
-		
+
 	def test_create_course(self):
+		default_date_str = "2015-06-13T04:59:00+00:00"
+
 		course = create_course(
 					ntiid='tag:nextthought.com,2011-10:NTI-purchasable_course-LSTD_1153',
 					name="A History of the United States",
@@ -41,9 +44,11 @@ class TestPurchasableCourse(unittest.TestCase):
 					author="Janux",
 					giftable=True,
 					description="History is about more than the people",
-					vendor_info={"CRN" : 34846, "Term": 201410})
+					vendor_info={"CRN" : 34846, "Term": 201410},
+					purchase_cutoff_date=default_date_str,
+					redeem_cutoff_date=default_date_str)
 		ext = to_external_object(course)
-		assert_that(ext, 
+		assert_that(ext,
 					has_entries('Amount', 500.0,
 								'Class','PurchasableCourse',
 								'Currency', u'USD',
@@ -54,8 +59,10 @@ class TestPurchasableCourse(unittest.TestCase):
 								'Public', True,
 								'Redeemable', False,
 								'Title', u'A History of the United States',
+								'PurchaseCutOffDate', default_date_str,
+								'RedeemCutOffDate', default_date_str,
 								'VendorInfo', is_({u'CRN': 34846, u'Term': 201410})))
-		
+
 		ext = to_external_object(course, name="summary")
 		assert_that(ext, does_not(has_key('Icon')))
 		assert_that(ext, does_not(has_key('Public')))
@@ -70,6 +77,5 @@ class TestPurchasableCourse(unittest.TestCase):
 		assert_that(ext, does_not(has_key('Signature')))
 		assert_that(ext, does_not(has_key('Department')))
 		assert_that(ext, does_not(has_key('Communities')))
-		
+
 		assert_that(ext, has_entry('VendorInfo', has_length(2)))
-		

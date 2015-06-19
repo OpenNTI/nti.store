@@ -26,6 +26,8 @@ from nti.contentfragments.schema import HTMLContentFragment
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.users.interfaces import checkEmailAddress
 
+from .schema import DateTime
+
 from nti.schema.field import Int
 from nti.schema.field import Bool
 from nti.schema.field import Float
@@ -103,14 +105,16 @@ class IPurchasable(IItemBundle):
 	Public = Bool(title="Public flag", required=False, default=False)
 	Giftable = Bool(title="Giftable flag", required=False, default=False)
 	Redeemable = Bool(title="Redeemable flag", required=False, default=False)
+	RedeemCutOffDate = DateTime(title="Redeem cutoff date", required=False)
 	IsPurchasable = Bool(title="Can be purchased", required=True, default=True,readonly=True)
+	PurchaseCutOffDate = DateTime(title="Purchase cutoff date", required=False)
 	VendorInfo = Object(IPurchasableVendorInfo, title="vendor info", required=False)
 	VendorInfo.setTaggedValue('_ext_excluded_out', True)
 
 class IPurchasableChoiceBundle(IPurchasable):
 	"""
-	marker interface for a purchasable choice bundle. 
-	
+	marker interface for a purchasable choice bundle.
+
 	Buyers can buy/redeem one item from the Items list.
 	"""
 
@@ -151,7 +155,7 @@ class ICopier(interface.Interface):
 	"""
 	An adapter to an object that is being copied
 	"""
-	
+
 	def __call__(source, *args, **kwargs):
 		"""
 		Given the source object return a new copy.
@@ -184,7 +188,7 @@ class IPurchaseOrder(IMinimalSequence):
 	def copy(purchasables=None):
 		"""
 		makes a new copy of this purchase order
-		
+
 		:param purchasables Collection of purchasables to copy. None/Empty copy all
 		"""
 
@@ -404,7 +408,7 @@ class IPurchaseAttempt(IContained):
 
 class IInvitationPurchaseAttempt(IPurchaseAttempt):
 	ExpirationTime = Number(title="The expirtation time", required=False)
-	
+
 	def isExpired(now=None):
 		"""
 		return if this invitation is expired
@@ -496,7 +500,7 @@ class IGiftPurchaseAttemptRedeemed(IPurchaseAttemptEvent):
 	user = Object(IUser, title="The gift receiver")
 	code = ValidTextLine(title="The gift code", required=False)
 	request = interface.Attribute('Purchase request')
-	
+
 @interface.implementer(IPurchaseAttemptEvent)
 class PurchaseAttemptEvent(ObjectEvent):
 
@@ -563,7 +567,7 @@ class GiftPurchaseAttemptRedeemed(PurchaseAttemptEvent):
 		self.user = user
 		self.code = code
 		self.request = request
-		
+
 class IPurchaseHistory(IIterable):
 
 	def add_purchase(purchase):
@@ -619,7 +623,7 @@ class IObjectTransformer(interface.Interface):
 	Called to transform an object
 
 	These are typically found as adapters, registered on the
-	context object. 
+	context object.
 
 	The context object is passed to the ``__call__`` method to allow the adapter
 	factories to return singleton objects such as a function.

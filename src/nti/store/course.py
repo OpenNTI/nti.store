@@ -12,6 +12,7 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import six
+import isodate
 import datetime
 import dateutil.parser
 from collections import Mapping
@@ -51,25 +52,30 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 				  description=None, icon=None, thumbnail=None, discountable=False,
 				  bulk_purchase=False, public=True, giftable=False, redeemable=False,
 				  vendor_info=None, factory=PurchasableCourse,
+				  purchase_cutoff_date=None, redeem_cutoff_date=None,
 				  # deprecated / legacy
 				  communities=None, featured=False, preview=False,
 				  department=None, signature=None, startdate=None, **kwargs):
 
 	if amount is not None and not provider:
-		raise AssertionError("Must specfify a provider")
+		raise AssertionError("Must specify a provider")
 
 	if amount is not None and not currency:
-		raise AssertionError("Must specfify a currency")
+		raise AssertionError("Must specify a currency")
 
 	fee = float(fee) if fee is not None else None
 	amount = float(amount) if amount is not None else amount
 	communities = to_frozenset(communities) if items else None
 	items = to_frozenset(items) if items else frozenset((ntiid,))
 
-	if isinstance(startdate, six.string_types):
-		dateutil.parser.parse(startdate)
-	elif isinstance(startdate, datetime.date):
-		startdate = startdate.isoformat()
+	def _parse_time( field ):
+		result = field
+		if isinstance(field, six.string_types):
+			result = dateutil.parser.parse(field)
+		elif isinstance(field, datetime.date):
+			result = field.isoformat()
+		return result
+	startdate = _parse_time( startdate )
 
 	vendor = DefaultPurchasableVendorInfo(vendor_info) \
 			 if vendor_info and isinstance(vendor_info, Mapping) else None
@@ -101,6 +107,8 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 	result.Icon = icon
 	result.VendorInfo = vendor
 	result.Thumbnail = thumbnail
+	result.PurchaseCutOffDate = purchase_cutoff_date
+	result.RedeemCutOffDate = redeem_cutoff_date
 
 	# deprecated / legacy
 	result.Preview = preview
