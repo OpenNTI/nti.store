@@ -12,7 +12,6 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import six
-import isodate
 import datetime
 import dateutil.parser
 from collections import Mapping
@@ -35,9 +34,9 @@ from .purchasable import DefaultPurchasableVendorInfo
 from .interfaces import IPurchasableCourse
 from .interfaces import IPurchasableCourseChoiceBundle
 
-@interface.implementer(IPurchasableCourse)
 @WithRepr
 @EqHash('NTIID',)
+@interface.implementer(IPurchasableCourse)
 class PurchasableCourse(Purchasable):
 	createDirectFieldProperties(IPurchasableCourse)
 	Description = AdaptingFieldProperty(IPurchasableCourse['Description'])
@@ -68,14 +67,14 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 	communities = to_frozenset(communities) if items else None
 	items = to_frozenset(items) if items else frozenset((ntiid,))
 
-	def _parse_time( field ):
+	def _parse_time(field):
 		result = field
 		if isinstance(field, six.string_types):
 			result = dateutil.parser.parse(field)
 		elif isinstance(field, datetime.date):
 			result = field.isoformat()
 		return result
-	startdate = _parse_time( startdate )
+	startdate = _parse_time(startdate)
 
 	vendor = DefaultPurchasableVendorInfo(vendor_info) \
 			 if vendor_info and isinstance(vendor_info, Mapping) else None
@@ -107,8 +106,8 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 	result.Icon = icon
 	result.VendorInfo = vendor
 	result.Thumbnail = thumbnail
-	result.PurchaseCutOffDate = purchase_cutoff_date
 	result.RedeemCutOffDate = redeem_cutoff_date
+	result.PurchaseCutOffDate = purchase_cutoff_date
 
 	# deprecated / legacy
 	result.Preview = preview
