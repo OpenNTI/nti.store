@@ -11,9 +11,7 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-import six
 import datetime
-import dateutil.parser
 from collections import Mapping
 
 from zope import component
@@ -66,12 +64,10 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
 	amount = float(amount) if amount is not None else amount
 	communities = to_frozenset(communities) if items else None
 	items = to_frozenset(items) if items else frozenset((ntiid,))
-
+	
 	def _parse_time(field):
 		result = field
-		if isinstance(field, six.string_types):
-			result = dateutil.parser.parse(field)
-		elif isinstance(field, datetime.date):
+		if isinstance(field, (datetime.datetime, datetime.date)):
 			result = field.isoformat()
 		return result
 	startdate = _parse_time(startdate)
