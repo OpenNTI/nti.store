@@ -92,10 +92,19 @@ def _purchase_attempt_started(purchase, event):
 	for purchasable in purchasables:
 		if 	purchasable.PurchaseCutOffDate is not None and \
 			now > _parse_datetime(purchasable.PurchaseCutOffDate):
-			raise PurchaseException(_("Item cannot be purchase at this time"))
+			raise PurchaseException(_("Item(s) cannot be purchase at this time"))
 	# update state
 	_update_state(purchase, PA_STATE_STARTED)
 	logger.info('%s started', purchase.id)
+
+@component.adapter(IGiftPurchaseAttempt, IPurchaseAttemptStarted)
+def _gift_purchase_attempt_started(purchase, event):
+	now = datetime.now()
+	purchasables = get_purchasables(purchase)
+	for purchasable in purchasables:
+		if 	purchasable.RedeemCutOffDate is not None and \
+			now > _parse_datetime(purchasable.RedeemCutOffDate):
+			raise RedemptionException(_("Gift cannot be purchase at this time"))
 
 def _activate_items(purchase, user=None, add_roles=True):
 	user = user or purchase.creator
