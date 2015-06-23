@@ -19,7 +19,7 @@ import unittest
 
 from zope import component
 
-from nti.store import interfaces as store_interfaces
+from nti.store.interfaces import IPurchasablePricer
 from nti.store.payments.stripe.stripe_purchase import create_stripe_priceable
 
 from nti.store.tests import SharedConfiguringTestLayer
@@ -54,7 +54,7 @@ class TestUtils(unittest.TestCase):
 	layer = UtilsTestLayer
 
 	def test_price(self):
-		pricer = component.getUtility(store_interfaces.IPurchasablePricer, name="stripe")
+		pricer = component.getUtility(IPurchasablePricer, name="stripe")
 		p = create_stripe_priceable(u"bleach", 5, self.coupon.id)
 		priced = pricer.price(p)
 		assert_that(priced, is_not(none()))
@@ -65,7 +65,7 @@ class TestUtils(unittest.TestCase):
 		assert_that(priced.Quantity, is_(5))
 
 	def test_evaluate(self):
-		pricer = component.getUtility(store_interfaces.IPurchasablePricer, name="stripe")
+		pricer = component.getUtility(IPurchasablePricer, name="stripe")
 		p0 = create_stripe_priceable(u"bleach", 5, self.coupon.id)
 		p1 = create_stripe_priceable(u"xyz-book", 1)
 		result = pricer.evaluate((p0, p1))
@@ -76,7 +76,7 @@ class TestUtils(unittest.TestCase):
 		assert_that(result.TotalNonDiscountedPrice, is_(1100))
 
 	def test_evaluate_fee(self):
-		pricer = component.getUtility(store_interfaces.IPurchasablePricer, name="stripe")
+		pricer = component.getUtility(IPurchasablePricer, name="stripe")
 		p0 = create_stripe_priceable(u"gotye", 10, self.coupon.id)
 		p1 = create_stripe_priceable(u"xyz-book", 3)
 		result = pricer.evaluate((p0, p1))

@@ -11,7 +11,11 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from . import MessageFactory as _
+
 import time
+import isodate
+from datetime import datetime
 
 from zope import component
 
@@ -27,6 +31,7 @@ from nti.dataserver.interfaces import IUser
 
 from nti.invitations.interfaces import IInvitationAcceptedEvent
 
+from . import PurchaseException
 from . import RedemptionException
 
 from .interfaces import PA_STATE_FAILED
@@ -55,6 +60,7 @@ from .content_roles import remove_users_content_roles
 
 from .purchasable import expand_purchase_item_ids
 
+from .purchase_attempt import get_purchasables
 from .purchase_attempt import create_redeemed_purchase_attempt
 
 from .purchase_history import activate_items
@@ -68,6 +74,10 @@ from .store import get_purchase_by_code
 from .store import get_purchase_history
 from .store import get_transaction_code
 
+def _parse_datetime(t):
+	result = isodate.parse_datetime(t) if t else None
+	return result.replace(tzinfo=None) if result is not None else None
+
 def _update_state(purchase, state):
 	if purchase is not None:
 		purchase = removeAllProxies(purchase)
@@ -77,6 +87,13 @@ def _update_state(purchase, state):
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptStarted)
 def _purchase_attempt_started(purchase, event):
+	now = datetime.now()
+	purchasables = get_purchasables(purchase)
+	for purchasable in purchasables:
+		if 	purchasable.PurchaseCutOffDate is not None and \
+			now > _parse_datetime(purchasable.PurchaseCutOffDate):
+			raise PurchaseException(_("Item cannot be purchase at this time"))
+	# update state
 	_update_state(purchase, PA_STATE_STARTED)
 	logger.info('%s started', purchase.id)
 
@@ -195,8 +212,15 @@ def _gift_purchase_attempt_successful(purchase, event):
 
 @component.adapter(IGiftPurchaseAttempt, IGiftPurchaseAttemptRedeemed)
 def _gift_purchase_attempt_redeemed(purchase, event):
+	now = datetime.now()
+	purchasables = get_purchasables(purchase)
+	for purchasable in purchasables:
+		if 	purchasable.RedeemCutOffDate is not None and \
+			now > _parse_datetime(purchasable.RedeemCutOffDate):
+			raise RedemptionException(_("Gift purchase cannot be redeemed at this time"))
+
 	if purchase.is_redeemed():
-		raise RedemptionException("Gift purchase already redeemed")
+		raise RedemptionException(_("Gift purchase already redeemed"))
 
 	code = event.code or get_invitation_code(purchase)
 	new_pid = _make_redeem_purchase_attempt(user=event.user,

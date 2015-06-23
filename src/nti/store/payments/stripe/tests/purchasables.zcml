@@ -20,7 +20,7 @@
 		currency="USD"
 		discountable="False"
 		bulk_purchase="True" />
-		
+
 	<pcs:registerPurchasable
 		ntiid="bleach"
 		title="Bleach"

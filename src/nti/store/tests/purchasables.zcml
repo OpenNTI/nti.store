@@ -63,8 +63,8 @@
 		bulk_purchase="False"
 		icon="http://prmia.org/"
 		license="1 Year License"
-		redeem_cutoff_date="2015-06-13T04:59:00+00:00"
-		purchase_cutoff_date="2015-06-13T04:59:00+00:00"
+		redeem_cutoff_date="2025-06-13T04:59:00+00:00"
+		purchase_cutoff_date="2025-06-13T04:59:00+00:00"
 		items="var-risk volatility" />
 
 </configure>
