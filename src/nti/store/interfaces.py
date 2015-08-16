@@ -431,7 +431,7 @@ class IGiftPurchaseAttempt(IPurchaseAttempt):
 
 	DeliveryDate = Datetime(title="The gift delivery date", required=False)
 
-	Sender = interface.Attribute("Alias for Sender name")
+	Sender = interface.Attribute("Alias for Creator")
 	Sender.setTaggedValue('_ext_excluded_out', True)
 
 	From = interface.Attribute("alias for Creator")
