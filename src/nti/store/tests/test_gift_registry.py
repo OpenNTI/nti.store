@@ -119,7 +119,7 @@ class TestGiftRegistry(unittest.TestCase):
 			assert_that( ext, has_entry( 'To', is_('Azien Sosuke')) )
 			assert_that( ext, has_entry( 'Receiver', is_('azien@bleach.org')) )
 			assert_that( ext, has_entry( 'ReceiverName', is_('Azien Sosuke')) )
-			assert_that( ext, has_entry( 'Sender', is_('Ichigo Kurosaki')) )
+			assert_that( ext, has_entry( 'Sender', is_(username)) )
 			assert_that( ext, has_entry( 'SenderName', is_('Ichigo Kurosaki')) )
 			assert_that( ext, has_entry( 'RedemptionCode', is_not(none())) )
 			assert_that( ext, has_entry( 'DeliveryDate', is_not(none())) )
