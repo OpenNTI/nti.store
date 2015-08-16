@@ -354,7 +354,7 @@ def create_gift_purchase_attempt(creator, order, processor, state=None, descript
 				Order=order, Processor=processor, Creator=creator.lower(),
 				Description=description, State=state,
 				StartTime=float(start_time), Context=context, SenderName=sender,
-				ReceiverName=receiver_name, 	Message=message,
+				ReceiverName=receiver_name, Message=message,
 				DeliveryDate=delivery_date, Receiver=receiver,
 				TargetPurchaseID=target)
 	return result
