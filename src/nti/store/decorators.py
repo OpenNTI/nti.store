@@ -60,7 +60,7 @@ class GiftPurchaseAttemptDecorator(object):
 	def decorateExternalObject(self, original, external):
 		code = get_gift_code(original)
 		external['To'] = original.ReceiverName
-		external['Sender'] = original.SenderName
+		external['Sender'] = original.Creator
 		if original.has_succeeded():
 			external['RedemptionCode'] = external['GiftCode'] = code
 
