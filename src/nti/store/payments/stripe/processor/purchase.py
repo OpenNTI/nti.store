@@ -21,6 +21,7 @@ from functools import partial
 from stripe import InvalidRequestError
 
 from zope import component
+
 from zope.event import notify
 
 from nti.dataserver.interfaces import IDataserverTransactionRunner
@@ -102,10 +103,10 @@ def _register_charge_notify(purchase_id, charge, username=None,
 	if not purchase.is_pending():
 		return False
 	
-	## register the charge id w/ the purchase and creator
+	# register the charge id w/ the purchase and creator
 	notify(RegisterStripeCharge(purchase, charge.id))
 	
-	## check charge
+	# check charge
 	if charge.paid:
 		result = True
 		purchase.Pricing = pricing
@@ -213,21 +214,21 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 								 username=username,
 								 token=token)
 		try:
-			## start the purchase. 
-			## We notify purchase has started and 
-			## return the order to price, charge metatada, description,  
-			## stripe customer id
+			# start the purchase. 
+			# We notify purchase has started and 
+			# return the order to price, charge metatada, description,  
+			# stripe customer id
 			order, metadata, description, customer_id = transaction_runner(start_purchase)
 			
-			## price the purchasable order
-			## this is done outside a DS transaction in case
-			## we need to get a stripe coupon. make sure 
-			## we get the right site component
+			# price the purchasable order
+			# this is done outside a DS transaction in case
+			# we need to get a stripe coupon. make sure 
+			# we get the right site component
 			registry = find_site_components(site_names) 
 			registry = component if registry is None else registry
 			pricing = price_order(order, registry=registry)
 			
-			## check priced amount w/ expected amount
+			# check priced amount w/ expected amount
 			currency = pricing.Currency
 			amount = pricing.TotalPurchasePrice
 			application_fee = pricing.TotalPurchaseFee \
@@ -239,13 +240,13 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 				raise PurchaseException("Purchase order amount did not match the "
 										"expected amount")
 
-			## get priced amount in cents as expected by stripe
-			## round to two decimal places first
+			# get priced amount in cents as expected by stripe
+			# round to two decimal places first
 			cents_amount = int(round(amount * 100.0, ROUND_DECIMAL))
 			application_fee = int(round(application_fee * 100.0, ROUND_DECIMAL)) \
 							  if application_fee else None
 							
-			## execute stripe charge outside a DS transaction
+			# execute stripe charge outside a DS transaction
 			charge = _execute_stripe_charge(card=token,
 											currency=currency,
 											metadata=metadata,
@@ -288,8 +289,8 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 			# report exception
 			raise t, v, tb
 		
-		## now we can do post purchase registration that is
-		## independent of the purchase
+		# now we can do post purchase registration that is
+		# independent of the purchase
 		if success:
 			self._post_purchase(transaction_runner, 
 								charge=charge,
