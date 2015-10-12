@@ -11,8 +11,6 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-import zope.intid
-
 from zope import component
 from zope import interface
 from zope import lifecycleevent
@@ -22,6 +20,8 @@ from zope.annotation import factory as an_factory
 from zope.container.contained import Contained
 
 from zope.deprecation import deprecated
+
+from zope.intid import IIntIds
 
 from zope.location import locate
 from zope.location.interfaces import ISublocations
@@ -85,7 +85,7 @@ class PurchaseHistory(Contained, Persistent):
 
 	@property
 	def _intids(self):
-		return component.getUtility(zope.intid.IIntIds)
+		return component.getUtility(IIntIds)
 
 	def activate_items(self, items):
 		"""
@@ -110,13 +110,13 @@ class PurchaseHistory(Contained, Persistent):
 		return item in self._items_activated
 
 	def add_purchase(self, purchase):
-		# # locate before firing events
+		# locate before firing events
 		locate(purchase, self)
-		# # add to connection and fire event
+		# add to connection and fire event
 		IConnection(self).add(purchase)
 		lifecycleevent.created(purchase)
 		lifecycleevent.added(purchase)  # get an iid
-		# # now we can get an OID/NTIID
+		# now we can get an OID/NTIID
 		result = purchase.id = unicode(to_external_ntiid_oid(purchase))
 		self._purchases[purchase.id] = purchase
 		return result
@@ -248,7 +248,7 @@ def get_purchase_history(user, start_time=None, end_time=None, catalog=None):
 	if user is None:
 		result = ()
 	else:
-		intids = component.getUtility(zope.intid.IIntIds)
+		intids = component.getUtility(IIntIds)
 		catalog = get_catalog() if catalog is None else catalog
 		creator_intids = catalog[IX_CREATOR].apply({'any_of': (user.username,)})
 		mimetype_intids = catalog[IX_MIMETYPE].apply({'any_of': NONGIFT_MIME_TYPES})
@@ -272,7 +272,7 @@ def get_purchase_history_by_item(user, purchasable_id):
 	if user is None:
 		result = ()
 	else:
-		intids = component.getUtility(zope.intid.IIntIds)
+		intids = component.getUtility(IIntIds)
 		doc_ids = get_purchase_ids_by_items(user, purchasable_id)
 		result = LocatedExternalList(ResultSet(doc_ids, intids, ignore_invalid=True))
 	return result
