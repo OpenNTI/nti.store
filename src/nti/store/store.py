@@ -81,7 +81,7 @@ def remove_purchasable(item, registry=None):
 		provided = find_most_derived_interface(item, IPurchasable)
 	else:
 		provided = IPurchasable
-	unregisterUtility(registry, provided=provided, name=name)
+	unregisterUtility(registry, component=item, provided=provided, name=name)
 	lifecycleevent.removed(item)
 
 # Transaction codes
