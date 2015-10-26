@@ -9,8 +9,6 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-import zope.intid
-
 from zope import component
 from zope import interface
 from zope import lifecycleevent
@@ -18,6 +16,8 @@ from zope import lifecycleevent
 from zope.container.contained import Contained
 
 from zope.deprecation import deprecated
+
+from zope.intid import IIntIds
 
 from zope.location import locate
 
@@ -75,7 +75,7 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 
 	@property
 	def intids(self):
-		result = component.getUtility(zope.intid.IIntIds)
+		result = component.getUtility(IIntIds)
 		return result
 
 	def register_purchase(self, username, purchase):
@@ -161,7 +161,7 @@ def get_gift_pending_purchases(username, items=None):
 	return result
 
 def get_gift_purchase_history(username, start_time=None, end_time=None, catalog=None):
-	intids = component.getUtility(zope.intid.IIntIds)
+	intids = component.getUtility(IIntIds)
 	catalog = get_catalog() if catalog is None else catalog
 	mimetype_intids = catalog[IX_MIMETYPE].apply({'any_of': GIFT_PURCHASE_ATTEMPT_MIME_TYPES})
 	if mimetype_intids:
