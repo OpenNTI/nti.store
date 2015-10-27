@@ -23,7 +23,7 @@ class StoreTestLayer(ZopeComponentLayer,
 
 	set_up_packages = ('nti.dataserver',
 					   'nti.store',
-					   ('configure_invitations.zcml', 'nti.appserver'),
+					   'nti.app.invitations',
 					   ('purchasables.zcml', 'nti.store.tests'),
 					   ('purchasables.zcml', 'nti.store.payments.stripe.tests'))
 
