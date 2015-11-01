@@ -23,8 +23,6 @@ from zope.location import locate
 
 from ZODB.interfaces import IConnection
 
-import BTrees
-
 from persistent import Persistent
 
 from nti.dataserver.dicts import LastModifiedDict
@@ -48,7 +46,7 @@ from .interfaces import IGiftRegistry
 from .interfaces import IUserGiftHistory
 from .interfaces import IGiftPurchaseAttempt
 
-from . import get_catalog
+from . import get_purchase_catalog
 
 deprecated('UserGiftHistory', 'Use new gift purchase storage')
 @interface.implementer(IUserGiftHistory)
@@ -63,8 +61,6 @@ class GiftRecordMap(LastModifiedDict, Contained):
 
 @interface.implementer(IGiftRegistry)
 class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
-
-	family = BTrees.family64
 
 	def __init__(self):
 		super(GiftRegistry, self).__init__()
@@ -87,13 +83,13 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 			index = GiftRecordMap(username)
 			self[username] = index
 
-		# # locate before firing events
+		# locate before firing events
 		locate(purchase, index)
-		# # add to connection and fire events
+		# add to connection and fire events
 		IConnection(self).add(purchase)
 		lifecycleevent.created(purchase)
 		lifecycleevent.added(purchase)  # get an iid
-		# # now we can get an OID/NTIID and set creator
+		# now we can get an OID/NTIID and set creator
 		purchase.creator = username
 		purchase.id = unicode(to_external_ntiid_oid(purchase))
 		index[purchase.id] = purchase
@@ -162,8 +158,9 @@ def get_gift_pending_purchases(username, items=None):
 
 def get_gift_purchase_history(username, start_time=None, end_time=None, catalog=None):
 	intids = component.getUtility(IIntIds)
-	catalog = get_catalog() if catalog is None else catalog
-	mimetype_intids = catalog[IX_MIMETYPE].apply({'any_of': GIFT_PURCHASE_ATTEMPT_MIME_TYPES})
+	catalog = get_purchase_catalog() if catalog is None else catalog
+	mimetype_intids = catalog[IX_MIMETYPE].apply({'any_of': 
+												   GIFT_PURCHASE_ATTEMPT_MIME_TYPES})
 	if mimetype_intids:
 		creator_intids = catalog[IX_CREATOR].apply({'any_of': (username,)})
 		time_ids = catalog[IX_CREATEDTIME].apply({'between': (start_time, end_time)})

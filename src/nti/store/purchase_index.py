@@ -9,25 +9,26 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from zope.catalog.interfaces import ICatalog
+
 from zope.location import locate
 
-from zc.intid import IIntIds
-
-from zope.catalog.interfaces import ICatalog
-from zope.catalog.interfaces import ICatalogIndex
+from zope.intid import IIntIds
 
 from nti.dataserver.interfaces import ICreatedUsername
 
 from nti.zope_catalog.catalog import Catalog
+
+from nti.zope_catalog.datetime import TimestampToNormalized64BitIntNormalizer
+
 from nti.zope_catalog.index import NormalizationWrapper
+from nti.zope_catalog.index import AttributeKeywordIndex
 from nti.zope_catalog.index import SetIndex as RawSetIndex
 from nti.zope_catalog.index import ValueIndex as RawValueIndex
 from nti.zope_catalog.index import AttributeValueIndex as ValueIndex
 from nti.zope_catalog.index import IntegerValueIndex as RawIntegerValueIndex
 
-from nti.zope_catalog.index import AttributeKeywordIndex
 from nti.zope_catalog.string import StringTokenNormalizer
-from nti.zope_catalog.datetime import TimestampToNormalized64BitIntNormalizer
 
 from .interfaces import IPurchaseAttempt
 from .interfaces import IRedeemedPurchaseAttempt
@@ -135,16 +136,14 @@ def install_purchase_catalog(site_manager_container, intids=None):
 	lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_NAME)
 
 	for name, clazz in ((IX_ITEMS, ItemsIndex),
-						 (IX_STATE, StateIndex),
-						 (IX_CREATOR, CreatorIndex),
-						 (IX_MIMETYPE, MimeTypeIndex),
-						 (IX_REV_ITEMS, RevItemsIndex),
-						 (IX_CREATEDTIME, StartTimeIndex),
-						 (IX_REDEMPTION_CODE, RedemptionCodeIndex)):
+						(IX_STATE, StateIndex),
+						(IX_CREATOR, CreatorIndex),
+						(IX_MIMETYPE, MimeTypeIndex),
+						(IX_REV_ITEMS, RevItemsIndex),
+						(IX_CREATEDTIME, StartTimeIndex),
+						(IX_REDEMPTION_CODE, RedemptionCodeIndex)):
 		index = clazz(family=intids.family)
-		assert ICatalogIndex.providedBy(index)
 		intids.register(index)
 		locate(index, catalog, name)
 		catalog[name] = index
-
 	return catalog

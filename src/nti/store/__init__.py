@@ -62,5 +62,6 @@ def get_user(user):
 	result = User.get_user(str(user)) if user and not IUser.providedBy(user) else user
 	return result
 
-def get_catalog():
+def get_purchase_catalog():
 	return component.getUtility(ICatalog, name=CATALOG_NAME)
+get_catalog = get_purchase_catalog
