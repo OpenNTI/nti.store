@@ -159,16 +159,13 @@ def get_gift_pending_purchases(username, items=None):
 def get_gift_purchase_history(username, start_time=None, end_time=None, catalog=None):
 	intids = component.getUtility(IIntIds)
 	catalog = get_purchase_catalog() if catalog is None else catalog
-	mimetype_intids = catalog[IX_MIMETYPE].apply({'any_of': 
-												   GIFT_PURCHASE_ATTEMPT_MIME_TYPES})
-	if mimetype_intids:
-		creator_intids = catalog[IX_CREATOR].apply({'any_of': (username,)})
-		time_ids = catalog[IX_CREATEDTIME].apply({'between': (start_time, end_time)})
-		doc_ids = catalog.family.IF.intersection(mimetype_intids, creator_intids)
-		doc_ids = catalog.family.IF.intersection(doc_ids, time_ids)
-		result = LocatedExternalList(ResultSet(doc_ids, intids, ignore_invalid=True))
-	else:
-		result = ()
+	query = {
+		IX_CREATOR: {'any_of': (username,)},
+		IX_MIMETYPE: {'any_of': GIFT_PURCHASE_ATTEMPT_MIME_TYPES},
+		IX_CREATEDTIME: {'between': (start_time, end_time)}
+	}
+	doc_ids = catalog.apply(query)
+	result = LocatedExternalList(ResultSet(doc_ids, intids, ignore_invalid=True))
 	return result
 
 def register_gift_purchase_attempt(username, purchase):
