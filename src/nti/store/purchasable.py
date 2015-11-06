@@ -49,9 +49,9 @@ class DefaultPurchasableVendorInfo(dict):
 	def toExternalObject(self, *args, **kwargs):
 		return dict(self)
 
-@interface.implementer(IPurchasable, IContentTypeAware)
 @WithRepr
 @EqHash('NTIID',)
+@interface.implementer(IPurchasable, IContentTypeAware)
 class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle, Contained):
 
 	__metaclass__ = MetaStoreObject
