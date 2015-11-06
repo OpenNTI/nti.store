@@ -41,7 +41,7 @@ class PurchasableCourse(Purchasable):
 
 @interface.implementer(IPurchasableCourseChoiceBundle)
 class PurchasableCourseChoiceBundle(PurchasableCourse):
-	__external_class_name__ = 'PurchasableCourse'
+	__external_class_name__ = 'PurchasableCourseChoiceBundle'
 	IsPurchasable = False
 
 def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
