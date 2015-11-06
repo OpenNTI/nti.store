@@ -58,7 +58,7 @@ from .purchase_index import IX_CREATEDTIME
 from .interfaces import IPurchaseAttempt
 from .interfaces import IPurchaseHistory
 
-from . import get_catalog
+from . import get_purchase_catalog
 
 # classes
 
@@ -249,22 +249,24 @@ def get_purchase_history(user, start_time=None, end_time=None, catalog=None):
 		result = ()
 	else:
 		intids = component.getUtility(IIntIds)
-		catalog = get_catalog() if catalog is None else catalog
-		creator_intids = catalog[IX_CREATOR].apply({'any_of': (user.username,)})
-		mimetype_intids = catalog[IX_MIMETYPE].apply({'any_of': NONGIFT_MIME_TYPES})
-		time_ids = catalog[IX_CREATEDTIME].apply({'between': (start_time, end_time)})
-		doc_ids = catalog.family.IF.intersection(time_ids, creator_intids)
-		doc_ids = catalog.family.IF.intersection(doc_ids, mimetype_intids)
+		catalog = get_purchase_catalog() if catalog is None else catalog
+		query = {
+			IX_CREATOR:{'any_of': (user.username,)},
+			IX_MIMETYPE: {'any_of': NONGIFT_MIME_TYPES},
+			IX_CREATEDTIME: {'between': (start_time, end_time)}
+		}
+		doc_ids = catalog.apply(query)
 		result = LocatedExternalList(ResultSet(doc_ids, intids, ignore_invalid=True))
 	return result
 
 def get_purchase_ids_by_items(user, *purchasables):
-	catalog = get_catalog()
-	items_ids = catalog[IX_ITEMS].apply({'any_of': purchasables})
-	creator_intids = catalog[IX_CREATOR].apply({'any_of': (user.username,)})
-	mimetype_intids = catalog[IX_MIMETYPE].apply({'any_of': NONGIFT_MIME_TYPES})
-	result = catalog.family.IF.intersection(items_ids, creator_intids)
-	result = catalog.family.IF.intersection(result, mimetype_intids)
+	catalog = get_purchase_catalog()
+	query = {
+		IX_ITEMS:{'any_of': purchasables},
+		IX_CREATOR: {'any_of': (user.username,)},
+		IX_MIMETYPE: {'any_of': NONGIFT_MIME_TYPES}
+	}
+	result = catalog.apply(query)
 	return result
 
 def get_purchase_history_by_item(user, purchasable_id):
@@ -294,9 +296,7 @@ def register_purchase_attempt(purchase, user):
 add_purchase_attempt = register_purchase_attempt
 
 def get_purchasable_ids(registry=component):
-	result = []
-	for p in get_purchasables(registry):
-		result.append(p.NTIID)
+	result = [p.NTIID for p in get_purchasables(registry)]
 	return result
 
 def get_available_items(user, registry=component):
