@@ -14,7 +14,7 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
-from zope.container.contained import Contained
+from zope.location.interfaces import IContained
 
 from zope.mimetype.interfaces import IContentTypeAware
 
@@ -51,8 +51,8 @@ class DefaultPurchasableVendorInfo(dict):
 
 @WithRepr
 @EqHash('NTIID',)
-@interface.implementer(IPurchasable, IContentTypeAware)
-class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle, Contained):
+@interface.implementer(IPurchasable, IContentTypeAware, IContained)
+class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle):
 
 	__metaclass__ = MetaStoreObject
 
@@ -63,6 +63,9 @@ class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle, Contained)
 
 	isPublic = alias('Public')
 	isGiftable = alias('Giftable')
+
+	__parent__ = None
+	__name__ = ntiid = alias('NTIID')
 
 @interface.implementer(IPurchasableChoiceBundle)
 class PurchasableChoiceBundle(Purchasable):
