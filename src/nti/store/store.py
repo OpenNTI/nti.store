@@ -71,6 +71,7 @@ def register_purchasable(item, name=None, registry=None):
 		if connection is not None:
 			connection.add(item)
 			lifecycleevent.added(item)
+			item.__parent__ = registry # parent
 		return item
 	return None
 
@@ -83,6 +84,7 @@ def remove_purchasable(item, registry=None):
 		provided = IPurchasable
 	unregisterUtility(registry, component=item, provided=provided, name=name)
 	lifecycleevent.removed(item)
+	item.__parent__ = None # ground
 
 # Transaction codes
 
