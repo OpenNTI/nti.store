@@ -61,10 +61,11 @@ from . import get_user
 get_purchasable = get_purchasable
 get_all_purchasables = get_purchasables
 
-def register_purchasable(item, name=None, registry=None):
+def register_purchasable(item, name=None, provided=None, registry=None):
 	name = name or item.NTIID
 	registry = registry if registry is not None else component.getSiteManager()
-	provided = find_most_derived_interface(item, IPurchasable)
+	if provided is None:
+		provided = find_most_derived_interface(item, IPurchasable)
 	if registry.queryUtility(provided, name=name) is None:
 		registerUtility(registry, item, provided=provided, name=name)
 		connection = IConnection(registry, None)
@@ -75,16 +76,18 @@ def register_purchasable(item, name=None, registry=None):
 		return item
 	return None
 
-def remove_purchasable(item, registry=None):
+def remove_purchasable(item, provided=None, registry=None):
 	name = getattr(item, 'NTIID', item)
 	registry = registry if registry is not None else component.getSiteManager()
-	if IPurchasable.providedBy(item):
-		provided = find_most_derived_interface(item, IPurchasable)
-	else:
-		provided = IPurchasable
-	unregisterUtility(registry, component=item, provided=provided, name=name)
+	if provided is None:
+		if IPurchasable.providedBy(item):
+			provided = find_most_derived_interface(item, IPurchasable)
+		else:
+			provided = IPurchasable
+	result = unregisterUtility(registry, component=item, provided=provided, name=name)
 	lifecycleevent.removed(item)
 	item.__parent__ = None # ground
+	return result
 
 # Transaction codes
 
