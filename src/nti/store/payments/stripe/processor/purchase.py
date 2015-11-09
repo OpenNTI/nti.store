@@ -26,8 +26,6 @@ from zope.event import notify
 
 from nti.dataserver.interfaces import IDataserverTransactionRunner
 
-from nti.site.site import find_site_components
-
 from .... import get_user
 from .... import ROUND_DECIMAL
 from .... import PurchaseException
@@ -221,12 +219,8 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 			order, metadata, description, customer_id = transaction_runner(start_purchase)
 			
 			# price the purchasable order
-			# this is done outside a DS transaction in case
-			# we need to get a stripe coupon. make sure 
-			# we get the right site component
-			registry = find_site_components(site_names) 
-			registry = component if registry is None else registry
-			pricing = price_order(order, registry=registry)
+			pricer = partial(price_order, order)
+			pricing = transaction_runner(pricer)
 			
 			# check priced amount w/ expected amount
 			currency = pricing.Currency
