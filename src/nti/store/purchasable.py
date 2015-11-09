@@ -20,6 +20,8 @@ from zope.mimetype.interfaces import IContentTypeAware
 
 from nti.common.property import alias
 
+from nti.dataserver.interfaces import SYSTEM_USER_ID
+
 from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
 from nti.externalization.representation import WithRepr
@@ -58,6 +60,8 @@ class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle):
 
 	createDirectFieldProperties(IPurchasable)
 	Description = AdaptingFieldProperty(IPurchasable['Description'])
+
+	creator = SYSTEM_USER_ID
 
 	IsPurchasable = True
 
