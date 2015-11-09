@@ -85,8 +85,8 @@ def remove_purchasable(item, provided=None, registry=None):
 		else:
 			provided = IPurchasable
 	result = unregisterUtility(registry, component=item, provided=provided, name=name)
-	lifecycleevent.removed(item)
 	if IPurchasable.providedBy(item):
+		lifecycleevent.removed(item)
 		item.__parent__ = None # ground
 	return result
 
