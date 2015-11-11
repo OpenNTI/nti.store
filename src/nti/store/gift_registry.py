@@ -25,8 +25,9 @@ from ZODB.interfaces import IConnection
 
 from persistent import Persistent
 
+from nti.containers.containers import CaseInsensitiveCheckingLastModifiedBTreeContainer
+
 from nti.dataserver.dicts import LastModifiedDict
-from nti.dataserver.containers import CaseInsensitiveCheckingLastModifiedBTreeContainer
 
 from nti.externalization.oids import to_external_ntiid_oid
 from nti.externalization.interfaces import LocatedExternalList
