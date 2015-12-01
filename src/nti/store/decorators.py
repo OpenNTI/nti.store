@@ -9,11 +9,10 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-from zope import interface
 from zope import component
+from zope import interface
 
 from nti.externalization.singleton import SingletonDecorator
-from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalObjectDecorator
 
 from .store import get_gift_code
@@ -25,8 +24,6 @@ from .interfaces import IPurchaseAttempt
 from .interfaces import IPurchasableCourse
 from .interfaces import IGiftPurchaseAttempt
 from .interfaces import IInvitationPurchaseAttempt
-
-LINKS = StandardExternalFields.LINKS
 
 @component.adapter(IPurchaseAttempt)
 @interface.implementer(IExternalObjectDecorator)
