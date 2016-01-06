@@ -17,7 +17,7 @@ from zope.mimetype.interfaces import IContentTypeAware
 
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
-from nti.externalization.representation import WithRepr
+from nti.common.representation import WithRepr
 
 from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
@@ -37,6 +37,8 @@ class Priceable(SchemaConfigured):
 
 	NTIID = FP(IPriceable['NTIID'])
 	Quantity = FP(IPriceable['Quantity'])
+
+	parameters = {} # IContentTypeAware
 
 	def copy(self, *args, **kwargs):
 		return copy_priceable(self, *args, **kwargs)

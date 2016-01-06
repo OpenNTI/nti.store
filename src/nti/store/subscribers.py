@@ -224,8 +224,8 @@ def _gift_purchase_attempt_redeemed(purchase, event):
 	now = datetime.now()
 	purchasables = get_purchasables(purchase)
 	for purchasable in purchasables:
-		if 	purchasable.RedeemCutOffDate is not None and \
-			now > _parse_datetime(purchasable.RedeemCutOffDate):
+		if 		purchasable.RedeemCutOffDate is not None \
+			and now > _parse_datetime(purchasable.RedeemCutOffDate):
 			raise RedemptionException(_("Gift purchase cannot be redeemed at this time"))
 
 	if purchase.is_redeemed():

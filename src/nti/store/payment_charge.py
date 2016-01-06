@@ -42,6 +42,8 @@ class UserAddress(SchemaConfigured):
 	Zip = FP(IUserAddress['Zip'])
 	Country = FP(IUserAddress['Country'])
 
+	parameters = {}  # IContentTypeAware
+
 	def __str__(self):
 		return "%s\n%s,%s %s\n%s" % (self.Street,
 									 self.City,
@@ -60,10 +62,10 @@ class UserAddress(SchemaConfigured):
 							 Zip=zip_, Country=country)
 		return result
 
-@total_ordering
-@interface.implementer(IPaymentCharge, IContentTypeAware)
 @WithRepr
+@total_ordering
 @EqHash('Name', 'Amount', 'Created', 'Currency')
+@interface.implementer(IPaymentCharge, IContentTypeAware)
 class PaymentCharge(SchemaConfigured):
 
 	__metaclass__ = MetaStoreObject
@@ -74,6 +76,8 @@ class PaymentCharge(SchemaConfigured):
 	CardLast4 = FP(IPaymentCharge['CardLast4'])
 	Address = FP(IPaymentCharge['Address'])
 	Name = FP(IPaymentCharge['Name'])
+
+	parameters = {}  # IContentTypeAware
 
 	def __str__(self):
 		return "%s:%s" % (self.Currency, self.Amount)

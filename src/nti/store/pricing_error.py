@@ -11,7 +11,7 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
 
-from nti.externalization.representation import WithRepr
+from nti.common.representation import WithRepr
 
 from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
@@ -21,9 +21,9 @@ from .utils import MetaStoreObject
 
 from .interfaces import IPricingError
 
-@interface.implementer(IPricingError)
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
+@interface.implementer(IPricingError)
 class PricingError(SchemaConfigured):
 	__metaclass__ = MetaStoreObject
 	createDirectFieldProperties(IPricingError)

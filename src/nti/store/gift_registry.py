@@ -17,7 +17,7 @@ from zope.container.contained import Contained
 
 from zope.deprecation import deprecated
 
-from zope.intid import IIntIds
+from zope.intid.interfaces import IIntIds
 
 from zope.location import locate
 
@@ -94,9 +94,8 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 		purchase.creator = username
 		purchase.id = unicode(to_external_ntiid_oid(purchase))
 		index[purchase.id] = purchase
-
 		return purchase
-	add = add_purchase = register_purchase
+	add = append = add_purchase = register_purchase
 
 	def remove_purchase(self, username, purchase):
 		if username in self:
@@ -122,8 +121,8 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 			index = self[username]
 			items = to_frozenset(items) if items else None
 			for p in index.values():
-				if 	(p.is_pending() or p.is_unknown()) and \
-					(not items or to_frozenset(p.Items).intersection(items)):
+				if 		(p.is_pending() or p.is_unknown()) \
+					and (not items or to_frozenset(p.Items).intersection(items)):
 					result.append(p)
 		except KeyError:
 			pass
@@ -162,10 +161,10 @@ def get_gift_purchase_history(username, start_time=None, end_time=None, catalog=
 	catalog = get_purchase_catalog() if catalog is None else catalog
 	query = {
 		IX_CREATOR: {'any_of': (username,)},
-		IX_MIMETYPE: {'any_of': GIFT_PURCHASE_ATTEMPT_MIME_TYPES},
-		IX_CREATEDTIME: {'between': (start_time, end_time)}
+		IX_CREATEDTIME: {'between': (start_time, end_time)},
+		IX_MIMETYPE: {'any_of': GIFT_PURCHASE_ATTEMPT_MIME_TYPES}
 	}
-	doc_ids = catalog.apply(query)
+	doc_ids = catalog.apply(query) or ()
 	result = LocatedExternalList(ResultSet(doc_ids, intids, ignore_invalid=True))
 	return result
 

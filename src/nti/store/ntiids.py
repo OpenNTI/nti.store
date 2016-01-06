@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Defines purchasable object and operations on them
-
 .. $Id$
 """
 

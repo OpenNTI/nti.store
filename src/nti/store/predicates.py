@@ -34,6 +34,6 @@ class _GiftPurchaseAttemptPrincipalObjects(BasePrincipalObjects):
 
 	def iter_objects(self, intids=None):
 		registry = get_gift_registry()
-		for username in list(registry.keys()):
+		for username in list(registry.keys()): # snapshot
 			for gift in registry.get_purchases(username):
 				yield gift

@@ -68,6 +68,8 @@ class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle):
 	isPublic = alias('Public')
 	isGiftable = alias('Giftable')
 
+	parameters =  {} # IContentTypeAware
+
 	__parent__ = None
 	__name__ = ntiid = alias('NTIID')
 

@@ -34,9 +34,9 @@ from . import ROUND_DECIMAL
 from . import PricingException
 from . import InvalidPurchasable
 
-@interface.implementer(IPricedItem, IContentTypeAware)
 @WithRepr
 @EqHash('NTIID',)
+@interface.implementer(IPricedItem, IContentTypeAware)
 class PricedItem(Priceable):
 	__metaclass__ = MetaStoreObject
 	createDirectFieldProperties(IPricedItem)
@@ -52,12 +52,11 @@ def create_priced_item(ntiid, purchase_price, purchase_fee=None,
 						Quantity=quantity, Currency=currency)
 	return result
 
-@interface.implementer(IPricingResults, IContentTypeAware)
 @WithRepr
+@interface.implementer(IPricingResults, IContentTypeAware)
 class PricingResults(SchemaConfigured):
 	__metaclass__ = MetaStoreObject
 	createDirectFieldProperties(IPricingResults)
-
 
 def create_pricing_results(items=None, purchase_price=0.0, purchase_fee=0.0,
 						   non_discounted_price=None, currency='USD'):

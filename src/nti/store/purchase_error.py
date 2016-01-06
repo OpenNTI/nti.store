@@ -13,18 +13,19 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
 
-from nti.externalization.representation import WithRepr
+from nti.common.representation import WithRepr
 
 from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
 
 from .utils import MetaStoreObject
+
 from .interfaces import IPurchaseError
 
-@interface.implementer(IPurchaseError)
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
+@interface.implementer(IPurchaseError)
 class PurchaseError(SchemaConfigured):
 	__metaclass__ = MetaStoreObject
 	createDirectFieldProperties(IPurchaseError)

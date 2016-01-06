@@ -21,7 +21,7 @@ from zope.container.contained import Contained
 
 from zope.deprecation import deprecated
 
-from zope.intid import IIntIds
+from zope.intid.interfaces import IIntIds
 
 from zope.location import locate
 from zope.location.interfaces import ISublocations
@@ -38,7 +38,7 @@ from nti.externalization.oids import to_external_ntiid_oid
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import LocatedExternalList
 
-from nti.ntiids import ntiids
+from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.zope_catalog.catalog import ResultSet
 
@@ -120,7 +120,7 @@ class PurchaseHistory(Contained, Persistent):
 		result = purchase.id = unicode(to_external_ntiid_oid(purchase))
 		self._purchases[purchase.id] = purchase
 		return result
-	add = append = add_purchase
+	add = append = register_purchase = add_purchase
 
 	def remove_purchase(self, purchase):
 		try:
@@ -149,8 +149,8 @@ class PurchaseHistory(Contained, Persistent):
 	def get_pending_purchases(self, items=None):
 		items = to_frozenset(items) if items else None
 		for p in self.values():
-			if	(p.is_pending() or p.is_unknown()) and \
-				(not items or to_frozenset(p.Items).intersection(items)):
+			if		(p.is_pending() or p.is_unknown()) \
+				and (not items or to_frozenset(p.Items).intersection(items)):
 				yield p
 
 	def get_purchase_history_by_item(self, item):
@@ -218,7 +218,7 @@ def is_item_activated(user, item):
 	return False
 
 def get_purchase_attempt(purchase_id, user=None):
-	result = ntiids.find_object_with_ntiid(purchase_id)
+	result = find_object_with_ntiid(purchase_id)
 	result = result if IPurchaseAttempt.providedBy(result) else None
 	if result is not None and user:
 		user = get_user(user)
@@ -255,7 +255,7 @@ def get_purchase_history(user, start_time=None, end_time=None, catalog=None):
 			IX_MIMETYPE: {'any_of': NONGIFT_MIME_TYPES},
 			IX_CREATEDTIME: {'between': (start_time, end_time)}
 		}
-		doc_ids = catalog.apply(query)
+		doc_ids = catalog.apply(query) or ()
 		result = LocatedExternalList(ResultSet(doc_ids, intids, ignore_invalid=True))
 	return result
 
@@ -266,7 +266,7 @@ def get_purchase_ids_by_items(user, *purchasables):
 		IX_CREATOR: {'any_of': (user.username,)},
 		IX_MIMETYPE: {'any_of': NONGIFT_MIME_TYPES}
 	}
-	result = catalog.apply(query)
+	result = catalog.apply(query) or ()
 	return result
 
 def get_purchase_history_by_item(user, purchasable_id):

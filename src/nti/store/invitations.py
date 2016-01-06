@@ -13,12 +13,12 @@ logger = __import__('logging').getLogger(__name__)
 
 from . import MessageFactory as _
 
-import zc.intid as zc_intid
-
 from zope import component
 from zope import interface
 
 from zope.proxy import removeAllProxies
+
+from zc.intid import IIntIds
 
 from nti.externalization.integer_strings import to_external_string
 from nti.externalization.integer_strings import from_external_string
@@ -78,7 +78,7 @@ class _StorePurchaseInvitation(JoinEntitiesInvitation):
 
 def get_invitation_code(purchase, registry=component):
 	if purchase is not None:
-		iid = registry.getUtility(zc_intid.IIntIds).getId(removeAllProxies(purchase))
+		iid = registry.getUtility(IIntIds).getId(removeAllProxies(purchase))
 		__traceback_info__ = purchase, iid
 		result = to_external_string(iid)
 		return result
@@ -88,7 +88,7 @@ def get_purchase_by_code(code, registry=component):
 	if code is not None:
 		__traceback_info__ = code
 		iid = from_external_string(code)
-		result = registry.getUtility(zc_intid.IIntIds).queryObject(iid)
+		result = registry.getUtility(IIntIds).queryObject(iid)
 		return result
 	return None
 

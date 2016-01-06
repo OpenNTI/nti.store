@@ -90,13 +90,13 @@ def to_purchase_attempt_context(context):
 def empty_purchase_attempt_context():
 	return DefaultPurchaseAttemptContext()
 
+@WithRepr
 @total_ordering
+@EqHash("Order", "StartTime", "Processor")
 @interface.implementer(ICreated,
 					   IPurchaseAttempt,
 					   IAttributeAnnotatable,
 					   IContentTypeAware)
-@WithRepr
-@EqHash("Order", "StartTime", "Processor")
 class PurchaseAttempt(ModDateTrackingObject,
 					  SchemaConfigured,
 					  Contained,
@@ -113,6 +113,8 @@ class PurchaseAttempt(ModDateTrackingObject,
 	state = alias('State')
 	context = alias('Context')
 	createdTime = alias('StartTime')
+
+	parameters = {} # IContentTypeAware
 
 	@property
 	def Items(self):
