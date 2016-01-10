@@ -9,7 +9,6 @@ __docformat__ = "restructuredtext en"
 
 from zope import interface
 
-from zope.schema import vocabulary
 from zope.deprecation import deprecated
 
 from zope.container.interfaces import IContained
@@ -18,6 +17,8 @@ from zope.container.interfaces import IContainer
 from zope.interface.common.sequence import IMinimalSequence
 from zope.interface.common.mapping import IEnumerableMapping
 from zope.interface.interfaces import ObjectEvent, IObjectEvent
+
+from zope.schema import vocabulary
 
 from dolmen.builtins import IIterable
 
@@ -41,8 +42,8 @@ from nti.schema.field import ValidText
 from nti.schema.field import ListOrTuple
 from nti.schema.field import ValidTextLine
 
-# : A :class:`zope.Interfaces.IVocabularyTokenized` vocabulary
-# : will be available as a registered vocabulary under this name
+#: A :class:`zope.Interfaces.IVocabularyTokenized` vocabulary
+#: will be available as a registered vocabulary under this name
 PURCHASABLE_VOCAB_NAME = 'nti.store.purchasable.vocabulary'
 
 PA_STATE_FAILED = u'Failed'
@@ -80,7 +81,7 @@ class IItemBundle(interface.Interface):
 									  required=False, default='')
 	Items = FrozenSet(value_type=ValidTextLine(title='The item identifier'),
 					  title="Bundle items")
-IContentBundle = IItemBundle #BWC
+IContentBundle = IItemBundle  # BWC
 
 class IPurchasableVendorInfo(IEnumerableMapping):
 	"""
@@ -106,7 +107,7 @@ class IPurchasable(IItemBundle):
 	Giftable = Bool(title="Giftable flag", required=False, default=False)
 	Redeemable = Bool(title="Redeemable flag", required=False, default=False)
 	RedeemCutOffDate = DateTime(title="Redeem cutoff date", required=False)
-	IsPurchasable = Bool(title="Can be purchased", required=True, default=True,readonly=True)
+	IsPurchasable = Bool(title="Can be purchased", required=True, default=True, readonly=True)
 	PurchaseCutOffDate = DateTime(title="Purchase cutoff date", required=False)
 	VendorInfo = Object(IPurchasableVendorInfo, title="vendor info", required=False)
 	VendorInfo.setTaggedValue('_ext_excluded_out', True)
@@ -146,7 +147,7 @@ class IPurchasableCourse(IPurchasable):
 	# For purchaseables, we want to share this.
 	VendorInfo = Object(IPurchasableVendorInfo, title="vendor info", required=False)
 	VendorInfo.setTaggedValue('_ext_excluded_out', False)
-ICourse = IPurchasableCourse # alias BWC
+ICourse = IPurchasableCourse  # alias BWC
 
 class IPurchasableCourseChoiceBundle(IPurchasableChoiceBundle, IPurchasableCourse):
 	pass
@@ -349,7 +350,7 @@ class IPurchaseAttempt(IContained):
 					 required=False)
 	Context.setTaggedValue('_ext_excluded_out', True)
 
-	## CS. these fields are readonly and must not be created
+	# CS. these fields are readonly and must not be created
 	Items = interface.Attribute("Purchasable NTIIDs")
 	Items.setTaggedValue('_ext_excluded_out', True)
 
@@ -407,6 +408,7 @@ class IPurchaseAttempt(IContained):
 		"""
 
 class IInvitationPurchaseAttempt(IPurchaseAttempt):
+
 	ExpirationTime = Number(title="The expirtation time", required=False)
 
 	def isExpired(now=None):
@@ -629,7 +631,7 @@ class IObjectTransformer(interface.Interface):
 	factories to return singleton objects such as a function.
 	"""
 
-	def __call__( context, user=None ):
+	def __call__(context, user=None):
 		pass
 
 # depreecated interfaces
