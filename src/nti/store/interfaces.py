@@ -14,9 +14,11 @@ from zope.deprecation import deprecated
 from zope.container.interfaces import IContained
 from zope.container.interfaces import IContainer
 
+from zope.interface.interfaces import ObjectEvent 
+from zope.interface.interfaces import IObjectEvent
+
 from zope.interface.common.sequence import IMinimalSequence
 from zope.interface.common.mapping import IEnumerableMapping
-from zope.interface.interfaces import ObjectEvent, IObjectEvent
 
 from zope.schema import vocabulary
 
@@ -27,7 +29,7 @@ from nti.contentfragments.schema import HTMLContentFragment
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.users.interfaces import checkEmailAddress
 
-from .schema import DateTime
+from nti.store.schema import DateTime
 
 from nti.schema.field import Int
 from nti.schema.field import Bool
@@ -118,7 +120,7 @@ class IPurchasableChoiceBundle(IPurchasable):
 
 	Buyers can buy/redeem one item from the Items list.
 	"""
-
+	
 class IPurchasableCourse(IPurchasable):
 	Name = ValidTextLine(title='Course Name', required=False)
 
