@@ -23,39 +23,39 @@ from nti.schema.interfaces import find_most_derived_interface
 from nti.site.utils import registerUtility
 from nti.site.utils import unregisterUtility
 
-from .interfaces import IPurchasable
-from .interfaces import IPurchaseAttempt
-from .interfaces import IPurchaseHistory
-from .interfaces import IGiftPurchaseAttempt
+from nti.store import get_user
 
-from .gift_registry import get_gift_registry
-from .gift_registry import get_gift_purchase_history
-from .gift_registry import get_gift_pending_purchases
-from .gift_registry import remove_gift_purchase_attempt
-from .gift_registry import register_gift_purchase_attempt
+from nti.store.gift_registry import get_gift_registry
+from nti.store.gift_registry import get_gift_purchase_history
+from nti.store.gift_registry import get_gift_pending_purchases
+from nti.store.gift_registry import remove_gift_purchase_attempt
+from nti.store.gift_registry import register_gift_purchase_attempt
 
-from .invitations import get_invitation_code
-from .invitations import get_purchase_by_code
+from nti.store.interfaces import IPurchasable
+from nti.store.interfaces import IPurchaseAttempt
+from nti.store.interfaces import IPurchaseHistory
+from nti.store.interfaces import IGiftPurchaseAttempt
 
-from .purchasable import get_purchasable
-from .purchasable import get_purchasables
+from nti.store.invitations import get_invitation_code
+from nti.store.invitations import get_purchase_by_code
 
-from .purchase_attempt import create_purchase_attempt
-from .purchase_attempt import create_gift_purchase_attempt
-from .purchase_attempt import get_purchasables as get_purchase_purchasables
+from nti.store.purchasable import get_purchasable
+from nti.store.purchasable import get_purchasables
 
-from .purchase_history import activate_items
-from .purchase_history import PurchaseHistory
-from .purchase_history import deactivate_items
-from .purchase_history import is_item_activated
-from .purchase_history import has_history_by_item
-from .purchase_history import get_pending_purchases
-from .purchase_history import register_purchase_attempt
-from .purchase_history import get_purchase_history_by_item
-from .purchase_history import get_purchase_history as get_user_purchase_history
-from .purchase_history import remove_purchase_attempt as remove_hist_purchase_attempt
+from nti.store.purchase_attempt import create_purchase_attempt
+from nti.store.purchase_attempt import create_gift_purchase_attempt
+from nti.store.purchase_attempt import get_purchasables as get_purchase_purchasables
 
-from . import get_user
+from nti.store.purchase_history import activate_items
+from nti.store.purchase_history import PurchaseHistory
+from nti.store.purchase_history import deactivate_items
+from nti.store.purchase_history import is_item_activated
+from nti.store.purchase_history import has_history_by_item
+from nti.store.purchase_history import get_pending_purchases
+from nti.store.purchase_history import register_purchase_attempt
+from nti.store.purchase_history import get_purchase_history_by_item
+from nti.store.purchase_history import get_purchase_history as get_user_purchase_history
+from nti.store.purchase_history import remove_purchase_attempt as remove_hist_purchase_attempt
 
 # Purchasables
 get_purchasable = get_purchasable
@@ -84,7 +84,9 @@ def remove_purchasable(item, provided=None, registry=None):
 			provided = find_most_derived_interface(item, IPurchasable)
 		else:
 			provided = IPurchasable
-	result = unregisterUtility(registry, component=item, provided=provided, name=name)
+	result = unregisterUtility(registry, 
+							   name=name,
+							   provided=provided)
 	if IPurchasable.providedBy(item):
 		lifecycleevent.removed(item)
 		item.__parent__ = None # ground
