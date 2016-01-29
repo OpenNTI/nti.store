@@ -15,6 +15,7 @@ from zope import interface
 
 from zope.annotation.interfaces import IAttributeAnnotatable
 
+from nti.common.property import alias
 from nti.common.representation import WithRepr
 
 from nti.schema.schema import EqHash
@@ -22,19 +23,17 @@ from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import AdaptingFieldProperty
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from .interfaces import IItemBundle
+from nti.store.interfaces import IItemBundle
 
-@interface.implementer(IItemBundle, IAttributeAnnotatable)
 @WithRepr
 @EqHash('NTIID',)
+@interface.implementer(IItemBundle, IAttributeAnnotatable)
 class ItemBundle(SchemaConfigured):
 
 	createDirectFieldProperties(IItemBundle)
 	Description = AdaptingFieldProperty(IItemBundle['Description'])
 
-	@property
-	def id(self):
-		return self.NTIID
+	id = ntiid = alias('NTIID')
 
 	def __str__(self):
 		return self.NTIID
