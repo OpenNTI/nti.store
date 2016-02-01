@@ -13,20 +13,30 @@ import six
 
 from nti.mimetype.mimetype import MIME_BASE
 
-from .interfaces import ICopier
+from nti.store import PURCHASABLE
+from nti.store import PURCHASABLE_COURSE
+from nti.store import PURCHASABLE_CHOICE_BUNDLE
+from nti.store import PURCHASABLE_COURSE_CHOICE_BUNDLE
 
+from nti.store.interfaces import ICopier
+
+# : Store MimeType base
 STORE_MIME_BASE = MIME_BASE + b'.store'
 
+# : Non-Gift purchase attempt MimeTypes
 NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES = \
 		tuple([STORE_MIME_BASE + x for x in (b'.purchaseattempt',
 											 b'.invitationpurchaseattempt',
 											 b'.redeemedpurchaseattempt') ])
 
+# : Gift purchase attempt MimeTypes
 GIFT_PURCHASE_ATTEMPT_MIME_TYPES = tuple([STORE_MIME_BASE + b'.giftpurchaseattempt'])
 
+# : Purchase attempt MimeTypes
 PURCHASE_ATTEMPT_MIME_TYPES = \
 		NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES + GIFT_PURCHASE_ATTEMPT_MIME_TYPES
 
+# : Purchasables MimeTypes
 PURCHASABLE_MIME_TYPES = []
 PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + b'.purchasable')
 PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + b'.purchasablecourse')
@@ -34,9 +44,21 @@ PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + b'.purchasablechoicebundle')
 PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + b'.purchasablecoursechoicebundle')
 PURCHASABLE_MIME_TYPES = tuple(PURCHASABLE_MIME_TYPES)
 
+# : All store MimeTypes
 ALL_STORE_MIME_TYPES = list(PURCHASE_ATTEMPT_MIME_TYPES)
 ALL_STORE_MIME_TYPES.extend(PURCHASABLE_MIME_TYPES)
 ALL_STORE_MIME_TYPES = tuple(ALL_STORE_MIME_TYPES)
+
+def get_ntiid_type(mimeType):
+	if mimeType == PURCHASABLE_MIME_TYPES[0]:  # purchasable
+		return PURCHASABLE
+	elif mimeType == PURCHASABLE_MIME_TYPES[1]:  # purchasable course
+		return PURCHASABLE_COURSE
+	elif mimeType == PURCHASABLE_CHOICE_BUNDLE[2]:  # purchasable choice bundle
+		return PURCHASABLE_CHOICE_BUNDLE
+	elif mimeType == PURCHASABLE_COURSE_CHOICE_BUNDLE[3]:  # purchasable course choice bundle
+		return PURCHASABLE_COURSE_CHOICE_BUNDLE
+	return None
 
 def from_delimited(value, delim=' '):
 	result = value.split(delim)
