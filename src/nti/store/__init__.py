@@ -20,19 +20,35 @@ from zope.catalog.interfaces import ICatalog
 from nti.dataserver.users import User
 from nti.dataserver.interfaces import IUser
 
-from .interfaces import IRefundException
-from .interfaces import IPricingException
-from .interfaces import IPurchaseException
-from .interfaces import INTIStoreException
-from .interfaces import IRedemptionException
+from nti.store.interfaces import IRefundException
+from nti.store.interfaces import IPricingException
+from nti.store.interfaces import IPurchaseException
+from nti.store.interfaces import INTIStoreException
+from nti.store.interfaces import IRedemptionException
 
+#: Pricing round decimal
 ROUND_DECIMAL = 2
+
+#: Purchasable NTIID type
 PURCHASABLE = 'purchasable'
+
+#: Purchasable course NTIID type
 PURCHASABLE_COURSE = 'purchasable_course'
+
+#: Purchasable content NTIID type
 PURCHASABLE_CONTENT = 'purchasable_content'
+
+#: Purchasable choice bundle NTIID type
 PURCHASABLE_CHOICE_BUNDLE = 'purchasable_choice_bundle'
+
+#: Purchasable course choice bundle NTIID type
 PURCHASABLE_COURSE_CHOICE_BUNDLE = 'purchasable_course_choice_bundle'
 
+#: Tuple of purchasable NTIID types
+PURCHASABLE_NTIID_TYPES = (PURCHASABLE, PURCHASABLE_COURSE, PURCHASABLE_CONTENT, 
+						   PURCHASABLE_CHOICE_BUNDLE, PURCHASABLE_COURSE_CHOICE_BUNDLE)
+
+#: Purchases index name
 CATALOG_NAME = 'nti.dataserver.++etc++purchase-catalog'
 
 @interface.implementer(INTIStoreException)
