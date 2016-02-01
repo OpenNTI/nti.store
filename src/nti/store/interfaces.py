@@ -29,6 +29,8 @@ from nti.contentfragments.schema import HTMLContentFragment
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.users.interfaces import checkEmailAddress
 
+from nti.namedfile.interfaces import INamedFile
+
 from nti.store.schema import DateTime
 
 from nti.schema.field import Int
@@ -37,7 +39,9 @@ from nti.schema.field import Float
 from nti.schema.field import Choice
 from nti.schema.field import Number
 from nti.schema.field import Object
+from nti.schema.field import Variant
 from nti.schema.field import Datetime
+from nti.schema.field import ValidURI
 from nti.schema.field import FrozenSet
 from nti.schema.field import Timedelta
 from nti.schema.field import ValidText
@@ -101,7 +105,11 @@ class IPurchasable(IItemBundle):
 	Discountable = Bool(title="Discountable flag", required=True, default=False)
 	BulkPurchase = Bool(title="Bulk purchase flag", required=True, default=False)
 	Fee = Float(title="Percentage fee", required=False, min=0.0)
-	Icon = ValidTextLine(title='Icon URL', required=False)
+	Icon =Variant((ValidTextLine(title="Icon name"),
+				   ValidURI(title="Icon source uri"),
+				   Object(INamedFile, title="Icon file")),
+				   title="Purchasable icon",
+				   required=False)
 	Thumbnail = ValidTextLine(title='Thumbnail URL', required=False)
 	Provider = ValidTextLine(title='Purchasable item provider', required=True)
 	License = ValidTextLine(title='Purchasable license', required=False)
