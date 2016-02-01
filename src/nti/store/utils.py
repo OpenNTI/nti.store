@@ -20,23 +20,23 @@ from nti.store import PURCHASABLE_COURSE_CHOICE_BUNDLE
 
 from nti.store.interfaces import ICopier
 
-# : Store MimeType base
+#: Store MimeType base
 STORE_MIME_BASE = MIME_BASE + b'.store'
 
-# : Non-Gift purchase attempt MimeTypes
+#: Non-Gift purchase attempt MimeTypes
 NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES = \
 		tuple([STORE_MIME_BASE + x for x in (b'.purchaseattempt',
 											 b'.invitationpurchaseattempt',
 											 b'.redeemedpurchaseattempt') ])
 
-# : Gift purchase attempt MimeTypes
+#: Gift purchase attempt MimeTypes
 GIFT_PURCHASE_ATTEMPT_MIME_TYPES = tuple([STORE_MIME_BASE + b'.giftpurchaseattempt'])
 
-# : Purchase attempt MimeTypes
+#: Purchase attempt MimeTypes
 PURCHASE_ATTEMPT_MIME_TYPES = \
 		NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES + GIFT_PURCHASE_ATTEMPT_MIME_TYPES
 
-# : Purchasables MimeTypes
+#: Purchasables MimeTypes
 PURCHASABLE_MIME_TYPES = []
 PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + b'.purchasable')
 PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + b'.purchasablecourse')
@@ -44,7 +44,7 @@ PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + b'.purchasablechoicebundle')
 PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + b'.purchasablecoursechoicebundle')
 PURCHASABLE_MIME_TYPES = tuple(PURCHASABLE_MIME_TYPES)
 
-# : All store MimeTypes
+#: All store MimeTypes
 ALL_STORE_MIME_TYPES = list(PURCHASE_ATTEMPT_MIME_TYPES)
 ALL_STORE_MIME_TYPES.extend(PURCHASABLE_MIME_TYPES)
 ALL_STORE_MIME_TYPES = tuple(ALL_STORE_MIME_TYPES)
