@@ -84,7 +84,7 @@ def remove_purchasable(item, provided=None, registry=None):
 			provided = find_most_derived_interface(item, IPurchasable)
 		else:
 			provided = IPurchasable
-	result = unregisterUtility(registry, 
+	result = unregisterUtility(registry,
 							   name=name,
 							   provided=provided)
 	if IPurchasable.providedBy(item):
@@ -119,7 +119,7 @@ def get_purchase_attempt(purchase_id, user=None):
 	if result is not None and user:
 		if IGiftPurchaseAttempt.providedBy(result):
 			username = getattr(user, 'username', user)
-			result = None if result.creator != username.lower() else result
+			result = None if result.creator.lower() != username.lower() else result
 		elif IPurchaseAttempt.providedBy(result):
 			user = get_user(user)
 			if user is not None:
