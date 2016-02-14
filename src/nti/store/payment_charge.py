@@ -21,13 +21,14 @@ from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from nti.externalization.representation import WithRepr
 
-from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 
-from .utils import MetaStoreObject
+from nti.schema.schema import EqHash
 
-from .interfaces import IUserAddress
-from .interfaces import IPaymentCharge
+from nti.store.interfaces import IUserAddress
+from nti.store.interfaces import IPaymentCharge
+
+from nti.store.utils import MetaStoreObject
 
 @WithRepr
 @EqHash('Zip', 'City', 'State', 'Street', 'Country')
@@ -70,12 +71,12 @@ class PaymentCharge(SchemaConfigured):
 
 	__metaclass__ = MetaStoreObject
 
+	Name = FP(IPaymentCharge['Name'])
 	Amount = FP(IPaymentCharge['Amount'])
 	Currency = FP(IPaymentCharge['Currency'])
 	Created = FP(IPaymentCharge['Created'])
 	CardLast4 = FP(IPaymentCharge['CardLast4'])
 	Address = FP(IPaymentCharge['Address'])
-	Name = FP(IPaymentCharge['Name'])
 
 	parameters = {}  # IContentTypeAware
 

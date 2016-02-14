@@ -13,7 +13,7 @@ from zope import interface
 
 from nti.ntiids.interfaces import INTIIDResolver
 
-from .purchasable import get_purchasable
+from nti.store.store import get_purchasable
 
 @interface.implementer(INTIIDResolver)
 class _PurchasableResolver(object):

@@ -19,14 +19,15 @@ from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from nti.common.representation import WithRepr
 
-from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 
-from .utils import MetaStoreObject
+from nti.schema.schema import EqHash
 
-from .interfaces import IPriceable
+from nti.store.interfaces import IPriceable
 
-from .purchasable import get_purchasable
+from nti.store.purchasable import get_purchasable
+
+from nti.store.utils import MetaStoreObject
 
 @WithRepr
 @EqHash('NTIID', 'Quantity')
@@ -38,7 +39,7 @@ class Priceable(SchemaConfigured):
 	NTIID = FP(IPriceable['NTIID'])
 	Quantity = FP(IPriceable['Quantity'])
 
-	parameters = {} # IContentTypeAware
+	parameters = {}  # IContentTypeAware
 
 	def copy(self, *args, **kwargs):
 		return copy_priceable(self, *args, **kwargs)

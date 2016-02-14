@@ -16,9 +16,9 @@ from nti.dataserver.interfaces import ISystemUserPrincipal
 
 from nti.metadata.predicates import BasePrincipalObjects
 
-from .interfaces import IPurchaseHistory
+from nti.store.interfaces import IPurchaseHistory
 
-from .store import get_gift_registry
+from nti.store.store import get_gift_registry
 
 @component.adapter(IUser)
 class _PurchaseAttemptPrincipalObjects(BasePrincipalObjects):
@@ -26,7 +26,7 @@ class _PurchaseAttemptPrincipalObjects(BasePrincipalObjects):
 	def iter_objects(self):
 		user = self.user
 		history = IPurchaseHistory(user)
-		for purchase in list(history):
+		for purchase in list(history):  # snapshot
 			yield purchase
 
 @component.adapter(ISystemUserPrincipal)
@@ -34,6 +34,6 @@ class _GiftPurchaseAttemptPrincipalObjects(BasePrincipalObjects):
 
 	def iter_objects(self, intids=None):
 		registry = get_gift_registry()
-		for username in list(registry.keys()): # snapshot
+		for username in list(registry.keys()):  # snapshot
 			for gift in registry.get_purchases(username):
 				yield gift

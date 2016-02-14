@@ -29,6 +29,11 @@ from nti.externalization.interfaces import IInternalObjectExternalizer
 
 from nti.externalization.representation import WithRepr
 
+from nti.schema.fieldproperty import AdaptingFieldProperty
+from nti.schema.fieldproperty import createDirectFieldProperties
+
+from nti.schema.schema import EqHash
+
 from nti.store.item_bundle import ItemBundle
 
 from nti.store.interfaces import IPurchasable
@@ -38,11 +43,6 @@ from nti.store.interfaces import IPurchasableChoiceBundle
 from nti.store.utils import to_frozenset
 from nti.store.utils import to_collection
 from nti.store.utils import MetaStoreObject
-
-from nti.schema.fieldproperty import AdaptingFieldProperty
-from nti.schema.fieldproperty import createDirectFieldProperties
-
-from nti.schema.schema import EqHash
 
 @interface.implementer(IPurchasableVendorInfo, IInternalObjectExternalizer)
 class DefaultPurchasableVendorInfo(dict):

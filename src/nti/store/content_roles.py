@@ -22,9 +22,9 @@ from nti.dataserver.interfaces import IMutableGroupMember
 
 from nti.ntiids import ntiids
 
-from .content_utils import get_collection_root_ntiid
+from nti.store import get_user
 
-from . import get_user
+from nti.store.content_utils import get_collection_root_ntiid
 
 def get_descendants(unit):
 	yield unit
