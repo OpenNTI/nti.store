@@ -17,6 +17,11 @@ from zope.intid.interfaces import IIntIds
 
 from nti.dataserver.interfaces import ICreatedUsername
 
+from nti.store import CATALOG_NAME
+
+from nti.store.interfaces import IPurchaseAttempt
+from nti.store.interfaces import IRedeemedPurchaseAttempt
+
 from nti.zope_catalog.catalog import Catalog
 
 from nti.zope_catalog.datetime import TimestampToNormalized64BitIntNormalizer
@@ -29,11 +34,6 @@ from nti.zope_catalog.index import AttributeValueIndex as ValueIndex
 from nti.zope_catalog.index import IntegerValueIndex as RawIntegerValueIndex
 
 from nti.zope_catalog.string import StringTokenNormalizer
-
-from .interfaces import IPurchaseAttempt
-from .interfaces import IRedeemedPurchaseAttempt
-
-from . import CATALOG_NAME
 
 IX_ITEMS = 'items'
 IX_STATE = 'state'
@@ -124,7 +124,6 @@ class StoreCatalog(Catalog):
 def install_purchase_catalog(site_manager_container, intids=None):
 	lsm = site_manager_container.getSiteManager()
 	intids = intids if intids is not None else lsm.getUtility(IIntIds)
-
 	catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME)
 	if catalog is not None:
 		return catalog
