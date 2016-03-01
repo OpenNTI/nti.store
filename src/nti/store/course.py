@@ -23,14 +23,14 @@ from nti.schema.schema import EqHash
 from nti.schema.fieldproperty import AdaptingFieldProperty
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from .utils import to_frozenset
+from nti.store.purchasable import Purchasable
+from nti.store.purchasable import get_purchasable
+from nti.store.purchasable import DefaultPurchasableVendorInfo
 
-from .purchasable import Purchasable
-from .purchasable import get_purchasable
-from .purchasable import DefaultPurchasableVendorInfo
+from nti.store.interfaces import IPurchasableCourse
+from nti.store.interfaces import IPurchasableCourseChoiceBundle
 
-from .interfaces import IPurchasableCourse
-from .interfaces import IPurchasableCourseChoiceBundle
+from nti.store.utils import to_frozenset
 
 @WithRepr
 @EqHash('NTIID',)

@@ -27,5 +27,3 @@ class _PurchasableResolver(object):
 
 	def resolve(self, ntiid_string):
 		return get_purchasable(ntiid_string)
-
-_CourseResolver = _PurchasableResolver  # alias BWC

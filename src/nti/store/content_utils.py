@@ -25,7 +25,7 @@ def get_paths(ntiid, library=None, registry=component):
 
 def get_ntiid_path(ntiid, library=None, registry=component):
 	result = get_paths(ntiid, library, registry)
-	result = tuple([p.ntiid for p in result]) if result else ()
+	result = tuple(p.ntiid for p in result) if result else ()
 	return result
 
 def get_collection_root(ntiid, library=None, registry=component):
@@ -33,6 +33,6 @@ def get_collection_root(ntiid, library=None, registry=component):
 	return paths[0] if paths else None
 
 def get_collection_root_ntiid(ntiid, library=None, registry=component):
-	croot = get_collection_root(ntiid, library, registry)
-	result = croot.ntiid if croot else None
+	root = get_collection_root(ntiid, library, registry)
+	result = root.ntiid if root is not None else None
 	return result

@@ -9,18 +9,18 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-from zope import interface
 from zope import component
+from zope import interface
 
 from nti.externalization.interfaces import IInternalObjectExternalizer
 
 from nti.externalization.datastructures import InterfaceObjectIO
 from nti.externalization.interfaces import StandardExternalFields
 
-from .interfaces import IPurchasable
-from .interfaces import IPurchasableCourse
-from .interfaces import IPurchasableChoiceBundle
-from .interfaces import IPurchasableCourseChoiceBundle
+from nti.store.interfaces import IPurchasable
+from nti.store.interfaces import IPurchasableCourse
+from nti.store.interfaces import IPurchasableChoiceBundle
+from nti.store.interfaces import IPurchasableCourseChoiceBundle
 
 @component.adapter(IPurchasable)
 @interface.implementer(IInternalObjectExternalizer)

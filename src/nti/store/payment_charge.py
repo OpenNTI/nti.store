@@ -19,7 +19,7 @@ from zope.mimetype.interfaces import IContentTypeAware
 
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
-from nti.externalization.representation import WithRepr
+from nti.common.representation import WithRepr
 
 from nti.schema.field import SchemaConfigured
 

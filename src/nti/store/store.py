@@ -108,9 +108,9 @@ is_item_activated = is_item_activated
 
 get_pending_purchases = get_pending_purchases
 create_purchase_attempt = create_purchase_attempt
-register_purchase_attempt = register_purchase_attempt
 get_purchase_purchasables = get_purchase_purchasables
 get_user_purchase_history = get_user_purchase_history
+register_purchase_attempt = register_purchase_attempt
 get_purchase_history_by_item = get_purchase_history_by_item
 
 def get_purchase_attempt(purchase_id, user=None):

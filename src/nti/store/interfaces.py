@@ -7,6 +7,8 @@
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
 
+logger = __import__('logging').getLogger(__name__)
+
 from zope import interface
 
 from zope.deprecation import deprecated
@@ -14,11 +16,12 @@ from zope.deprecation import deprecated
 from zope.container.interfaces import IContained
 from zope.container.interfaces import IContainer
 
-from zope.interface.interfaces import ObjectEvent 
-from zope.interface.interfaces import IObjectEvent
+from zope.interface.common.mapping import IEnumerableMapping
 
 from zope.interface.common.sequence import IMinimalSequence
-from zope.interface.common.mapping import IEnumerableMapping
+
+from zope.interface.interfaces import ObjectEvent 
+from zope.interface.interfaces import IObjectEvent
 
 from zope.schema import vocabulary
 
@@ -27,11 +30,10 @@ from dolmen.builtins import IIterable
 from nti.contentfragments.schema import HTMLContentFragment
 
 from nti.dataserver.interfaces import IUser
+
 from nti.dataserver.users.interfaces import checkEmailAddress
 
 from nti.namedfile.interfaces import INamedFile
-
-from nti.store.schema import DateTime
 
 from nti.schema.field import Int
 from nti.schema.field import Bool
@@ -47,6 +49,8 @@ from nti.schema.field import Timedelta
 from nti.schema.field import ValidText
 from nti.schema.field import ListOrTuple
 from nti.schema.field import ValidTextLine
+
+from nti.store.schema import DateTime
 
 #: A :class:`zope.Interfaces.IVocabularyTokenized` vocabulary
 #: will be available as a registered vocabulary under this name

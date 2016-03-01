@@ -14,12 +14,13 @@ from zope import component
 from zope import interface
 
 from nti.externalization.datastructures import InterfaceObjectIO
+
 from nti.externalization.interfaces import IInternalObjectUpdater
 from nti.externalization.interfaces import StandardExternalFields
 
-from .utils import to_frozenset
+from nti.store.interfaces import IPurchasable
 
-from .interfaces import IPurchasable
+from nti.store.utils import to_frozenset
 
 ITEMS = StandardExternalFields.ITEMS
 

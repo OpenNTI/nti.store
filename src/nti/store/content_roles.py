@@ -18,6 +18,7 @@ from zope import component
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
 from nti.dataserver import authorization as nauth
+
 from nti.dataserver.interfaces import IMutableGroupMember
 
 from nti.ntiids import ntiids

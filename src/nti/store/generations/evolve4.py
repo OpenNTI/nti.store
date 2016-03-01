@@ -11,18 +11,20 @@ logger = __import__('logging').getLogger(__name__)
 
 generation = 4
 
-import zope.intid
-
 from zope import component
+
 from zope.component.hooks import site, setHooks
+
+from zope.intid.interfaces import IIntIds
 
 from nti.dataserver.interfaces import IUser
 
 from nti.metadata import get_uid
 from nti.metadata.interfaces import IMetadataQueue
 
-from ..store import get_purchase_history
-from ..predicates import _GiftPurchaseAttemptPrincipalObjects as gift_source
+from nti.store.predicates import _GiftPurchaseAttemptPrincipalObjects as gift_source
+
+from nti.store.store import get_purchase_history
 
 def do_evolve(context):
 	setHooks()
@@ -31,7 +33,7 @@ def do_evolve(context):
 	ds_folder = root['nti.dataserver']
 
 	lsm = ds_folder.getSiteManager()
-	intids = lsm.getUtility(zope.intid.IIntIds)
+	intids = lsm.getUtility(IIntIds)
 	
 	queue = lsm.getUtility(IMetadataQueue)
 	

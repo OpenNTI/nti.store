@@ -175,6 +175,9 @@
 		<subscriber	factory=".predicates._PurchaseAttemptPrincipalObjects"
 					provides="nti.dataserver.interfaces.IPrincipalMetadataObjects" />
 			
+		<subscriber	factory=".predicates._PurchasablesPrincipalObjects"
+					provides="nti.dataserver.interfaces.IPrincipalMetadataObjects" />
+
 		<subscriber	factory=".predicates._GiftPurchaseAttemptPrincipalObjects"
 					provides="nti.dataserver.interfaces.IPrincipalMetadataObjects" />
 	</configure>

@@ -17,8 +17,9 @@ from zope import interface
 
 from zope.catalog.interfaces import ICatalog
 
-from nti.dataserver.users import User
 from nti.dataserver.interfaces import IUser
+
+from nti.dataserver.users import User
 
 from nti.store.interfaces import IRefundException
 from nti.store.interfaces import IPricingException

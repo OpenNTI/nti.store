@@ -34,20 +34,21 @@ from nti.externalization.interfaces import LocatedExternalList
 
 from nti.ntiids.ntiids import find_object_with_ntiid
 
+from nti.store import get_purchase_catalog
+
+from nti.store.interfaces import IGiftRegistry
+from nti.store.interfaces import IUserGiftHistory
+from nti.store.interfaces import IGiftPurchaseAttempt
+
+from nti.store.purchase_index import IX_CREATOR
+from nti.store.purchase_index import IX_MIMETYPE
+from nti.store.purchase_index import IX_CREATEDTIME
+
+from nti.store.utils import GIFT_PURCHASE_ATTEMPT_MIME_TYPES
+
+from nti.store.utils import to_frozenset
+
 from nti.zope_catalog.catalog import ResultSet
-
-from .utils import to_frozenset
-from .utils import GIFT_PURCHASE_ATTEMPT_MIME_TYPES
-
-from .purchase_index import IX_CREATOR
-from .purchase_index import IX_MIMETYPE
-from .purchase_index import IX_CREATEDTIME
-
-from .interfaces import IGiftRegistry
-from .interfaces import IUserGiftHistory
-from .interfaces import IGiftPurchaseAttempt
-
-from . import get_purchase_catalog
 
 deprecated('UserGiftHistory', 'Use new gift purchase storage')
 @interface.implementer(IUserGiftHistory)

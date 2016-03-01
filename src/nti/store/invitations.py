@@ -11,8 +11,6 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-from . import MessageFactory as _
-
 from zope import component
 from zope import interface
 
@@ -26,9 +24,11 @@ from nti.externalization.integer_strings import from_external_string
 from nti.invitations.interfaces import IInvitation
 from nti.invitations.invitation import JoinEntitiesInvitation
 
-from .interfaces import IStorePurchaseInvitation
+from nti.store import MessageFactory as _
 
-from . import get_user
+from nti.store import get_user
+
+from nti.store.interfaces import IStorePurchaseInvitation
 
 interface.alsoProvides(IStorePurchaseInvitation, IInvitation)
 
