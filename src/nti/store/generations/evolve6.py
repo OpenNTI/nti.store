@@ -21,17 +21,18 @@ from zope.annotation.interfaces import IAnnotations
 
 from nti.dataserver.interfaces import IUser
 
+from nti.store.purchase_index import IX_CREATOR
+from nti.store.purchase_index import IX_MIMETYPE
+from nti.store.purchase_index import CATALOG_NAME
+
+from nti.store.interfaces import IPurchaseAttempt
+from nti.store.interfaces import IPurchaseHistory
+
+from nti.store.store import get_purchase_history_annotation_key
+
+from nti.store.utils import NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES
+
 from nti.zope_catalog.catalog import ResultSet
-
-from ..purchase_index import IX_CREATOR
-from ..purchase_index import IX_MIMETYPE
-from ..purchase_index import CATALOG_NAME
-
-from ..interfaces import IPurchaseHistory
-
-from ..store import get_purchase_history_annotation_key
-
-from ..utils import NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES
 
 def get_purchases(catalog, username, intids):
 	creator_intids = catalog[IX_CREATOR].apply({'any_of': (username,)})
@@ -48,12 +49,12 @@ def do_evolve(context, generation=generation):
 	conn = context.connection
 	ds_folder = conn.root()['nti.dataserver']
 	annotation_key = get_purchase_history_annotation_key()
-	
+
 	with site(ds_folder):
 		lsm = ds_folder.getSiteManager()
 		intids = lsm.getUtility(zope.intid.IIntIds)
-		catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME )
-		
+		catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME)
+
 		users = ds_folder['users']
 		for user in users.values():
 			if not IUser.providedBy(user):
@@ -63,17 +64,20 @@ def do_evolve(context, generation=generation):
 				continue
 			history = IPurchaseHistory(user)
 
-			if not hasattr(history, '_purchases'):
-				history._purchases = history.family.OO.OOBTree()
-			
+			if hasattr(history, '_purchases'):
+				continue
+
+			history._purchases = history.family.OO.OOBTree()
+
 			for purchase in get_purchases(catalog, user.username, intids):
-				if not purchase.id in history._purchases:
+				if 		IPurchaseAttempt.providedBy(purchase) \
+					and not purchase.id in history._purchases:
 					history._purchases[purchase.id] = purchase
 					count += 1
-					
+
 			if hasattr(history, '_index'):
 				del history._index
-	
+
 	logger.info('Store evolution %s done. %s items migrated', generation, count)
 
 def evolve(context):

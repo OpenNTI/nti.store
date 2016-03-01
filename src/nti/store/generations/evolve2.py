@@ -11,25 +11,28 @@ logger = __import__('logging').getLogger(__name__)
 
 generation = 2
 
-import zope.intid
-
 from zope import component
-from zope.component.hooks import site, setHooks
+
 from zope.annotation.interfaces import IAnnotations
+
+from zope.component.hooks import site
+from zope.component.hooks import setHooks
+
+from zope.intid.interfaces import IIntIds
 
 from nti.dataserver.interfaces import IUser
 
 from nti.externalization.oids import to_external_ntiid_oid
 
-from nti.zope_catalog.catalog import is_broken
-
-from ..interfaces import IPurchaseAttempt
-from ..interfaces import IPurchaseHistory
+from nti.store.interfaces import IPurchaseAttempt
+from nti.store.interfaces import IPurchaseHistory
 	
-from ..store import get_purchase_history_annotation_key
+from nti.store.store import get_purchase_history_annotation_key
+
+from nti.zope_catalog.catalog import isBroken
 
 def _check_valid(p, uid, purchasable_id=None, intids=None, debug=True):
-	if p is None or is_broken(p) or not IPurchaseAttempt.providedBy(p):
+	if p is None or isBroken(p) or not IPurchaseAttempt.providedBy(p):
 		return False
 	# they exist in the backward index so that queryObject works,
 	# but they do not actually have an intid that matches
@@ -37,8 +40,7 @@ def _check_valid(p, uid, purchasable_id=None, intids=None, debug=True):
 	# those cases that allow removal (courses). We think (hope) this is a
 	# rare problem, so we pretend it doesn't exist, only logging loudly.
 	# This could also be a corruption in our internal indexes.
-	if intids is None:
-		intids = component.getUtility(zope.intid.IIntIds)
+	intids = component.getUtility(IIntIds) if intids is None else intids
 	queried = intids.queryId(p)
 	if queried != uid:
 		try:
@@ -101,7 +103,7 @@ def update_user_purchase_data(user, intids=None):
 	if not annotation_key in annotations:
 		return (update_count, removed_count) 
 		
-	intids = intids if intids is not None else component.getUtility(zope.intid.IIntIds)
+	intids = component.getUtility(IIntIds) if intids is None else intids
 	history = IPurchaseHistory(user)
 	if len(history) == 0: # no history remove
 		del annotations[annotation_key]
@@ -145,7 +147,7 @@ def evolve(context):
 	ds_folder = root['nti.dataserver']
 	with site(ds_folder):
 		lsm = ds_folder.getSiteManager()
-		intids = lsm.getUtility(zope.intid.IIntIds)
+		intids = lsm.getUtility(IIntIds)
 		users = ds_folder['users']
 		for user in users.values():
 			if IUser.providedBy(user):
@@ -154,4 +156,4 @@ def evolve(context):
 	
 from nti.common.deprecated import hiding_warnings
 with hiding_warnings():
-	from ..interfaces import IEnrollmentAttempt
+	from nti.store.interfaces import IEnrollmentAttempt

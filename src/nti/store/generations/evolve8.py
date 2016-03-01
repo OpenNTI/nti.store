@@ -11,18 +11,18 @@ logger = __import__('logging').getLogger(__name__)
 
 generation = 8
 
-import zope.intid
-
 from zope.catalog.interfaces import ICatalog
 
 from zope.component.hooks import site, setHooks
 
+from zope.intid.interfaces import IIntIds
+
+from nti.store.purchase_index import IX_MIMETYPE
+from nti.store.purchase_index import CATALOG_NAME
+
+from nti.store.utils import PURCHASE_ATTEMPT_MIME_TYPES
+
 from nti.zope_catalog.catalog import ResultSet
-
-from ..purchase_index import IX_MIMETYPE
-from ..purchase_index import CATALOG_NAME
-
-from ..utils import PURCHASE_ATTEMPT_MIME_TYPES
 
 OLD_PID = u'tag:nextthought.com,2011-10:NTI-purchasable_course-LSTD_1153'
 NEW_PID = u'tag:nextthought.com,2011-10:NTI-purchasable_course-Spring2015_LSTD_1153'
@@ -42,9 +42,9 @@ def do_evolve(context, generation=generation):
 	
 	with site(ds_folder):
 		lsm = ds_folder.getSiteManager()
-		intids = lsm.getUtility(zope.intid.IIntIds)
+		intids = lsm.getUtility(IIntIds)
 		catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME )
-		for purchase in list(get_purchases(catalog, intids)): ## we are mutating
+		for purchase in list(get_purchases(catalog, intids)): # we are mutating
 			if OLD_PID not in purchase.Items:
 				continue
 			order = purchase.Order

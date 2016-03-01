@@ -11,7 +11,7 @@ logger = __import__('logging').getLogger(__name__)
 
 generation = 3
 
-from .install import install_gift_registry
+from nti.store.generations.install import install_gift_registry
 
 def evolve(context):
     """

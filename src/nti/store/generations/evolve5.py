@@ -11,18 +11,20 @@ logger = __import__('logging').getLogger(__name__)
 
 generation = 5
 
-import zope.intid
-
 from zope.catalog.interfaces import ICatalog
+
+from zope.intid.interfaces import IIntIds
 
 from nti.dataserver.metadata_index import CATALOG_NAME as METADATA_CATALOG_NAME
 
+from nti.store.interfaces import IPurchaseAttempt
+
+from nti.store.purchase_index import IX_MIMETYPE
+from nti.store.purchase_index import install_purchase_catalog
+
+from nti.store.utils import PURCHASE_ATTEMPT_MIME_TYPES
+
 from nti.zope_catalog.catalog import ResultSet
-
-from ..purchase_index import IX_MIMETYPE
-from ..purchase_index import install_purchase_catalog
-
-from ..utils import PURCHASE_ATTEMPT_MIME_TYPES
 
 def index_purchases(metadata_catalog, purchase_catalog, intids):
 	result = 0
@@ -30,11 +32,12 @@ def index_purchases(metadata_catalog, purchase_catalog, intids):
 	item_intids = mimetype_index.apply({'any_of': PURCHASE_ATTEMPT_MIME_TYPES})
 	results = ResultSet(item_intids, intids, True)
 	for uid, obj in results.iter_pairs():
-		try:
-			purchase_catalog.index_doc(uid, obj)
-			result += 1
-		except Exception:
-			logger.debug("Cannot index object with id %s", uid)
+		if IPurchaseAttempt.providedBy(obj):
+			try:
+				purchase_catalog.index_doc(uid, obj)
+				result += 1
+			except Exception:
+				logger.debug("Cannot index object with id %s", uid)
 	return result
 
 def do_evolve(context, generation=generation):
@@ -43,14 +46,13 @@ def do_evolve(context, generation=generation):
 	conn = context.connection
 	dataserver_folder = conn.root()['nti.dataserver']
 	lsm = dataserver_folder.getSiteManager()
-	intids = lsm.getUtility(zope.intid.IIntIds)
+	intids = lsm.getUtility(IIntIds)
 	
 	metadata_catalog = lsm.getUtility(ICatalog, METADATA_CATALOG_NAME)
 	purchase_catalog = install_purchase_catalog(dataserver_folder, intids)
 	total = index_purchases(metadata_catalog, purchase_catalog, intids)
 	
-	logger.info('Store evolution %s done; %s items(s) indexed',
-				generation, total)
+	logger.info('Store evolution %s done; %s items(s) indexed', generation, total)
 
 def evolve(context):
 	"""

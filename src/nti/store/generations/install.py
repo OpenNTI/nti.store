@@ -15,13 +15,13 @@ generation = 8
 
 from zope.generations.generations import SchemaManager
 
-import zope.intid
+from zope.intid.interfaces import IIntIds
 
-from ..interfaces import IGiftRegistry
+from nti.store.gift_registry import GiftRegistry
 
-from ..gift_registry import GiftRegistry
+from nti.store.interfaces import IGiftRegistry
 
-from ..purchase_index import install_purchase_catalog
+from nti.store.purchase_index import install_purchase_catalog
 
 class _StoreSchemaManager(SchemaManager):
 	"""
@@ -36,22 +36,22 @@ class _StoreSchemaManager(SchemaManager):
 def evolve(context):
 	install_catalog(context)
 	install_gift_registry(context)
-	
+
 def install_catalog(context):
 	conn = context.connection
 	root = conn.root()
 	dataserver_folder = root['nti.dataserver']
 	lsm = dataserver_folder.getSiteManager()
-	intids = lsm.getUtility(zope.intid.IIntIds)
+	intids = lsm.getUtility(IIntIds)
 	install_purchase_catalog(dataserver_folder, intids)
-	
+
 def install_gift_registry(context):
 	conn = context.connection
 	root = conn.root()
 
 	dataserver_folder = root['nti.dataserver']
 	lsm = dataserver_folder.getSiteManager()
-	intids = lsm.getUtility(zope.intid.IIntIds)
+	intids = lsm.getUtility(IIntIds)
 
 	registry = GiftRegistry()
 	registry.__parent__ = dataserver_folder
