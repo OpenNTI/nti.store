@@ -11,9 +11,9 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope.catalog.interfaces import ICatalog
 
-from zope.location import locate
-
 from zope.intid.interfaces import IIntIds
+
+from zope.location import locate
 
 from nti.dataserver.interfaces import ICreatedUsername
 

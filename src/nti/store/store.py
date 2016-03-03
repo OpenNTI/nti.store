@@ -129,7 +129,8 @@ def get_purchase_attempt(purchase_id, user=None):
 def remove_purchase_attempt(purchase, user=None):
 	if not IPurchaseAttempt.providedBy(purchase):
 		purchase = get_purchase_attempt(purchase, user)
-
+	
+	# Order matters
 	if IGiftPurchaseAttempt.providedBy(purchase):
 		username = user or purchase.creator
 		result = remove_gift_purchase_attempt(purchase, username)

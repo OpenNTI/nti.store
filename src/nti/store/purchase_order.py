@@ -23,21 +23,22 @@ from nti.common.property import CachedProperty
 
 from nti.externalization.representation import WithRepr
 
-from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 
-from .utils import to_list
-from .utils import copy_object
-from .utils import MetaStoreObject
+from nti.schema.schema import EqHash
 
-from .priceable import Priceable
+from nti.store.interfaces import IPriceable
+from nti.store.interfaces import IPurchaseItem
+from nti.store.interfaces import IPurchaseOrder
 
-from .interfaces import IPriceable
-from .interfaces import IPurchaseItem
-from .interfaces import IPurchaseOrder
+from nti.store.purchasable import get_purchasable
+from nti.store.purchasable import get_providers as get_providers_from_purchasables
 
-from .purchasable import get_purchasable
-from .purchasable import get_providers as get_providers_from_purchasables
+from nti.store.priceable import Priceable
+
+from nti.store.utils import to_list
+from nti.store.utils import copy_object
+from nti.store.utils import MetaStoreObject
 
 @interface.implementer(IPurchaseItem)
 class PurchaseItem(Priceable):
@@ -90,7 +91,7 @@ def get_purchasables(order):
 		p = get_purchasable(item)
 		if p is not None:
 			result.append(p)
-	return result
+	return tuple(result)
 
 def get_providers(order):
 	"""
@@ -106,7 +107,7 @@ def get_currencies(order):
 	"""
 	purchasables = get_purchasables(order)
 	result = {p.Currency for p in purchasables}
-	return list(result)
+	return tuple(result)
 
 def replace_quantity(po_or_items, quantity):
 	for item in getattr(po_or_items, 'Items', po_or_items):

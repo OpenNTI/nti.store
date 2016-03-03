@@ -13,13 +13,14 @@ from zope import interface
 
 from nti.externalization.representation import WithRepr
 
-from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from .utils import MetaStoreObject
+from nti.schema.schema import EqHash
 
-from .interfaces import IRedemptionError
+from nti.store.interfaces import IRedemptionError
+
+from nti.store.utils import MetaStoreObject
 
 @WithRepr
 @EqHash('Type', 'Code', 'Message')

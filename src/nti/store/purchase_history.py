@@ -24,6 +24,7 @@ from zope.deprecation import deprecated
 from zope.intid.interfaces import IIntIds
 
 from zope.location import locate
+
 from zope.location.interfaces import ISublocations
 
 from ZODB.interfaces import IConnection
@@ -40,25 +41,25 @@ from nti.externalization.interfaces import LocatedExternalList
 
 from nti.ntiids.ntiids import find_object_with_ntiid
 
+from nti.store import get_user
+from nti.store import get_purchase_catalog
+
+from nti.store.interfaces import IPurchaseAttempt
+from nti.store.interfaces import IPurchaseHistory
+
+from nti.store.purchasable import get_purchasable
+from nti.store.purchasable import get_purchasables
+
+from nti.store.purchase_index import IX_ITEMS
+from nti.store.purchase_index import IX_CREATOR
+from nti.store.purchase_index import IX_MIMETYPE
+from nti.store.purchase_index import IX_CREATEDTIME
+
+from nti.store.utils import NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES as NONGIFT_MIME_TYPES
+
+from nti.store.utils import to_frozenset
+
 from nti.zope_catalog.catalog import ResultSet
-
-from . import get_user
-
-from .purchasable import get_purchasable
-from .purchasable import get_purchasables
-
-from .utils import to_frozenset
-from .utils import NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES as NONGIFT_MIME_TYPES
-
-from .purchase_index import IX_ITEMS
-from .purchase_index import IX_CREATOR
-from .purchase_index import IX_MIMETYPE
-from .purchase_index import IX_CREATEDTIME
-
-from .interfaces import IPurchaseAttempt
-from .interfaces import IPurchaseHistory
-
-from . import get_purchase_catalog
 
 # classes
 
@@ -309,7 +310,6 @@ def get_available_items(user, registry=component):
 		# get purchase history
 		purchased = set()
 		user = get_user(user)
-
 		history = IPurchaseHistory(user)
 		for p in history:
 			if p.has_succeeded() or p.is_pending():
