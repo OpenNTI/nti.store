@@ -12,10 +12,10 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
+from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IInternalObjectExternalizer
 
 from nti.externalization.datastructures import InterfaceObjectIO
-from nti.externalization.interfaces import StandardExternalFields
 
 from nti.store.interfaces import IPurchasable
 from nti.store.interfaces import IPurchasableCourse

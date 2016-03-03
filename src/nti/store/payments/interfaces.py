@@ -14,8 +14,8 @@ from zope import interface
 from nti.schema.field import Object
 from nti.schema.field import ValidTextLine
 
-from ..interfaces import IPriceable
-from ..interfaces import IPurchaseAttempt
+from nti.store.interfaces import IPriceable
+from nti.store.interfaces import IPurchaseAttempt
 
 class ICouponPriceable(IPriceable):
 	Coupon = ValidTextLine(title="The coupon", required=False)

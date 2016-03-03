@@ -19,9 +19,10 @@ from zope import interface
 
 from nti.externalization.representation import WithRepr
 
-from nti.schema.schema import EqHash
 from nti.schema.fieldproperty import AdaptingFieldProperty
 from nti.schema.fieldproperty import createDirectFieldProperties
+
+from nti.schema.schema import EqHash
 
 from nti.store.purchasable import Purchasable
 from nti.store.purchasable import get_purchasable
