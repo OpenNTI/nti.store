@@ -77,7 +77,8 @@ class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle):
 
 	def isPublic(self):
 		return self.Public
-
+	is_public = isPublic
+	
 @interface.implementer(IPurchasableChoiceBundle)
 class PurchasableChoiceBundle(Purchasable):
 	__external_class_name__ = 'Purchasable'
