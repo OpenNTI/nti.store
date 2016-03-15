@@ -55,7 +55,7 @@ class DefaultPurchasableVendorInfo(dict):
 
 @WithRepr
 @EqHash('NTIID',)
-@interface.implementer(IPurchasable, IContentTypeAware, IContained)
+@interface.implementer(IPurchasable, IContained, IContentTypeAware)
 class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle):
 
 	__metaclass__ = MetaStoreObject
@@ -74,6 +74,9 @@ class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle):
 
 	__parent__ = None
 	__name__ = ntiid = alias('NTIID')
+
+	def isPublic(self):
+		return self.Public
 
 @interface.implementer(IPurchasableChoiceBundle)
 class PurchasableChoiceBundle(Purchasable):

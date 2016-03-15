@@ -126,6 +126,11 @@ class IPurchasable(IItemBundle):
 	VendorInfo = Object(IPurchasableVendorInfo, title="vendor info", required=False)
 	VendorInfo.setTaggedValue('_ext_excluded_out', True)
 
+	def isPublic():
+		"""
+		return if this purchasable is public
+		"""
+
 class IPurchasableChoiceBundle(IPurchasable):
 	"""
 	marker interface for a purchasable choice bundle.
