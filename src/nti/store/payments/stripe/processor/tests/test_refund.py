@@ -14,10 +14,11 @@ from hamcrest import has_property
 
 import unittest
 
-import zope.intid
 from zope import component
 
-from nti.externalization import integer_strings
+from zope.intid.interfaces import IIntIds
+
+from nti.common import integer_strings
 
 from nti.store import purchase_history
 from nti.store import interfaces as store_interfaces
@@ -55,7 +56,7 @@ class TestRefundProcessor(unittest.TestCase):
 			assert_that(pa.State, is_(store_interfaces.PA_STATE_SUCCESS))
 
 			# start refund
-			zope_iids = component.getUtility(zope.intid.IIntIds)
+			zope_iids = component.getUtility(IIntIds)
 			uid = zope_iids.getId(pa)
 			trx_id = integer_strings.to_external_string(uid)
 			charge = self.manager.refund_purchase(trx_id)
@@ -77,7 +78,7 @@ class TestRefundProcessor(unittest.TestCase):
 			assert_that(pa.State, is_(store_interfaces.PA_STATE_SUCCESS))
 
 			# start refund
-			zope_iids = component.getUtility(zope.intid.IIntIds)
+			zope_iids = component.getUtility(IIntIds)
 			uid = zope_iids.getId(pa)
 			trx_id = integer_strings.to_external_string(uid)
 			charge = self.manager.refund_purchase(trx_id, amount=50)

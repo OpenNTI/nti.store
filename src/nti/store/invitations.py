@@ -14,12 +14,12 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
+from zope.intid.interfaces import IIntIds
+
 from zope.proxy import removeAllProxies
 
-from zc.intid import IIntIds
-
-from nti.externalization.integer_strings import to_external_string
-from nti.externalization.integer_strings import from_external_string
+from nti.common.integer_strings import to_external_string
+from nti.common.integer_strings import from_external_string
 
 from nti.invitations.interfaces import IInvitation
 from nti.invitations.invitation import JoinEntitiesInvitation
