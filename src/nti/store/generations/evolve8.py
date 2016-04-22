@@ -44,7 +44,7 @@ def do_evolve(context, generation=generation):
 		lsm = ds_folder.getSiteManager()
 		intids = lsm.getUtility(IIntIds)
 		catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME )
-		for purchase in list(get_purchases(catalog, intids)): # we are mutating
+		for purchase in tuple(get_purchases(catalog, intids)): # we are mutating
 			if OLD_PID not in purchase.Items:
 				continue
 			order = purchase.Order
