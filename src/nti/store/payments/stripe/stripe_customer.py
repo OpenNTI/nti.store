@@ -15,17 +15,17 @@ from zope.event import notify
 
 from nti.dataserver.users.interfaces import IUserProfile
 
-from ... import get_user
+from nti.store import get_user
 
-from .stripe_io import StripeIO
-from .stripe_io import get_stripe_customer
-from .stripe_io import create_stripe_customer
-from .stripe_io import delete_stripe_customer
-from .stripe_io import update_stripe_customer
+from nti.store.payments.stripe.interfaces import IStripeCustomer
+from nti.store.payments.stripe.interfaces import StripeCustomerCreated
+from nti.store.payments.stripe.interfaces import StripeCustomerDeleted
 
-from .interfaces import IStripeCustomer
-from .interfaces import StripeCustomerCreated
-from .interfaces import StripeCustomerDeleted
+from nti.store.payments.stripe.stripe_io import StripeIO
+from nti.store.payments.stripe.stripe_io import get_stripe_customer
+from nti.store.payments.stripe.stripe_io import create_stripe_customer
+from nti.store.payments.stripe.stripe_io import delete_stripe_customer
+from nti.store.payments.stripe.stripe_io import update_stripe_customer
 
 def get_customer_data(user):
 	result = None
@@ -34,7 +34,7 @@ def get_customer_data(user):
 		profile = IUserProfile(user)
 		result = {
 			'email':getattr(profile, 'email', None),
-			'description':getattr(profile, 'description', None) 
+			'description':getattr(profile, 'description', None)
 		}
 	return result
 
@@ -48,7 +48,7 @@ def create_customer(user, coupon=None, api_key=None):
 		notify(StripeCustomerCreated(user, customer.id))
 		return customer
 	return None
-	
+
 def delete_customer(user, api_key=None):
 	result = False
 	user = get_user(user)
@@ -67,13 +67,13 @@ def update_customer(user, customer=None, coupon=None, api_key=None):
 		params = get_customer_data(user)
 		params['coupon'] = coupon
 		params['api_key'] = api_key
-		if customer is None:	
+		if customer is None:
 			customer = IStripeCustomer(user).customer_id
 		params['customer'] = customer
 		result = update_stripe_customer(**params)
 		return result
 	return False
-	
+
 def get_customer(user, api_key=None):
 	user = get_user(user)
 	if user is not None:
@@ -81,7 +81,7 @@ def get_customer(user, api_key=None):
 		result = get_stripe_customer(customer_id, api_key=api_key)
 		return result
 	return None
-		
+
 class StripeCustomer(StripeIO):
 
 	@classmethod

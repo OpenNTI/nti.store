@@ -20,8 +20,8 @@ from nti.externalization.interfaces import IInternalObjectIO
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import IInternalObjectExternalizer
 
-from .interfaces import IStripeCoupon
-from .interfaces import IStripePurchaseError
+from nti.store.payments.stripe.interfaces import IStripeCoupon
+from nti.store.payments.stripe.interfaces import IStripePurchaseError
 
 def _makenone(s):
 	if isinstance(s, six.string_types) and s.lower() == 'none':

@@ -21,49 +21,67 @@ from nti.schema.field import Bool
 from nti.schema.field import Object
 from nti.schema.field import ValidTextLine
 
-from ..interfaces import RegisterPurchaseData
-from ..interfaces import IRegisterPurchaseData
+from nti.store.interfaces import IPriceable
+from nti.store.interfaces import IPricedItem
+from nti.store.interfaces import IPricingError
+from nti.store.interfaces import IPurchaseItem
+from nti.store.interfaces import IPurchaseError
+from nti.store.interfaces import IPurchaseOrder
+from nti.store.interfaces import IOperationError 
+from nti.store.interfaces import IPaymentProcessor
 
-from ...interfaces import IPriceable
-from ...interfaces import IPricedItem
-from ...interfaces import IPricingError
-from ...interfaces import IPurchaseItem
-from ...interfaces import IPurchaseError
-from ...interfaces import IPurchaseOrder
-from ...interfaces import IOperationError 
-from ...interfaces import IPaymentProcessor
+from nti.store.payments.interfaces import RegisterPurchaseData
+from nti.store.payments.interfaces import IRegisterPurchaseData
 
 # stripe marker interfaces
 
 class IStripeCoupon(interface.Interface):
-	"""marker interface for a stripe coupon"""
+	"""
+	marker interface for a stripe coupon
+	"""
 
 class IStripeException(interface.Interface):
-	"""marker interface for a stripe exception"""
+	"""
+	marker interface for a stripe exception
+	"""
 
 class IInvalidStripeCoupon(IStripeException):
-	"""marker interface for an invalid stripe exception"""
+	"""
+	marker interface for an invalid stripe exception
+	"""
 	
 class INoSuchStripeCoupon(IStripeException):
-	"""marker interface for an no such stripe exception"""
+	"""
+	marker interface for an no such stripe exception
+	"""
 	
 class IStripeError(interface.Interface):
-	"""marker interface for a stripe errors"""
+	"""
+	marker interface for a stripe errors
+	"""
 
 class IStripeAPIError(IStripeError):
 	"""marker interface for a stripe api error"""
 
 class IStripeAPIConnectionError(IStripeError):
-	"""marker interface for a stripe api connection error"""
+	"""
+	marker interface for a stripe api connection error
+	"""
 
 class IStripeCardError(IStripeError):
-	"""marker interface for a stripe card errors"""
+	"""
+	marker interface for a stripe card errors
+	"""
 
 class IStripeInvalidRequestError(IStripeError):
-	"""marker interface for a stripe invalid request errors"""
+	"""
+	marker interface for a stripe invalid request errors
+	"""
 
 class IStripeAuthenticationError(IStripeError):
-	"""marker interface for a stripe authentication errors"""
+	"""
+	marker interface for a stripe authentication errors
+	"""
 
 # event interfaces
 
@@ -148,11 +166,11 @@ class IStripePaymentProcessor(IPaymentProcessor):
 		"""
 		Create a stripe token
 		
-		:customer_id Stripe customer id
-		:number Credit card number
-		:exp_month Expiration month
-		:exp_year Expiration year
-		:cvc CVC number
+		:param customer_id Stripe customer id
+		:param number Credit card number
+		:param exp_month Expiration month
+		:param exp_year Expiration year
+		:param cvc CVC number
 		"""
 
 	def validate_coupon(coupon):
