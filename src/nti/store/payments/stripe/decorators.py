@@ -9,21 +9,21 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-from zope import interface
 from zope import component
+from zope import interface
 
 from nti.externalization.singleton import SingletonDecorator
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalObjectDecorator
 
-from ...decorators import PricedItemDecorator
+from nti.store.decorators import PricedItemDecorator
 
-from ...interfaces import IPurchaseAttempt
+from nti.store.interfaces import IPurchaseAttempt
 
-from .interfaces import IStripePricedItem
-from .interfaces import IStripePurchaseAttempt
+from nti.store.payments.stripe import STRIPE
 
-from . import STRIPE
+from nti.store.payments.stripe.interfaces import IStripePricedItem
+from nti.store.payments.stripe.interfaces import IStripePurchaseAttempt
 
 LINKS = StandardExternalFields.LINKS
 
