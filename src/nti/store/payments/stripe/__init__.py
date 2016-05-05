@@ -37,10 +37,6 @@ class InvalidStripeCoupon(StripeException):
 class NoSuchStripeCoupon(StripeException):
 	pass
 
-# Monkey patch stripe
-import stripe
-stripe.api_version = '2016-03-07'
-
 # Reduce verbosity of stripe logger
 from stripe.util import logger as stripe_logger
 stripe_logger.setLevel(logging.ERROR)
