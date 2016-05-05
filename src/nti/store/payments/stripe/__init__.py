@@ -13,15 +13,15 @@ import logging
 
 from zope import interface
 
-from ... import ROUND_DECIMAL
-from ... import MessageFactory
+from nti.store import ROUND_DECIMAL
+from nti.store import MessageFactory
 
-from .interfaces import IStripeException
-from .interfaces import INoSuchStripeCoupon
-from .interfaces import IInvalidStripeCoupon
+from nti.store.payments.stripe.interfaces import IStripeException
+from nti.store.payments.stripe.interfaces import INoSuchStripeCoupon
+from nti.store.payments.stripe.interfaces import IInvalidStripeCoupon
 
-from .stripe_error import StripePurchaseError # re-export
-from .stripe_error import StripeOperationError # re-export
+from nti.store.payments.stripe.stripe_error import StripePurchaseError # re-export
+from nti.store.payments.stripe.stripe_error import StripeOperationError # re-export
 
 STRIPE = u"stripe"
 
@@ -37,6 +37,10 @@ class InvalidStripeCoupon(StripeException):
 class NoSuchStripeCoupon(StripeException):
 	pass
 
-## CS: Reduce verbosity of stripe logger
+# Monkey patch stripe
+import stripe
+stripe.api_version = '2016-03-07'
+
+# Reduce verbosity of stripe logger
 from stripe.util import logger as stripe_logger
 stripe_logger.setLevel(logging.ERROR)
