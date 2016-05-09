@@ -207,9 +207,10 @@ class InvitationPurchaseAttempt(PurchaseAttempt):
 		return result
 	is_expired = isExpired
 
-	def linked_purchase_id(self, user):
+	def get_linked_purchase_id(self, user):
 		user = getattr(user, "username", user)
 		return self._consumers.get(user.lower()) if user else None
+	linked_purchase_id = get_linked_purchase_id
 
 	def register(self, user, linked_purchase_id=None):
 		user = getattr(user, "username", user)
@@ -384,11 +385,12 @@ class DefaultPurchaseAttemptFactory(object):
 		return result
 
 # deprecated
-from zope.deprecation import deprecated
 
 from nti.common.deprecated import hiding_warnings
 with hiding_warnings():
 	from .interfaces import IEnrollmentPurchaseAttempt
+
+from zope.deprecation import deprecated
 
 deprecated("EnrollmentPurchaseAttempt", "use proper course enrollment")
 @interface.implementer(IEnrollmentPurchaseAttempt)

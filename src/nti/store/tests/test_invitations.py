@@ -11,9 +11,14 @@ from hamcrest import is_
 from hamcrest import not_none
 from hamcrest import assert_that
 
+from nose.tools import assert_raises
+
 import unittest
 
 from nti.dataserver.users import User
+
+from nti.store.interfaces import IPurchaseHistory
+from nti.store.interfaces import IStorePurchaseInvitationActor
 
 from nti.store.invitations import InvitationExpired
 from nti.store.invitations import InvitationCapacityExceeded
@@ -23,13 +28,9 @@ from nti.store.purchase_order import create_purchase_item
 from nti.store.purchase_order import create_purchase_order
 from nti.store.purchase_attempt import create_purchase_attempt
 
-from nti.store.interfaces import IPurchaseHistory
-
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
 from nti.store.tests import SharedConfiguringTestLayer
-
-from nose.tools import assert_raises
 
 class TestInvitations(unittest.TestCase):
 
@@ -60,15 +61,16 @@ class TestInvitations(unittest.TestCase):
 		invitation = create_store_purchase_invitation(purchase)
 		assert_that(invitation, is_(not_none()))
 		assert_that(invitation.capacity, is_(1))
-		assert_that(invitation.creator, is_(user))
-		assert_that(invitation.code, is_(not_none()))
+		assert_that(invitation.creator, is_(user.username))
 
 		user2 = self._create_user(username='nt2@nti.com')
-		invitation.accept(user2)
+		actor = IStorePurchaseInvitationActor(invitation)
+		actor.accept(user2, invitation)
 
 		user3 = self._create_user(username='nt3@nti.com')
 		with assert_raises(InvitationCapacityExceeded):
-			invitation.accept(user3)
+			actor = IStorePurchaseInvitationActor(invitation)
+			actor.accept(user3, invitation)
 
 	@WithMockDSTrans
 	def test_create_invitation_expired(self):
@@ -81,7 +83,8 @@ class TestInvitations(unittest.TestCase):
 		invitation = create_store_purchase_invitation(purchase)
 		user3 = self._create_user(username='nt3@nti.com')
 		with assert_raises(InvitationExpired):
-			invitation.accept(user3)
+			actor = IStorePurchaseInvitationActor(invitation)
+			actor.accept(user3, invitation)
 
 	@WithMockDSTrans
 	def test_restore_token(self):

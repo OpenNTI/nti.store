@@ -33,6 +33,9 @@ from nti.dataserver.interfaces import IUser
 
 from nti.dataserver.users.interfaces import checkEmailAddress
 
+from nti.invitations.interfaces import IInvitation
+from nti.invitations.interfaces import IInvitationActor
+
 from nti.namedfile.interfaces import INamedFile
 
 from nti.schema.field import Int
@@ -617,8 +620,19 @@ class IPurchaseHistory(IIterable):
 		Return all purchase attempts
 		"""
 
-class IStorePurchaseInvitation(interface.Interface):
-	pass
+class IStorePurchaseInvitation(IInvitation):
+	purchase = Variant((ValidTextLine(title="Purchase NTIID"),
+					    Object(IInvitationPurchaseAttempt, title="The invitation purchase")),
+					   title='The Invitation purchase')
+
+	linked_purchase = Variant((ValidTextLine(title="Purchase NTIID"),
+					    	  Object(IPurchaseAttempt, title="The linked purchase")),
+					    	  title='The Linked purchase')
+	
+class IStorePurchaseInvitationActor(IInvitationActor):
+	"""
+	Actor for :class:``.IStorePurchaseInvitation`` objects
+	"""
 
 # gift registry
 
