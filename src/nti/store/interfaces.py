@@ -20,7 +20,7 @@ from zope.interface.common.mapping import IEnumerableMapping
 
 from zope.interface.common.sequence import IMinimalSequence
 
-from zope.interface.interfaces import ObjectEvent 
+from zope.interface.interfaces import ObjectEvent
 from zope.interface.interfaces import IObjectEvent
 
 from zope.schema import vocabulary
@@ -137,7 +137,7 @@ class IPurchasableChoiceBundle(IPurchasable):
 
 	Buyers can buy/redeem one item from the Items list.
 	"""
-	
+
 class IPurchasableCourse(IPurchasable):
 	Name = ValidTextLine(title='Course Name', required=False)
 
@@ -662,3 +662,12 @@ class IEnrollmentAttempt(IPurchaseAttempt):
 deprecated('IEnrollmentPurchaseAttempt', 'Use new course enrollment')
 class IEnrollmentPurchaseAttempt(IEnrollmentAttempt):
 	Processor = ValidTextLine(title='Enrollment institution', required=False)
+
+class IStorePurchaseMetadataProvider(interface.Interface):
+	"""
+	Updates the given data dict with metadata information on
+	the purchase/
+	"""
+
+	def update_metadata(data):
+		pass

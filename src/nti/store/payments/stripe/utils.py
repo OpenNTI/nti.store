@@ -14,20 +14,23 @@ logger = __import__('logging').getLogger(__name__)
 import six
 import time
 
+from zope import component
+
 from nti.common.string import safestr
 
 from nti.externalization.externalization import to_external_object
 
-from ...payment_charge import UserAddress
-from ...payment_charge import PaymentCharge
+from nti.store.payment_charge import UserAddress
+from nti.store.payment_charge import PaymentCharge
 
-from ...interfaces import IPurchaseError
+from nti.store.interfaces import IPurchaseError
+from nti.store.interfaces import IStorePurchaseMetadataProvider
 
-from .stripe_error import StripePurchaseError
+from nti.store.payments.stripe.stripe_error import StripePurchaseError
 
-from .interfaces import IStripeError
-from .interfaces import IStripePurchaseError
-from .interfaces import IStripeOperationError
+from nti.store.payments.stripe.interfaces import IStripeError
+from nti.store.payments.stripe.interfaces import IStripePurchaseError
+from nti.store.payments.stripe.interfaces import IStripeOperationError
 
 def makenone(s, default=None):
 	if isinstance(s, six.string_types):
@@ -58,6 +61,9 @@ def get_charge_metata(purchase_id, username=None,
 		data['Username'] = username
 	if customer_id:
 		data['CustomerID'] = customer_id
+
+	for _, meta_subscriber in component.getUtilitiesFor(IStorePurchaseMetadataProvider):
+		data = meta_subscriber.update_metadata( data )
 
 	context = flatten_context(context)
 	if context:
