@@ -58,7 +58,7 @@ class TestInvitations(unittest.TestCase):
 		purchase = self._create_purchase_attempt(quantity=1)
 		hist.add_purchase(purchase)
 
-		invitation = create_store_purchase_invitation(purchase)
+		invitation = create_store_purchase_invitation(purchase, 'nt2@nti.com')
 		assert_that(invitation, is_(not_none()))
 		assert_that(invitation.creator, is_(user.username))
 
@@ -79,7 +79,7 @@ class TestInvitations(unittest.TestCase):
 		purchase = self._create_purchase_attempt(quantity=1, expiration=1)
 		hist.add_purchase(purchase)
 
-		invitation = create_store_purchase_invitation(purchase)
+		invitation = create_store_purchase_invitation(purchase, 'nt3@nti.com')
 		user3 = self._create_user(username='nt3@nti.com')
 		with assert_raises(InvitationExpired):
 			actor = IStorePurchaseInvitationActor(invitation)

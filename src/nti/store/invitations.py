@@ -103,11 +103,11 @@ def get_purchase_by_code(code, registry=component):
 		return result
 	return None
 
-def create_store_purchase_invitation(purchase, receiver=None):
+def create_store_purchase_invitation(purchase, receiver):
 	result = StorePurchaseInvitation(purchase=purchase)
 	result.expirationTime = getattr(purchase, 'ExpirationTime', None) or 0
 	result.creator = getattr(purchase.creator, 'username', purchase.creator)  # sender
-	result.receiver = receiver
+	result.receiver = getattr(receiver, 'username', receiver)
 	return result
 
 @interface.implementer(IStorePurchaseInvitationActor)
