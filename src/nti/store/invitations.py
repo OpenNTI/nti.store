@@ -35,8 +35,6 @@ from nti.schema.fieldproperty import createDirectFieldProperties
 
 from nti.store import MessageFactory as _
 
-from nti.store import get_user
-
 from nti.store.interfaces import IPurchaseAttempt
 from nti.store.interfaces import IStorePurchaseInvitation 
 from nti.store.interfaces import IStorePurchaseInvitationActor
@@ -54,54 +52,39 @@ class InvitationCapacityExceeded(InvitationValidationError):
 class StorePurchaseInvitation(Invitation):
 	createDirectFieldProperties(IStorePurchaseInvitation)
 
-	_purchase = None
-	_linked_purchase = None
+	_redeemed_purchase = None
+	_invitation_purchase = None
 
 	def __init__(self, purchase, **kwargs):
 		super(StorePurchaseInvitation, self).__init__(**kwargs)
-		self.purchase = purchase  # Invitation purchase
+		self.invitation_purchase = purchase
 
-	def _setPurchase(self, nv):
+	def _setInvitationPurchase(self, nv):
 		if IPurchaseAttempt.providedBy(nv):
-			self._purchase = to_external_ntiid_oid(nv)
+			self._invitation_purchase = to_external_ntiid_oid(nv)
 		else:
-			self._purchase = nv
+			self._invitation_purchase = nv
 
-	def _getPurchase(self):
-		if self._purchase:
-			return find_object_with_ntiid(self._purchase)
+	def _getInvitationPurchase(self):
+		if self._invitation_purchase:
+			return find_object_with_ntiid(self._invitation_purchase)
 		return None
-	purchase = property(_getPurchase, _setPurchase)
+	invitation_purchase = purchase = property(_getInvitationPurchase, 
+											  _setInvitationPurchase)
 	
-	def _setLinkedPurchase(self, nv):
+	def _setRedeemedPurchase(self, nv):
 		if IPurchaseAttempt.providedBy(nv):
-			self._linked_purchase = to_external_ntiid_oid(nv)
+			self._redeemed_purchase = to_external_ntiid_oid(nv)
 		else:
-			self._linked_purchase = nv
+			self._redeemed_purchase = nv
 
-	def _getLinkedPurchase(self):
-		if self._linked_purchase:
-			return find_object_with_ntiid(self._linked_purchase)
+	def _getRedeemedPurchase(self):
+		if self._redeemed_purchase:
+			return find_object_with_ntiid(self._redeemed_purchase)
 		return None
-	linked_purchase = property(_getLinkedPurchase, _setLinkedPurchase)
+	redeemed_purchase = linked_purchase = property(_getRedeemedPurchase,
+												   _setRedeemedPurchase)
 
-	@property
-	def capacity(self):
-		return self.purchase.Quantity
-
-	def register(self, user, linked_purchase_id=None, now=None):
-		if self.purchase.isExpired(now=now):
-			raise InvitationExpired()
-
-		if not self.purchase.register(user, linked_purchase_id):
-			raise InvitationAlreadyAccepted()
-
-		if not self.purchase.consume_token():
-			raise InvitationCapacityExceeded()
-
-	def accept(self, user):
-		user = get_user(user)
-		super(StorePurchaseInvitation, self).accept(user)
 _StorePurchaseInvitation = StorePurchaseInvitation # BWC
 
 def get_invitation_code(purchase, registry=component):
@@ -146,17 +129,17 @@ class StorePurchaseInvitationActor(object):
 		redemption_code = get_invitation_code(purchase)
 
 		# create and register a purchase attempt for accepting user
-		linked_purchase = make_redeem_purchase_attempt(user, original, redemption_code)
+		redeemed_purchase = make_redeem_purchase_attempt(user, original, redemption_code)
 
-		if not purchase.register(user, linked_purchase):
+		if not purchase.register(user, redeemed_purchase):
 			raise InvitationAlreadyAccepted(invitation)
 
 		if not purchase.consume_token():
 			raise InvitationCapacityExceeded(invitation)
 
-		invitation.linked_purchase = linked_purchase
+		invitation.linked_purchase = redeemed_purchase
 
 		logger.info('Invitation %s has been accepted with purchase %s',
-					invitation.code, linked_purchase)
+					invitation.code, redeemed_purchase)
 
 		return result

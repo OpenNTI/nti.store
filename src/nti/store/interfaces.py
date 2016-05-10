@@ -621,13 +621,13 @@ class IPurchaseHistory(IIterable):
 		"""
 
 class IStorePurchaseInvitation(IInvitation):
-	purchase = Variant((ValidTextLine(title="Purchase NTIID"),
-					    Object(IInvitationPurchaseAttempt, title="The invitation purchase")),
-					   title='The Invitation purchase')
+	invitation_purchase = Variant((ValidTextLine(title="Purchase NTIID"),
+					   			   Object(IInvitationPurchaseAttempt, title="The invitation purchase")),
+					   			  title='The Invitation purchase')
 
-	linked_purchase = Variant((ValidTextLine(title="Purchase NTIID"),
-					    	  Object(IPurchaseAttempt, title="The linked purchase")),
-					    	  title='The Linked purchase')
+	redeemed_purchase = Variant((ValidTextLine(title="Purchase NTIID"),
+					    	  	Object(IRedeemedPurchaseAttempt, title="The linked purchase")),
+					    	    title='The Linked purchase')
 	
 class IStorePurchaseInvitationActor(IInvitationActor):
 	"""

@@ -60,7 +60,6 @@ class TestInvitations(unittest.TestCase):
 
 		invitation = create_store_purchase_invitation(purchase)
 		assert_that(invitation, is_(not_none()))
-		assert_that(invitation.capacity, is_(1))
 		assert_that(invitation.creator, is_(user.username))
 
 		user2 = self._create_user(username='nt2@nti.com')
