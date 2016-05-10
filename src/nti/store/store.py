@@ -57,6 +57,8 @@ from nti.store.purchase_history import get_purchase_history_by_item
 from nti.store.purchase_history import get_purchase_history as get_user_purchase_history
 from nti.store.purchase_history import remove_purchase_attempt as remove_hist_purchase_attempt
 
+from nti.store.redeem import make_redeem_purchase_attempt
+
 # Purchasables
 get_purchasable = get_purchasable
 get_all_purchasables = get_purchasables
@@ -175,3 +177,7 @@ def delete_purchase_history(user):
 		annotations.pop(annotation_key, None)
 		return True
 	return False
+
+# Redeem
+
+make_redeem_purchase_attempt = make_redeem_purchase_attempt

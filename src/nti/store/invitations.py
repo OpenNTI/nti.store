@@ -37,18 +37,11 @@ from nti.store import MessageFactory as _
 
 from nti.store import get_user
 
-from nti.store.content_roles import add_users_content_roles
-
 from nti.store.interfaces import IPurchaseAttempt
 from nti.store.interfaces import IStorePurchaseInvitation 
 from nti.store.interfaces import IStorePurchaseInvitationActor
 
-from nti.store.purchasable import expand_purchase_item_ids
-
-from nti.store.purchase_attempt import create_redeemed_purchase_attempt
-
-from nti.store.purchase_history import activate_items
-from nti.store.purchase_history import register_purchase_attempt
+from nti.store.redeem import make_redeem_purchase_attempt
 
 InvitationExpired = InvitationExpiredError # BWC
 InvitationAlreadyAccepted = InvitationAlreadyAcceptedError # BWC
@@ -62,11 +55,11 @@ class StorePurchaseInvitation(Invitation):
 	createDirectFieldProperties(IStorePurchaseInvitation)
 
 	_purchase = None
-	_linked_purchase_id = None
+	_linked_purchase = None
 
 	def __init__(self, purchase, **kwargs):
 		super(StorePurchaseInvitation, self).__init__(**kwargs)
-		self.purchase = purchase
+		self.purchase = purchase  # Invitation purchase
 
 	def _setPurchase(self, nv):
 		if IPurchaseAttempt.providedBy(nv):
@@ -82,13 +75,13 @@ class StorePurchaseInvitation(Invitation):
 	
 	def _setLinkedPurchase(self, nv):
 		if IPurchaseAttempt.providedBy(nv):
-			self._linked_purchase_id = to_external_ntiid_oid(nv)
+			self._linked_purchase = to_external_ntiid_oid(nv)
 		else:
-			self._linked_purchase_id = nv
+			self._linked_purchase = nv
 
 	def _getLinkedPurchase(self):
-		if self._linked_purchase_id:
-			return find_object_with_ntiid(self._linked_purchase_id)
+		if self._linked_purchase:
+			return find_object_with_ntiid(self._linked_purchase)
 		return None
 	linked_purchase = property(_getLinkedPurchase, _setLinkedPurchase)
 
@@ -134,17 +127,6 @@ def create_store_purchase_invitation(purchase, receiver=None):
 	result.receiver = receiver
 	return result
 
-def _make_redeem_purchase_attempt(user, original, code, activate_roles=True):
-	# create and register a purchase attempt for accepting user
-	redeemed = create_redeemed_purchase_attempt(original, code)
-	result = register_purchase_attempt(redeemed, user)
-	activate_items(user, redeemed.Items)
-	# XXX Legacy. activate any content roles
-	if activate_roles:
-		lib_items = expand_purchase_item_ids(original.Items)
-		add_users_content_roles(user, lib_items)
-	return result
-
 @interface.implementer(IStorePurchaseInvitationActor)
 class StorePurchaseInvitationActor(object):
 
@@ -164,19 +146,17 @@ class StorePurchaseInvitationActor(object):
 		redemption_code = get_invitation_code(purchase)
 
 		# create and register a purchase attempt for accepting user
-		linked_purchase_id = _make_redeem_purchase_attempt(user,
-														   original, 
-														   redemption_code)
+		linked_purchase = make_redeem_purchase_attempt(user, original, redemption_code)
 
-		if not purchase.register(user, linked_purchase_id):
+		if not purchase.register(user, linked_purchase):
 			raise InvitationAlreadyAccepted(invitation)
 
 		if not purchase.consume_token():
 			raise InvitationCapacityExceeded(invitation)
 
-		invitation.linked_purchase = linked_purchase_id
+		invitation.linked_purchase = linked_purchase
 
 		logger.info('Invitation %s has been accepted with purchase %s',
-					invitation.code, linked_purchase_id)
+					invitation.code, linked_purchase)
 
 		return result

@@ -27,8 +27,6 @@ from nti.common.proxy import removeAllProxies
 
 from nti.dataserver.interfaces import IUser
 
-from nti.invitations.interfaces import IInvitationAcceptedEvent
-
 from nti.store import MessageFactory as _
 
 from nti.store import PurchaseException
@@ -53,7 +51,6 @@ from nti.store.interfaces import PurchaseAttemptRefunded
 from nti.store.interfaces import IPurchaseAttemptDisputed
 from nti.store.interfaces import IPurchaseAttemptRefunded
 from nti.store.interfaces import IRedeemedPurchaseAttempt
-from nti.store.interfaces import IStorePurchaseInvitation
 from nti.store.interfaces import IInvitationPurchaseAttempt
 from nti.store.interfaces import IPurchaseAttemptSuccessful
 from nti.store.interfaces import IGiftPurchaseAttemptRedeemed
@@ -61,12 +58,12 @@ from nti.store.interfaces import IGiftPurchaseAttemptRedeemed
 from nti.store.purchasable import expand_purchase_item_ids
 
 from nti.store.purchase_attempt import get_purchasables
-from nti.store.purchase_attempt import create_redeemed_purchase_attempt
 
 from nti.store.purchase_history import activate_items
 from nti.store.purchase_history import deactivate_items
 from nti.store.purchase_history import get_purchase_attempt
-from nti.store.purchase_history import register_purchase_attempt
+
+from nti.store.redeem import make_redeem_purchase_attempt
 
 from nti.store.store import get_gift_code
 from nti.store.store import get_invitation_code
@@ -183,36 +180,6 @@ def _purchase_attempt_synced(purchase, event):
 	lifecycleevent.modified(purchase)
 	logger.info('%s has been synched', purchase.id)
 
-def _make_redeem_purchase_attempt(user, original, code, activate_roles=True):
-	# create and register a purchase attempt for accepting user
-	redeemed = create_redeemed_purchase_attempt(original, code)
-	result = register_purchase_attempt(redeemed, user)
-	activate_items(user, redeemed.Items)
-	if activate_roles:
-		lib_items = expand_purchase_item_ids(original.Items)
-		add_users_content_roles(user, lib_items)
-	return result
-
-@component.adapter(IInvitationAcceptedEvent)
-def _purchase_invitation_accepted(event):
-	invitation = event.object
-	if 		IStorePurchaseInvitation.providedBy(invitation) \
-		and IInvitationPurchaseAttempt.providedBy(invitation.purchase):
-
-		user = event.user
-		code = invitation.code
-		original = invitation.purchase
-
-		# create and register a purchase attempt for accepting user
-		new_pid = _make_redeem_purchase_attempt(user, original, code)
-
-		# link purchase. This validates there are enough tokens and
-		# use has not accepted already
-		invitation.register(user, new_pid)
-
-		logger.info('invitation %s has been accepted with purchase %s',
-					code, new_pid)
-
 @component.adapter(IGiftPurchaseAttempt, IPurchaseAttemptSuccessful)
 def _gift_purchase_attempt_successful(purchase, event):
 	logger.info('Gift purchase by %s completed successfully. Gift code %s',
@@ -231,9 +198,9 @@ def _gift_purchase_attempt_redeemed(purchase, event):
 		raise RedemptionException(_("Gift purchase already redeemed"))
 
 	code = event.code or get_invitation_code(purchase)
-	new_pid = _make_redeem_purchase_attempt(user=event.user,
-											original=purchase,
-											code=code)
+	new_pid = make_redeem_purchase_attempt(user=event.user,
+										   original=purchase,
+										   code=code)
 
 	# change state
 	purchase = removeAllProxies(purchase)
