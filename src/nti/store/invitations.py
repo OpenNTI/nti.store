@@ -54,6 +54,8 @@ class InvitationCapacityExceeded(InvitationValidationError):
 class StorePurchaseInvitation(Invitation):
 	createDirectFieldProperties(IStorePurchaseInvitation)
 
+	mimeType = mime_type = u'application/vnd.nextthought.store.purchaseinvitation'
+
 	source = alias('source_purchase')
 	target = alias('redeemed_purchase')
 		
