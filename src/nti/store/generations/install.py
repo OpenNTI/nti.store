@@ -11,7 +11,7 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-generation = 8
+generation = 9
 
 from zope.generations.generations import SchemaManager
 
@@ -32,10 +32,6 @@ class _StoreSchemaManager(SchemaManager):
 											generation=generation,
 											minimum_generation=generation,
 											package_name='nti.store.generations')
-
-def evolve(context):
-	install_catalog(context)
-	install_gift_registry(context)
 
 def install_catalog(context):
 	conn = context.connection
@@ -60,3 +56,7 @@ def install_gift_registry(context):
 	lsm.registerUtility(registry, provided=IGiftRegistry)
 
 	return registry
+
+def evolve(context):
+	install_catalog(context)
+	install_gift_registry(context)

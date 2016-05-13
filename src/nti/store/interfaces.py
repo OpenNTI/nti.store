@@ -441,6 +441,7 @@ class IInvitationPurchaseAttempt(IPurchaseAttempt):
 class IRedeemedPurchaseAttempt(IPurchaseAttempt):
 	RedemptionTime = Number(title='Redemption time', required=True)
 	RedemptionCode = ValidTextLine(title='Redemption Code', required=True)
+	SourcePurchaseID = ValidTextLine(title='Source Purchase ID', required=False)
 
 class IGiftPurchaseAttempt(IPurchaseAttempt):
 	Creator = ValidTextLine(title="Gift creator Email", required=True)
@@ -621,13 +622,14 @@ class IPurchaseHistory(IIterable):
 		"""
 
 class IStorePurchaseInvitation(IInvitation):
-	invitation_purchase = Variant((ValidTextLine(title="Purchase NTIID"),
-					   			   Object(IInvitationPurchaseAttempt, title="The invitation purchase")),
-					   			  title='The Invitation purchase')
+	source_purchase = Variant((ValidTextLine(title="Purchase NTIID"),
+					   		   Object(IPurchaseAttempt, title="The source purchase")),
+					   		   title='The source purchase')
 
 	redeemed_purchase = Variant((ValidTextLine(title="Purchase NTIID"),
 					    	  	Object(IRedeemedPurchaseAttempt, title="The linked purchase")),
-					    	    title='The Linked purchase')
+					    	    title='The Linked purchase',
+					    	    required=False)
 	
 class IStorePurchaseInvitationActor(IInvitationActor):
 	"""

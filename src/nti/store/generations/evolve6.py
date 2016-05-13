@@ -11,22 +11,23 @@ logger = __import__('logging').getLogger(__name__)
 
 generation = 6
 
-import zope.intid
+from zope.annotation.interfaces import IAnnotations
 
 from zope.catalog.interfaces import ICatalog
 
-from zope.component.hooks import site, setHooks
+from zope.component.hooks import site
+from zope.component.hooks import setHooks
 
-from zope.annotation.interfaces import IAnnotations
+from zope.intid.interfaces import IIntIds
 
 from nti.dataserver.interfaces import IUser
+
+from nti.store.interfaces import IPurchaseAttempt
+from nti.store.interfaces import IPurchaseHistory
 
 from nti.store.purchase_index import IX_CREATOR
 from nti.store.purchase_index import IX_MIMETYPE
 from nti.store.purchase_index import CATALOG_NAME
-
-from nti.store.interfaces import IPurchaseAttempt
-from nti.store.interfaces import IPurchaseHistory
 
 from nti.store.store import get_purchase_history_annotation_key
 
@@ -52,8 +53,8 @@ def do_evolve(context, generation=generation):
 
 	with site(ds_folder):
 		lsm = ds_folder.getSiteManager()
-		intids = lsm.getUtility(zope.intid.IIntIds)
-		catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME)
+		intids = lsm.getUtility(IIntIds)
+		catalog = lsm.getUtility(ICatalog, name=CATALOG_NAME)
 
 		users = ds_folder['users']
 		for user in users.values():

@@ -13,7 +13,8 @@ generation = 8
 
 from zope.catalog.interfaces import ICatalog
 
-from zope.component.hooks import site, setHooks
+from zope.component.hooks import site
+from zope.component.hooks import setHooks
 
 from zope.intid.interfaces import IIntIds
 
@@ -39,23 +40,23 @@ def do_evolve(context, generation=generation):
 	setHooks()
 	conn = context.connection
 	ds_folder = conn.root()['nti.dataserver']
-	
+
 	with site(ds_folder):
 		lsm = ds_folder.getSiteManager()
 		intids = lsm.getUtility(IIntIds)
-		catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME )
-		for purchase in tuple(get_purchases(catalog, intids)): # we are mutating
+		catalog = lsm.getUtility(ICatalog, name=CATALOG_NAME)
+		for purchase in list(get_purchases(catalog, intids)):  # mutating
 			if OLD_PID not in purchase.Items:
 				continue
 			order = purchase.Order
 			for item in order.Items:
 				if item.NTIID == OLD_PID:
 					item.NTIID = NEW_PID
-					
+
 			doc_id = intids.getId(purchase)
 			catalog.index_doc(doc_id, purchase)
-			count +=1
-	
+			count += 1
+
 	logger.info('Store evolution %s done. %s items migrated', generation, count)
 
 def evolve(context):

@@ -11,7 +11,8 @@ logger = __import__('logging').getLogger(__name__)
 
 generation = 7
 
-from zope.component.hooks import site, setHooks
+from zope.component.hooks import site
+from zope.component.hooks import setHooks
 
 from zope.intid.interfaces import IIntIds
 
@@ -32,10 +33,10 @@ def do_evolve(context, generation=generation):
 
 	with site(ds_folder):
 		lsm = ds_folder.getSiteManager()
-		registry = lsm.queryUtility(IGiftRegistry)
 		intids = lsm.getUtility(IIntIds)
+		registry = lsm.getUtility(IGiftRegistry)
 
-		for username, store in list(registry.items()):
+		for username, store in list(registry.items()): # mutating
 			if not IUserGiftHistory.providedBy(store):
 				continue
 

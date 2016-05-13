@@ -23,6 +23,12 @@ from nti.store.interfaces import ICopier
 #: Store MimeType base
 STORE_MIME_BASE = MIME_BASE + b'.store'
 
+#: Invitation purchase attempt
+INVITATION_PURCHASE_ATTEMPT_MIME_TYPE = STORE_MIME_BASE + b'.invitationpurchaseattempt'
+
+#: Redeem purchase attempt
+REDEEM_PURCHASE_ATTEMPT_MIME_TYPE = STORE_MIME_BASE + b'.redeemedpurchaseattempt'
+
 #: Non-Gift purchase attempt MimeTypes
 NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES = \
 		tuple([STORE_MIME_BASE + x for x in (b'.purchaseattempt',

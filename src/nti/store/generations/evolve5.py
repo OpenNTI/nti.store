@@ -42,16 +42,16 @@ def index_purchases(metadata_catalog, purchase_catalog, intids):
 
 def do_evolve(context, generation=generation):
 	logger.info("Store evolution %s started", generation);
-	
+
 	conn = context.connection
 	dataserver_folder = conn.root()['nti.dataserver']
 	lsm = dataserver_folder.getSiteManager()
 	intids = lsm.getUtility(IIntIds)
-	
+
 	metadata_catalog = lsm.getUtility(ICatalog, METADATA_CATALOG_NAME)
 	purchase_catalog = install_purchase_catalog(dataserver_folder, intids)
 	total = index_purchases(metadata_catalog, purchase_catalog, intids)
-	
+
 	logger.info('Store evolution %s done; %s items(s) indexed', generation, total)
 
 def evolve(context):

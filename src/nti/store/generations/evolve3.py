@@ -14,9 +14,9 @@ generation = 3
 from nti.store.generations.install import install_gift_registry
 
 def evolve(context):
-    """
-    Evolve generation 2 to 3 by registering the gift registry
-    """
-    logger.info("Store generation %s started", generation)
-    install_gift_registry(context)
-    logger.info("Store generation %s completed", generation)
+	"""
+	Evolve generation 2 to 3 by registering the gift registry
+	"""
+	logger.info("Store generation %s started", generation)
+	install_gift_registry(context)
+	logger.info("Store generation %s completed", generation)

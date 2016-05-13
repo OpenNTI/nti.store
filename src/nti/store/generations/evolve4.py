@@ -34,22 +34,22 @@ def do_evolve(context):
 
 	lsm = ds_folder.getSiteManager()
 	intids = lsm.getUtility(IIntIds)
-	
+
 	queue = lsm.getUtility(IMetadataQueue)
-	
+
 	logger.info('Generation %s started', generation)
-	
+
 	gifts = purchases = 0
 	with site(ds_folder):
 		assert  component.getSiteManager() == ds_folder.getSiteManager(), \
 				"Hooks not installed?"
-	
+
 		# purchase attempts
 		users = ds_folder['users']
 		for user in users.values():
 			if not IUser.providedBy(user):
 				continue
-		
+
 			# get all purchase attempt
 			history = get_purchase_history(user, safe=False)
 			if not history:
@@ -71,7 +71,7 @@ def do_evolve(context):
 				gifts += 1
 			except TypeError:
 				pass
-	
+
 	logger.info('Generation %s completed. %s purchases(s) and %s gift(s) registered',
 				generation, purchases, gifts)
 

@@ -39,9 +39,13 @@ from nti.dataserver.users.user_profile import get_searchable_realname_parts
 
 from nti.externalization.interfaces import IInternalObjectExternalizer
 
+from nti.externalization.oids import to_external_ntiid_oid
+
 from nti.externalization.representation import WithRepr
 
 from nti.mimetype.mimetype import MIME_BASE
+
+from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
@@ -242,10 +246,17 @@ class InvitationPurchaseAttempt(PurchaseAttempt):
 class RedeemedPurchaseAttempt(PurchaseAttempt):
 	RedemptionCode = FP(IRedeemedPurchaseAttempt['RedemptionCode'])
 	RedemptionTime = FP(IRedeemedPurchaseAttempt['RedemptionTime'])
+	SourcePurchaseID = FP(IRedeemedPurchaseAttempt['SourcePurchaseID'])
+	
+	@property
+	def SourcePurchase(self):
+		ntiid = self.SourcePurchaseID
+		result = find_object_with_ntiid(ntiid) if ntiid else None
+		return result 
 
 @interface.implementer(IUserProfile)
 class GiftPurchaseUserProfile(object):
-	avatarURL = email = realname = alias = None
+	backgroundURL = avatarURL = email = realname = alias = None # User profile fields
 
 	def get_searchable_realname_parts(self):
 		return get_searchable_realname_parts(self.realname)
@@ -344,7 +355,8 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, items=(),
 				StartTime=purchase.StartTime, EndTime=purchase.EndTime,
 				Error=purchase.Error, Synced=purchase.Synced, Context=context,
 				RedemptionTime=float(redemption_time),
-				RedemptionCode=unicode(redemption_code))
+				RedemptionCode=unicode(redemption_code),
+				SourcePurchaseID=to_external_ntiid_oid(purchase))
 	return result
 
 def create_gift_purchase_attempt(creator, order, processor, state=None, description=None,

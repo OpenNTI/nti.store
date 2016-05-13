@@ -19,6 +19,8 @@ from zope.intid.interfaces import IIntIds
 from nti.common.integer_strings import to_external_string
 from nti.common.integer_strings import from_external_string
 
+from nti.common.property import alias
+
 from nti.common.proxy import removeAllProxies
 
 from nti.externalization.oids import to_external_ntiid_oid
@@ -52,25 +54,34 @@ class InvitationCapacityExceeded(InvitationValidationError):
 class StorePurchaseInvitation(Invitation):
 	createDirectFieldProperties(IStorePurchaseInvitation)
 
+	source = alias('source_purchase')
+	target = alias('redeemed_purchase')
+		
+	_source_purchase = None
 	_redeemed_purchase = None
-	_invitation_purchase = None
 
 	def __init__(self, purchase, **kwargs):
 		super(StorePurchaseInvitation, self).__init__(**kwargs)
-		self.invitation_purchase = purchase
+		self.source_purchase = purchase
 
-	def _setInvitationPurchase(self, nv):
-		if IPurchaseAttempt.providedBy(nv):
-			self._invitation_purchase = to_external_ntiid_oid(nv)
-		else:
-			self._invitation_purchase = nv
-
-	def _getInvitationPurchase(self):
-		if self._invitation_purchase:
-			return find_object_with_ntiid(self._invitation_purchase)
+	def _getSourcePurchase(self):
+		if self._source_purchase:
+			return find_object_with_ntiid(self._source_purchase)
 		return None
-	invitation_purchase = purchase = property(_getInvitationPurchase, 
-											  _setInvitationPurchase)
+
+	def _setSourcePurchase(self, nv):
+		if IPurchaseAttempt.providedBy(nv):
+			self._source_purchase = to_external_ntiid_oid(nv)
+		else:
+			self._source_purchase = nv
+
+	source_purchase = invitation_purchase = property(_getSourcePurchase, 
+										  			 _setSourcePurchase)
+
+	def _getRedeemedPurchase(self):
+		if self._redeemed_purchase:
+			return find_object_with_ntiid(self._redeemed_purchase)
+		return None
 	
 	def _setRedeemedPurchase(self, nv):
 		if IPurchaseAttempt.providedBy(nv):
@@ -78,10 +89,6 @@ class StorePurchaseInvitation(Invitation):
 		else:
 			self._redeemed_purchase = nv
 
-	def _getRedeemedPurchase(self):
-		if self._redeemed_purchase:
-			return find_object_with_ntiid(self._redeemed_purchase)
-		return None
 	redeemed_purchase = linked_purchase = property(_getRedeemedPurchase,
 												   _setRedeemedPurchase)
 
@@ -119,7 +126,7 @@ class StorePurchaseInvitationActor(object):
 	def accept(self, user, invitation=None):
 		result = True
 		invitation = self.invitation if invitation is None else invitation
-		purchase = invitation.purchase
+		purchase = invitation.source_purchase
 		if purchase.isExpired():
 			raise InvitationExpired(invitation)
 		original = invitation.purchase
@@ -137,7 +144,7 @@ class StorePurchaseInvitationActor(object):
 		if not purchase.consume_token():
 			raise InvitationCapacityExceeded(invitation)
 
-		invitation.linked_purchase = redeemed_purchase
+		invitation.redeemed_purchase = redeemed_purchase
 
 		logger.info('Invitation %s has been accepted with purchase %s',
 					invitation.code, redeemed_purchase)
