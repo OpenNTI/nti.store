@@ -38,7 +38,7 @@ from nti.schema.fieldproperty import createDirectFieldProperties
 from nti.store import MessageFactory as _
 
 from nti.store.interfaces import IPurchaseAttempt
-from nti.store.interfaces import IStorePurchaseInvitation 
+from nti.store.interfaces import IStorePurchaseInvitation
 from nti.store.interfaces import IStorePurchaseInvitationActor
 
 from nti.store.redeem import make_redeem_purchase_attempt
@@ -58,7 +58,8 @@ class StorePurchaseInvitation(Invitation):
 
 	source = alias('source_purchase')
 	target = alias('redeemed_purchase')
-		
+	purchase = alias('source_purchase')
+
 	_source_purchase = None
 	_redeemed_purchase = None
 
@@ -77,14 +78,14 @@ class StorePurchaseInvitation(Invitation):
 		else:
 			self._source_purchase = nv
 
-	source_purchase = invitation_purchase = property(_getSourcePurchase, 
+	source_purchase = invitation_purchase = property(_getSourcePurchase,
 										  			 _setSourcePurchase)
 
 	def _getRedeemedPurchase(self):
 		if self._redeemed_purchase:
 			return find_object_with_ntiid(self._redeemed_purchase)
 		return None
-	
+
 	def _setRedeemedPurchase(self, nv):
 		if IPurchaseAttempt.providedBy(nv):
 			self._redeemed_purchase = to_external_ntiid_oid(nv)
