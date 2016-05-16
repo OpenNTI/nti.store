@@ -37,6 +37,7 @@ from nti.invitations.interfaces import IInvitation
 from nti.invitations.interfaces import IInvitationActor
 
 from nti.namedfile.interfaces import INamedFile
+from nti.namedfile.interfaces import IFileConstrained
 
 from nti.schema.field import Int
 from nti.schema.field import Bool
@@ -106,7 +107,7 @@ class IPurchasableVendorInfo(IEnumerableMapping):
 	information.
 	"""
 
-class IPurchasable(IItemBundle):
+class IPurchasable(IItemBundle, IFileConstrained):
 	Amount = Float(title="Cost amount", required=True, min=0.0)
 	Currency = ValidTextLine(title='Currency amount', required=True, default='USD')
 	Discountable = Bool(title="Discountable flag", required=True, default=False)
