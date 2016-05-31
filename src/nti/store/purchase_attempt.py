@@ -122,8 +122,6 @@ class PurchaseAttempt(ModDateTrackingObject,
 	context = alias('Context')
 	createdTime = alias('StartTime')
 
-	parameters = {} # IContentTypeAware
-
 	@property
 	def Items(self):
 		return self.Order.NTIIDs

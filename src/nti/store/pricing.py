@@ -42,7 +42,7 @@ from nti.store.utils import MetaStoreObject
 class PricedItem(Priceable):
 	__metaclass__ = MetaStoreObject
 	createDirectFieldProperties(IPricedItem)
-
+		
 def create_priced_item(ntiid, purchase_price, purchase_fee=None,
 					   non_discounted_price=None, quantity=1, currency='USD'):
 	quantity = 1 if quantity is None else int(quantity)

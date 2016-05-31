@@ -39,8 +39,6 @@ class Priceable(SchemaConfigured):
 	NTIID = FP(IPriceable['NTIID'])
 	Quantity = FP(IPriceable['Quantity'])
 
-	parameters = {}  # IContentTypeAware
-
 	def copy(self, *args, **kwargs):
 		return copy_priceable(self, *args, **kwargs)
 
