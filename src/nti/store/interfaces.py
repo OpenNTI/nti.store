@@ -594,6 +594,8 @@ class GiftPurchaseAttemptRedeemed(PurchaseAttemptEvent):
 		self.code = code
 		self.request = request
 
+# user purchase history
+
 class IPurchaseHistory(IIterable):
 
 	def add_purchase(purchase):
@@ -622,7 +624,9 @@ class IPurchaseHistory(IIterable):
 		Return all purchase attempts
 		"""
 
-class IStorePurchaseInvitation(IInvitation):
+# invitations
+
+class IPurchaseInvitation(IInvitation):
 	source_purchase = Variant((ValidTextLine(title="Purchase NTIID"),
 					   		   Object(IPurchaseAttempt, title="The source purchase")),
 					   		   title='The source purchase')
@@ -631,10 +635,26 @@ class IStorePurchaseInvitation(IInvitation):
 					    	  	Object(IRedeemedPurchaseAttempt, title="The linked purchase")),
 					    	    title='The Linked purchase',
 					    	    required=False)
+
+class IPurchaseInvitationActor(IInvitationActor):
+	"""
+	Actor for :class:``.IPurchaseInvitation`` objects
+	"""
 	
-class IStorePurchaseInvitationActor(IInvitationActor):
+class IStorePurchaseInvitation(IPurchaseInvitation):
+	pass
+	
+class IStorePurchaseInvitationActor(IPurchaseInvitationActor):
 	"""
 	Actor for :class:``.IStorePurchaseInvitation`` objects
+	"""
+
+class IStoreGiftInvitation(IPurchaseInvitation):
+	item = ValidTextLine(title="Purchase item NTIID", required=False)
+	
+class IStoreGiftInvitationActor(IPurchaseInvitationActor):
+	"""
+	Actor for :class:``.IStoreGiftInvitation`` objects
 	"""
 
 # gift registry
@@ -670,15 +690,7 @@ class IObjectTransformer(interface.Interface):
 	def __call__(context, user=None):
 		pass
 
-# depreecated interfaces
-
-deprecated('IEnrollmentAttempt', 'Use new course enrollment')
-class IEnrollmentAttempt(IPurchaseAttempt):
-	pass
-
-deprecated('IEnrollmentPurchaseAttempt', 'Use new course enrollment')
-class IEnrollmentPurchaseAttempt(IEnrollmentAttempt):
-	Processor = ValidTextLine(title='Enrollment institution', required=False)
+# metadata
 
 class IStorePurchaseMetadataProvider(interface.Interface):
 	"""
@@ -688,3 +700,13 @@ class IStorePurchaseMetadataProvider(interface.Interface):
 
 	def update_metadata(data):
 		pass
+
+# depreecated interfaces
+
+deprecated('IEnrollmentAttempt', 'Use new course enrollment')
+class IEnrollmentAttempt(IPurchaseAttempt):
+	pass
+
+deprecated('IEnrollmentPurchaseAttempt', 'Use new course enrollment')
+class IEnrollmentPurchaseAttempt(IEnrollmentAttempt):
+	Processor = ValidTextLine(title='Enrollment institution', required=False)

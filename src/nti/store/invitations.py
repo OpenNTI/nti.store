@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Store invitations
-
 .. $Id$
 """
 
@@ -56,9 +54,8 @@ class StorePurchaseInvitation(Invitation):
 
 	mimeType = mime_type = u'application/vnd.nextthought.store.purchaseinvitation'
 
-	source = alias('source_purchase')
 	target = alias('redeemed_purchase')
-	purchase = alias('source_purchase')
+	purchase = source = alias('source_purchase')
 
 	_source_purchase = None
 	_redeemed_purchase = None
@@ -97,27 +94,27 @@ class StorePurchaseInvitation(Invitation):
 
 _StorePurchaseInvitation = StorePurchaseInvitation # BWC
 
-def get_invitation_code(purchase, registry=component):
+def get_invitation_code(purchase):
 	if purchase is not None:
-		iid = registry.getUtility(IIntIds).getId(removeAllProxies(purchase))
+		iid = component.getUtility(IIntIds).getId(removeAllProxies(purchase))
 		__traceback_info__ = purchase, iid
 		result = to_external_string(iid)
 		return result
 	return None
 
-def get_purchase_by_code(code, registry=component):
+def get_purchase_by_code(code):
 	if code is not None:
 		__traceback_info__ = code
 		iid = from_external_string(code)
-		result = registry.getUtility(IIntIds).queryObject(iid)
+		result = component.getUtility(IIntIds).queryObject(iid)
 		return result
 	return None
 
 def create_store_purchase_invitation(purchase, receiver):
 	result = StorePurchaseInvitation(purchase=purchase)
-	result.expirationTime = getattr(purchase, 'ExpirationTime', None) or 0
-	result.creator = getattr(purchase.creator, 'username', purchase.creator)  # sender
 	result.receiver = getattr(receiver, 'username', receiver)
+	result.expirationTime = getattr(purchase, 'ExpirationTime', None) or 0
+	result.creator = getattr(purchase.creator, 'username', purchase.creator) # sender
 	return result
 
 @interface.implementer(IStorePurchaseInvitationActor)
