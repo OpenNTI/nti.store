@@ -13,7 +13,7 @@ from zope import interface
 
 from zope.mimetype.interfaces import IContentTypeAware
 
-from nti.common.property import alias as _
+from nti.common.property import alias as _a
 
 from nti.common.representation import WithRepr
 
@@ -36,8 +36,8 @@ class StripeConnectKey(SchemaConfigured):
 
 	__metaclass__ = MetaStoreObject
 
-	key = _('PrivateKey')
-	alias = name = _('Alias')
+	key = _a('PrivateKey')
+	alias = name = _a('Alias')
 
 	def __setattr__(self, name, value):
 		if name in ("key", "PrivateKey", 'RefreshToken'):
