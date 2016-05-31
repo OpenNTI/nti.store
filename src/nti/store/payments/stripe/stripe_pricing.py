@@ -14,21 +14,21 @@ import stripe
 
 from zope import component
 
-from ...interfaces import IPaymentProcessor
+from nti.store import PricingException
 
-from ...pricing import create_pricing_results
-from ...pricing import DefaultPurchasablePricer
+from nti.store.interfaces import IPaymentProcessor
 
-from ... import PricingException
+from nti.store.payments.stripe import STRIPE
 
-from . import NoSuchStripeCoupon
-from . import InvalidStripeCoupon
+from nti.store.payments.stripe import NoSuchStripeCoupon
+from nti.store.payments.stripe import InvalidStripeCoupon
 
-from .interfaces import IStripeConnectKey
+from nti.store.payments.stripe.interfaces import IStripeConnectKey
 
-from .stripe_purchase import StripePricedPurchasable
+from nti.store.payments.stripe.stripe_purchase import StripePricedPurchasable
 
-from . import STRIPE
+from nti.store.pricing import create_pricing_results
+from nti.store.pricing import DefaultPurchasablePricer
 
 def get_coupon(coupon=None, api_key=None, processor=STRIPE, registry=component):
 	manager = registry.getUtility(IPaymentProcessor, name=processor)
@@ -46,14 +46,14 @@ def get_coupon(coupon=None, api_key=None, processor=STRIPE, registry=component):
 			if not validated_coupon:
 				raise InvalidStripeCoupon()
 	return coupon
-	
+
 class StripePurchasablePricer(DefaultPurchasablePricer):
 
 	processor = STRIPE
 
 	def get_coupon(self, coupon=None, api_key=None, registry=component):
-		result = get_coupon(coupon=coupon, 
-							api_key=api_key, 
+		result = get_coupon(coupon=coupon,
+							api_key=api_key,
 							processor=self.processor,
 							registry=component)
 		return result
@@ -69,8 +69,8 @@ class StripePurchasablePricer(DefaultPurchasablePricer):
 		purchase_price = priced.PurchasePrice
 
 		if coupon is not None and stripe_key:
-			priced.Coupon = self.get_coupon(coupon=coupon, 
-											api_key=stripe_key.PrivateKey, 
+			priced.Coupon = self.get_coupon(coupon=coupon,
+											api_key=stripe_key.PrivateKey,
 											registry=registry)
 			if priced.Coupon is not None:
 				priced.NonDiscountedPrice = purchase_price

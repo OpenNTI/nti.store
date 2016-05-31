@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Defines stripe payment object.
-
 .. $Id$
 """
 
@@ -12,24 +10,27 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
+
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from nti.schema.schema import EqHash
 
-from ...pricing import PricedItem
-from ...priceable import Priceable
-from ...priceable import copy_priceable
-from ...purchase_order import PurchaseItem
-from ...purchase_order import PurchaseOrder
-from ...purchase_order import copy_purchase_order
-from ...purchase_order import create_purchase_order
+from nti.store.payments.stripe.interfaces import IStripePriceable
+from nti.store.payments.stripe.interfaces import IStripePricedItem
+from nti.store.payments.stripe.interfaces import IStripePurchaseItem
+from nti.store.payments.stripe.interfaces import IStripePurchaseOrder
 
-from .interfaces import IStripePriceable
-from .interfaces import IStripePricedItem
-from .interfaces import IStripePurchaseItem
-from .interfaces import IStripePurchaseOrder
+from nti.store.payments.stripe.utils import replace_items_coupon as replace_coupon
 
-from .utils import replace_items_coupon as replace_coupon
+from nti.store.priceable import Priceable
+from nti.store.priceable import copy_priceable
+
+from nti.store.pricing import PricedItem
+
+from nti.store.purchase_order import PurchaseItem
+from nti.store.purchase_order import PurchaseOrder
+from nti.store.purchase_order import copy_purchase_order
+from nti.store.purchase_order import create_purchase_order
 
 @interface.implementer(IStripePriceable)
 @EqHash('Coupon', 'NTIID', 'Quantity')
@@ -92,18 +93,18 @@ def create_stripe_purchase_item(ntiid, quantity=1, coupon=None):
 class StripePurchaseOrder(PurchaseOrder):
 
 	Coupon = FP(IStripePurchaseOrder['Coupon'])  # overide items coupon
-	
+
 	def item_factory(self, item):
 		return create_stripe_purchase_item(ntiid=item)
-	
+
 	def copy(self, *args, **kwargs):
 		result = copy_stripe_purchase_order(self, *args, **kwargs)
 		return result
 
 	def __eq__(self, other):
 		try:
-			return 	super(StripePurchaseOrder, self).__eq__(other) and \
-					self.Coupon == other.Coupon
+			return 		super(StripePurchaseOrder, self).__eq__(other) \
+					and self.Coupon == other.Coupon
 		except AttributeError:
 			return NotImplemented
 

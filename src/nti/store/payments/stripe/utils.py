@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Stripe utilities.
-
 .. $Id$
 """
 
@@ -20,17 +18,17 @@ from nti.common.string import safestr
 
 from nti.externalization.externalization import to_external_object
 
-from nti.store.payment_charge import UserAddress
-from nti.store.payment_charge import PaymentCharge
-
 from nti.store.interfaces import IPurchaseError
 from nti.store.interfaces import IStorePurchaseMetadataProvider
 
-from nti.store.payments.stripe.stripe_error import StripePurchaseError
+from nti.store.payment_charge import UserAddress
+from nti.store.payment_charge import PaymentCharge
 
 from nti.store.payments.stripe.interfaces import IStripeError
 from nti.store.payments.stripe.interfaces import IStripePurchaseError
 from nti.store.payments.stripe.interfaces import IStripeOperationError
+
+from nti.store.payments.stripe.stripe_error import StripePurchaseError
 
 def makenone(s, default=None):
 	if isinstance(s, six.string_types):
@@ -62,8 +60,8 @@ def get_charge_metata(purchase_id, username=None,
 	if customer_id:
 		data['CustomerID'] = customer_id
 
-	for _, meta_subscriber in component.getUtilitiesFor(IStorePurchaseMetadataProvider):
-		data = meta_subscriber.update_metadata( data )
+	for _, meta_subscriber in list(component.getUtilitiesFor(IStorePurchaseMetadataProvider)):
+		data = meta_subscriber.update_metadata(data)
 
 	context = flatten_context(context)
 	if context:
@@ -125,5 +123,5 @@ def adapt_to_purchase_error(e):
 	return result
 
 def replace_items_coupon(context, coupon=None):
-	for item in getattr(context, 'Items', context):
+	for item in getattr(context, 'Items', context) or ():
 		item.Coupon = coupon

@@ -9,9 +9,14 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-from .sync import SyncProcessor
-from .event import EventProcessor
-from .coupon import CouponProcessor
-from .refund import RefundProcessor
-from .pricing import PricingProcessor
-from .purchase import PurchaseProcessor
+from nti.store.payments.stripe.processor.coupon import CouponProcessor
+
+from nti.store.payments.stripe.processor.event import EventProcessor
+
+from nti.store.payments.stripe.processor.pricing import PricingProcessor
+
+from nti.store.payments.stripe.processor.purchase import PurchaseProcessor
+
+from nti.store.payments.stripe.processor.refund import RefundProcessor
+
+from nti.store.payments.stripe.processor.sync import SyncProcessor

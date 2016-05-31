@@ -10,24 +10,26 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
+
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from nti.externalization.representation import WithRepr
 
-from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from ...purchase_error import PurchaseError
+from nti.schema.schema import EqHash
 
-from ...utils import MetaStoreObject
+from nti.store.payments.stripe.interfaces import IStripePurchaseError
+from nti.store.payments.stripe.interfaces import IStripeOperationError
 
-from .interfaces import IStripePurchaseError
-from .interfaces import IStripeOperationError
+from nti.store.purchase_error import PurchaseError
 
-@interface.implementer(IStripeOperationError)
+from nti.store.utils import MetaStoreObject
+
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
+@interface.implementer(IStripeOperationError)
 class StripeOperationError(SchemaConfigured):
 	__metaclass__ = MetaStoreObject
 	createDirectFieldProperties(IStripeOperationError)

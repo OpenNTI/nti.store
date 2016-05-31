@@ -16,7 +16,7 @@ import sys
 
 import stripe
 
-from . import StripeException
+from nti.store.payments.stripe import StripeException
 
 _marker = object()
 
@@ -94,12 +94,12 @@ def create_token(customer_id=None, number=None, exp_month=None, exp_year=None,
 
 	token = _do_stripe_operation(stripe.Token.create, api_key=api_key, **data)
 	return token
-create_stripe_token = create_token	# alias
+create_stripe_token = create_token  # alias
 
 def get_stripe_token(token, api_key=None):
 	token = _do_stripe_operation(stripe.Token.retrieve, token, api_key=api_key)
 	return token
-get_token = get_stripe_token # alias
+get_token = get_stripe_token  # alias
 
 # charges
 
@@ -134,7 +134,7 @@ def get_stripe_charges(customer=None, start_time=None, end_time=None, count=50,
 
 	_loop = True
 	while _loop:
-		charges = query_stripe_charges(	count=count, offset=offset,
+		charges = query_stripe_charges(count=count, offset=offset,
 										customer=customer, api_key=api_key)
 		if not charges.data:
 			_loop = False
@@ -206,13 +206,13 @@ class StripeIO(object):
 							  exp_month=exp_month, exp_year=exp_year,
 							  cvc=cvc, api_key=api_key, **kwargs)
 		return result
-	create_stripe_token = create_token # alias
+	create_stripe_token = create_token  # alias
 
 	@classmethod
 	def get_stripe_token(cls, token, api_key=None):
 		result = get_stripe_token(token, api_key=api_key)
 		return result
-	get_token = get_stripe_token # alias
+	get_token = get_stripe_token  # alias
 
 	@classmethod
 	def create_stripe_charge(cls, amount, currency='USD', customer_id=None, card=None,
@@ -225,13 +225,13 @@ class StripeIO(object):
 									  application_fee=application_fee,
 									  api_key=api_key)
 		return result
-	create_charge = create_stripe_charge # alias
+	create_charge = create_stripe_charge  # alias
 
 	@classmethod
 	def get_stripe_charge(cls, charge_id, api_key=None):
 		result = get_stripe_charge(charge_id=charge_id, api_key=api_key)
 		return result
-	get_charge = get_stripe_charge # alias
+	get_charge = get_stripe_charge  # alias
 
 	@classmethod
 	def get_stripe_charges(self, customer=None, start_time=None, end_time=None,
@@ -240,14 +240,14 @@ class StripeIO(object):
 									start_time=start_time,
 									end_time=end_time, api_key=api_key)
 		return result
-	get_charges = get_stripe_charges # alias
+	get_charges = get_stripe_charges  # alias
 
 	@classmethod
 	def update_stripe_charge(self, charge, description=None, metadata=None, api_key=None):
 		result = update_stripe_charge(charge=charge, description=description,
 									  metadata=metadata, api_key=api_key)
 		return result
-	update_charge = update_stripe_charge # alias
+	update_charge = update_stripe_charge  # alias
 
 	@classmethod
 	def get_stripe_coupon(cls, coupon_code, api_key=None):

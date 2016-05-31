@@ -14,25 +14,25 @@ from datetime import date
 
 from zope.event import notify
 
-from ....interfaces import PurchaseAttemptFailed
-from ....interfaces import PurchaseAttemptSynced
-from ....interfaces import PurchaseAttemptRefunded
-from ....interfaces import PurchaseAttemptSuccessful
+from nti.store.interfaces import PurchaseAttemptFailed
+from nti.store.interfaces import PurchaseAttemptSynced
+from nti.store.interfaces import PurchaseAttemptRefunded
+from nti.store.interfaces import PurchaseAttemptSuccessful
 
-from ....store import get_purchase_attempt
+from nti.store.payments.stripe.interfaces import RegisterStripeCharge
+from nti.store.payments.stripe.interfaces import IStripePurchaseAttempt
 
-from ..utils import create_payment_charge
-from ..utils import adapt_to_purchase_error
+from nti.store.payments.stripe.processor.base import get_api_key
+from nti.store.payments.stripe.processor.base import get_charges
+from nti.store.payments.stripe.processor.base import BaseProcessor
 
-from ..interfaces import RegisterStripeCharge
-from ..interfaces import IStripePurchaseAttempt
+from nti.store.payments.stripe.stripe_io import get_stripe_token
+from nti.store.payments.stripe.stripe_io import get_stripe_charge
 
-from ..stripe_io import get_stripe_token
-from ..stripe_io import get_stripe_charge
+from nti.store.payments.stripe.utils import create_payment_charge
+from nti.store.payments.stripe.utils import adapt_to_purchase_error
 
-from .base import get_api_key
-from .base import get_charges
-from .base import BaseProcessor
+from nti.store.store import get_purchase_attempt
 
 def sync_purchase(purchase_id, username=None, api_key=None, request=None):
 	"""
@@ -109,11 +109,11 @@ def sync_purchase(purchase_id, username=None, api_key=None, request=None):
 	if do_synch:
 		notify(PurchaseAttemptSynced(purchase))
 	return charge
-	
+
 class SyncProcessor(BaseProcessor):
 
 	@classmethod
 	def sync_purchase(cls, purchase_id, username, api_key=None, request=None):
-		result = sync_purchase(	purchase_id=purchase_id, username=username,
+		result = sync_purchase(purchase_id=purchase_id, username=username,
 								api_key=api_key, request=request)
 		return result

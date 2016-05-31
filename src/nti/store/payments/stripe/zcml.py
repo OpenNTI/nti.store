@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Directives to be used in ZCML: registering static keys.
-
 .. $Id$
 """
 
@@ -12,12 +10,14 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
-from zope.configuration import fields
+
 from zope.component.zcml import utility
 
-from .stripe_key import StripeConnectKey
+from zope.configuration import fields
 
-from .interfaces import IStripeConnectKey 
+from nti.store.payments.stripe.interfaces import IStripeConnectKey
+
+from nti.store.payments.stripe.stripe_key import StripeConnectKey
 
 class IRegisterStripeKeyDirective(interface.Interface):
 	"""

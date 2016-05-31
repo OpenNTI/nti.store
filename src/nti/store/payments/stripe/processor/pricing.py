@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Stripe purchase pricing functionalilty.
-
 .. $Id$
 """
 
@@ -13,12 +11,13 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import component
 
-from ....interfaces import IPurchasablePricer
-from ....purchase_history import get_purchase_attempt
+from nti.store.interfaces import IPurchasablePricer
 
-from .. import STRIPE
+from nti.store.payments.stripe import STRIPE
 
-from .base import BaseProcessor
+from nti.store.payments.stripe.processor.base import BaseProcessor
+
+from nti.store.purchase_history import get_purchase_attempt
 
 def price_order(order, name=STRIPE, registry=component):
 	pricer = component.getUtility(IPurchasablePricer, name=name)
@@ -28,12 +27,12 @@ def price_order(order, name=STRIPE, registry=component):
 def price_purchase(purchase_attempt, name=STRIPE, registry=component):
 	result = price_order(purchase_attempt.Order, registry=registry)
 	return result
-	
+
 class PricingProcessor(BaseProcessor):
 
 	def do_pricing(self, purchase_attempt, registry=component):
 		result = price_purchase(purchase_attempt,
-								name=self.name, 
+								name=self.name,
 								registry=registry)
 		return result
 	_do_pricing = do_pricing  # BWC

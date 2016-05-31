@@ -18,14 +18,14 @@ from datetime import datetime
 
 from dateutil import relativedelta
 
-from ... import _BasePaymentProcessor
+from nti.store.payments import _BasePaymentProcessor
 
-from .. import ROUND_DECIMAL
-from .. import InvalidStripeCoupon
+from nti.store.payments.stripe import ROUND_DECIMAL
+from nti.store.payments.stripe import InvalidStripeCoupon
 
-from ..stripe_io import get_stripe_coupon
+from nti.store.payments.stripe.processor.base import BaseProcessor
 
-from .base import BaseProcessor
+from nti.store.payments.stripe.stripe_io import get_stripe_coupon
 
 def get_coupon(coupon, api_key=None):
 	if isinstance(coupon, six.string_types):
@@ -48,7 +48,7 @@ def validate_coupon(coupon, api_key=None):
 	if result:
 		if coupon.duration == u'repeating':
 			redeem_by = coupon.redeem_by
-			times_redeemed = coupon.times_redeemed or 0 
+			times_redeemed = coupon.times_redeemed or 0
 			duration_in_months = coupon.duration_in_months
 			diff_months = months_between(coupon.created, time.time())
 			max_redemptions = \
@@ -61,7 +61,7 @@ def validate_coupon(coupon, api_key=None):
 			result = (coupon.redeem_by is None or time.time() <= coupon.redeem_by) and \
 					 (not coupon.times_redeemed)
 	return result
-	
+
 def get_and_validate_coupon(coupon=None, api_key=None):
 	coupon = get_coupon(coupon=coupon, api_key=api_key) if coupon else None
 	if coupon is not None and not validate_coupon(coupon=coupon, api_key=api_key):

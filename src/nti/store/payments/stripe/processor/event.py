@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Stripe event functionalilty.
-
 .. $Id$
 """
 
@@ -18,16 +16,16 @@ from zope.event import notify
 
 from nti.common.maps import CaseInsensitiveDict
 
-from ....store import get_purchase_attempt
+from nti.store.interfaces import PurchaseAttemptFailed
+from nti.store.interfaces import PurchaseAttemptDisputed
+from nti.store.interfaces import PurchaseAttemptRefunded
+from nti.store.interfaces import PurchaseAttemptSuccessful
 
-from ....interfaces import PurchaseAttemptFailed
-from ....interfaces import PurchaseAttemptDisputed
-from ....interfaces import PurchaseAttemptRefunded
-from ....interfaces import PurchaseAttemptSuccessful
+from nti.store.payments.stripe.processor.base import BaseProcessor
 
-from ..utils import create_payment_charge
+from nti.store.payments.stripe.utils import create_payment_charge
 
-from .base import BaseProcessor
+from nti.store.store import get_purchase_attempt
 
 class EventProcessor(BaseProcessor):
 

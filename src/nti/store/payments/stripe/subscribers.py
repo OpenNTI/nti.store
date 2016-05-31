@@ -10,14 +10,15 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 from zope import component
+
 from zope.annotation import IAnnotations
 
-from .interfaces import IStripeCustomer
-from .interfaces import IRegisterStripeToken
-from .interfaces import IRegisterStripeCharge
-from .interfaces import IStripeCustomerCreated
-from .interfaces import IStripeCustomerDeleted
-from .interfaces import IStripePurchaseAttempt
+from nti.store.payments.stripe.interfaces import IStripeCustomer
+from nti.store.payments.stripe.interfaces import IRegisterStripeToken
+from nti.store.payments.stripe.interfaces import IRegisterStripeCharge
+from nti.store.payments.stripe.interfaces import IStripeCustomerCreated
+from nti.store.payments.stripe.interfaces import IStripeCustomerDeleted
+from nti.store.payments.stripe.interfaces import IStripePurchaseAttempt
 
 @component.adapter(IStripeCustomerCreated)
 def stripe_customer_created(event):
@@ -42,7 +43,7 @@ def register_stripe_token(event):
 	sp.TokenID = event.token
 	logger.debug("Purchase %s was associated with stripe token %s",
 				 purchase.id, event.token)
-	
+
 @component.adapter(IRegisterStripeCharge)
 def register_stripe_charge(event):
 	purchase = event.purchase

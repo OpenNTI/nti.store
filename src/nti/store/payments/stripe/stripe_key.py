@@ -14,17 +14,19 @@ from zope import interface
 from zope.mimetype.interfaces import IContentTypeAware
 
 from nti.common.property import alias as _
+
 from nti.common.representation import WithRepr
 
-from nti.utils.cypher import get_plaintext
-
-from nti.schema.schema import EqHash
 from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from ...utils import MetaStoreObject
+from nti.schema.schema import EqHash
 
-from .interfaces import IStripeConnectKey
+from nti.store.payments.stripe.interfaces import IStripeConnectKey
+
+from nti.store.utils import MetaStoreObject
+
+from nti.utils.cypher import get_plaintext
 
 @WithRepr
 @EqHash('Alias',)
@@ -33,7 +35,7 @@ class StripeConnectKey(SchemaConfigured):
 	createDirectFieldProperties(IStripeConnectKey)
 
 	__metaclass__ = MetaStoreObject
-	
+
 	key = _('PrivateKey')
 	alias = name = _('Alias')
 

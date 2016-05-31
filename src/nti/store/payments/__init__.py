@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Base class for payment processors.
-
 .. $Id$
 """
 

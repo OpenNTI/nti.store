@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Stripe purchase functionalilty.
-
 .. $Id$
 """
 
@@ -10,8 +8,6 @@ from __future__ import print_function, unicode_literals, absolute_import, divisi
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
-
-from .... import MessageFactory as _
 
 import six
 import sys
@@ -26,34 +22,37 @@ from zope.event import notify
 
 from nti.dataserver.interfaces import IDataserverTransactionRunner
 
-from .... import get_user
-from .... import ROUND_DECIMAL
-from .... import PurchaseException
+from nti.store import MessageFactory as _
 
-from ....store import get_purchase_attempt
+from nti.store import get_user
+from nti.store import ROUND_DECIMAL
+from nti.store import PurchaseException
 
-from ....interfaces import PurchaseAttemptFailed
-from ....interfaces import PurchaseAttemptStarted
-from ....interfaces import PurchaseAttemptSuccessful
+from nti.store.interfaces import PurchaseAttemptFailed
+from nti.store.interfaces import PurchaseAttemptStarted
+from nti.store.interfaces import PurchaseAttemptSuccessful
 
-from ..stripe_io import create_charge
-from ..stripe_io import update_charge
-from ..stripe_customer import StripeCustomer
-from ..stripe_customer import create_customer
+from nti.store.payments.stripe.interfaces import IStripeCustomer
+from nti.store.payments.stripe.interfaces import RegisterStripeToken
+from nti.store.payments.stripe.interfaces import RegisterStripeCharge
+from nti.store.payments.stripe.interfaces import IStripePurchaseAttempt
 
-from ..utils import get_charge_metata
-from ..utils import create_payment_charge
-from ..utils import adapt_to_purchase_error
+from nti.store.payments.stripe.processor.coupon import CouponProcessor
 
-from ..interfaces import IStripeCustomer
-from ..interfaces import RegisterStripeToken
-from ..interfaces import RegisterStripeCharge
-from ..interfaces import IStripePurchaseAttempt
+from nti.store.payments.stripe.processor.pricing import price_order
+from nti.store.payments.stripe.processor.pricing import PricingProcessor
 
-from .coupon import CouponProcessor
+from nti.store.payments.stripe.stripe_customer import StripeCustomer
+from nti.store.payments.stripe.stripe_customer import create_customer
 
-from .pricing import price_order
-from .pricing import PricingProcessor
+from nti.store.payments.stripe.stripe_io import create_charge
+from nti.store.payments.stripe.stripe_io import update_charge
+
+from nti.store.payments.stripe.utils import get_charge_metata
+from nti.store.payments.stripe.utils import create_payment_charge
+from nti.store.payments.stripe.utils import adapt_to_purchase_error
+
+from nti.store.store import get_purchase_attempt
 
 def get_transaction_runner():
 	result = component.getUtility(IDataserverTransactionRunner)
@@ -75,20 +74,20 @@ def _start_purchase(purchase_id, token, username=None):
 		customer_id = adapted.customer_id if adapted else None
 
 	context = purchase.Context
-	order = purchase.Order.copy() # make a copy of the order
+	order = purchase.Order.copy()  # make a copy of the order
 	description = purchase.Description or purchase.id
 	metadata = get_charge_metata(purchase_id, username=username,
 								 context=context, customer_id=customer_id)
 	return (order, metadata, description, customer_id)
 
-def _execute_stripe_charge(	purchase_id, cents_amount, currency, card,
+def _execute_stripe_charge(purchase_id, cents_amount, currency, card,
 							application_fee=None, customer_id=None,
 							metadata=None, description=None, api_key=None):
 	logger.info('Creating stripe charge for %s', purchase_id)
 	metadata = metadata or {}
 
 	description = description or purchase_id
-	charge = create_charge(	cents_amount, currency=currency,
+	charge = create_charge(cents_amount, currency=currency,
 							card=card, metadata=metadata,
 							customer_id=customer_id,
 							application_fee=application_fee,
@@ -300,7 +299,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
 		return charge.id if charge is not None else None
 
 	def get_payment_charge(self, purchase, username=None, api_key=None):
-		purchase_id = purchase # save original
+		purchase_id = purchase  # save original
 		if isinstance(purchase, six.string_types):
 			purchase = get_purchase_attempt(purchase, username)
 
