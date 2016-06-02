@@ -83,7 +83,7 @@ def _start_purchase(purchase_id, token, username=None):
 def _execute_stripe_charge(purchase_id, cents_amount, currency, card,
 							application_fee=None, customer_id=None,
 							metadata=None, description=None, api_key=None):
-	logger.info('Creating stripe charge for %s', purchase_id)
+	logger.info('Creating stripe charge for %s (metadata=%s)', purchase_id, metadata)
 	metadata = metadata or {}
 
 	description = description or purchase_id
