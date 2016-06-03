@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Stripe base processor functionalilty.
-
 .. $Id$
 """
 
@@ -15,15 +13,15 @@ from zope import component
 
 from nti.common.maps import CaseInsensitiveDict
 
-from ....purchase_attempt import get_providers
+from nti.store.payments.stripe import STRIPE
 
-from ..stripe_io import StripeIO
-from ..stripe_io import get_stripe_charges
-from ..stripe_io import create_stripe_token
+from nti.store.payments.stripe.stripe_io import StripeIO
+from nti.store.payments.stripe.stripe_io import get_stripe_charges
+from nti.store.payments.stripe.stripe_io import create_stripe_token
 
-from ..interfaces import IStripeConnectKey
+from nti.store.payments.stripe.interfaces import IStripeConnectKey
 
-from .. import STRIPE
+from nti.store.purchase_attempt import get_providers
 
 def get_api_key(purchase):
 	providers = get_providers(purchase)
@@ -40,17 +38,16 @@ def get_charges(purchase_id=None, username=None, customer=None,
 									 end_time=end_time,
 									 api_key=api_key):
 		
+		description = charge.description
 		metadata = CaseInsensitiveDict(charge.metadata or {})
-		if  (purchase_id and metadata.get('PurchaseID') == purchase_id) or \
-			(customer and metadata.get('CustomerID') == customer) or \
-			(username and metadata.get('Username') == username):
+		if  	(purchase_id and metadata.get('PurchaseID') == purchase_id) \
+			or 	(customer and metadata.get('CustomerID') == customer) \
+			or 	(username and metadata.get('Username') == username):
 			result.append(charge)
-		else:
-			## legacy
-			desc = charge.description
-			if  (purchase_id and purchase_id in desc) or \
-				(username and username in desc) or \
-				(customer and customer in desc):
+		elif description: ## legacy
+			if  	(purchase_id and purchase_id in description) \
+				or 	(username and username in description) \
+				or 	(customer and customer in description):
 				result.append(charge)
 	return result
 

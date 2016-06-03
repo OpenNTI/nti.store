@@ -53,6 +53,7 @@ from nti.store.payments.stripe.utils import create_payment_charge
 from nti.store.payments.stripe.utils import adapt_to_purchase_error
 
 from nti.store.store import get_purchase_attempt
+from nti.store.store import get_purchase_purchasables
 
 def get_transaction_runner():
 	result = component.getUtility(IDataserverTransactionRunner)
@@ -75,8 +76,8 @@ def _start_purchase(purchase_id, token, username=None):
 
 	context = purchase.Context
 	order = purchase.Order.copy()  # make a copy of the order
-	# description = u'' # purchase.Description or purchase.id
-	description = None # Remove Description due to char limit
+	purchasables = get_purchase_purchasables(purchase)
+	description = purchase.Description or (purchasables[0].Title if purchasables else None)
 	metadata = get_charge_metata(purchase_id, username=username,
 								 context=context, customer_id=customer_id)
 	return (order, metadata, description, customer_id)
@@ -86,6 +87,7 @@ def _execute_stripe_charge(purchase_id, cents_amount, currency, card,
 						   metadata=None, description=None, api_key=None):
 	logger.info('Creating stripe charge for %s (metadata=%s)', purchase_id, metadata)
 	metadata = metadata or {}
+	description = description or None
 	charge = create_charge(cents_amount, currency=currency,
 						   card=card, metadata=metadata,
 						   customer_id=customer_id,
