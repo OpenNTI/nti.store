@@ -75,7 +75,8 @@ def _start_purchase(purchase_id, token, username=None):
 
 	context = purchase.Context
 	order = purchase.Order.copy()  # make a copy of the order
-	description = purchase.Description or purchase.id
+	# description = u'' # purchase.Description or purchase.id
+	description = u'' # Remove Description due to char limit
 	metadata = get_charge_metata(purchase_id, username=username,
 								 context=context, customer_id=customer_id)
 	return (order, metadata, description, customer_id)
