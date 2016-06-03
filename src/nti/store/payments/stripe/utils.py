@@ -55,8 +55,6 @@ def get_charge_metata(purchase_id, username=None,
 	"""
 	context = to_external_object(context) if context else None
 	data = {'PurchaseID': purchase_id}
-	if username:
-		data['Username'] = username
 	if customer_id:
 		data['CustomerID'] = customer_id
 
