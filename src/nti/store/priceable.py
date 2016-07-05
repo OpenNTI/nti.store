@@ -70,9 +70,9 @@ class Priceable(SchemaConfigured):
 	def __str__(self):
 		return self.NTIID
 
-def create_priceable(ntiid, quantity=1):
+def create_priceable(ntiid, quantity=1, factory=Priceable):
 	quantity = 1 if quantity is None else int(quantity)
-	result = Priceable(NTIID=unicode(ntiid), Quantity=quantity)
+	result = factory(NTIID=unicode(ntiid), Quantity=quantity)
 	return result
 
 def copy_priceable(source, *args, **kwargs):
