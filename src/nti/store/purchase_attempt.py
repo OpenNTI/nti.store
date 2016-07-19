@@ -32,10 +32,10 @@ from nti.coremetadata.interfaces import ICreated
 
 from nti.common.property import alias
 
-from nti.dataserver.datastructures import ModDateTrackingObject
-
 from nti.dataserver.users.interfaces import IUserProfile
 from nti.dataserver.users.user_profile import get_searchable_realname_parts
+
+from nti.dublincore.time_mixins import ModifiedTimeMixin as ModDateTrackingObject
 
 from nti.externalization.interfaces import IInternalObjectExternalizer
 
