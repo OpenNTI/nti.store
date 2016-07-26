@@ -14,12 +14,12 @@ from zope import interface
 
 from zope.intid.interfaces import IIntIds
 
-from nti.common.integer_strings import to_external_string
-from nti.common.integer_strings import from_external_string
-
 from nti.common.property import alias
 
 from nti.common.proxy import removeAllProxies
+
+from nti.externalization.integer_strings import to_external_string
+from nti.externalization.integer_strings import from_external_string
 
 from nti.externalization.oids import to_external_ntiid_oid
 
