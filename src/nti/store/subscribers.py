@@ -23,9 +23,9 @@ from zope.event import notify
 
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 
-from nti.common.proxy import removeAllProxies
-
 from nti.dataserver.interfaces import IUser
+
+from nti.externalization.proxy import removeAllProxies
 
 from nti.store import MessageFactory as _
 
