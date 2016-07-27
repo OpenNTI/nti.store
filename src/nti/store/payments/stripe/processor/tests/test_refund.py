@@ -18,7 +18,7 @@ from zope import component
 
 from zope.intid.interfaces import IIntIds
 
-from nti.common import integer_strings
+from nti.externalization import integer_strings
 
 from nti.store import purchase_history
 from nti.store import interfaces as store_interfaces
