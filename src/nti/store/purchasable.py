@@ -29,10 +29,10 @@ from nti.externalization.interfaces import IInternalObjectExternalizer
 
 from nti.externalization.representation import WithRepr
 
+from nti.schema.eqhash import EqHash
+
 from nti.schema.fieldproperty import AdaptingFieldProperty
 from nti.schema.fieldproperty import createDirectFieldProperties
-
-from nti.schema.schema import EqHash
 
 from nti.store.item_bundle import ItemBundle
 

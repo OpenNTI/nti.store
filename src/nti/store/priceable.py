@@ -17,11 +17,11 @@ from zope.mimetype.interfaces import IContentTypeAware
 
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
-from nti.common.representation import WithRepr
+from nti.externalization.representation import WithRepr
+
+from nti.schema.eqhash import EqHash
 
 from nti.schema.field import SchemaConfigured
-
-from nti.schema.schema import EqHash
 
 from nti.store.interfaces import IPriceable
 

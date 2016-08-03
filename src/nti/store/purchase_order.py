@@ -23,9 +23,9 @@ from nti.common.property import CachedProperty
 
 from nti.externalization.representation import WithRepr
 
-from nti.schema.field import SchemaConfigured
+from nti.schema.eqhash import EqHash
 
-from nti.schema.schema import EqHash
+from nti.schema.field import SchemaConfigured
 
 from nti.store.interfaces import IPriceable
 from nti.store.interfaces import IPurchaseItem

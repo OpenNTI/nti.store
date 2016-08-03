@@ -47,10 +47,11 @@ from nti.mimetype.mimetype import MIME_BASE
 
 from nti.ntiids.ntiids import find_object_with_ntiid
 
-from nti.schema.field import SchemaConfigured
-from nti.schema.fieldproperty import createDirectFieldProperties
+from nti.schema.eqhash import EqHash
 
-from nti.schema.schema import EqHash
+from nti.schema.field import SchemaConfigured
+
+from nti.schema.fieldproperty import createDirectFieldProperties
 
 from nti.store.interfaces import PA_STATE_FAILED
 from nti.store.interfaces import PA_STATE_FAILURE

@@ -13,7 +13,7 @@ from zope import interface
 
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
-from nti.schema.schema import EqHash
+from nti.schema.eqhash import EqHash
 
 from nti.store.payments.stripe.interfaces import IStripePriceable
 from nti.store.payments.stripe.interfaces import IStripePricedItem
