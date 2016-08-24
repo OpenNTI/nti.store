@@ -15,9 +15,9 @@ from zope import interface
 
 from zope.annotation.interfaces import IAttributeAnnotatable
 
-from nti.common.property import alias
-
 from nti.externalization.representation import WithRepr
+
+from nti.property.property import alias
 
 from nti.schema.eqhash import EqHash
 

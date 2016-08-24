@@ -14,8 +14,6 @@ from zope import interface
 
 from zope.intid.interfaces import IIntIds
 
-from nti.common.property import alias
-
 from nti.externalization.integer_strings import to_external_string
 from nti.externalization.integer_strings import from_external_string
 
@@ -30,6 +28,8 @@ from nti.invitations.interfaces import InvitationAlreadyAcceptedError
 from nti.invitations.model import Invitation
 
 from nti.ntiids.ntiids import find_object_with_ntiid
+
+from nti.property.property import alias
 
 from nti.schema.fieldproperty import createDirectFieldProperties
 
