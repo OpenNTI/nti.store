@@ -30,8 +30,6 @@ import BTrees
 
 from nti.coremetadata.interfaces import ICreated
 
-from nti.common.property import alias
-
 from nti.dataserver.users.interfaces import IUserProfile
 from nti.dataserver.users.user_profile import get_searchable_realname_parts
 
@@ -46,6 +44,8 @@ from nti.externalization.representation import WithRepr
 from nti.mimetype.mimetype import MIME_BASE
 
 from nti.ntiids.ntiids import find_object_with_ntiid
+
+from nti.property.property import alias
 
 from nti.schema.eqhash import EqHash
 

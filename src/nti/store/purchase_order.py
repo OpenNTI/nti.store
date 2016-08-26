@@ -19,9 +19,9 @@ from zope.annotation.interfaces import IAttributeAnnotatable
 
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
-from nti.common.property import CachedProperty
-
 from nti.externalization.representation import WithRepr
+
+from nti.property.property import CachedProperty
 
 from nti.schema.eqhash import EqHash
 

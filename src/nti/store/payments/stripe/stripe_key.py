@@ -13,9 +13,9 @@ from zope import interface
 
 from zope.mimetype.interfaces import IContentTypeAware
 
-from nti.common.property import alias as _a
-
 from nti.externalization.representation import WithRepr
+
+from nti.property.property import alias as _a
 
 from nti.schema.eqhash import EqHash
 

@@ -18,8 +18,6 @@ from zope.location.interfaces import IContained
 
 from zope.mimetype.interfaces import IContentTypeAware
 
-from nti.common.property import alias
-
 from nti.dataserver.interfaces import SYSTEM_USER_ID
 
 from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
@@ -28,6 +26,8 @@ from nti.externalization.interfaces import LocatedExternalList
 from nti.externalization.interfaces import IInternalObjectExternalizer
 
 from nti.externalization.representation import WithRepr
+
+from nti.property.property import alias
 
 from nti.schema.eqhash import EqHash
 

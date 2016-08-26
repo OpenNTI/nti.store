@@ -22,9 +22,9 @@ from zope.container.contained import Contained
 
 from persistent import Persistent
 
-from nti.common.property import alias
-
 from nti.dataserver.interfaces import IUser
+
+from nti.property.property import alias
 
 from nti.store.interfaces import IPurchaseAttempt
 

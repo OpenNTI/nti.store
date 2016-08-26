@@ -11,9 +11,9 @@ __docformat__ = "restructuredtext en"
 
 from zope import interface
 
-from nti.common.property import alias as _alias
-
 from nti.dataserver.interfaces import IUser
+
+from nti.property.property import alias as _alias
 
 from nti.schema.field import Int
 from nti.schema.field import Set
