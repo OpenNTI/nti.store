@@ -167,8 +167,7 @@ def get_gift_purchase_history(username, start_time=None, end_time=None, catalog=
 		IX_MIMETYPE: {'any_of': GIFT_PURCHASE_ATTEMPT_MIME_TYPES}
 	}
 	doc_ids = catalog.apply(query) or ()
-	result = LocatedExternalList(ResultSet(doc_ids, intids, ignore_invalid=True))
-	return result
+	return LocatedExternalList(ResultSet(doc_ids, intids, True))
 
 def register_gift_purchase_attempt(username, purchase):
 	registry = get_gift_registry()

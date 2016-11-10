@@ -258,7 +258,7 @@ def get_purchase_history(user, start_time=None, end_time=None, catalog=None):
 			IX_CREATEDTIME: {'between': (start_time, end_time)}
 		}
 		doc_ids = catalog.apply(query) or ()
-		result = LocatedExternalList(ResultSet(doc_ids, intids, ignore_invalid=True))
+		result = LocatedExternalList(ResultSet(doc_ids, intids, True))
 	return result
 
 def get_purchase_ids_by_items(user, *purchasables):
@@ -278,7 +278,7 @@ def get_purchase_history_by_item(user, purchasable_id):
 	else:
 		intids = component.getUtility(IIntIds)
 		doc_ids = get_purchase_ids_by_items(user, purchasable_id)
-		result = LocatedExternalList(ResultSet(doc_ids, intids, ignore_invalid=True))
+		result = LocatedExternalList(ResultSet(doc_ids, intids, True))
 	return result
 
 def has_history_by_item(user, purchasable_id):
