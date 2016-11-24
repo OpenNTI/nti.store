@@ -9,6 +9,8 @@
 	<include package="zope.component" />
 	<include package="zope.security" />
 	
+	<include package="nti.contentlibrary" />
+	
 	<!-- Generations -->
 	<utility factory=".generations.install._StoreSchemaManager"
 			 name="nti.dataserver-store"

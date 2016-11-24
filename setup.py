@@ -30,7 +30,8 @@ setup(
 	namespace_packages=['nti'],
 	install_requires=[
 		'setuptools',
-		'stripe'
+		'stripe',
+		'nti.contentlibrary'
 	],
 	entry_points=entry_points
 )
