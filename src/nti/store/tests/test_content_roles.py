@@ -34,6 +34,7 @@ class TestContentRoles(unittest.TestCase):
 
 	def setUp(self):
 		library = FileLibrary(os.path.join(os.path.dirname(__file__), 'library'))
+		library.syncContentPackages()
 		component.provideUtility(library, lib_interfaces.IFilesystemContentPackageLibrary)
 
 	def _create_user(self, username='nt@nti.com', password='temp001'):
