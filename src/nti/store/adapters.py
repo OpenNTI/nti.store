@@ -15,7 +15,7 @@ from zope import interface
 from dolmen.builtins import IDict
 from dolmen.builtins import IString
 
-from nti.common.string import to_unicode
+from nti.base._compat import to_unicode
 
 from nti.store.interfaces import IRefundError
 from nti.store.interfaces import IPricingError
