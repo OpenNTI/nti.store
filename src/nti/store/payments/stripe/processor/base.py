@@ -9,9 +9,9 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-from zope import component
+from requests.structures import CaseInsensitiveDict
 
-from nti.common.maps import CaseInsensitiveDict
+from zope import component
 
 from nti.store.payments.stripe import STRIPE
 
