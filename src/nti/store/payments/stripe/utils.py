@@ -14,7 +14,7 @@ import time
 
 from zope import component
 
-from nti.common.string import safestr
+from nti.base._compat import unicode_
 
 from nti.externalization.externalization import to_external_object
 
@@ -42,7 +42,7 @@ def flatten_context(context=None):
 	for k, v in context.items():
 		if v is not None and not isinstance(v, six.string_types):
 			v = str(v)
-		v = safestr(v) if v else v
+		v = unicode_(v) if v else v
 		if not v:
 			continue
 		result[k] = v[:500]  # stripe requirement
