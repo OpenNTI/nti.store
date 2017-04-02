@@ -23,16 +23,18 @@ from nti.store.interfaces import IRedemptionError
 
 from nti.store.utils import MetaStoreObject
 
+
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
 @interface.implementer(IRedemptionError)
 class RedemptionError(SchemaConfigured):
-	__metaclass__ = MetaStoreObject
-	createDirectFieldProperties(IRedemptionError)
+    __metaclass__ = MetaStoreObject
+    createDirectFieldProperties(IRedemptionError)
 
-	def __str__(self):
-		return self.Message
+    def __str__(self):
+        return self.Message
+
 
 def create_redemption_error(message, type_=None, code=None):
-	result = RedemptionError(Message=message, Type=type_, Code=code)
-	return result
+    result = RedemptionError(Message=message, Type=type_, Code=code)
+    return result

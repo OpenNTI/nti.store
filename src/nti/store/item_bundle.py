@@ -28,16 +28,17 @@ from nti.schema.fieldproperty import createDirectFieldProperties
 
 from nti.store.interfaces import IItemBundle
 
+
 @WithRepr
 @EqHash('NTIID',)
 @interface.implementer(IItemBundle, IAttributeAnnotatable)
 class ItemBundle(SchemaConfigured):
+    createDirectFieldProperties(IItemBundle)
 
-	createDirectFieldProperties(IItemBundle)
-	Description = AdaptingFieldProperty(IItemBundle['Description'])
+    Description = AdaptingFieldProperty(IItemBundle['Description'])
 
-	id = ntiid = alias('NTIID')
+    id = ntiid = alias('NTIID')
 
-	def __str__(self):
-		return self.NTIID
+    def __str__(self):
+        return self.NTIID
 ContentBundle = ItemBundle  # BWC

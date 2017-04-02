@@ -29,58 +29,62 @@ from nti.store.purchasable import get_purchasable
 
 from nti.store.utils import MetaStoreObject
 
+
 @WithRepr
 @EqHash('NTIID', 'Quantity')
 @interface.implementer(IPriceable, IContentTypeAware)
 class Priceable(SchemaConfigured):
 
-	__metaclass__ = MetaStoreObject
+    __metaclass__ = MetaStoreObject
 
-	NTIID = FP(IPriceable['NTIID'])
-	Quantity = FP(IPriceable['Quantity'])
+    NTIID = FP(IPriceable['NTIID'])
+    Quantity = FP(IPriceable['Quantity'])
 
-	def copy(self, *args, **kwargs):
-		return copy_priceable(self, *args, **kwargs)
+    def copy(self, *args, **kwargs):
+        return copy_priceable(self, *args, **kwargs)
 
-	@property
-	def purchasable(self):
-		result = get_purchasable(self.NTIID)
-		return result
+    @property
+    def purchasable(self):
+        result = get_purchasable(self.NTIID)
+        return result
 
-	@property
-	def Currency(self):
-		result = getattr(self.purchasable, 'Currency', None)
-		return result
+    @property
+    def Currency(self):
+        result = getattr(self.purchasable, 'Currency', None)
+        return result
 
-	@property
-	def Provider(self):
-		result = getattr(self.purchasable, 'Provider', None)
-		return result
+    @property
+    def Provider(self):
+        result = getattr(self.purchasable, 'Provider', None)
+        return result
 
-	@property
-	def Amount(self):
-		result = getattr(self.purchasable, 'Amount', None)
-		return result
+    @property
+    def Amount(self):
+        result = getattr(self.purchasable, 'Amount', None)
+        return result
 
-	@property
-	def Fee(self):
-		result = getattr(self.purchasable, 'Fee', None)
-		return result
+    @property
+    def Fee(self):
+        result = getattr(self.purchasable, 'Fee', None)
+        return result
 
-	def __str__(self):
-		return self.NTIID
+    def __str__(self):
+        return self.NTIID
+
 
 def create_priceable(ntiid, quantity=1, factory=Priceable):
-	quantity = 1 if quantity is None else int(quantity)
-	result = factory(NTIID=unicode(ntiid), Quantity=quantity)
-	return result
+    quantity = 1 if quantity is None else int(quantity)
+    result = factory(NTIID=unicode(ntiid), Quantity=quantity)
+    return result
+
 
 def copy_priceable(source, *args, **kwargs):
-	quantity = kwargs.get('quantity')
-	ntiid = kwargs.get('ntiid') or source.NTIID
-	quantity = source.Quantity if quantity is None else quantity
-	result = source.__class__(NTIID=ntiid, Quantity=quantity)
-	return result
+    quantity = kwargs.get('quantity')
+    ntiid = kwargs.get('ntiid') or source.NTIID
+    quantity = source.Quantity if quantity is None else quantity
+    result = source.__class__(NTIID=ntiid, Quantity=quantity)
+    return result
+
 
 def _priceable_copier(context):
-	return copy_priceable
+    return copy_priceable

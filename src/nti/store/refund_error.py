@@ -23,16 +23,18 @@ from nti.store.interfaces import IRefundError
 
 from nti.store.utils import MetaStoreObject
 
+
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
 @interface.implementer(IRefundError)
 class RefundError(SchemaConfigured):
-	__metaclass__ = MetaStoreObject
-	createDirectFieldProperties(IRefundError)
+    __metaclass__ = MetaStoreObject
+    createDirectFieldProperties(IRefundError)
 
-	def __str__(self):
-		return self.Message
+    def __str__(self):
+        return self.Message
+
 
 def create_refudn_error(message, type_=None, code=None):
-	result = RefundError(Message=message, Type=type_, Code=code)
-	return result
+    result = RefundError(Message=message, Type=type_, Code=code)
+    return result

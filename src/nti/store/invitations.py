@@ -41,112 +41,122 @@ from nti.store.interfaces import IStorePurchaseInvitationActor
 
 from nti.store.redeem import make_redeem_purchase_attempt
 
-InvitationExpired = InvitationExpiredError # BWC
-InvitationAlreadyAccepted = InvitationAlreadyAcceptedError # BWC
+InvitationExpired = InvitationExpiredError  # BWC
+InvitationAlreadyAccepted = InvitationAlreadyAcceptedError  # BWC
+
 
 class InvitationCapacityExceeded(InvitationValidationError):
-	__doc__ = _("The limit for this invitation code has been exceeded.")
-	i18n_message = __doc__
+    __doc__ = _("The limit for this invitation code has been exceeded.")
+    i18n_message = __doc__
+
 
 @interface.implementer(IStorePurchaseInvitation)
 class StorePurchaseInvitation(Invitation):
-	createDirectFieldProperties(IStorePurchaseInvitation)
+    createDirectFieldProperties(IStorePurchaseInvitation)
 
-	mimeType = mime_type = u'application/vnd.nextthought.store.purchaseinvitation'
+    mimeType = mime_type = u'application/vnd.nextthought.store.purchaseinvitation'
 
-	target = alias('redeemed_purchase')
-	purchase = source = alias('source_purchase')
+    target = alias('redeemed_purchase')
+    purchase = source = alias('source_purchase')
 
-	_source_purchase = None
-	_redeemed_purchase = None
+    _source_purchase = None
+    _redeemed_purchase = None
 
-	def __init__(self, purchase, **kwargs):
-		super(StorePurchaseInvitation, self).__init__(**kwargs)
-		self.source_purchase = purchase
+    def __init__(self, purchase, **kwargs):
+        super(StorePurchaseInvitation, self).__init__(**kwargs)
+        self.source_purchase = purchase
 
-	def _getSourcePurchase(self):
-		if self._source_purchase:
-			return find_object_with_ntiid(self._source_purchase)
-		return None
+    def _getSourcePurchase(self):
+        if self._source_purchase:
+            return find_object_with_ntiid(self._source_purchase)
+        return None
 
-	def _setSourcePurchase(self, nv):
-		if IPurchaseAttempt.providedBy(nv):
-			self._source_purchase = to_external_ntiid_oid(nv)
-		else:
-			self._source_purchase = nv
+    def _setSourcePurchase(self, nv):
+        if IPurchaseAttempt.providedBy(nv):
+            self._source_purchase = to_external_ntiid_oid(nv)
+        else:
+            self._source_purchase = nv
 
-	source_purchase = invitation_purchase = property(_getSourcePurchase,
-										  			 _setSourcePurchase)
+    source_purchase = invitation_purchase = property(_getSourcePurchase,
+                                                     _setSourcePurchase)
 
-	def _getRedeemedPurchase(self):
-		if self._redeemed_purchase:
-			return find_object_with_ntiid(self._redeemed_purchase)
-		return None
+    def _getRedeemedPurchase(self):
+        if self._redeemed_purchase:
+            return find_object_with_ntiid(self._redeemed_purchase)
+        return None
 
-	def _setRedeemedPurchase(self, nv):
-		if IPurchaseAttempt.providedBy(nv):
-			self._redeemed_purchase = to_external_ntiid_oid(nv)
-		else:
-			self._redeemed_purchase = nv
+    def _setRedeemedPurchase(self, nv):
+        if IPurchaseAttempt.providedBy(nv):
+            self._redeemed_purchase = to_external_ntiid_oid(nv)
+        else:
+            self._redeemed_purchase = nv
 
-	redeemed_purchase = linked_purchase = property(_getRedeemedPurchase,
-												   _setRedeemedPurchase)
+    redeemed_purchase = linked_purchase = property(_getRedeemedPurchase,
+                                                   _setRedeemedPurchase)
 
-_StorePurchaseInvitation = StorePurchaseInvitation # BWC
+
+_StorePurchaseInvitation = StorePurchaseInvitation  # BWC
+
 
 def get_invitation_code(purchase):
-	if purchase is not None:
-		iid = component.getUtility(IIntIds).getId(removeAllProxies(purchase))
-		__traceback_info__ = purchase, iid
-		result = to_external_string(iid)
-		return result
-	return None
+    if purchase is not None:
+        iid = component.getUtility(IIntIds).getId(removeAllProxies(purchase))
+        __traceback_info__ = purchase, iid
+        result = to_external_string(iid)
+        return result
+    return None
+
 
 def get_purchase_by_code(code):
-	if code is not None:
-		__traceback_info__ = code
-		iid = from_external_string(code)
-		result = component.getUtility(IIntIds).queryObject(iid)
-		return result
-	return None
+    if code is not None:
+        __traceback_info__ = code
+        iid = from_external_string(code)
+        result = component.getUtility(IIntIds).queryObject(iid)
+        return result
+    return None
+
 
 def create_store_purchase_invitation(purchase, receiver):
-	result = StorePurchaseInvitation(purchase=purchase)
-	result.receiver = getattr(receiver, 'username', receiver)
-	result.expirationTime = getattr(purchase, 'ExpirationTime', None) or 0
-	result.creator = getattr(purchase.creator, 'username', purchase.creator) # sender
-	return result
+    result = StorePurchaseInvitation(purchase=purchase)
+    result.receiver = getattr(receiver, 'username', receiver)
+    result.expirationTime = getattr(purchase, 'ExpirationTime', None) or 0
+    result.creator = getattr(
+        purchase.creator, 'username', purchase.creator)  # sender
+    return result
+
 
 @interface.implementer(IStorePurchaseInvitationActor)
 class StorePurchaseInvitationActor(object):
 
-	def __init__(self, invitation=None):
-		self.invitation = invitation
+    def __init__(self, invitation=None):
+        self.invitation = invitation
 
-	def accept(self, user, invitation=None):
-		result = True
-		invitation = self.invitation if invitation is None else invitation
-		purchase = invitation.source_purchase
-		if purchase.isExpired():
-			raise InvitationExpired(invitation)
-		original = invitation.purchase
+    def accept(self, user, invitation=None):
+        result = True
+        invitation = self.invitation if invitation is None else invitation
+        purchase = invitation.source_purchase
+        if purchase.isExpired():
+            raise InvitationExpired(invitation)
+        original = invitation.purchase
 
-		# XXX This is the redemption code to be used to link back to the
-		# invitaion purchase. See refund subscribers
-		redemption_code = get_invitation_code(purchase)
+        # XXX This is the redemption code to be used to link back to the
+        # invitaion purchase. See refund subscribers
+        redemption_code = get_invitation_code(purchase)
 
-		# create and register a purchase attempt for accepting user
-		redeemed_purchase = make_redeem_purchase_attempt(user, original, redemption_code)
+        # create and register a purchase attempt for accepting user
+        redeemed_purchase = make_redeem_purchase_attempt(user, 
+														 original, 
+														 redemption_code)
 
-		if not purchase.register(user, redeemed_purchase):
-			raise InvitationAlreadyAccepted(invitation)
+        if not purchase.register(user, redeemed_purchase):
+            raise InvitationAlreadyAccepted(invitation)
 
-		if not purchase.consume_token():
-			raise InvitationCapacityExceeded(invitation)
+        if not purchase.consume_token():
+            raise InvitationCapacityExceeded(invitation)
 
-		invitation.redeemed_purchase = redeemed_purchase
+        invitation.redeemed_purchase = redeemed_purchase
 
-		logger.info('Invitation %s has been accepted with purchase %s',
-					invitation.code, redeemed_purchase)
+        logger.info('Invitation %s has been accepted with purchase %s',
+                    invitation.code, redeemed_purchase)
 
-		return result
+        return result

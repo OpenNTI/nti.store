@@ -15,8 +15,6 @@ from zope.intid.interfaces import IIntIds
 
 from zope.location import locate
 
-from nti.dataserver.interfaces import ICreatedUsername
-
 from nti.store import CATALOG_NAME
 
 from nti.store.interfaces import IPurchaseAttempt
@@ -43,106 +41,121 @@ IX_REV_ITEMS = 'revItems'
 IX_REDEMPTION_CODE = 'redemptionCode'
 IX_STARTTIME = IX_CREATEDTIME = 'startTime'
 
+
 class MimeTypeIndex(ValueIndex):
-	default_field_name = 'mimeType'
-	default_interface = IPurchaseAttempt
+    default_field_name = 'mimeType'
+    default_interface = IPurchaseAttempt
+
 
 class RedemptionCodeIndex(ValueIndex):
-	default_field_name = 'RedemptionCode'
-	default_interface = IRedeemedPurchaseAttempt
+    default_field_name = 'RedemptionCode'
+    default_interface = IRedeemedPurchaseAttempt
+
 
 class ValidatingCreator(object):
 
-	__slots__ = (b'creator',)
+    __slots__ = (b'creator',)
 
-	def __init__(self, obj, default=None):
-		try:
-			if IPurchaseAttempt.providedBy(obj):
-				self.creator = ICreatedUsername(obj).creator_username
-		except (AttributeError, TypeError):
-			pass
+    def __init__(self, obj, default=None):
+        try:
+            if IPurchaseAttempt.providedBy(obj):
+                username = getattr(obj.creator, 'username', obj.creator)
+                username = getattr(username, 'id', username)
+                self.creator = username
+        except (AttributeError, TypeError):
+            pass
 
-	def __reduce__(self):
-		raise TypeError()
+    def __reduce__(self):
+        raise TypeError()
+
 
 def CreatorIndex(family=None):
-	return NormalizationWrapper(field_name='creator',
-								interface=ValidatingCreator,
-								index=RawValueIndex(family=family),
-								normalizer=StringTokenNormalizer())
+    return NormalizationWrapper(field_name='creator',
+                                interface=ValidatingCreator,
+                                index=RawValueIndex(family=family),
+                                normalizer=StringTokenNormalizer())
+
 
 class ItemsRawIndex(RawSetIndex):
-	pass
+    pass
+
 
 def ItemsIndex(family=None):
-	return NormalizationWrapper(field_name='Items',
-								interface=IPurchaseAttempt,
-								normalizer=StringTokenNormalizer(),
-								index=ItemsRawIndex(family=family),
-								is_collection=True)
+    return NormalizationWrapper(field_name='Items',
+                                interface=IPurchaseAttempt,
+                                normalizer=StringTokenNormalizer(),
+                                index=ItemsRawIndex(family=family),
+                                is_collection=True)
+
 
 class StartTimeRawIndex(RawIntegerValueIndex):
-	pass
+    pass
+
 
 def StartTimeIndex(family=None):
-	return NormalizationWrapper(field_name='StartTime',
-								interface=IPurchaseAttempt,
-								index=StartTimeRawIndex(family=family),
-								normalizer=TimestampToNormalized64BitIntNormalizer())
+    return NormalizationWrapper(field_name='StartTime',
+                                interface=IPurchaseAttempt,
+                                index=StartTimeRawIndex(family=family),
+                                normalizer=TimestampToNormalized64BitIntNormalizer())
 
 
 class StateRawIndex(RawValueIndex):
-	pass
+    pass
+
 
 def StateIndex(family=None):
-	return NormalizationWrapper(field_name='State',
-								interface=IPurchaseAttempt,
-								index=StateRawIndex(family=family),
-								normalizer=StringTokenNormalizer())
+    return NormalizationWrapper(field_name='State',
+                                interface=IPurchaseAttempt,
+                                index=StateRawIndex(family=family),
+                                normalizer=StringTokenNormalizer())
+
 
 class RevItems(object):
 
-	__slots__ = (b'context',)
+    __slots__ = (b'context',)
 
-	def __init__(self, context, default=None):
-		self.context = context
+    def __init__(self, context, default=None):
+        self.context = context
 
-	@property
-	def items(self):
-		if IPurchaseAttempt.providedBy(self.context):
-			result = self.context.Items
-			return result
+    @property
+    def items(self):
+        if IPurchaseAttempt.providedBy(self.context):
+            result = self.context.Items
+            return result
+
 
 def RevItemsIndex(family=None):
-	return AttributeKeywordIndex(field_name='items',
-								 interface=RevItems,
-								 family=family)
+    return AttributeKeywordIndex(field_name='items',
+                                 interface=RevItems,
+                                 family=family)
+
 
 class StoreCatalog(Catalog):
-	pass
+    pass
+
 
 def install_purchase_catalog(site_manager_container, intids=None):
-	lsm = site_manager_container.getSiteManager()
-	intids = intids if intids is not None else lsm.getUtility(IIntIds)
-	catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME)
-	if catalog is not None:
-		return catalog
+    lsm = site_manager_container.getSiteManager()
+    intids = intids if intids is not None else lsm.getUtility(IIntIds)
+    catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME)
+    if catalog is not None:
+        return catalog
 
-	catalog = StoreCatalog(family=intids.family)
-	catalog.__name__ = CATALOG_NAME
-	catalog.__parent__ = site_manager_container
-	intids.register(catalog)
-	lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_NAME)
+    catalog = StoreCatalog(family=intids.family)
+    catalog.__name__ = CATALOG_NAME
+    catalog.__parent__ = site_manager_container
+    intids.register(catalog)
+    lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_NAME)
 
-	for name, clazz in ((IX_ITEMS, ItemsIndex),
-						(IX_STATE, StateIndex),
-						(IX_CREATOR, CreatorIndex),
-						(IX_MIMETYPE, MimeTypeIndex),
-						(IX_REV_ITEMS, RevItemsIndex),
-						(IX_CREATEDTIME, StartTimeIndex),
-						(IX_REDEMPTION_CODE, RedemptionCodeIndex)):
-		index = clazz(family=intids.family)
-		intids.register(index)
-		locate(index, catalog, name)
-		catalog[name] = index
-	return catalog
+    for name, clazz in ((IX_ITEMS, ItemsIndex),
+                        (IX_STATE, StateIndex),
+                        (IX_CREATOR, CreatorIndex),
+                        (IX_MIMETYPE, MimeTypeIndex),
+                        (IX_REV_ITEMS, RevItemsIndex),
+                        (IX_CREATEDTIME, StartTimeIndex),
+                        (IX_REDEMPTION_CODE, RedemptionCodeIndex)):
+        index = clazz(family=intids.family)
+        intids.register(index)
+        locate(index, catalog, name)
+        catalog[name] = index
+    return catalog

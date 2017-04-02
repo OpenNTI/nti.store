@@ -25,32 +25,35 @@ from nti.store.interfaces import IPurchaseHistory
 from nti.store.store import get_gift_registry
 from nti.store.store import get_all_purchasables
 
+
 @component.adapter(IUser)
 class _PurchaseAttemptPrincipalObjects(BasePrincipalObjects):
 
-	def iter_objects(self):
-		user = self.user
-		history = IPurchaseHistory(user)
-		for purchase in list(history):  # snapshot
-			yield purchase
+    def iter_objects(self):
+        user = self.user
+        history = IPurchaseHistory(user)
+        for purchase in list(history):  # snapshot
+            yield purchase
+
 
 @component.adapter(ISystemUserPrincipal)
 class _PurchasablesPrincipalObjects(BasePrincipalObjects):
 
-	def iter_objects(self):
-		seen = set()
-		for site in get_all_host_sites():
-			with current_site(site):
-				for purchasable in get_all_purchasables():
-					if purchasable.NTIID not in seen:
-						seen.add(purchasable.NTIID)
-						yield purchasable
+    def iter_objects(self):
+        seen = set()
+        for site in get_all_host_sites():
+            with current_site(site):
+                for purchasable in get_all_purchasables():
+                    if purchasable.NTIID not in seen:
+                        seen.add(purchasable.NTIID)
+                        yield purchasable
+
 
 @component.adapter(ISystemUserPrincipal)
 class _GiftPurchaseAttemptPrincipalObjects(BasePrincipalObjects):
 
-	def iter_objects(self, intids=None):
-		registry = get_gift_registry()
-		for username in list(registry.keys()):  # snapshot
-			for gift in registry.get_purchases(username):
-				yield gift
+    def iter_objects(self, intids=None):
+        registry = get_gift_registry()
+        for username in list(registry.keys()):  # snapshot
+            for gift in registry.get_purchases(username):
+                yield gift

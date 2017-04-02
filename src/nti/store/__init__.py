@@ -46,39 +46,50 @@ PURCHASABLE_CHOICE_BUNDLE = 'purchasable_choice_bundle'
 PURCHASABLE_COURSE_CHOICE_BUNDLE = 'purchasable_course_choice_bundle'
 
 #: Tuple of purchasable NTIID types
-PURCHASABLE_NTIID_TYPES = (PURCHASABLE, PURCHASABLE_COURSE, PURCHASABLE_CONTENT, 
-						   PURCHASABLE_CHOICE_BUNDLE, PURCHASABLE_COURSE_CHOICE_BUNDLE)
+PURCHASABLE_NTIID_TYPES = (PURCHASABLE, PURCHASABLE_COURSE, PURCHASABLE_CONTENT,
+                           PURCHASABLE_CHOICE_BUNDLE, PURCHASABLE_COURSE_CHOICE_BUNDLE)
 
 #: Purchases index name
 CATALOG_NAME = 'nti.dataserver.++etc++purchase-catalog'
 
+
 @interface.implementer(INTIStoreException)
 class NTIStoreException(Exception):
-	pass
+    pass
+
 
 class InvalidPurchasable(NTIStoreException):
-	pass
+    pass
+
 
 @interface.implementer(IPricingException)
 class PricingException(NTIStoreException):
-	pass
+    pass
+
 
 @interface.implementer(IPurchaseException)
 class PurchaseException(NTIStoreException):
-	pass
+    pass
+
 
 @interface.implementer(IRefundException)
 class RefundException(NTIStoreException):
-	pass
+    pass
+
 
 @interface.implementer(IRedemptionException)
 class RedemptionException(NTIStoreException):
-	pass
+    pass
+
 
 def get_user(user):
-	result = User.get_user(str(user)) if user and not IUser.providedBy(user) else user
-	return result
+    if user and not IUser.providedBy(user):
+        result = User.get_user(str(user))
+    else:
+        result = user
+    return result
+
 
 def get_purchase_catalog():
-	return component.getUtility(ICatalog, name=CATALOG_NAME)
+    return component.getUtility(ICatalog, name=CATALOG_NAME)
 get_catalog = get_purchase_catalog

@@ -33,96 +33,101 @@ from nti.store.interfaces import IPurchasableCourseChoiceBundle
 
 from nti.store.utils import to_frozenset
 
+
 @WithRepr
 @EqHash('NTIID',)
 @interface.implementer(IPurchasableCourse)
 class PurchasableCourse(Purchasable):
-	createDirectFieldProperties(IPurchasableCourse)
-	Description = AdaptingFieldProperty(IPurchasableCourse['Description'])
+    createDirectFieldProperties(IPurchasableCourse)
+    Description = AdaptingFieldProperty(IPurchasableCourse['Description'])
+
 
 @interface.implementer(IPurchasableCourseChoiceBundle)
 class PurchasableCourseChoiceBundle(PurchasableCourse):
-	__external_class_name__ = 'PurchasableCourseChoiceBundle'
-	IsPurchasable = False
+    __external_class_name__ = 'PurchasableCourseChoiceBundle'
+    IsPurchasable = False
+
 
 def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
-				  items=(), fee=None, title=None, license_=None, author=None,
-				  description=None, icon=None, thumbnail=None, discountable=False,
-				  bulk_purchase=False, public=True, giftable=False, redeemable=False,
-				  vendor_info=None, factory=PurchasableCourse,
-				  purchase_cutoff_date=None, redeem_cutoff_date=None,
-				  # deprecated / legacy
-				  communities=None, featured=False, preview=False,
-				  department=None, signature=None, startdate=None, **kwargs):
+                  items=(), fee=None, title=None, license_=None, author=None,
+                  description=None, icon=None, thumbnail=None, discountable=False,
+                  bulk_purchase=False, public=True, giftable=False, redeemable=False,
+                  vendor_info=None, factory=PurchasableCourse,
+                  purchase_cutoff_date=None, redeem_cutoff_date=None,
+                  # deprecated / legacy
+                  communities=None, featured=False, preview=False,
+                  department=None, signature=None, startdate=None, **kwargs):
 
-	if amount is not None and not provider:
-		raise AssertionError("Must specify a provider")
+    if amount is not None and not provider:
+        raise AssertionError("Must specify a provider")
 
-	if amount is not None and not currency:
-		raise AssertionError("Must specify a currency")
+    if amount is not None and not currency:
+        raise AssertionError("Must specify a currency")
 
-	fee = float(fee) if fee is not None else None
-	amount = float(amount) if amount is not None else amount
-	communities = to_frozenset(communities) if items else None
-	items = to_frozenset(items) if items else frozenset((ntiid,))
-	
-	def _parse_time(field):
-		result = field
-		if isinstance(field, (datetime.datetime, datetime.date)):
-			result = field.isoformat()
-		return result
-	startdate = _parse_time(startdate)
+    fee = float(fee) if fee is not None else None
+    amount = float(amount) if amount is not None else amount
+    communities = to_frozenset(communities) if items else None
+    items = to_frozenset(items) if items else frozenset((ntiid,))
 
-	vendor = DefaultPurchasableVendorInfo(vendor_info) \
-			 if vendor_info and isinstance(vendor_info, Mapping) else None
+    def _parse_time(field):
+        result = field
+        if isinstance(field, (datetime.datetime, datetime.date)):
+            result = field.isoformat()
+        return result
+    startdate = _parse_time(startdate)
 
-	result = factory()
+    vendor = DefaultPurchasableVendorInfo(vendor_info) \
+        if vendor_info and isinstance(vendor_info, Mapping) else None
 
-	# basic info
-	result.Name = name
-	result.NTIID = ntiid
-	result.Title = title
-	result.Items = items
-	result.Author = author
-	result.Provider = provider
-	result.Description = description
+    result = factory()
 
-	# cost
-	result.Fee = fee
-	result.Amount = amount
-	result.Currency = currency
+    # basic info
+    result.Name = name
+    result.NTIID = ntiid
+    result.Title = title
+    result.Items = items
+    result.Author = author
+    result.Provider = provider
+    result.Description = description
 
-	# flags
-	result.Public = public
-	result.Giftable = giftable
-	result.Redeemable = redeemable
-	result.Discountable = discountable
-	result.BulkPurchase = bulk_purchase
+    # cost
+    result.Fee = fee
+    result.Amount = amount
+    result.Currency = currency
 
-	# extras
-	result.Icon = icon
-	result.VendorInfo = vendor
-	result.Thumbnail = thumbnail
-	result.RedeemCutOffDate = redeem_cutoff_date
-	result.PurchaseCutOffDate = purchase_cutoff_date
+    # flags
+    result.Public = public
+    result.Giftable = giftable
+    result.Redeemable = redeemable
+    result.Discountable = discountable
+    result.BulkPurchase = bulk_purchase
 
-	# deprecated / legacy
-	result.Preview = preview
-	result.License = license_
-	result.Featured = featured
-	result.StartDate = startdate
-	result.Signature = signature
-	result.Department = department
-	result.Communities = communities
+    # extras
+    result.Icon = icon
+    result.VendorInfo = vendor
+    result.Thumbnail = thumbnail
+    result.RedeemCutOffDate = redeem_cutoff_date
+    result.PurchaseCutOffDate = purchase_cutoff_date
 
-	return result
+    # deprecated / legacy
+    result.Preview = preview
+    result.License = license_
+    result.Featured = featured
+    result.StartDate = startdate
+    result.Signature = signature
+    result.Department = department
+    result.Communities = communities
+
+    return result
+
 
 def get_course(course_id, registry=component):
-	result = get_purchasable(course_id, registry=registry)
-	return result
+    result = get_purchasable(course_id, registry=registry)
+    return result
+
 
 import zope.deferredimport
 zope.deferredimport.initialize()
 zope.deferredimport.deprecated(
-	"Use PurchasableCourse instead",
-	Course='nti.store.course:PurchasableCourse')
+    "Use PurchasableCourse instead",
+    Course='nti.store.course:PurchasableCourse')

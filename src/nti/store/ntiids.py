@@ -15,15 +15,16 @@ from nti.ntiids.interfaces import INTIIDResolver
 
 from nti.store.store import get_purchasable
 
+
 @interface.implementer(INTIIDResolver)
 class _PurchasableResolver(object):
 
-	singleton = None
+    singleton = None
 
-	def __new__(cls, *args, **kwargs):
-		if not cls.singleton:
-			cls.singleton = super(_PurchasableResolver, cls).__new__(cls)
-		return cls.singleton
+    def __new__(cls, *args, **kwargs):
+        if not cls.singleton:
+            cls.singleton = super(_PurchasableResolver, cls).__new__(cls)
+        return cls.singleton
 
-	def resolve(self, ntiid_string):
-		return get_purchasable(ntiid_string)
+    def resolve(self, ntiid_string):
+        return get_purchasable(ntiid_string)

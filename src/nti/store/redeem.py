@@ -18,12 +18,13 @@ from nti.store.purchase_history import register_purchase_attempt
 
 from nti.store.purchasable import expand_purchase_item_ids
 
+
 def make_redeem_purchase_attempt(user, original, code, activate_roles=True):
-	# create and register a purchase attempt for accepting user
-	redeemed = create_redeemed_purchase_attempt(original, code)
-	result = register_purchase_attempt(redeemed, user)
-	activate_items(user, redeemed.Items)
-	if activate_roles:
-		lib_items = expand_purchase_item_ids(original.Items)
-		add_users_content_roles(user, lib_items)
-	return result
+    # create and register a purchase attempt for accepting user
+    redeemed = create_redeemed_purchase_attempt(original, code)
+    result = register_purchase_attempt(redeemed, user)
+    activate_items(user, redeemed.Items)
+    if activate_roles:
+        lib_items = expand_purchase_item_ids(original.Items)
+        add_users_content_roles(user, lib_items)
+    return result

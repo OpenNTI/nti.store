@@ -24,29 +24,34 @@ from nti.store.utils import to_frozenset
 
 ITEMS = StandardExternalFields.ITEMS
 
+
 def get_readonly_fields(iface):
-	result = set()
-	for name in schema.getFieldNames(iface):
-		if iface[name].readonly:
-			result.add(name)
-	return result
+    result = set()
+    for name in schema.getFieldNames(iface):
+        if iface[name].readonly:
+            result.add(name)
+    return result
+
 
 def remove_readonly_fields(parsed, iface):
-	for name in get_readonly_fields(iface):
-		if name in parsed:
-			del parsed[name]
+    for name in get_readonly_fields(iface):
+        if name in parsed:
+            del parsed[name]
+
 
 @component.adapter(IPurchasable)
 @interface.implementer(IInternalObjectUpdater)
 class _PurchasableUpdater(object):
 
-	__slots__ = ('obj',)
+    __slots__ = ('obj',)
 
-	def __init__(self, obj):
-		self.obj = obj
+    def __init__(self, obj):
+        self.obj = obj
 
-	def updateFromExternalObject(self, parsed, *args, **kwargs):
-		remove_readonly_fields(parsed, IPurchasable)
-		parsed[ITEMS] = to_frozenset(parsed.get(ITEMS))
-		result = InterfaceObjectIO(self.obj, IPurchasable).updateFromExternalObject(parsed)
-		return result
+    def updateFromExternalObject(self, parsed, *args, **kwargs):
+        remove_readonly_fields(parsed, IPurchasable)
+        parsed[ITEMS] = to_frozenset(parsed.get(ITEMS))
+        result = InterfaceObjectIO(
+                    self.obj, 
+                    IPurchasable).updateFromExternalObject(parsed)
+        return result
