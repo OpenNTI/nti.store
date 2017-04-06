@@ -58,10 +58,11 @@ def index_site(doc_id, obj, items, site_index, seen):
     else:
         for site in get_all_host_sites():
             with current_site(site):
-                for name in items:
+                for item in items:
                     purchasable = component.queryUtility(IPurchasable,
-                                                         name=name)
+                                                         name=item)
                     if purchasable is not None:
+                        seen[item] = site.__name__
                         site_index.index_doc(doc_id, obj)
                         return 1
     return 0
