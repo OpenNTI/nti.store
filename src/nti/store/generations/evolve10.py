@@ -108,6 +108,6 @@ def do_evolve(context, generation=generation):
 
 def evolve(context):
     """
-    Evolve to generation 10 by adding site indexe to the purchase catalog
+    Evolve to generation 10 by adding site index to the purchase catalog
     """
     do_evolve(context, generation)
