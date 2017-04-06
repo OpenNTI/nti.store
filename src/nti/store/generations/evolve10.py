@@ -30,7 +30,8 @@ from nti.store.interfaces import IPurchasable
 from nti.store.interfaces import IPurchaseAttempt
 
 from nti.store.purchase_index import IX_SITE
-from nti.store.purchase_index import IX_ITEMS
+from nti.store.purchase_index import IX_MIMETYPE
+
 from nti.store.purchase_index import SiteIndex
 from nti.store.purchase_index import install_purchase_catalog
 
@@ -93,13 +94,12 @@ def do_evolve(context, generation=generation):
                 locate(index, catalog, name)
                 catalog[name] = index
         site_index = catalog[IX_SITE]
-        item_index = catalog[IX_ITEMS].index
-        for doc_id in list(item_index.ids()):  # mutating
+        mt_index = catalog[IX_MIMETYPE]
+        for doc_id in list(mt_index.ids()):  # mutating
             obj = intids.queryObject(doc_id)
-            items = item_index.documents_to_values.get(doc_id)
-            if IPurchaseAttempt.providedBy(obj) and items:
-                result += index_site(doc_id, obj, 
-                                     list(items), site_index, seen)
+            if IPurchaseAttempt.providedBy(obj):
+                items = list(obj.Items or ())
+                result += index_site(doc_id, obj, items, site_index, seen)
 
     component.getGlobalSiteManager().unregisterUtility(mock_ds, IDataserver)
     logger.info('Evolution %s done. %s record(s) indexed',
