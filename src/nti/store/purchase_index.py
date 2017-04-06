@@ -9,11 +9,15 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from zope.component.hooks import getSite
+
 from zope.catalog.interfaces import ICatalog
 
 from zope.intid.interfaces import IIntIds
 
 from zope.location import locate
+
+from nti.base._compat import unicode_
 
 from nti.store import CATALOG_NAME
 
@@ -33,6 +37,7 @@ from nti.zope_catalog.index import IntegerValueIndex as RawIntegerValueIndex
 
 from nti.zope_catalog.string import StringTokenNormalizer
 
+IX_SITE = 'site'
 IX_ITEMS = 'items'
 IX_STATE = 'state'
 IX_CREATOR = 'creator'
@@ -40,6 +45,23 @@ IX_MIMETYPE = 'mimeType'
 IX_REV_ITEMS = 'revItems'
 IX_REDEMPTION_CODE = 'redemptionCode'
 IX_STARTTIME = IX_CREATEDTIME = 'startTime'
+
+
+class ValidatingSiteName(object):
+
+    __slots__ = (b'site',)
+
+    def __init__(self, obj, default=None):
+        if IPurchaseAttempt.providedBy(obj):
+            self.site = unicode_(getSite().__name__)
+
+    def __reduce__(self):
+        raise TypeError()
+
+
+class SiteIndex(ValueIndex):
+    default_field_name = 'site'
+    default_interface = ValidatingSiteName
 
 
 class MimeTypeIndex(ValueIndex):
@@ -147,7 +169,8 @@ def install_purchase_catalog(site_manager_container, intids=None):
     intids.register(catalog)
     lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_NAME)
 
-    for name, clazz in ((IX_ITEMS, ItemsIndex),
+    for name, clazz in ((IX_SITE, SiteIndex),
+                        (IX_ITEMS, ItemsIndex),
                         (IX_STATE, StateIndex),
                         (IX_CREATOR, CreatorIndex),
                         (IX_MIMETYPE, MimeTypeIndex),
