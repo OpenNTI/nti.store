@@ -96,7 +96,7 @@ def do_evolve(context, generation=generation):
         item_index = catalog[IX_ITEMS].index
         for doc_id in list(item_index.ids()):  # mutating
             obj = intids.queryObject(doc_id)
-            items = index.documents_to_values.get(doc_id)
+            items = item_index.documents_to_values.get(doc_id)
             if IPurchaseAttempt.providedBy(obj) and items:
                 result += index_site(doc_id, obj, 
                                      list(items), site_index, seen)
