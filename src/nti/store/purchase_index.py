@@ -53,7 +53,9 @@ class ValidatingSiteName(object):
 
     def __init__(self, obj, default=None):
         if IPurchaseAttempt.providedBy(obj):
-            self.site = unicode_(getSite().__name__)
+            site = getSite()
+            if site is not None:
+                self.site = unicode_(site.__name__)
 
     def __reduce__(self):
         raise TypeError()
