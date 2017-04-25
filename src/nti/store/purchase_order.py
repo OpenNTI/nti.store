@@ -17,11 +17,11 @@ from zope import interface
 
 from zope.annotation.interfaces import IAttributeAnnotatable
 
+from zope.cachedescriptors.property import CachedProperty
+
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from nti.externalization.representation import WithRepr
-
-from nti.property.property import CachedProperty
 
 from nti.schema.eqhash import EqHash
 
