@@ -9,7 +9,21 @@ Payeezy Payment interfaces
 from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
+from zope import interface
+
 from nti.store.interfaces import IPaymentProcessor
+
+from nti.schema.field import TextLine
+
+
+class IPayeezyConnectKey(interface.Interface):
+    APIKey = TextLine(title=u"The api key", required=True)
+
+    APISecret = TextLine(title=u"The api secret", required=True)
+    APISecret.setTaggedValue('_ext_excluded_out', True)
+
+    ReportingToken = TextLine(title=u"Reporting token", required=False)
+    ReportingToken.setTaggedValue('_ext_excluded_out', True)
 
 
 class IPayeezyPaymentProcessor(IPaymentProcessor):

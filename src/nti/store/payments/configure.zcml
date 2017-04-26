@@ -8,6 +8,7 @@
 	<include package="zope.component" />
 	<include package="zope.security" />
 	
-	<include package=".stripe" file="configure.zcml" />
+	<include package=".stripe" />
+	<include package=".payeezy" />
 
 </configure>

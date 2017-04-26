@@ -13,16 +13,27 @@ from zope import interface
 
 from zope.component.zcml import utility
 
+from zope.configuration import fields
+
+from nti.store.payments.payeezy.interfaces import IPayeezyConnectKey
+
+from nti.store.payments.payeezy.model import PayeezyConnectKey
+
 
 class IRegisterPayeezyKeyDirective(interface.Interface):
     """
     The arguments needed for registering a key
     """
+    api_key = fields.TextLine(title=u"The API key value.", required=True)
+    api_secret = fields.TextLine(title=u"The API secret value.", required=True)
+    reporting_token = fields.TextLine(title=u"Reporting token", required=False)
 
 
-def registerPayeezyKey(_context):
+def registerPayeezyKey(_context, api_key, api_secret, reporting_token=None):
     """
     Register a Payeezy key with the given alias
     """
-    utility(_context, provides=None, component=None, name='')
-    logger.debug("Payeezy key %s has been registered")
+    key = PayeezyConnectKey(APIKey=api_key,
+                            APISecret=api_secret,
+                            ReportingToken=reporting_token)
+    utility(_context, provides=IPayeezyConnectKey, component=key)

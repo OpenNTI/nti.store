@@ -3,8 +3,8 @@
 
 	<meta:directives namespace="http://nextthought.com/ntp/payeezy">
 		<meta:directive	name="registerPayeezyKey"
-						schema=".zcml.IRegisterPayeezyDirective"
-						handler=".zcml.registerPayeezy" />
+						schema=".zcml.IRegisterPayeezyKeyDirective"
+						handler=".zcml.registerPayeezyKey" />
 	</meta:directives>
 
 </configure>
