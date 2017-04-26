@@ -1,0 +1,10 @@
+<configure	xmlns="http://namespaces.zope.org/zope"
+			xmlns:meta="http://namespaces.zope.org/meta">
+
+	<meta:directives namespace="http://nextthought.com/ntp/payeezy">
+		<meta:directive	name="registerPayeezyKey"
+						schema=".zcml.IRegisterPayeezyDirective"
+						handler=".zcml.registerPayeezy" />
+	</meta:directives>
+
+</configure>
