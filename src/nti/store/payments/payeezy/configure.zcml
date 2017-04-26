@@ -20,4 +20,9 @@
 		root_interfaces=".interfaces.IPayeezyConnectKey"
 		modules=".model" />
 	
+	<!-- Test keys -->
+	<configure zcml:condition="have devmode">
+		<include file="_test_keys.zcml" />
+	</configure>
+	
 </configure>
