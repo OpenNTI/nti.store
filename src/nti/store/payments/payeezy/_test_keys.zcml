@@ -11,8 +11,8 @@
 	
 	<payeezy:registerPayeezyKey
 		provider="NTI"
-		api_key="LIpQyLD7p5FmspOs6pPW9gWG"
-		api_secret="PRJEOy95OA5fNURGcAZ9OgQ"
-		reporting_token="UgM2hVJjZqEDgSUHEBVTgmUW0r" />
+		api_key="XkfzLq6WkZZS4yLGbJIIA0oo6MjX9A8u"
+		api_secret="a03d370591e7250952e9ea8f6ab72ef2306fcf5459ee30ddd04f3de29ff77e49"
+		reporting_token="224efc52af01b0e0" />
 		
 </configure>

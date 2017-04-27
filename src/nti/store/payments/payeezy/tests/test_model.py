@@ -14,9 +14,14 @@ from hamcrest import has_entry
 from hamcrest import assert_that
 does_not = is_not
 
+from nti.testing.matchers import validly_provides
+from nti.testing.matchers import verifiably_provides
+
 import unittest
 
 from nti.externalization.externalization import toExternalObject
+
+from nti.store.payments.payeezy.interfaces import IPayeezyConnectKey
 
 from nti.store.payments.payeezy.model import PayeezyConnectKey
 
@@ -26,15 +31,26 @@ from nti.store.tests import SharedConfiguringTestLayer
 class TestModel(unittest.TestCase):
 
     layer = SharedConfiguringTestLayer
-    
-    def test_external(self):
-        key = PayeezyConnectKey(APIKey=u"LIpQyLD7p5FmspOs6pPW9gWG",
+
+    def test_interface(self):
+        key = PayeezyConnectKey(Provider=u'NTI',
+                                APIKey=u"LIpQyLD7p5FmspOs6pPW9gWG",
                                 APISecret=u"3K9VJFyfj0oGIMi7Aeg3HNBp",
                                 ReportingToken=u"jBCSE4ACnJBHGItexYhLF8At2PRpLh")
-       
+        assert_that(key, validly_provides(IPayeezyConnectKey))
+        assert_that(key, verifiably_provides(IPayeezyConnectKey))
+
+    def test_external(self):
+        key = PayeezyConnectKey(Provider=u'NTI',
+                                APIKey=u"LIpQyLD7p5FmspOs6pPW9gWG",
+                                APISecret=u"3K9VJFyfj0oGIMi7Aeg3HNBp",
+                                ReportingToken=u"jBCSE4ACnJBHGItexYhLF8At2PRpLh")
+
         extobj = toExternalObject(key)
         assert_that(extobj, has_key('MimeType'))
         assert_that(extobj, does_not(has_key('APISecret')))
         assert_that(extobj, does_not(has_key('ReportingToken')))
-        assert_that(extobj, 
+        assert_that(extobj,
+                    has_entry('Provider', is_(u'NTI')))
+        assert_that(extobj,
                     has_entry('APIKey', is_(u'LIpQyLD7p5FmspOs6pPW9gWG')))

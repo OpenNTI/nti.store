@@ -35,13 +35,13 @@ class TLSv1Adapter(HTTPAdapter):
 
 class PayeezyHTTPAuthorize(object):
 
-    def __init__(self, api_key, api_secret, token, url, token_url):
+    def __init__(self, api_key, api_secret, token, url, token_url=None):
         self.token = token
         self.api_key = api_key
         self.api_secret = api_secret
         # urls
         self.url = url
-        self.token_url = token_url
+        self.token_url = token_url or url
         # cryptographically strong random number
         self.nonce = str(int(os.urandom(16).encode('hex'), 16))
         self.timestamp = str(int(round(time.time() * 1000)))

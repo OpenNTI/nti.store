@@ -36,6 +36,7 @@ class PayeezyConnectKey(SchemaConfigured):
     __metaclass__ = MetaStoreObject
 
     Alias = alias('Provider')
+    Token = alias('ReportingToken')
 
     def __setattr__(self, name, value):
         if name in ("APISecret", 'ReportingToken'):

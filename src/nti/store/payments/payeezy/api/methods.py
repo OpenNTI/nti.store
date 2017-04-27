@@ -16,13 +16,13 @@ from nti.store.payments.payeezy.api import authorization
 
 class Payeezy(object):
 
-    def __init__(self, api_key, api_secret, token, url, token_url):
+    def __init__(self, api_key, api_secret, token, url, token_url=None):
         self.token = token
         self.api_key = api_key
         self.api_secret = api_secret
         # urls
         self.url = url
-        self.token_url = token_url
+        self.token_url = token_url or url
 
     def authorize(self, amount=None, currency_code=None, description=None,
                   card_type=None, cardholder_name=None, card_number=None,
