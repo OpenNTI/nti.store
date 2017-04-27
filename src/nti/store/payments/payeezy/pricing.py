@@ -9,4 +9,10 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-PAYEEZY = u"payeezy"
+from nti.store.payments.payeezy import PAYEEZY
+
+from nti.store.pricing import DefaultPurchasablePricer
+
+
+class PayeezyPurchasablePricer(DefaultPurchasablePricer):
+    processor = PAYEEZY

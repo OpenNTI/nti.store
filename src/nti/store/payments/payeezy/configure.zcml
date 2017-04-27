@@ -10,6 +10,10 @@
 	
 	<include package=".processor" />
 
+	<!-- Pricing -->
+	<utility factory=".pricing.PayeezyPurchasablePricer"
+			 name="stripe" />
+	
 	<!-- Externalization -->
 	<include package="nti.externalization" file="meta.zcml" />
 	<include package="nti.externalization" />
