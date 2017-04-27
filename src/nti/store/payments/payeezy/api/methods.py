@@ -57,17 +57,17 @@ class Payeezy(object):
         return self.make_primary_transaction(payload=make_payload_output['payload'])
 
     def capture(self, amount=None, currency_code=None, description=None,
-                transaction_tag=None, transactionID=None):
+                transaction_tag=None, transaction_id=None):
 
         make_payload_output = self.make_payload(amount=amount,
                                                 currency_code=currency_code,
                                                 transaction_tag=transaction_tag,
-                                                transactionID=transactionID,
+                                                transaction_id=transaction_id,
                                                 description=description,
                                                 transaction_type='capture')
 
         return self.make_secondary_transaction(payload=make_payload_output['payload'],
-                                               transactionID=make_payload_output['transactionID'])
+                                               transaction_id=make_payload_output['transaction_id'])
 
     def void(self,  payload):
         self.payload = payload
@@ -88,20 +88,21 @@ class Payeezy(object):
                                                           self.tokenurl)
         return self.payeezy.make_card_based_transaction_post_call(self.payload)
 
-    def make_secondary_transaction(self, payload, transactionID):
+    def make_secondary_transaction(self, payload, transaction_id):
         self.payload = payload
-        self.transactionID = transactionID
+        self.transaction_id = transaction_id
         self.payeezy = authorization.PayeezyHTTPAuthorize(self.api_key, 
                                                           self.api_secret, 
                                                           self.token, 
                                                           self.url, 
                                                           self.tokenurl)
-        return self.payeezy.make_capture_void_refund_post_call(self.payload, self.transactionID)
+        return self.payeezy.make_capture_void_refund_post_call(self.payload, 
+                                                               self.transaction_id)
 
     def make_payload(self, amount=None, currency_code='USD',  description=None,
                      card_type=None, cardholder_name=None, card_number=None,
                      card_expiry=None, card_cvv=None, transaction_type=None,
-                     transaction_tag=None, transactionID=None):
+                     transaction_tag=None, transaction_id=None):
 
         assert amount is not None, "Amount cannot be None"
         if isinstance(object, six.integer_types):
@@ -144,7 +145,7 @@ class Payeezy(object):
                 }
             }
         else:
-            assert transactionID, "Transaction ID cannot be None"
+            assert transaction_id, "Transaction ID cannot be None"
             assert transaction_tag, "Transaction Tag cannot be None"
             if isinstance(transaction_tag, six.integer_types):
                 transaction_tag = str(transaction_tag)
@@ -157,4 +158,4 @@ class Payeezy(object):
                 "currency_code": currency_code.upper()
             }
 
-        return {'payload': payload, 'transactionID': transactionID}
+        return {'payload': payload, 'transaction_id': transaction_id}
