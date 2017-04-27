@@ -11,8 +11,6 @@ __docformat__ = "restructuredtext en"
 
 from zope import interface
 
-from nti.store.interfaces import IPaymentProcessor
-
 from nti.schema.field import TextLine
 
 
@@ -24,7 +22,3 @@ class IPayeezyConnectKey(interface.Interface):
 
     ReportingToken = TextLine(title=u"Reporting token", required=False)
     ReportingToken.setTaggedValue('_ext_excluded_out', True)
-
-
-class IPayeezyPaymentProcessor(IPaymentProcessor):
-    pass

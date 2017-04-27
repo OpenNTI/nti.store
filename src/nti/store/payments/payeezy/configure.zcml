@@ -8,9 +8,7 @@
 	<include package="zope.component" file="meta.zcml" />
 	<include package="zope.component" />
 	
-	<utility factory=".processor.StripePaymentProcessor"
-			 provides=".interfaces.IPayeezyPaymentProcessor"
-			 name="payeezy" />
+	<include package=".processor" />
 
 	<!-- Externalization -->
 	<include package="nti.externalization" file="meta.zcml" />
