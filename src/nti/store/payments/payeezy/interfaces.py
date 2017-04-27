@@ -11,12 +11,20 @@ __docformat__ = "restructuredtext en"
 
 from zope import interface
 
+from zope.interface.common.mapping import IReadMapping
+
 from nti.schema.field import TextLine
+
+
+class IPayeezyURLMap(IReadMapping):
+    """
+    marker interface for URL maps
+    """
 
 
 class IPayeezyConnectKey(interface.Interface):
     Provider = TextLine(title=u"The key name.", required=True)
-    
+
     APIKey = TextLine(title=u"The api key.", required=True)
 
     APISecret = TextLine(title=u"The api secret.", required=True)

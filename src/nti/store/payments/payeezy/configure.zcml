@@ -22,6 +22,14 @@
 		root_interfaces=".interfaces.IPayeezyConnectKey"
 		modules=".model" />
 	
+	<!-- URLs -->
+	<configure zcml:condition="have production_env">
+		<utility factory=".live_urls" />
+	</configure>
+	<configure zcml:condition="not-have production_env">
+		<utility factory=".test_urls" />
+	</configure>
+
 	<!-- Test keys -->
 	<configure zcml:condition="have devmode">
 		<include file="_test_keys.zcml" />
