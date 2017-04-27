@@ -30,7 +30,7 @@ setup(
 	namespace_packages=['nti'],
 	install_requires=[
 		'setuptools',
-		'payeezy',
+		'requests',
 		'stripe',
 		'nti.contentlibrary'
 	],
