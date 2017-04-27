@@ -11,7 +11,7 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
 
-from nti.store.payments.payeezy.interfaces import IPayeezyPaymentProcessor
+from nti.store.payments.payeezy.processor.interfaces import IPayeezyPaymentProcessor
 
 
 @interface.implementer(IPayeezyPaymentProcessor)

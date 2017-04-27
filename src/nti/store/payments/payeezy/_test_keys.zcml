@@ -10,6 +10,7 @@
 	<include package="." file="meta.zcml" />
 	
 	<payeezy:registerPayeezyKey
+		provider="NTI"
 		api_key="LIpQyLD7p5FmspOs6pPW9gWG"
 		api_secret="PRJEOy95OA5fNURGcAZ9OgQ"
 		reporting_token="UgM2hVJjZqEDgSUHEBVTgmUW0r" />

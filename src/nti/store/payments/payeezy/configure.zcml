@@ -12,7 +12,7 @@
 
 	<!-- Pricing -->
 	<utility factory=".pricing.PayeezyPurchasablePricer"
-			 name="stripe" />
+			 name="payeezy" />
 	
 	<!-- Externalization -->
 	<include package="nti.externalization" file="meta.zcml" />

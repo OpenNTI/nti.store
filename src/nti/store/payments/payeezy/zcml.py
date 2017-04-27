@@ -24,16 +24,18 @@ class IRegisterPayeezyKeyDirective(interface.Interface):
     """
     The arguments needed for registering a key
     """
+    provider = fields.TextLine(title=u"The key provider/alias.", required=True)
     api_key = fields.TextLine(title=u"The API key value.", required=True)
     api_secret = fields.TextLine(title=u"The API secret value.", required=True)
     reporting_token = fields.TextLine(title=u"Reporting token", required=False)
 
 
-def registerPayeezyKey(_context, api_key, api_secret, reporting_token=None):
+def registerPayeezyKey(_context, provider, api_key, api_secret, reporting_token=None):
     """
     Register a Payeezy key with the given alias
     """
     key = PayeezyConnectKey(APIKey=api_key,
+                            Provider=provider,
                             APISecret=api_secret,
                             ReportingToken=reporting_token)
-    utility(_context, provides=IPayeezyConnectKey, component=key)
+    utility(_context, provides=IPayeezyConnectKey, component=key, name=provider)

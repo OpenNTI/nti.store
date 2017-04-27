@@ -23,6 +23,8 @@ from nti.store.payments.payeezy.interfaces import IPayeezyConnectKey
 
 from nti.store.utils import MetaStoreObject
 
+from nti.property.property import alias
+
 from nti.utils.cypher import get_plaintext
 
 
@@ -32,6 +34,8 @@ class PayeezyConnectKey(SchemaConfigured):
     createDirectFieldProperties(IPayeezyConnectKey)
 
     __metaclass__ = MetaStoreObject
+
+    Alias = alias('Provider')
 
     def __setattr__(self, name, value):
         if name in ("APISecret", 'ReportingToken'):

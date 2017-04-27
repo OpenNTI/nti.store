@@ -32,6 +32,7 @@ ZCML_STRING = u"""
     <include package="." file="meta.zcml" />
 
     <payeezy:registerPayeezyKey
+        provider="NTI"
         api_key="LIpQyLD7p5FmspOs6pPW9gWG"
         api_secret="PRJEOy95OA5fNURGcAZ9OgQ"
         reporting_token="UgM2hVJjZqEDgSUHEBVTgmUW0r" />
@@ -46,9 +47,12 @@ class TestZcml(nti.testing.base.ConfiguringTestBase):
     def test_registration(self):
         self.configure_string(ZCML_STRING)
 
-        key = component.queryUtility(IPayeezyConnectKey)
+        key = component.queryUtility(IPayeezyConnectKey, name="NTI")
         assert_that(key, is_not(none()))
 
+        assert_that(key, 
+                    has_property('Provider', is_("NTI")))
+        
         assert_that(key, 
                     has_property('APIKey', is_("LIpQyLD7p5FmspOs6pPW9gWG")))
 

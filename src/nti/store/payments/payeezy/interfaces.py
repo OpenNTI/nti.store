@@ -15,10 +15,12 @@ from nti.schema.field import TextLine
 
 
 class IPayeezyConnectKey(interface.Interface):
-    APIKey = TextLine(title=u"The api key", required=True)
+    Provider = TextLine(title=u"The key name.", required=True)
+    
+    APIKey = TextLine(title=u"The api key.", required=True)
 
-    APISecret = TextLine(title=u"The api secret", required=True)
+    APISecret = TextLine(title=u"The api secret.", required=True)
     APISecret.setTaggedValue('_ext_excluded_out', True)
 
-    ReportingToken = TextLine(title=u"Reporting token", required=False)
+    ReportingToken = TextLine(title=u"Reporting token.", required=False)
     ReportingToken.setTaggedValue('_ext_excluded_out', True)
