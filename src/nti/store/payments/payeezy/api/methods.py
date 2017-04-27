@@ -86,7 +86,7 @@ class Payeezy(object):
                                                           self.token, 
                                                           self.url, 
                                                           self.tokenurl)
-        return self.payeezy.makeCardBasedTransactionPostCall(self.payload)
+        return self.payeezy.make_card_based_transaction_post_call(self.payload)
 
     def make_secondary_transaction(self, payload, transactionID):
         self.payload = payload
@@ -96,7 +96,7 @@ class Payeezy(object):
                                                           self.token, 
                                                           self.url, 
                                                           self.tokenurl)
-        return self.payeezy.makeCaptureVoidRefundPostCall(self.payload, self.transactionID)
+        return self.payeezy.make_capture_void_refund_post_call(self.payload, self.transactionID)
 
     def make_payload(self, amount=None, currency_code='USD',  description=None,
                      card_type=None, cardholder_name=None, card_number=None,
