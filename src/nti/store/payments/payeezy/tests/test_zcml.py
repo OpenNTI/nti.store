@@ -35,7 +35,8 @@ ZCML_STRING = u"""
         provider="NTI"
         api_key="LIpQyLD7p5FmspOs6pPW9gWG"
         api_secret="PRJEOy95OA5fNURGcAZ9OgQ"
-        reporting_token="UgM2hVJjZqEDgSUHEBVTgmUW0r" />
+        token="UgM2hVJjZqEDgSUHEBVTgmUW0r100"
+        js_security_key="b9d0ee63dbf511a1902" />
 
 </configure>
 
@@ -60,4 +61,7 @@ class TestZcml(nti.testing.base.ConfiguringTestBase):
                     has_property('APISecret', is_("PRJEOy95OA5fNURGcAZ9OgQ")))
         
         assert_that(key, 
-                    has_property('ReportingToken', is_("UgM2hVJjZqEDgSUHEBVTgmUW0r")))
+                    has_property('Token', is_("UgM2hVJjZqEDgSUHEBVTgmUW0r100")))
+        
+        assert_that(key, 
+                    has_property('JSSecurityKey', is_("b9d0ee63dbf511a1902")))

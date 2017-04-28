@@ -29,15 +29,17 @@ class IRegisterPayeezyKeyDirective(interface.Interface):
     provider = fields.TextLine(title=u"The key provider/alias.", required=True)
     api_key = fields.TextLine(title=u"The API key value.", required=True)
     api_secret = fields.TextLine(title=u"The API secret value.", required=True)
-    reporting_token = fields.TextLine(title=u"Reporting token", required=False)
+    js_security_key = fields.TextLine(title=u"The JS security key.", required=True)
+    token = fields.TextLine(title=u"Reporting token", required=False)
 
 
-def registerPayeezyKey(_context, provider, api_key, api_secret, reporting_token=None):
+def registerPayeezyKey(_context, provider, api_key, api_secret, token, js_security_key=None):
     """
     Register a Payeezy key with the given alias
     """
-    key = PayeezyConnectKey(APIKey=api_key,
+    key = PayeezyConnectKey(Token=token,
+                            APIKey=api_key,
                             Provider=provider,
                             APISecret=bytes_(api_secret),
-                            ReportingToken=reporting_token)
+                            JSSecurityKey=js_security_key)
     utility(_context, provides=IPayeezyConnectKey, component=key, name=provider)

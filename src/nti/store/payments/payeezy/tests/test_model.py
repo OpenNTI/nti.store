@@ -35,16 +35,18 @@ class TestModel(unittest.TestCase):
     def test_interface(self):
         key = PayeezyConnectKey(Provider=u'NTI',
                                 APIKey=u"LIpQyLD7p5FmspOs6pPW9gWG",
-                                APISecret=u"3K9VJFyfj0oGIMi7Aeg3HNBp",
-                                ReportingToken=u"jBCSE4ACnJBHGItexYhLF8At2PRpLh")
+                                APISecret=b"3K9VJFyfj0oGIMi7Aeg3HNBp",
+                                Token=u"jBCSE4ACnJBHGItexYhLF8At2PRpLh",
+                                JSSecurityKey=u"b9d0ee63Aizendbf511a1902")
         assert_that(key, validly_provides(IPayeezyConnectKey))
         assert_that(key, verifiably_provides(IPayeezyConnectKey))
 
     def test_external(self):
         key = PayeezyConnectKey(Provider=u'NTI',
                                 APIKey=u"LIpQyLD7p5FmspOs6pPW9gWG",
-                                APISecret=u"3K9VJFyfj0oGIMi7Aeg3HNBp",
-                                ReportingToken=u"jBCSE4ACnJBHGItexYhLF8At2PRpLh")
+                                APISecret=b"3K9VJFyfj0oGIMi7Aeg3HNBp",
+                                Token=u"jBCSE4ACnJBHGItexYhLF8At2PRpLh",
+                                JSSecurityKey=u"b9d0ee63Aizendbf511a1902")
 
         extobj = toExternalObject(key)
         assert_that(extobj, has_key('MimeType'))
@@ -54,3 +56,5 @@ class TestModel(unittest.TestCase):
                     has_entry('Provider', is_(u'NTI')))
         assert_that(extobj,
                     has_entry('APIKey', is_(u'LIpQyLD7p5FmspOs6pPW9gWG')))
+        assert_that(extobj,
+                    has_entry('JSSecurityKey', is_(u'b9d0ee63Aizendbf511a1902')))

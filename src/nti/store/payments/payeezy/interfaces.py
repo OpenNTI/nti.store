@@ -31,5 +31,7 @@ class IPayeezyConnectKey(interface.Interface):
     APISecret = ValidBytesLine(title=u"The api secret.", required=True)
     APISecret.setTaggedValue('_ext_excluded_out', True)
 
-    ReportingToken = TextLine(title=u"Reporting token.", required=False)
-    ReportingToken.setTaggedValue('_ext_excluded_out', True)
+    Token = TextLine(title=u"Token.", required=True)
+    Token.setTaggedValue('_ext_excluded_out', True)
+
+    JSSecurityKey = TextLine(title=u"The JS security key.", required=False)

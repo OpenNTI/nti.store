@@ -25,8 +25,6 @@ from nti.store.utils import MetaStoreObject
 
 from nti.property.property import alias
 
-from nti.utils.cypher import get_plaintext
-
 
 @WithRepr
 @interface.implementer(IPayeezyConnectKey, IContentTypeAware)
@@ -36,12 +34,3 @@ class PayeezyConnectKey(SchemaConfigured):
     __metaclass__ = MetaStoreObject
 
     Alias = alias('Provider')
-    Token = alias('ReportingToken')
-
-    def __setattr__(self, name, value):
-        if name in ("APISecret", 'ReportingToken'):
-            try:
-                value = get_plaintext(value)
-            except Exception:
-                pass
-        return SchemaConfigured.__setattr__(self, name, value)

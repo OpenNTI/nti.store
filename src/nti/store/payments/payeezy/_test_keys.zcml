@@ -13,7 +13,7 @@
 		provider="NTI-TEST"
 		api_key="XkfzLq6WkZZS4yLGbJIIA0oo6MjX9A8u"
 		api_secret="a03d370591e7250952e9ea8f6ab72ef2306fcf5459ee30ddd04f3de29ff77e49"
-		reporting_token="224efc52af01b0e0" />
+		token="fdoa-f7377016cbaebcba014f4a494ca8c886f7377016cbaebcba"
+		js_security_key="fdoa-js-0ee63dbf511a1902d08a4392df92fb9d0ee63dbf511a1902" />
 		
 </configure>
-	
