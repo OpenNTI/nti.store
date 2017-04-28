@@ -32,7 +32,7 @@ from nti.store.payments.stripe.stripe_error import StripePurchaseError
 
 def makenone(s, default=None):
 	if isinstance(s, six.string_types):
-		s = default if s == 'None' else unicode(s)
+		s = default if s == 'None' else s
 	return s
 
 def flatten_context(context=None):
@@ -70,7 +70,7 @@ def get_charge_metata(purchase_id, username=None,
 
 def create_user_address(charge):
 	"""
-	creates a payment_charge.UserAddress from a stripe charge
+	creates a charge.UserAddress from a stripe charge
 	"""
 	card = getattr(charge, 'card', None)
 	if card is not None:
@@ -95,7 +95,7 @@ def get_card_info(charge):
 
 def create_payment_charge(charge):
 	"""
-	creates a payment_charge.PaymentCharge from a stripe charge
+	creates a PaymentCharge from a stripe charge
 	"""
 	amount = charge.amount / 100.0
 	currency = charge.currency.upper()
