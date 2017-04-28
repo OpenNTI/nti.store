@@ -13,8 +13,21 @@ from zope import interface
 
 from zope.interface.common.mapping import IReadMapping
 
+from zope.schema.vocabulary import SimpleTerm
+from zope.schema.vocabulary import SimpleVocabulary
+
 from nti.schema.field import TextLine
 from nti.schema.field import ValidBytesLine
+
+
+FAILED = u'failed'
+SUCCESS = u'success'
+FAILURE = u'failure'
+APPROVED = u'approved'
+
+STATES = (FAILED, FAILURE, APPROVED, SUCCESS)
+
+STATE_VOCABULARY = SimpleVocabulary([SimpleTerm(_x) for _x in STATES])
 
 
 class IPayeezyURLMap(IReadMapping):
