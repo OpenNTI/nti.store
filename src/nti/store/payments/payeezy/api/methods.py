@@ -53,8 +53,9 @@ class Payeezy(object):
                                                 card_cvv=card_cvv,
                                                 description=description,
                                                 transaction_type='purchase')
-
-        return self.make_primary_transaction(payload=make_payload_output['payload'])
+        payload = make_payload_output['payload']
+        payload["partial_redemption"] = "false" # always
+        return self.make_primary_transaction(payload=payload)
 
     def capture(self, amount=None, currency_code=None, description=None,
                 transaction_tag=None, transaction_id=None):
@@ -85,7 +86,7 @@ class Payeezy(object):
                                                           self.api_secret,
                                                           self.token, 
                                                           self.url, 
-                                                          self.tokenurl)
+                                                          self.token_url)
         return self.payeezy.make_card_based_transaction_post_call(self.payload)
 
     def make_secondary_transaction(self, payload, transaction_id):
@@ -95,7 +96,7 @@ class Payeezy(object):
                                                           self.api_secret, 
                                                           self.token, 
                                                           self.url, 
-                                                          self.tokenurl)
+                                                          self.token_url)
         return self.payeezy.make_capture_void_refund_post_call(self.payload, 
                                                                self.transaction_id)
 
@@ -105,7 +106,7 @@ class Payeezy(object):
                      transaction_tag=None, transaction_id=None):
 
         assert amount is not None, "Amount cannot be None"
-        if isinstance(object, six.integer_types):
+        if isinstance(amount, six.integer_types):
             amount = str(amount)
 
         assert currency_code, "Currency cannot be None"
@@ -113,7 +114,7 @@ class Payeezy(object):
 
         # fill some description
         if description is None:
-            description = transaction_type + 'transaction for amount: ' + amount
+            description = "%s transaction for amount: %s"  % (transaction_type, amount)
 
         if transaction_type in ('authorize', 'purchase'):
             assert card_number is not None, "Card number cannot be None"
