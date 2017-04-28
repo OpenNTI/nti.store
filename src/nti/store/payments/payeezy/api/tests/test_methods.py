@@ -7,7 +7,11 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
+from hamcrest import none
 from hamcrest import is_not
+from hamcrest import has_entry
+from hamcrest import assert_that
+from hamcrest import has_entries
 does_not = is_not
 
 import unittest
@@ -39,12 +43,23 @@ class TestMethods(unittest.TestCase):
         
     def test_purchase(self):
         payeezy = self._get_payeezy()
-        # from IPython.terminal.debugger import set_trace
-        # set_trace()
-        payeezy.purchase(100, "USD", 
-                         card_type="visa", 
-                         cardholder_name="Ichigo Kurosaki",
-                         card_number="4012000033330026", 
-                         card_expiry="0930", 
-                         card_cvv="019")
-        
+        result = payeezy.purchase(100, "USD", 
+                                 card_type="visa", 
+                                 cardholder_name="Ichigo Kurosaki",
+                                 card_number="4012000033330026", 
+                                 card_expiry="0930", 
+                                 card_cvv="019")
+        data = result.json()
+        assert_that(data, 
+                    has_entries('amount', '100',
+                                'correlation_id', is_not(none()),
+                                'currency', 'USD',
+                                'method', 'credit_card',
+                                'token', has_entries(
+                                            'token_data', has_entry('value', is_not(none())),
+                                            'token_type', 'FDToken'),
+                                'transaction_id', is_not(none()), 
+                                'transaction_status', 'approved',
+                                'transaction_tag', is_not(none()),
+                                'transaction_type', 'purchase',
+                                'validation_status', 'success'))
