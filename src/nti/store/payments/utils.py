@@ -10,6 +10,7 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import re
+import six
 import numbers
 
 from zope import schema
@@ -27,7 +28,7 @@ def is_valid_creditcard_number(s):
     """
     if isinstance(s, numbers.Integral):
         s = str(s)
-    elif isinstance(s, basestring):
+    elif isinstance(s, six.string_types):
         # Drop spaces and dashes, commonly entered by humans
         # Anything else we consider invalid
         s = s.replace(' ', '').replace('-', '')
@@ -54,3 +55,23 @@ def validate_credit_card(number, exp_month, exp_year, cvc=None):
         raise schema.ValidationError('Invalid CVC number')
 
     return True
+
+
+def credit_card_type(cc_number):
+    """
+    Function determines type of CC by the given number.
+    
+    http://code.activestate.com/recipes/577815-determine-credit-card-type-by-number/
+    """
+    AMEX_CC_RE = re.compile(r"^3[47][0-9]{13}$")
+    VISA_CC_RE = re.compile(r"^4[0-9]{12}(?:[0-9]{3})?$")
+    MASTERCARD_CC_RE = re.compile(r"^5[1-5][0-9]{14}$")
+    DISCOVER_CC_RE = re.compile(r"^6(?:011|5[0-9]{2})[0-9]{12}$")
+    
+    CC_MAP = {"American Express": AMEX_CC_RE, "Visa": VISA_CC_RE,
+              "Mastercard": MASTERCARD_CC_RE, "Discover": DISCOVER_CC_RE}    
+    
+    for type_, regexp in CC_MAP.items():
+        if regexp.match(str(cc_number)):
+            return type_    
+    return None

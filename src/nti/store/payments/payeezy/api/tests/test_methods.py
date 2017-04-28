@@ -41,9 +41,10 @@ class TestMethods(unittest.TestCase):
         payeezy = self._get_payeezy()
         # from IPython.terminal.debugger import set_trace
         # set_trace()
-        print(payeezy.purchase(100, "USD", 
+        payeezy.purchase(100, "USD", 
                          card_type="visa", 
                          cardholder_name="Ichigo Kurosaki",
                          card_number="4012000033330026", 
                          card_expiry="0930", 
-                         card_cvv="019"))
+                         card_cvv="019")
+        

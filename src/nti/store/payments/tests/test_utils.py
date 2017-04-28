@@ -16,6 +16,7 @@ import unittest
 
 from zope.schema import ValidationError
 
+from nti.store.payments.utils import credit_card_type
 from nti.store.payments.utils import validate_credit_card
 from nti.store.payments.utils import is_valid_creditcard_number
 
@@ -53,3 +54,9 @@ class TestPaymentUtils(unittest.TestCase):
 
         with assert_raises(ValidationError):
             validate_credit_card("5105105105105100", "01", "13", "xx")
+            
+    def test_credit_card_type(self):
+        assert_that(credit_card_type('4024007141696'), is_('Visa'))
+        assert_that(credit_card_type(5570735810881011), is_('Mastercard'))
+        assert_that(credit_card_type(348728112862781), is_('American Express'))
+        assert_that(credit_card_type(6011350169121566), is_('Discover'))
