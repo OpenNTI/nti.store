@@ -48,3 +48,8 @@ class IPayeezyConnectKey(interface.Interface):
     Token.setTaggedValue('_ext_excluded_out', True)
 
     JSSecurityKey = TextLine(title=u"The JS security key.", required=False)
+
+
+class IPayeezyFDToken(interface.Interface):
+    type = TextLine(title=u"The token type name.", required=False)
+    value = TextLine(title=u"The token value.", required=True)

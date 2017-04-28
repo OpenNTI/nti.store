@@ -21,6 +21,7 @@ from nti.schema.field import SchemaConfigured
 
 from nti.schema.fieldproperty import createDirectFieldProperties
 
+from nti.store.payments.payeezy.interfaces import IPayeezyFDToken
 from nti.store.payments.payeezy.interfaces import IPayeezyConnectKey
 
 from nti.store.utils import MetaStoreObject
@@ -37,3 +38,11 @@ class PayeezyConnectKey(SchemaConfigured):
     __metaclass__ = MetaStoreObject
 
     Alias = alias('Provider')
+
+
+@WithRepr
+@interface.implementer(IPayeezyFDToken, IContentTypeAware)
+class PayeezyFDToken(SchemaConfigured):
+    createDirectFieldProperties(IPayeezyFDToken)
+
+    __metaclass__ = MetaStoreObject
