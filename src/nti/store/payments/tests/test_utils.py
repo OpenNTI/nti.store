@@ -56,7 +56,7 @@ class TestPaymentUtils(unittest.TestCase):
             validate_credit_card("5105105105105100", "01", "13", "xx")
             
     def test_credit_card_type(self):
-        assert_that(credit_card_type('4024007141696'), is_('Visa'))
-        assert_that(credit_card_type(5570735810881011), is_('Mastercard'))
-        assert_that(credit_card_type(348728112862781), is_('American Express'))
-        assert_that(credit_card_type(6011350169121566), is_('Discover'))
+        assert_that(credit_card_type('4024007141696'), is_('VISA'))
+        assert_that(credit_card_type(5424000000000015), is_('MASTERCARD'))
+        assert_that(credit_card_type('370000000000002'), is_('AMEX'))
+        assert_that(credit_card_type('6011000000000012'), is_('Discover'))

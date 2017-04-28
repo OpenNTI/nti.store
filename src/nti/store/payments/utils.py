@@ -68,8 +68,8 @@ def credit_card_type(cc_number):
     MASTERCARD_CC_RE = re.compile(r"^5[1-5][0-9]{14}$")
     DISCOVER_CC_RE = re.compile(r"^6(?:011|5[0-9]{2})[0-9]{12}$")
     
-    CC_MAP = {"American Express": AMEX_CC_RE, "Visa": VISA_CC_RE,
-              "Mastercard": MASTERCARD_CC_RE, "Discover": DISCOVER_CC_RE}    
+    CC_MAP = {"AMEX": AMEX_CC_RE, "VISA": VISA_CC_RE,
+              "MASTERCARD": MASTERCARD_CC_RE, "Discover": DISCOVER_CC_RE}    
     
     for type_, regexp in CC_MAP.items():
         if regexp.match(str(cc_number)):
