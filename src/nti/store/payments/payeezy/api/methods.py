@@ -37,98 +37,101 @@ class Payeezy(object):
                                                   self.api_secret,
                                                   self.token,
                                                   self.url,
-                                                  self.js_security_key)
+                                                  self.js_security_key,
+                                                  self.token_url)
 
     def authorize(self, amount=None, currency_code=None, description=None,
                   card_type=None, cardholder_name=None, card_number=None,
                   card_expiry=None, card_cvv=None):
 
-        make_payload_output = self.make_payload(amount=amount,
-                                                currency_code=currency_code,
-                                                card_type=card_type,
-                                                cardholder_name=cardholder_name,
-                                                card_number=card_number,
-                                                card_expiry=card_expiry,
-                                                card_cvv=card_cvv,
-                                                description=description,
-                                                transaction_type='authorize')
+        _make_payload_output = self._make_payload(amount=amount,
+                                                  currency_code=currency_code,
+                                                  card_type=card_type,
+                                                  cardholder_name=cardholder_name,
+                                                  card_number=card_number,
+                                                  card_expiry=card_expiry,
+                                                  card_cvv=card_cvv,
+                                                  description=description,
+                                                  transaction_type='authorize')
 
-        return self.make_primary_transaction(payload=make_payload_output['payload'])
+        return self._make_primary_transaction(payload=_make_payload_output['payload'])
 
     def purchase(self, amount=None, currency_code=None, description=None,
                  card_type=None, cardholder_name=None, card_number=None,
                  card_expiry=None, card_cvv=None):
 
-        make_payload_output = self.make_payload(amount=amount,
-                                                currency_code=currency_code,
-                                                card_type=card_type,
-                                                cardholder_name=cardholder_name,
-                                                card_number=card_number,
-                                                card_expiry=card_expiry,
-                                                card_cvv=card_cvv,
-                                                description=description,
-                                                transaction_type='purchase')
-        payload = make_payload_output['payload']
+        _make_payload_output = self._make_payload(amount=amount,
+                                                  currency_code=currency_code,
+                                                  card_type=card_type,
+                                                  cardholder_name=cardholder_name,
+                                                  card_number=card_number,
+                                                  card_expiry=card_expiry,
+                                                  card_cvv=card_cvv,
+                                                  description=description,
+                                                  transaction_type='purchase')
+        payload = _make_payload_output['payload']
         payload["partial_redemption"] = "false"  # always
-        return self.make_primary_transaction(payload=payload)
+        return self._make_primary_transaction(payload=payload)
 
     def capture(self, amount=None, currency_code=None, description=None,
                 transaction_tag=None, transaction_id=None):
 
-        make_payload_output = self.make_payload(amount=amount,
-                                                currency_code=currency_code,
-                                                transaction_tag=transaction_tag,
-                                                transaction_id=transaction_id,
-                                                description=description,
-                                                transaction_type='capture')
+        _make_payload_output = self._make_payload(amount=amount,
+                                                  currency_code=currency_code,
+                                                  transaction_tag=transaction_tag,
+                                                  transaction_id=transaction_id,
+                                                  description=description,
+                                                  transaction_type='capture')
 
-        return self.make_secondary_transaction(payload=make_payload_output['payload'],
-                                               transaction_id=make_payload_output['transaction_id'])
+        return self._make_secondary_transaction(payload=_make_payload_output['payload'],
+                                                transaction_id=_make_payload_output['transaction_id'])
 
     def void(self,  payload):
         self.payload = payload
         self.transaction_type = "void"
-        return self.make_secondary_transaction(self.transaction_type, self.payload)
+        return self._make_secondary_transaction(self.transaction_type, self.payload)
 
     def refund(self,  payload):
         self.payload = payload
         self.transaction_type = "refund"
-        return self.make_secondary_transaction(self.transaction_type, self.payload)
+        return self._make_secondary_transaction(self.transaction_type, self.payload)
 
     def get_fd_token(self, card_type=None, cardholder_name=None, card_number=None, 
-                     card_expiry=None, card_cvv=None,
+                     card_expiry=None, card_cvv=None, callback=None, callback=None,
                      street=None, city=None, state=None, zip_code=None, country=None):
 
-        payload = self.get_fd_token_payload(card_type=card_type, 
-                                            cardholder_name=cardholder_name, 
-                                            card_number=card_number, 
-                                            card_expiry=card_expiry,
-                                            card_cvv=card_cvv, 
-                                            street=street,
-                                            city=city, 
-                                            state=state, 
-                                            zip_code=zip_code,
-                                            country=country)
+        payload = self._make_fd_token_payload(callback=callback,
+                                              card_type=card_type, 
+                                              cardholder_name=cardholder_name, 
+                                              card_number=card_number, 
+                                              card_expiry=card_expiry,
+                                              card_cvv=card_cvv, 
+                                              street=street,
+                                              city=city, 
+                                              state=state, 
+                                              zip_code=zip_code,
+                                              country=country)
         payload['apikey'] = self.api_key
         payload['js_security_key'] = self.js_security_key
         self.payload = payload
+        return self.payeezy.make_token_get_call(payload)
 
-    # requests
+    # payload
 
-    def make_primary_transaction(self, payload):
+    def _make_primary_transaction(self, payload):
         self.payload = payload
         return self.payeezy.make_card_based_transaction_post_call(self.payload)
 
-    def make_secondary_transaction(self, payload, transaction_id):
+    def _make_secondary_transaction(self, payload, transaction_id):
         self.payload = payload
         self.transaction_id = transaction_id
         return self.payeezy.make_capture_void_refund_post_call(self.payload,
                                                                self.transaction_id)
 
-    def make_payload(self, amount=None, currency_code='USD',  description=None,
-                     card_type=None, cardholder_name=None, card_number=None,
-                     card_expiry=None, card_cvv=None, transaction_type=None,
-                     transaction_tag=None, transaction_id=None):
+    def _make_payload(self, amount=None, currency_code='USD',  description=None,
+                      card_type=None, cardholder_name=None, card_number=None,
+                      card_expiry=None, card_cvv=None, transaction_type=None,
+                      transaction_tag=None, transaction_id=None):
 
         assert amount is not None, "Amount cannot be None"
         if isinstance(amount, six.integer_types):
@@ -187,9 +190,11 @@ class Payeezy(object):
 
         return {'payload': payload, 'transaction_id': transaction_id}
 
-    def get_fd_token_payload(self, card_type=None, cardholder_name=None, card_number=None, 
-                             card_expiry=None, card_cvv=None,
-                             street=None, city=None, state=None, zip_code=None, country=None):
+    def _make_fd_token_payload(self, card_type=None, cardholder_name=None, card_number=None, 
+                               card_expiry=None, card_cvv=None, callback=None,
+                               street=None, city=None, state=None, zip_code=None, country=None):
+
+        callback = callback or 'Payeezy.callback'
 
         assert card_number is not None, "Card number cannot be None"
         if isinstance(card_number, six.integer_types):
@@ -208,7 +213,7 @@ class Payeezy(object):
         payload = {
             "ta_token": "NOIW", 
             "type": "FDToken",
-            "callback": 'Payeezy.callback',
+            "callback": callback,
             "credit_card.type": card_type,
             "credit_card.cardholder_name": cardholder_name, 
             "credit_card.card_number": card_number,
