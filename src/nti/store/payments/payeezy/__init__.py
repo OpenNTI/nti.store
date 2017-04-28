@@ -43,6 +43,6 @@ def live_urls():
 def test_urls():
     result = {
         PAY_URL: 'https://api-cert.payeezy.com/v1/transactions',
-        TOKEN_URL: 'https://api-cert.payeezy.com/v1/transactionst',
+        TOKEN_URL: 'https://api-cert.payeezy.com/v1/transactions',
     }
     return result
