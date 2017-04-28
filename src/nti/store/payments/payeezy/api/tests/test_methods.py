@@ -7,6 +7,7 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
+from hamcrest import is_
 from hamcrest import none
 from hamcrest import is_not
 from hamcrest import has_entry
@@ -14,7 +15,10 @@ from hamcrest import assert_that
 from hamcrest import has_entries
 does_not = is_not
 
+import re
 import unittest
+
+import simplejson
 
 from nti.store.payments.payeezy import PAY_URL
 from nti.store.payments.payeezy import TOKEN_URL
@@ -58,12 +62,42 @@ class TestMethods(unittest.TestCase):
                                 'correlation_id', is_not(none()),
                                 'currency', 'USD',
                                 'method', 'credit_card',
-                                'token', has_entries(
-                                            'token_data', 
-                                                has_entry('value', is_not(none())),
-                                            'token_type', 'FDToken'),
+                                'token',
+                                has_entries(
+                                    'token_data',
+                                        has_entry('value', is_not(none())),
+                                    'token_type', 'FDToken'),
                                 'transaction_id', is_not(none()),
                                 'transaction_status', 'approved',
                                 'transaction_tag', is_not(none()),
                                 'transaction_type', 'purchase',
                                 'validation_status', 'success'))
+
+    def test_fd_token(self):
+        callback = 'callback'
+        payeezy = self._get_payeezy()
+        result = payeezy.get_fd_token(card_type="visa",
+                                      cardholder_name="Ichigo Kurosaki",
+                                      card_number="4012000033330026",
+                                      card_expiry="0930",
+                                      card_cvv="019",
+                                      street="Bleach Way",
+                                      city="Norman",
+                                      state="OK",
+                                      zip_code="73072",
+                                      country="USA",
+                                      callback=callback)
+
+        assert_that(result.status_code, is_(200))
+        text = re.sub(r'[\s\n]', '', result.text)
+        text = text[len(callback) + 1:-1]
+        data = simplejson.loads(text)
+        assert_that(data,
+                    has_entries('status', 201,
+                                'results',
+                                has_entries('correlation_id', is_not(none()),
+                                            'status', 'success',
+                                            'type', 'FDToken',
+                                            'token',
+                                            has_entries('value', is_not(none()),
+                                                        'type', 'visa'))))

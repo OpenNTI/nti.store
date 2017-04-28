@@ -97,7 +97,7 @@ class Payeezy(object):
         return self._make_secondary_transaction(self.transaction_type, self.payload)
 
     def get_fd_token(self, card_type=None, cardholder_name=None, card_number=None, 
-                     card_expiry=None, card_cvv=None, callback=None, callback=None,
+                     card_expiry=None, card_cvv=None, callback=None,
                      street=None, city=None, state=None, zip_code=None, country=None):
 
         payload = self._make_fd_token_payload(callback=callback,
