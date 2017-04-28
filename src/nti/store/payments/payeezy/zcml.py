@@ -33,7 +33,8 @@ class IRegisterPayeezyKeyDirective(interface.Interface):
     token = fields.TextLine(title=u"Reporting token", required=False)
 
 
-def registerPayeezyKey(_context, provider, api_key, api_secret, token, js_security_key=None):
+def registerPayeezyKey(_context, provider, api_key, api_secret, token,
+                       js_security_key=None):
     """
     Register a Payeezy key with the given alias
     """

@@ -15,6 +15,8 @@ from zope.mimetype.interfaces import IContentTypeAware
 
 from nti.externalization.representation import WithRepr
 
+from nti.schema.eqhash import EqHash
+
 from nti.schema.field import SchemaConfigured
 
 from nti.schema.fieldproperty import createDirectFieldProperties
@@ -27,6 +29,7 @@ from nti.property.property import alias
 
 
 @WithRepr
+@EqHash('Provider',)
 @interface.implementer(IPayeezyConnectKey, IContentTypeAware)
 class PayeezyConnectKey(SchemaConfigured):
     createDirectFieldProperties(IPayeezyConnectKey)
