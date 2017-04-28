@@ -120,8 +120,7 @@ def create_store_purchase_invitation(purchase, receiver):
     result = StorePurchaseInvitation(purchase=purchase)
     result.receiver = getattr(receiver, 'username', receiver)
     result.expirationTime = getattr(purchase, 'ExpirationTime', None) or 0
-    result.creator = getattr(
-        purchase.creator, 'username', purchase.creator)  # sender
+    result.creator = getattr(purchase.creator, 'username', purchase.creator)  # sender
     return result
 
 
