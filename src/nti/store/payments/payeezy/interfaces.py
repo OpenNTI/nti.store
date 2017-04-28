@@ -14,6 +14,7 @@ from zope import interface
 from zope.interface.common.mapping import IReadMapping
 
 from nti.schema.field import TextLine
+from nti.schema.field import ValidBytesLine
 
 
 class IPayeezyURLMap(IReadMapping):
@@ -27,7 +28,7 @@ class IPayeezyConnectKey(interface.Interface):
 
     APIKey = TextLine(title=u"The api key.", required=True)
 
-    APISecret = TextLine(title=u"The api secret.", required=True)
+    APISecret = ValidBytesLine(title=u"The api secret.", required=True)
     APISecret.setTaggedValue('_ext_excluded_out', True)
 
     ReportingToken = TextLine(title=u"Reporting token.", required=False)

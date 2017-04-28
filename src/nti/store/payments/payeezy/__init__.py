@@ -22,7 +22,7 @@ PAY_URL = URL = 'URL'
 TOKEN_URL = 'TOKEN_URL'
 
 
-def get_credentials(name=''):
+def get_credentials(name):
     return component.getUtility(IPayeezyConnectKey, name=name)
 
 
