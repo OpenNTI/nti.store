@@ -23,16 +23,18 @@ from nti.store.interfaces import IPricingError
 
 from nti.store.utils import MetaStoreObject
 
+
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
 @interface.implementer(IPricingError)
 class PricingError(SchemaConfigured):
-	__metaclass__ = MetaStoreObject
-	createDirectFieldProperties(IPricingError)
+    __metaclass__ = MetaStoreObject
+    createDirectFieldProperties(IPricingError)
 
-	def __str__(self):
-		return self.Message
+    def __str__(self):
+        return self.Message
+
 
 def create_pricing_error(message, type_=None, code=None):
-	result = PricingError(Message=message, Type=type_, Code=code)
-	return result
+    result = PricingError(Message=message, Type=type_, Code=code)
+    return result

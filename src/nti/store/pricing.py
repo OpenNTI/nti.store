@@ -37,83 +37,95 @@ from nti.store.priceable import Priceable
 
 from nti.store.utils import MetaStoreObject
 
+
 @WithRepr
 @EqHash('NTIID',)
 @interface.implementer(IPricedItem, IContentTypeAware)
 class PricedItem(Priceable):
-	__metaclass__ = MetaStoreObject
-	createDirectFieldProperties(IPricedItem)
-		
+    __metaclass__ = MetaStoreObject
+    createDirectFieldProperties(IPricedItem)
+
+
 def create_priced_item(ntiid, purchase_price, purchase_fee=None,
-					   non_discounted_price=None, quantity=1, currency='USD'):
-	quantity = 1 if quantity is None else int(quantity)
-	purchase_fee = float(purchase_fee) if purchase_fee is not None else None
-	non_discounted_price = float(non_discounted_price) \
-						   if non_discounted_price is not None else None
-	result = PricedItem(NTIID=unicode(ntiid), PurchasePrice=float(purchase_price),
-						PurchaseFee=purchase_fee, NonDiscountedPrice=non_discounted_price,
-						Quantity=quantity, Currency=currency)
-	return result
+                       non_discounted_price=None, quantity=1, currency='USD'):
+    quantity = 1 if quantity is None else int(quantity)
+    purchase_fee = float(purchase_fee) if purchase_fee is not None else None
+    if non_discounted_price is not None:
+        non_discounted_price = float(non_discounted_price)
+    else:
+        non_discounted_price =  None
+    result = PricedItem(NTIID=ntiid, 
+                        PurchasePrice=float(purchase_price),
+                        PurchaseFee=purchase_fee, 
+                        NonDiscountedPrice=non_discounted_price,
+                        Quantity=quantity, 
+                        Currency=currency)
+    return result
+
 
 @WithRepr
 @interface.implementer(IPricingResults, IContentTypeAware)
 class PricingResults(SchemaConfigured):
-	__metaclass__ = MetaStoreObject
-	createDirectFieldProperties(IPricingResults)
+    __metaclass__ = MetaStoreObject
+    createDirectFieldProperties(IPricingResults)
+
 
 def create_pricing_results(items=None, purchase_price=0.0, purchase_fee=0.0,
-						   non_discounted_price=None, currency='USD'):
-	items = list() if items is None else items
-	purchase_fee = float(purchase_fee) if purchase_fee is not None else None
-	non_discounted_price = 	float(non_discounted_price) \
-							if non_discounted_price is not None else None
-	result = PricingResults(Items=items, TotalPurchasePrice=purchase_price,
-							TotalPurchaseFee=purchase_fee,
-							TotalNonDiscountedPrice=non_discounted_price,
-							Currency=currency)
-	return result
+                           non_discounted_price=None, currency='USD'):
+    items = list() if items is None else items
+    purchase_fee = float(purchase_fee) if purchase_fee is not None else None
+    if non_discounted_price is not None:
+        non_discounted_price = float(non_discounted_price)
+    else:
+        non_discounted_price = None
+    result = PricingResults(Items=items, 
+							TotalPurchasePrice=purchase_price,
+                            TotalPurchaseFee=purchase_fee,
+                            TotalNonDiscountedPrice=non_discounted_price,
+                            Currency=currency)
+    return result
+
 
 @interface.implementer(IPurchasablePricer)
 class DefaultPurchasablePricer(object):
 
-	def calc_fee(self, amount, fee):
-		fee_amount = 0.0
-		if fee is not None:
-			pct = fee / 100.0 if fee >= 1 else fee
-			fee_amount = round(amount * pct, ROUND_DECIMAL)
-		return fee_amount
+    def calc_fee(self, amount, fee):
+        fee_amount = 0.0
+        if fee is not None:
+            pct = fee / 100.0 if fee >= 1 else fee
+            fee_amount = round(amount * pct, ROUND_DECIMAL)
+        return fee_amount
 
-	def price(self, priceable, registry=None):
-		__traceback_info__ = priceable
-		quantity = priceable.Quantity or 1
-		purchasable = priceable.purchasable
-		if purchasable is None:
-			raise InvalidPurchasable("'%s' is an invalid purchasable NTIID" %
-									priceable.NTIID)
+    def price(self, priceable, registry=None):
+        __traceback_info__ = priceable
+        quantity = priceable.Quantity or 1
+        purchasable = priceable.purchasable
+        if purchasable is None:
+            raise InvalidPurchasable("'%s' is an invalid purchasable NTIID" %
+                                     priceable.NTIID)
 
-		amount = purchasable.Amount
-		new_amount = round(amount * quantity, ROUND_DECIMAL)
+        amount = purchasable.Amount
+        new_amount = round(amount * quantity, ROUND_DECIMAL)
 
-		fee_amount = self.calc_fee(new_amount, purchasable.Fee)
-		result = create_priced_item(ntiid=purchasable.NTIID,
-									purchase_price=new_amount,
-									purchase_fee=fee_amount,
-									quantity=quantity,
-									currency=priceable.Currency)
-		return result
+        fee_amount = self.calc_fee(new_amount, purchasable.Fee)
+        result = create_priced_item(ntiid=purchasable.NTIID,
+                                    purchase_price=new_amount,
+                                    purchase_fee=fee_amount,
+                                    quantity=quantity,
+                                    currency=priceable.Currency)
+        return result
 
-	def evaluate(self, priceables, registry=None):
-		currencies = set()
-		result = create_pricing_results()
-		for priceable in priceables:
-			priced = self.price(priceable, registry=registry)
-			result.Items.append(priced)
-			currencies.add(priceable.Currency)
-			result.TotalPurchaseFee += priced.PurchaseFee
-			result.TotalPurchasePrice += priced.PurchasePrice
+    def evaluate(self, priceables, registry=None):
+        currencies = set()
+        result = create_pricing_results()
+        for priceable in priceables:
+            priced = self.price(priceable, registry=registry)
+            result.Items.append(priced)
+            currencies.add(priceable.Currency)
+            result.TotalPurchaseFee += priced.PurchaseFee
+            result.TotalPurchasePrice += priced.PurchasePrice
 
-		if len(currencies) != 1:
-			raise PricingException(_("Multi-Currency pricing is not supported"))
-
-		result.Currency = currencies.pop()
-		return result
+        if len(currencies) != 1:
+            raise PricingException(_("Multi-Currency pricing is not supported"))
+        result.Currency = currencies.pop()
+        return result
