@@ -18,11 +18,11 @@ from nti.base._compat import unicode_
 
 from nti.externalization.externalization import to_external_object
 
+from nti.store.charge import UserAddress
+from nti.store.charge import PaymentCharge
+
 from nti.store.interfaces import IPurchaseError
 from nti.store.interfaces import IStorePurchaseMetadataProvider
-
-from nti.store.payment_charge import UserAddress
-from nti.store.payment_charge import PaymentCharge
 
 from nti.store.payments.stripe.interfaces import IStripeError
 from nti.store.payments.stripe.interfaces import IStripePurchaseError
