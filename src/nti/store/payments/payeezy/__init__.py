@@ -34,7 +34,7 @@ def get_url_map():
 def live_urls():
     result = {
         PAY_URL: 'https://api.payeezy.com/v1/transactions',
-        TOKEN_URL: 'https://api.payeezy.com/v1/transactions',
+        TOKEN_URL: 'https://api.payeezy.com/v1/securitytokens',
     }
     return result
 
@@ -43,6 +43,6 @@ def live_urls():
 def test_urls():
     result = {
         PAY_URL: 'https://api-cert.payeezy.com/v1/transactions',
-        TOKEN_URL: 'https://api-cert.payeezy.com/v1/transactions',
+        TOKEN_URL: 'https://api-cert.payeezy.com/v1/securitytokens',
     }
     return result

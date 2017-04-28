@@ -23,10 +23,14 @@ import requests
 
 class PayeezyHTTPAuthorize(object):
 
-    def __init__(self, api_key, api_secret, token, url, token_url=None):
+    payload = None
+
+    def __init__(self, api_key, api_secret, token, url, 
+                 js_security_key=None, token_url=None):
         self.token = token
         self.api_key = api_key
         self.api_secret = api_secret
+        self.js_security_key = js_security_key
         # urls
         self.url = url
         self.token_url = token_url or url
@@ -39,13 +43,13 @@ class PayeezyHTTPAuthorize(object):
     # HMAC Generation
     def generate_hmac_authentication_header(self, payload):
         message_data = self.api_key + self.nonce + self.timestamp + self.token + payload
-        hmacInHex = hmac.new(
-            self.api_secret, msg=message_data, digestmod=hashlib.sha256)
+        hmacInHex = hmac.new(self.api_secret,
+                             msg=message_data, 
+                             digestmod=hashlib.sha256)
         hmacInHex = hmacInHex.hexdigest().encode('ascii')
         return b64encode(hmacInHex)
 
-    # method to make calls for getToken
-    def get_token_post_call(self, payload):
+    def make_token_post_call(self, payload):
         response = requests.Session()
         self.payload = json.dumps(payload)
         authorization = self.generate_hmac_authentication_header(self.payload)
@@ -91,4 +95,10 @@ class PayeezyHTTPAuthorize(object):
                                    'Authorization': authorization
                                },
                                data=self.payload)
+        return result
+
+    def make_token_get_call(self, payload):
+        response = requests.Session()
+        self.payload = payload
+        result = response.get(self.token_url, params=self.payload)
         return result

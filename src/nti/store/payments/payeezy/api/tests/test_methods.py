@@ -17,6 +17,7 @@ does_not = is_not
 import unittest
 
 from nti.store.payments.payeezy import PAY_URL
+from nti.store.payments.payeezy import TOKEN_URL
 from nti.store.payments.payeezy import get_url_map
 from nti.store.payments.payeezy import get_credentials
 
@@ -36,29 +37,32 @@ class TestMethods(unittest.TestCase):
         url_map = get_url_map()
         credentials = self._credentials()
         result = Payeezy(api_key=credentials.APIKey,
-                         api_secret=credentials.APISecret, 
-                         token=credentials.Token, 
-                         url=url_map[PAY_URL])
+                         api_secret=credentials.APISecret,
+                         token=credentials.Token,
+                         url=url_map[PAY_URL],
+                         js_security_key=credentials.JSSecurityKey,
+                         token_url=url_map[TOKEN_URL])
         return result
-        
+
     def test_purchase(self):
         payeezy = self._get_payeezy()
-        result = payeezy.purchase(100, "USD", 
-                                 card_type="visa", 
-                                 cardholder_name="Ichigo Kurosaki",
-                                 card_number="4012000033330026", 
-                                 card_expiry="0930", 
-                                 card_cvv="019")
+        result = payeezy.purchase(100, "USD",
+                                  card_type="visa",
+                                  cardholder_name="Ichigo Kurosaki",
+                                  card_number="4012000033330026",
+                                  card_expiry="0930",
+                                  card_cvv="019")
         data = result.json()
-        assert_that(data, 
+        assert_that(data,
                     has_entries('amount', '100',
                                 'correlation_id', is_not(none()),
                                 'currency', 'USD',
                                 'method', 'credit_card',
                                 'token', has_entries(
-                                            'token_data', has_entry('value', is_not(none())),
+                                            'token_data', 
+                                                has_entry('value', is_not(none())),
                                             'token_type', 'FDToken'),
-                                'transaction_id', is_not(none()), 
+                                'transaction_id', is_not(none()),
                                 'transaction_status', 'approved',
                                 'transaction_tag', is_not(none()),
                                 'transaction_type', 'purchase',
