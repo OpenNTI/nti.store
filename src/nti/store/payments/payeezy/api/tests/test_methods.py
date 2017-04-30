@@ -76,17 +76,17 @@ class TestMethods(unittest.TestCase):
     def test_fd_token(self):
         callback = 'callback'
         payeezy = self._get_payeezy()
-        result = payeezy.get_fd_token(card_type="visa",
-                                      cardholder_name="Ichigo Kurosaki",
-                                      card_number="4012000033330026",
-                                      card_expiry="0930",
-                                      card_cvv="019",
-                                      street="Bleach Way",
-                                      city="Norman",
-                                      state="OK",
-                                      zip_code="73072",
-                                      country="USA",
-                                      callback=callback)
+        result = payeezy.fd_token(card_type="visa",
+                                  cardholder_name="Ichigo Kurosaki",
+                                  card_number="4012000033330026",
+                                  card_expiry="0930",
+                                  card_cvv="019",
+                                  street="Bleach Way",
+                                  city="Norman",
+                                  state="OK",
+                                  zip_code="73072",
+                                  country="USA",
+                                  callback=callback)
 
         assert_that(result.status_code, is_(200))
         text = re.sub(r'[\s\n]', '', result.text)

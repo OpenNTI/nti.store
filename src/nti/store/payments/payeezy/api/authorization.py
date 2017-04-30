@@ -40,7 +40,6 @@ class PayeezyHTTPAuthorize(object):
         # timeout
         self.timeout = 30
 
-    # HMAC Generation
     def generate_hmac_authentication_header(self, payload):
         message_data = self.api_key + self.nonce + self.timestamp + self.token + payload
         hmacInHex = hmac.new(self.api_secret,
