@@ -13,7 +13,7 @@ import six
 
 from zope.cachedescriptors.property import Lazy
 
-from nti.store.payments.payeezy.api import authorization
+from nti.store.payments.payeezy.api import requests
 
 
 class Payeezy(object):
@@ -33,12 +33,12 @@ class Payeezy(object):
 
     @Lazy
     def payeezy(self):
-        return authorization.PayeezyHTTPAuthorize(self.api_key,
-                                                  self.api_secret,
-                                                  self.token,
-                                                  self.url,
-                                                  self.js_security_key,
-                                                  self.token_url)
+        return requests.PayeezyHTTPRequests(self.api_key,
+                                            self.api_secret,
+                                            self.token,
+                                            self.url,
+                                            self.js_security_key,
+                                            self.token_url)
 
     def authorize(self, amount=None, currency_code=None, description=None,
                   card_type=None, cardholder_name=None, card_number=None,

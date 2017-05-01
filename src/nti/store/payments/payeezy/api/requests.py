@@ -23,7 +23,7 @@ import requests
 os.urandom(1)
 
 
-class PayeezyHTTPAuthorize(object):
+class PayeezyHTTPRequests(object):
 
     payload = None
 
