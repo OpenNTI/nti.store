@@ -20,6 +20,8 @@ import simplejson as json
 
 import requests
 
+os.urandom(1)
+
 
 class PayeezyHTTPAuthorize(object):
 
@@ -48,18 +50,6 @@ class PayeezyHTTPAuthorize(object):
         hmacInHex = hmacInHex.hexdigest().encode('ascii')
         return b64encode(hmacInHex)
 
-    def make_token_post_call(self, payload):
-        response = requests.Session()
-        self.payload = json.dumps(payload)
-        authorization = self.generate_hmac_authentication_header(self.payload)
-        result = response.post(self.token_url,
-                               headers={
-                                   'Content-type': 'application/json',
-                                   'apikey': self.api_key,
-                                   'token': self.token,
-                                   'Authorization': authorization},
-                               data=self.payload)
-        return result
 
     # Generic method to make calls for primary transactions
     def make_card_based_transaction_post_call(self, payload):
@@ -100,4 +90,19 @@ class PayeezyHTTPAuthorize(object):
         response = requests.Session()
         self.payload = payload
         result = response.get(self.token_url, params=self.payload)
+        return result
+    
+    def make_token_post_call(self, payload):
+        response = requests.Session()
+        self.payload = json.dumps(payload)
+        authorization = self.generate_hmac_authentication_header(self.payload)
+        result = response.post(self.url,  # transaction
+                               headers={
+                                   'Content-type': 'application/json',
+                                   'apikey': self.api_key,
+                                   'token': self.token,
+                                   'nonce': self.nonce,
+                                   'timestamp': self.timestamp,
+                                   'Authorization': authorization},
+                               data=self.payload)
         return result

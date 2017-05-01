@@ -60,6 +60,9 @@ class Payeezy(object):
                  card_type=None, cardholder_name=None, card_number=None,
                  card_expiry=None, card_cvv=None):
 
+        """
+        Credit card purchase
+        """
         _make_payload_output = self._make_payload(amount=amount,
                                                   currency_code=currency_code,
                                                   card_type=card_type,
@@ -99,6 +102,9 @@ class Payeezy(object):
     def fd_token(self, card_type=None, cardholder_name=None, card_number=None, 
                  card_expiry=None, card_cvv=None, callback=None,
                  street=None, city=None, state=None, zip_code=None, country=None):
+        """
+        Process an FDToken token
+        """
 
         payload = self._make_fd_token_payload(callback=callback,
                                               card_type=card_type, 
@@ -115,6 +121,19 @@ class Payeezy(object):
         payload['js_security_key'] = self.js_security_key
         self.payload = payload
         return self.payeezy.make_token_get_call(payload)
+
+    def token_payment(self, token, amount, currency_code, card_type, cardholder_name,
+                      card_expiry=None,  description=None):
+        
+        payload = self._make_token_purchase_payload(token=token,
+                                                    amount=amount,
+                                                    currency_code=currency_code,
+                                                    card_type=card_type, 
+                                                    cardholder_name=cardholder_name, 
+                                                    card_expiry=card_expiry,
+                                                    description=description)
+        self.payload = payload
+        return self.payeezy.make_token_post_call(payload)
 
     # payload
 
@@ -230,5 +249,53 @@ class Payeezy(object):
             payload['billing_address.state_province'] = state
         if zip_code is not None:
             payload['billing_address.zip_postal_code'] = str(zip_code)
+
+        return payload
+    
+    def _make_token_purchase_payload(self, token, amount, currency_code, card_type, cardholder_name,
+                                     card_expiry=None, card_cvv=None,  description=None):
+
+        assert token is not None, "Token cannot be None"
+        if isinstance(amount, six.integer_types):
+            token = str(token)
+
+        assert amount is not None, "Amount cannot be None"
+        if isinstance(amount, six.integer_types):
+            amount = str(amount)
+
+        assert currency_code, "Currency cannot be None"
+        assert card_type, "Card Type cannot be None"
+
+        if isinstance(card_expiry, six.integer_types):
+            card_expiry = str(card_expiry)
+            
+        # fill some description
+        if description is None:
+            msg = "%s transaction for amount: %s"
+            description = msg % (card_type, amount)
+
+        assert cardholder_name, "Card name was not provided"
+        if isinstance(card_expiry, six.integer_types):
+            card_expiry = str(card_expiry)
+
+        token_data = {
+            "type": card_type,
+            "value": token,
+            "cardholder_name": cardholder_name,
+        }
+        if card_expiry:
+            token_data['exp_date'] = card_expiry
+        
+        payload = {
+            "merchant_ref": description,
+            "transaction_type": 'purchase',
+            "method": "token",
+            "amount": amount,
+            "currency_code": currency_code.upper(),
+            "token": {
+                "token_type": "FDToken",
+                "token_data": token_data
+            }
+        }
 
         return payload
