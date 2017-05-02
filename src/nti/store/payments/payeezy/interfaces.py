@@ -17,6 +17,8 @@ from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 
 from nti.schema.field import Int
+from nti.schema.field import Number
+from nti.schema.field import Variant
 from nti.schema.field import TextLine
 from nti.schema.field import UniqueIterable
 from nti.schema.field import ValidBytesLine
@@ -81,7 +83,8 @@ class IPayeezyConnectKey(interface.Interface):
 
 class IPayeezyFDToken(interface.Interface):
     type = TextLine(title=u"The token type name.", required=False)
-    value = TextLine(title=u"The token value.", required=True)
+    value = Variant((TextLine(title=u"The token value."),
+                     Number(title=u"The token value.")), required=True)
 
 
 class IPayeezyPurchaseAttempt(interface.Interface):
