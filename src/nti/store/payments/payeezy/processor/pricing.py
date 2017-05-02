@@ -19,7 +19,7 @@ from nti.store.purchase_history import get_purchase_attempt
 
 
 def price_order(order, name=PAYEEZY, registry=component):
-    pricer = component.getUtility(IPurchasablePricer, name=name)
+    pricer = registry.getUtility(IPurchasablePricer, name=name)
     result = pricer.evaluate(order, registry=registry)
     return result
 
