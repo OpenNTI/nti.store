@@ -47,6 +47,7 @@ from nti.schema.field import Number
 from nti.schema.field import Object
 from nti.schema.field import Variant
 from nti.schema.field import Datetime
+from nti.schema.field import TextLine
 from nti.schema.field import ValidURI
 from nti.schema.field import FrozenSet
 from nti.schema.field import Timedelta
@@ -186,7 +187,7 @@ class ICopier(interface.Interface):
 		"""
 
 class IPriceable(interface.Interface):
-	NTIID = ValidTextLine(title='Purchasable item NTTID', required=True)
+	NTIID = TextLine(title='Purchasable item NTTID', required=True)
 	Quantity = Int(title="Quantity", required=False, default=1, min=0)
 
 	def copy():
@@ -251,8 +252,8 @@ class IPaymentCharge(interface.Interface):
 	Address = Object(IUserAddress, title='User address', required=False)
 
 class IOperationError(interface.Interface):
-	Type = ValidTextLine(title='Error type', required=True)
-	Code = ValidTextLine(title='Error code', required=False)
+	Type = TextLine(title='Error type', required=True)
+	Code = TextLine(title='Error code', required=False)
 	Message = ValidText(title='Error message', required=True)
 
 class IPricingError(IOperationError):
@@ -441,8 +442,8 @@ class IInvitationPurchaseAttempt(IPurchaseAttempt):
 
 class IRedeemedPurchaseAttempt(IPurchaseAttempt):
 	RedemptionTime = Number(title='Redemption time', required=True)
-	RedemptionCode = ValidTextLine(title='Redemption Code', required=True)
-	SourcePurchaseID = ValidTextLine(title='Source Purchase ID', required=False)
+	RedemptionCode = TextLine(title='Redemption Code', required=True)
+	SourcePurchaseID = TextLine(title='Source Purchase ID', required=False)
 
 class IGiftPurchaseAttempt(IPurchaseAttempt):
 	Creator = ValidTextLine(title="Gift creator Email", required=True)
@@ -452,7 +453,7 @@ class IGiftPurchaseAttempt(IPurchaseAttempt):
 							 constraint=checkEmailAddress)
 	ReceiverName = ValidTextLine(title='Receiver name', required=False)
 	Message = ValidText(title='Gift message', required=False)
-	TargetPurchaseID = ValidTextLine(title='NTIID of target purchase', required=False)
+	TargetPurchaseID = TextLine(title='NTIID of target purchase', required=False)
 	TargetPurchaseID.setTaggedValue('_ext_excluded_out', True)
 
 	DeliveryDate = Datetime(title="The gift delivery date", required=False)
@@ -524,7 +525,7 @@ class IPurchaseAttemptFailed(IPurchaseAttemptStateEvent):
 
 class IGiftPurchaseAttemptRedeemed(IPurchaseAttemptEvent):
 	user = Object(IUser, title="The gift receiver")
-	code = ValidTextLine(title="The gift code", required=False)
+	code = TextLine(title="The gift code", required=False)
 	request = interface.Attribute('Purchase request')
 
 @interface.implementer(IPurchaseAttemptEvent)
@@ -627,11 +628,11 @@ class IPurchaseHistory(IIterable):
 # invitations
 
 class IPurchaseInvitation(IInvitation):
-	source_purchase = Variant((ValidTextLine(title="Purchase NTIID"),
+	source_purchase = Variant((TextLine(title="Purchase NTIID"),
 					   		   Object(IPurchaseAttempt, title="The source purchase")),
 					   		   title='The source purchase')
 
-	redeemed_purchase = Variant((ValidTextLine(title="Purchase NTIID"),
+	redeemed_purchase = Variant((TextLine(title="Purchase NTIID"),
 					    	  	Object(IRedeemedPurchaseAttempt, title="The linked purchase")),
 					    	    title='The Linked purchase',
 					    	    required=False)
