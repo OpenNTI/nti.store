@@ -13,13 +13,18 @@ from zope import component
 from zope import interface
 
 from nti.store.payments.payeezy.interfaces import IPayeezyURLMap
+from nti.store.payments.payeezy.interfaces import IPayeezyException
 from nti.store.payments.payeezy.interfaces import IPayeezyConnectKey
-
 
 PAYEEZY = u"payeezy"
 
 PAY_URL = URL = 'URL'
 TOKEN_URL = 'TOKEN_URL'
+
+
+@interface.implementer(IPayeezyException)
+class PayeezyException(Exception):
+    pass
 
 
 def get_credentials(name):

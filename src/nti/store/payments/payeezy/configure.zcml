@@ -10,6 +10,27 @@
 	
 	<include package=".processor" />
 
+	<!-- Adapters -->
+	<adapter factory=".adapters._PayeezyCustomerFactory"
+			 for="nti.dataserver.interfaces.IUser"
+			 provides=".interfaces.IPayeezyCustomer" />
+
+	<adapter factory=".adapters._PayeezyPurchaseAttemptFactory"
+			 for="...interfaces.IPurchaseAttempt"
+			 provides=".interfaces.IPayeezyPurchaseAttempt" />
+
+	<adapter factory=".adapters._string_purchase_error"
+			 provides=".interfaces.IPayeezyPurchaseError"
+			 for="basestring" />
+
+	<adapter factory=".adapters._string_operation_error"
+			 provides=".interfaces.IPayeezyOperationError"
+			 for="basestring" />
+		 
+	<adapter factory=".adapters.payeezy_exception_adapter"
+			 provides=".interfaces.IPayeezyPurchaseError"
+			 for=".interfaces.IPayeezyException" />
+
 	<!-- Pricing -->
 	<utility factory=".pricing.PayeezyPurchasablePricer"
 			 name="payeezy" />
@@ -19,7 +40,9 @@
 	<include package="nti.externalization" />
 
 	<ext:registerAutoPackageIO
-		root_interfaces=".interfaces.IPayeezyConnectKey"
+		root_interfaces=".interfaces.IPayeezyConnectKey
+						 .interfaces.IPayeezyPurchaseError
+						 .interfaces.IPayeezyOperationError"
 		modules=".model" />
 	
 	<!-- URLs -->

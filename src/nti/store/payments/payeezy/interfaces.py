@@ -16,9 +16,13 @@ from zope.interface.common.mapping import IReadMapping
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 
+from nti.schema.field import Int
+from nti.schema.field import Set
 from nti.schema.field import TextLine
 from nti.schema.field import ValidBytesLine
 
+from nti.store.interfaces import IPurchaseError
+from nti.store.interfaces import IOperationError
 
 FAILED = u'failed'
 SUCCESS = u'success'
@@ -28,6 +32,31 @@ APPROVED = u'approved'
 STATES = (FAILED, FAILURE, APPROVED, SUCCESS)
 
 STATE_VOCABULARY = SimpleVocabulary([SimpleTerm(_x) for _x in STATES])
+
+
+class IPayeezyException(interface.Interface):
+    """
+    marker interface for a Payeezy exception
+    """
+
+
+class IPayeezyError(interface.Interface):
+    """
+    marker interface for all Payeezy errors
+    """
+
+
+class IPayeezyOperationError(IOperationError):
+    """
+    Marker interface for Payeezy operation errors
+    """
+    Status = Int(title=u'Status', required=False)
+
+
+class IPayeezyPurchaseError(IPurchaseError, IPayeezyOperationError):
+    """
+    Marker interface for Payeezy purchase errors
+    """
 
 
 class IPayeezyURLMap(IReadMapping):
@@ -53,3 +82,17 @@ class IPayeezyConnectKey(interface.Interface):
 class IPayeezyFDToken(interface.Interface):
     type = TextLine(title=u"The token type name.", required=False)
     value = TextLine(title=u"The token value.", required=True)
+
+
+class IPayeezyPurchaseAttempt(interface.Interface):
+    """
+    Marker interface for Payeezy purchase attempts
+    """
+
+
+class IPayeezyCustomer(interface.Interface):
+    """
+    Marker interface for Payeezy customers
+    """
+    Transactions = Set(value_type=TextLine(title=u'the transaction id'),
+                       title=u'customer transactions')
