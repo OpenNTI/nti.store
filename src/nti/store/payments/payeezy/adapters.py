@@ -81,15 +81,16 @@ def payeezy_exception_adapter(error):
     result = PayeezyPurchaseError(Type=u"PurchaseError")
     args = getattr(error, 'args', ())
     message = u' '.join(map(str, args))
+    result.Status = getattr(error, 'status', None)
     result.Message = message or u'Unspecified Payeezy Purchase Exception'
     return result
 
 
-def payeezy_operation_adpater(error, Type, clazz=PayeezyOperationError):
+def payeezy_operation_adapter(error, Type, clazz=PayeezyOperationError):
     result = clazz(Type=Type)
     args = getattr(error, 'args', ())
     result.Status = getattr(error, 'status', None)
-    message = error.message or u' '.join(map(str, args))
+    message = getattr(error, 'message', None) or u' '.join(map(str, args))
     result.Message = message or u'Unspecified Payeezy Error'
     return result
 
@@ -104,5 +105,5 @@ def _string_operation_error(message):
 
 @component.adapter(IPayeezyError)
 @interface.implementer(IPayeezyOperationError)
-def payeezy_error_adpater(error):
-    return payeezy_operation_adpater(error, Type=u"PayeezyError")
+def payeezy_error_adapter(error):
+    return payeezy_operation_adapter(error, Type=u"PayeezyError")

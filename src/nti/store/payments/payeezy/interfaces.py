@@ -17,8 +17,8 @@ from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 
 from nti.schema.field import Int
-from nti.schema.field import Set
 from nti.schema.field import TextLine
+from nti.schema.field import UniqueIterable
 from nti.schema.field import ValidBytesLine
 
 from nti.store.interfaces import IPurchaseError
@@ -94,5 +94,5 @@ class IPayeezyCustomer(interface.Interface):
     """
     Marker interface for Payeezy customers
     """
-    Transactions = Set(value_type=TextLine(title=u'the transaction id'),
-                       title=u'customer transactions')
+    Transactions = UniqueIterable(value_type=TextLine(title=u'the transaction id'),
+                                  title=u'customer transactions')

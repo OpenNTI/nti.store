@@ -31,6 +31,8 @@
 			 provides=".interfaces.IPayeezyPurchaseError"
 			 for=".interfaces.IPayeezyException" />
 
+	<adapter factory=".adapters.payeezy_error_adapter" />
+
 	<!-- Pricing -->
 	<utility factory=".pricing.PayeezyPurchasablePricer"
 			 name="payeezy" />
