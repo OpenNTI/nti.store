@@ -27,24 +27,14 @@ from nti.store.payments.stripe.interfaces import IStripeConnectKey
 
 from nti.store.utils import MetaStoreObject
 
-from nti.utils.cypher import get_plaintext
 
 @WithRepr
 @EqHash('Alias',)
 @interface.implementer(IStripeConnectKey, IContentTypeAware)
 class StripeConnectKey(SchemaConfigured):
-	createDirectFieldProperties(IStripeConnectKey)
+    createDirectFieldProperties(IStripeConnectKey)
 
-	__metaclass__ = MetaStoreObject
+    __metaclass__ = MetaStoreObject
 
-	key = _a('PrivateKey')
-	alias = name = _a('Alias')
-
-	def __setattr__(self, name, value):
-		if name in ("key", "PrivateKey", 'RefreshToken'):
-			try:
-				key = get_plaintext(value)
-				value = unicode(key)
-			except (TypeError, StandardError):
-				pass
-		return SchemaConfigured.__setattr__(self, name, value)
+    key = _a('PrivateKey')
+    alias = name = _a('Alias')

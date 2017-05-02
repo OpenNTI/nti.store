@@ -18,9 +18,10 @@ from nti.store.payments.stripe.processor import EventProcessor
 from nti.store.payments.stripe.processor import RefundProcessor
 from nti.store.payments.stripe.processor import PurchaseProcessor
 
+
 @interface.implementer(IStripePaymentProcessor)
-class StripePaymentProcessor(PurchaseProcessor, 
-							 SyncProcessor,
-							 EventProcessor,
-							 RefundProcessor):
-	pass
+class StripePaymentProcessor(PurchaseProcessor,
+                             SyncProcessor,
+                             EventProcessor,
+                             RefundProcessor):
+    pass
