@@ -43,7 +43,7 @@ from nti.store.payments.payeezy.model import PayeezyOperationError
 
 @component.adapter(IUser)
 @interface.implementer(IPayeezyCustomer)
-class _PayeezyCustomer(Contained, Persistent):
+class _PayeezyCustomer(Persistent, Contained):
 
     family = BTrees.family64
 
@@ -59,7 +59,7 @@ _PayeezyCustomerFactory = an_factory(_PayeezyCustomer)
 
 @component.adapter(IPurchaseAttempt)
 @interface.implementer(IPayeezyPurchaseAttempt)
-class _PayeezyPurchaseAttempt(Contained, Persistent):
+class _PayeezyPurchaseAttempt(Persistent, Contained):
 
     @property
     def purchase(self):
