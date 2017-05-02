@@ -17,6 +17,8 @@ from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from nti.externalization.representation import WithRepr
 
+from nti.property.property import alias
+
 from nti.schema.eqhash import EqHash
 
 from nti.schema.field import SchemaConfigured
@@ -31,8 +33,6 @@ from nti.store.payments.payeezy.interfaces import IPayeezyOperationError
 from nti.store.purchase_error import PurchaseError
 
 from nti.store.utils import MetaStoreObject
-
-from nti.property.property import alias
 
 
 @WithRepr
