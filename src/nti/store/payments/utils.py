@@ -11,13 +11,13 @@ logger = __import__('logging').getLogger(__name__)
 
 import re
 import six
-import numbers
 
 from zope import schema
 
 from z3c.schema.payments import isValidCreditCard
 from z3c.schema.payments import ISO7812CreditCard
 from z3c.schema.payments import NotValidISO7812CreditCard
+
 
 _cc = ISO7812CreditCard()
 
@@ -26,7 +26,7 @@ def is_valid_creditcard_number(s):
     """
     Returns True if the credit card number ``s`` is valid, False otherwise.
     """
-    if isinstance(s, numbers.Integral):
+    if isinstance(s, six.integer_types):
         s = str(s)
     elif isinstance(s, six.string_types):
         # Drop spaces and dashes, commonly entered by humans
@@ -34,7 +34,6 @@ def is_valid_creditcard_number(s):
         s = s.replace(' ', '').replace('-', '')
     else:
         return False
-
     return _cc.constraint(s) and isValidCreditCard(s)
 
 

@@ -10,10 +10,11 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 
-class _BasePaymentProcessor(object):
+class BasePaymentProcessor(object):
 
     def validate_coupon(self, coupon):
         return True
 
     def apply_coupon(self, amount, coupon=None):
         return amount
+_BasePaymentProcessor = BasePaymentProcessor # BWC

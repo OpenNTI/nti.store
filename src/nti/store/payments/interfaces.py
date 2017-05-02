@@ -10,7 +10,7 @@ __docformat__ = "restructuredtext en"
 from zope import interface
 
 from nti.schema.field import Object
-from nti.schema.field import ValidTextLine
+from nti.schema.field import TextLine as ValidTextLine
 
 from nti.store.interfaces import IPriceable
 from nti.store.interfaces import IPurchaseAttempt
