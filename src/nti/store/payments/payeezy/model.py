@@ -39,9 +39,8 @@ from nti.property.property import alias
 @EqHash('Provider',)
 @interface.implementer(IPayeezyConnectKey, IContentTypeAware)
 class PayeezyConnectKey(SchemaConfigured):
-    createDirectFieldProperties(IPayeezyConnectKey)
-
     __metaclass__ = MetaStoreObject
+    createDirectFieldProperties(IPayeezyConnectKey)
 
     Alias = alias('Provider')
 
@@ -49,9 +48,8 @@ class PayeezyConnectKey(SchemaConfigured):
 @WithRepr
 @interface.implementer(IPayeezyFDToken, IContentTypeAware)
 class PayeezyFDToken(SchemaConfigured):
-    createDirectFieldProperties(IPayeezyFDToken)
-
     __metaclass__ = MetaStoreObject
+    createDirectFieldProperties(IPayeezyFDToken)
 
 
 @WithRepr
