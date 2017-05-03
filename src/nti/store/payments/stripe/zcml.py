@@ -27,7 +27,7 @@ class IRegisterStripeKeyDirective(interface.Interface):
     The arguments needed for registering a key
     """
     alias = fields.TextLine(title=u"The human readable/writable key alias",
-						    required=True)
+                            required=True)
     private_key = fields.TextLine(title=u"The private key value. Should not contain spaces",
                                   required=True)
     live_mode = fields.Bool(title=u"Live mode flag", required=False)
@@ -37,16 +37,23 @@ class IRegisterStripeKeyDirective(interface.Interface):
                                  required=False)
 
 
+def decode_key(key):
+    try:
+        return get_plaintext(key)
+    except Exception:
+        return key
+
+
 def registerStripeKey(_context, alias, private_key, live_mode=None, stripe_user_id=None,
                       refresh_token=None, public_key=None):
     """
     Register a stripe key with the given alias
     """
-    sk = StripeConnectKey(Alias=alias, 
-						  LiveMode=live_mode,
-						  PublicKey=public_key,
+    sk = StripeConnectKey(Alias=alias,
+                          LiveMode=live_mode,
+                          PublicKey=public_key,
                           StripeUserID=stripe_user_id,
-						  PrivateKey=get_plaintext(private_key),
-                          RefreshToken=get_plaintext(refresh_token),)
+                          PrivateKey=decode_key(private_key),
+                          RefreshToken=decode_key(refresh_token),)
     utility(_context, provides=IStripeConnectKey, component=sk, name=alias)
     logger.debug("Stripe key %s has been registered", alias)
