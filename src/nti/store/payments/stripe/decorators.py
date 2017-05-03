@@ -27,19 +27,21 @@ from nti.store.payments.stripe.interfaces import IStripePurchaseAttempt
 
 LINKS = StandardExternalFields.LINKS
 
+
 @component.adapter(IStripePricedItem)
 @interface.implementer(IExternalObjectDecorator)
 class StripePricedItemDecorator(PricedItemDecorator):
-	pass
+    pass
+
 
 @component.adapter(IPurchaseAttempt)
 @interface.implementer(IExternalObjectDecorator)
 class PurchaseAttemptDecorator(object):
 
-	__metaclass__ = SingletonDecorator
+    __metaclass__ = SingletonDecorator
 
-	def decorateExternalObject(self, original, external):
-		if original.Processor == STRIPE:
-			ps = IStripePurchaseAttempt(original)
-			external['TokenID'] = ps.token_id
-			external['ChargeID'] = ps.charge_id
+    def decorateExternalObject(self, original, external):
+        if original.Processor == STRIPE:
+            ps = IStripePurchaseAttempt(original)
+            external['TokenID'] = ps.token_id
+            external['ChargeID'] = ps.charge_id

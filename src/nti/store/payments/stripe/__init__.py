@@ -20,22 +20,26 @@ from nti.store.payments.stripe.interfaces import IStripeException
 from nti.store.payments.stripe.interfaces import INoSuchStripeCoupon
 from nti.store.payments.stripe.interfaces import IInvalidStripeCoupon
 
-from nti.store.payments.stripe.stripe_error import StripePurchaseError # re-export
-from nti.store.payments.stripe.stripe_error import StripeOperationError # re-export
+from nti.store.payments.stripe.stripe_error import StripePurchaseError  # re-export
+from nti.store.payments.stripe.stripe_error import StripeOperationError  # re-export
 
 STRIPE = u"stripe"
 
+
 @interface.implementer(IStripeException)
 class StripeException(Exception):
-	pass
+    pass
+
 
 @interface.implementer(IInvalidStripeCoupon)
 class InvalidStripeCoupon(StripeException):
-	pass
+    pass
+
 
 @interface.implementer(INoSuchStripeCoupon)
 class NoSuchStripeCoupon(StripeException):
-	pass
+    pass
+
 
 # Reduce verbosity of stripe logger
 from stripe.util import logger as stripe_logger
