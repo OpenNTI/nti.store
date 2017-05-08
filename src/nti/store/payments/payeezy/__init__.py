@@ -15,6 +15,7 @@ from zope import interface
 from nti.store.payments.payeezy.interfaces import IPayeezyURLMap
 from nti.store.payments.payeezy.interfaces import IPayeezyException
 from nti.store.payments.payeezy.interfaces import IPayeezyConnectKey
+from nti.store.payments.payeezy.interfaces import IPayeezyTokenException
 
 PAYEEZY = u"payeezy"
 
@@ -24,6 +25,11 @@ TOKEN_URL = 'TOKEN_URL'
 
 @interface.implementer(IPayeezyException)
 class PayeezyException(Exception):
+    pass
+
+
+@interface.implementer(IPayeezyTokenException)
+class PayeezyTokenException(PayeezyException):
     pass
 
 

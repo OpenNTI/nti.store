@@ -42,6 +42,12 @@ class IPayeezyException(interface.Interface):
     """
 
 
+class IPayeezyTokenException(interface.Interface):
+    """
+    marker interface for a Payeezy token exception
+    """
+
+
 class IPayeezyError(interface.Interface):
     """
     marker interface for all Payeezy errors
@@ -85,6 +91,7 @@ class IPayeezyFDToken(interface.Interface):
     type = TextLine(title=u"The token type name.", required=False)
     value = Variant((TextLine(title=u"The token value."),
                      Number(title=u"The token value.")), required=True)
+    correlation_id = TextLine(title=u"The correlation id.", required=False)
 
 
 class IPayeezyPurchaseAttempt(interface.Interface):
