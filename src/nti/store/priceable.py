@@ -6,7 +6,7 @@ Defines priceable object.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -74,7 +74,7 @@ class Priceable(SchemaConfigured):
 
 def create_priceable(ntiid, quantity=1, factory=Priceable):
     quantity = 1 if quantity is None else int(quantity)
-    result = factory(NTIID=unicode(ntiid), Quantity=quantity)
+    result = factory(NTIID=ntiid, Quantity=quantity)
     return result
 
 
