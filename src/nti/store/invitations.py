@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -46,7 +46,7 @@ InvitationAlreadyAccepted = InvitationAlreadyAcceptedError  # BWC
 
 
 class InvitationCapacityExceeded(InvitationValidationError):
-    __doc__ = _("The limit for this invitation code has been exceeded.")
+    __doc__ = _(u"The limit for this invitation code has been exceeded.")
     i18n_message = __doc__
 
 
@@ -93,8 +93,6 @@ class StorePurchaseInvitation(Invitation):
 
     redeemed_purchase = linked_purchase = property(_getRedeemedPurchase,
                                                    _setRedeemedPurchase)
-
-
 _StorePurchaseInvitation = StorePurchaseInvitation  # BWC
 
 
@@ -120,7 +118,8 @@ def create_store_purchase_invitation(purchase, receiver):
     result = StorePurchaseInvitation(purchase=purchase)
     result.receiver = getattr(receiver, 'username', receiver)
     result.expirationTime = getattr(purchase, 'ExpirationTime', None) or 0
-    result.creator = getattr(purchase.creator, 'username', purchase.creator)  # sender
+    result.creator = getattr(
+        purchase.creator, 'username', purchase.creator)  # sender
     return result
 
 
@@ -143,9 +142,9 @@ class StorePurchaseInvitationActor(object):
         redemption_code = get_invitation_code(purchase)
 
         # create and register a purchase attempt for accepting user
-        redeemed_purchase = make_redeem_purchase_attempt(user, 
-														 original, 
-														 redemption_code)
+        redeemed_purchase = make_redeem_purchase_attempt(user,
+                                                         original,
+                                                         redemption_code)
 
         if not purchase.register(user, redeemed_purchase):
             raise InvitationAlreadyAccepted(invitation)
