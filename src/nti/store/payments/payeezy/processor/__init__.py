@@ -18,13 +18,9 @@ from nti.store.payments.payeezy import get_credentials
 from nti.store.payments.payeezy.api.methods import Payeezy
 
 
-def credentials(name):
-    return get_credentials(name)
-
-
 def get_payeezy(name):
     url_map = get_url_map()
-    credentials = credentials(name)
+    credentials = get_credentials(name)
     result = Payeezy(api_key=credentials.APIKey,
                      api_secret=credentials.APISecret,
                      token=credentials.Token,
