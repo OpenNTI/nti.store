@@ -23,18 +23,12 @@ from nti.store.payments.payeezy.model import PayeezyFDToken
 
 from nti.store.payments.payeezy.processor import get_payeezy
 
+from nti.store.payments.payeezy.processor.model import safe_error_message
+
 
 class TokenProcessor(object):
 
     __callback__ = "callback"
-
-    @classmethod
-    def _safe_error_message(cls, result):
-        try:
-            data = result.json()
-            return data['message']
-        except Exception:
-            return None
 
     @classmethod
     def decode_response(cls, result):
@@ -75,10 +69,10 @@ class TokenProcessor(object):
                                   zip_code=zip_code,
                                   country=country)
             if result.status_code != 200:
-                msg = _("Invalid status code")
+                msg = _("Invalid status code during token operation")
                 e = PayeezyTokenException(msg)
                 e.status = result.status_code
-                e.message = cls._safe_error_message(result)
+                e.message = safe_error_message(result)
                 raise e
 
             data = cls.decode_response(result)

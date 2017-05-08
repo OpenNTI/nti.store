@@ -61,9 +61,10 @@ _PayeezyCustomerFactory = an_factory(_PayeezyCustomer)
 @interface.implementer(IPayeezyPurchaseAttempt)
 class _PayeezyPurchaseAttempt(Persistent, Contained):
     
+    token = None
+    correlation_id = None
     transaction_id = None
     transaction_tag = None
-    correlation_id = None
     
     @property
     def purchase(self):

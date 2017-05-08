@@ -16,7 +16,6 @@ from zope.interface.common.mapping import IReadMapping
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 
-from nti.schema.field import Int
 from nti.schema.field import Number
 from nti.schema.field import Variant
 from nti.schema.field import TextLine
@@ -58,7 +57,8 @@ class IPayeezyOperationError(IOperationError):
     """
     Marker interface for Payeezy operation errors
     """
-    Status = Int(title=u'Status', required=False)
+    Status = Variant((TextLine(title=u"Status value."),
+                      Number(title=u"Status value.")), required=False)
 
 
 class IPayeezyPurchaseError(IPurchaseError, IPayeezyOperationError):
@@ -98,9 +98,10 @@ class IPayeezyPurchaseAttempt(interface.Interface):
     """
     Marker interface for Payeezy purchase attempts
     """
+    token = TextLine(title=u"Token value.", required=False)
+    correlation_id = TextLine(title=u"The correlation id.", required=False)
     transaction_id = TextLine(title=u"The transaction id.", required=False)
     transaction_tag = TextLine(title=u"The transaction tag.", required=False)
-    correlation_id = TextLine(title=u"The correlation id.", required=False)
 
 
 class IPayeezyCustomer(interface.Interface):
