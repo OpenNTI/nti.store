@@ -91,6 +91,9 @@ class IPayeezyPurchaseAttempt(interface.Interface):
     """
     Marker interface for Payeezy purchase attempts
     """
+    transaction_id = TextLine(title=u"The transaction id.", required=False)
+    transaction_tag = TextLine(title=u"The transaction tag.", required=False)
+    correlation_id = TextLine(title=u"The correlation id.", required=False)
 
 
 class IPayeezyCustomer(interface.Interface):
