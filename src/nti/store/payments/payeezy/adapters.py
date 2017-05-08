@@ -28,6 +28,8 @@ from nti.dataserver.interfaces import IUser
 
 from nti.property.property import alias
 
+from nti.store import MessageFactory as _
+
 from nti.store.interfaces import IPurchaseAttempt
 
 from nti.store.payments.payeezy.interfaces import IPayeezyError
@@ -87,7 +89,7 @@ def payeezy_exception_adapter(error):
     args = getattr(error, 'args', ())
     message = u' '.join(map(str, args))
     result.Status = getattr(error, 'status', None)
-    result.Message = message or u'Unspecified Payeezy Purchase Exception'
+    result.Message = message or _(u'Unspecified Payeezy Purchase Exception')
     return result
 
 
@@ -96,7 +98,7 @@ def payeezy_operation_adapter(error, Type, clazz=PayeezyOperationError):
     args = getattr(error, 'args', ())
     result.Status = getattr(error, 'status', None)
     message = getattr(error, 'message', None) or u' '.join(map(str, args))
-    result.Message = message or u'Unspecified Payeezy Error'
+    result.Message = message or _(u'Unspecified Payeezy Error')
     return result
 
 
@@ -104,7 +106,7 @@ def payeezy_operation_adapter(error, Type, clazz=PayeezyOperationError):
 @interface.implementer(IPayeezyOperationError)
 def _string_operation_error(message):
     result = PayeezyOperationError(Type=u"OperationError")
-    result.Message = text_(message or '')
+    result.Message = text_(message or u'')
     return result
 
 
