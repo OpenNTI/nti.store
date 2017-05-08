@@ -24,20 +24,15 @@ def price_order(order, name=PAYEEZY, registry=component):
     return result
 
 
-def price_purchase(purchase_attempt, name=PAYEEZY, registry=component):
-    result = price_order(purchase_attempt.Order, registry=registry)
-    return result
-
-
 class PricingProcessor(object):
 
-    def do_pricing(self, purchase_attempt, registry=component):
-        result = price_purchase(purchase_attempt,
-                                name=self.name,
-                                registry=registry)
+    @classmethod
+    def do_pricing(cls, purchase_attempt, registry=component):
+        result = price_order(purchase_attempt.Order, registry=registry)
         return result
 
-    def price_purchase(self, purchase_id, username, registry=component):
+    @classmethod
+    def price_purchase(cls, purchase_id, username, registry=component):
         purchase = get_purchase_attempt(purchase_id, username)
-        result = self.do_pricing(purchase, registry=registry)
+        result = cls.do_pricing(purchase, registry=registry)
         return result
