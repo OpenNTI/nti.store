@@ -18,4 +18,6 @@ from nti.store.payments.payeezy.processor.interfaces import IPayeezyPaymentProce
 
 @interface.implementer(IPayeezyPaymentProcessor)
 class PayeezyPaymentProcessor(BasePaymentProcessor):
-    pass
+    
+    def sync_purchase(self, purchase_id, username):
+        pass
