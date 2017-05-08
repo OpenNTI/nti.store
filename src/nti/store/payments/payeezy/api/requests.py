@@ -69,9 +69,9 @@ class PayeezyHTTPRequests(object):
         return result
 
     # Generic method to make calls for secondary transactions
-    def make_capture_void_refund_post_call(self, payload, transactionID):
+    def make_capture_void_refund_post_call(self, payload, transaction_id):
         response = requests.Session()
-        self.url = self.url + '/' + transactionID
+        self.url = self.url + '/' + transaction_id
         self.payload = json.dumps(payload)
         authorization = self.generate_hmac_authentication_header(self.payload)
         result = response.post(self.url,
