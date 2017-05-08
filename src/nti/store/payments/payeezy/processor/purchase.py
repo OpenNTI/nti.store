@@ -26,11 +26,11 @@ from nti.store import get_user
 from nti.store import ROUND_DECIMAL
 from nti.store import PurchaseException
 
+from nti.store.charge import PaymentCharge
+
 from nti.store.interfaces import PurchaseAttemptFailed
 from nti.store.interfaces import PurchaseAttemptStarted
 from nti.store.interfaces import PurchaseAttemptSuccessful
-
-from nti.store.charge import PaymentCharge
 
 from nti.store.payments.payeezy.interfaces import SUCCESS
 from nti.store.payments.payeezy.interfaces import APPROVED
@@ -50,7 +50,7 @@ from nti.store.payments.payeezy.processor.pricing import PricingProcessor
 from nti.store.store import get_purchase_attempt
 
 
-def transaction_runner():
+def get_transaction_runner():
     return component.getUtility(ISiteTransactionRunner)
 
 
@@ -88,14 +88,13 @@ def token_payment(payeezy, token, amount, currency,
 def execute_charge(api_key, token, amount, currency,
                    card_type, cardholder_name, card_expiry, description):
     logger.info('executing payeezy charge for %s', description)
-
     payeezy = get_payeezy(api_key)
     result = token_payment(payeezy, token, amount, currency,
                            card_type=card_type,
                            cardholder_name=cardholder_name,
                            card_expiry=card_expiry,
                            description=description)
-    if not result.status_code != 201:
+    if result.status_code != 201:
         msg = _('Invalid status code during purchase')
         e = PayeezyPurchaseError(msg)
         e.message = safe_error_message(result)
@@ -113,7 +112,7 @@ def execute_charge(api_key, token, amount, currency,
         if g_message or b_message:
             e.message = '%s - %s' % (g_message, b_message)
         raise e
-    return result
+    return data
 
 
 def register_charge_notify(charge, purchase_id, username=None,
@@ -143,27 +142,27 @@ def register_charge_notify(charge, purchase_id, username=None,
     customer = IPayeezyCustomer(get_user(username or ''), None)
     if transaction_id:
         customer.Transactions.add(transaction_id)
-
     return transaction_id
 
 
 class PurchaseProcessor(PricingProcessor):
 
-    def process_purchase(self, purchase_id, token,
+    @classmethod
+    def process_purchase(cls, purchase_id, token,
                          card_type, cardholder_name, card_expiry,
                          api_key, username=None, expected_amount=None, request=None):
 
-        transaction_runner = transaction_runner()
+        transaction_runner = get_transaction_runner()
 
-        start_purchase = partial(start_purchase,
-                                 token=token,
-                                 username=username,
-                                 purchase_id=purchase_id)
+        starter = partial(start_purchase,
+                          token=token,
+                          username=username,
+                          purchase_id=purchase_id)
         try:
             # start the purchase.
             # We notify purchase has started and
             # return the order to price
-            order = transaction_runner(start_purchase)
+            order = transaction_runner(starter)
 
             # price the purchasable order
             pricer = partial(price_order, order)
@@ -203,13 +202,13 @@ class PurchaseProcessor(PricingProcessor):
                                     card_expiry=card_expiry,
                                     api_key=api_key)
 
-            register_charge_notify = partial(register_charge_notify,
-                                             purchase_id=purchase_id,
-                                             username=username,
-                                             charge=charge,
-                                             pricing=pricing,
-                                             request=request)
-            return transaction_runner(register_charge_notify)
+            register_and_notifier = partial(register_charge_notify,
+                                            purchase_id=purchase_id,
+                                            username=username,
+                                            charge=charge,
+                                            pricing=pricing,
+                                            request=request)
+            return transaction_runner(register_and_notifier)
 
         except Exception as e:
             logger.exception("Cannot complete process purchase for '%s'",
