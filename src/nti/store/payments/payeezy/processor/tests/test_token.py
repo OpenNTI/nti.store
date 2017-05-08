@@ -63,7 +63,7 @@ class TestToken(unittest.TestCase):
                     has_property('correlation_id', is_('124.1493659640325')))
 
     @fudge.patch('nti.store.payments.payeezy.processor.token.TokenProcessor.fd_token',)
-    def test_invalid_response(self, mock_fdt):
+    def test_invalid_403_response(self, mock_fdt):
         fake_response = fudge.Fake()
         fake_response.status_code = 403
         fake_response.provides('json') \
@@ -80,3 +80,27 @@ class TestToken(unittest.TestCase):
             assert_that(e, has_property('status', is_(403)))
             assert_that(e, 
                         has_property('message', is_('HMAC validation Failure')))
+            
+    @fudge.patch('nti.store.payments.payeezy.processor.token.TokenProcessor.fd_token',
+                 'nti.store.payments.payeezy.processor.token.TokenProcessor.decode_response',)
+    def test_invalid_card(self, mock_fdt, mock_dcr):
+        fake_response = fudge.Fake()
+        fake_response.status_code = 200
+        fake_data = {
+            'results': {
+                'status': 'failure',
+                'token': {}
+            },
+            'status': 301
+        }
+        mock_fdt.is_callable().with_args().returns(fake_response)
+        mock_dcr.is_callable().with_args().returns(fake_data)
+        mock_fdt.is_callable().with_args().returns(fake_response)
+        with self.assertRaises(PayeezyTokenException) as e:
+            TokenProcessor.get_token("NTI-TEST",
+                                     card_type="visa",
+                                     cardholder_name="Ichigo Kurosaki",
+                                     card_number="4012000033330026",
+                                     card_expiry="0910",
+                                     card_cvv="019")
+            assert_that(e, has_property('status', is_(301)))
