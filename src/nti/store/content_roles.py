@@ -6,7 +6,7 @@ Content role management.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -39,12 +39,10 @@ def get_descendants(unit):
             return
 
 
-def check_item_in_library(item, library=None, registry=component):
+def check_item_in_library(item, library=None):
     result = None
     if item and ntiids.is_valid_ntiid_string(item):
-        result = get_collection_root_ntiid(item,
-										   library=library, 
-										   registry=registry)
+        result = get_collection_root_ntiid(item, library=library)
     return result
 
 
@@ -55,7 +53,7 @@ def get_role_for_item(item):
     return role
 
 
-def add_users_content_roles(user, items, library=None, registry=component):
+def add_users_content_roles(user, items, library=None):
     """
     Add the content roles to the given user
 
@@ -71,13 +69,13 @@ def add_users_content_roles(user, items, library=None, registry=component):
         return 0
 
     roles_to_add = set()
-    member = registry.getAdapter(user,
-                                 IMutableGroupMember,
-                                 nauth.CONTENT_ROLE_PREFIX)
+    member = component.getAdapter(user,
+                                  IMutableGroupMember,
+                                  nauth.CONTENT_ROLE_PREFIX)
     current_roles = {x.id: x for x in member.groups}
 
     for item in items:
-        lib_item = check_item_in_library(item, library, registry)
+        lib_item = check_item_in_library(item, library)
         if lib_item is None:
             logger.debug("Ignoring %s item", item)
             continue
@@ -91,7 +89,7 @@ def add_users_content_roles(user, items, library=None, registry=component):
     return len(roles_to_add)
 
 
-def remove_users_content_roles(user, items, library=None, registry=component):
+def remove_users_content_roles(user, items, library=None):
     """
     Remove the content roles from the given user
 
@@ -102,9 +100,9 @@ def remove_users_content_roles(user, items, library=None, registry=component):
     if not user or not items:
         return 0
 
-    member = registry.getAdapter(user,
-                                 IMutableGroupMember,
-                                 nauth.CONTENT_ROLE_PREFIX)
+    member = component.getAdapter(user,
+                                  IMutableGroupMember,
+                                  nauth.CONTENT_ROLE_PREFIX)
     if not member.hasGroups():
         return 0
 
@@ -113,7 +111,7 @@ def remove_users_content_roles(user, items, library=None, registry=component):
     current_size = len(current_roles)
 
     for item in items:
-        item = check_item_in_library(item, library, registry)
+        item = check_item_in_library(item, library)
         if item is not None:
             provider = ntiids.get_provider(item).lower()
             specific = ntiids.get_specific(item).lower()
@@ -128,16 +126,16 @@ def remove_users_content_roles(user, items, library=None, registry=component):
     return current_size - len(current_roles)
 
 
-def get_users_content_roles(user, registry=component):
+def get_users_content_roles(user):
     """
     Return a list of tuples with the user content roles
 
     :param user: The user object
     """
     user = get_user(user)
-    member = registry.getAdapter(user,
-                                 IMutableGroupMember,
-                                 nauth.CONTENT_ROLE_PREFIX)
+    member = component.getAdapter(user,
+                                  IMutableGroupMember,
+                                  nauth.CONTENT_ROLE_PREFIX)
 
     result = []
     for x in member.groups or ():
@@ -148,14 +146,14 @@ def get_users_content_roles(user, registry=component):
     return result
 
 
-def get_user_accessible_content(user, library=None, registry=component):
+def get_user_accessible_content(user, library=None):
     user = get_user(user)
-    member = registry.getAdapter(user,
-                                 IMutableGroupMember,
-                                 nauth.CONTENT_ROLE_PREFIX)
+    member = component.getAdapter(user,
+                                  IMutableGroupMember,
+                                  nauth.CONTENT_ROLE_PREFIX)
 
     if library is None:
-        library = registry.queryUtility(IContentPackageLibrary)
+        library = component.queryUtility(IContentPackageLibrary)
 
     packages = {}
     for package in (library.contentPackages if library is not None else ()):
@@ -168,9 +166,7 @@ def get_user_accessible_content(user, library=None, registry=component):
     for x in member.groups or ():
         ntiid = packages.get(x.id, None)
         if ntiid:
-            ntiid = get_collection_root_ntiid(ntiid,
-                                              library=library,
-                                              registry=registry)
+            ntiid = get_collection_root_ntiid(ntiid, library=library)
             result.add(ntiid)
     result.discard(None)
     return result
