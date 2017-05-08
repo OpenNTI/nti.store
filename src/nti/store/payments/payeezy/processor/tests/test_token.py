@@ -89,7 +89,7 @@ class TestToken(unittest.TestCase):
         fake_data = {
             'results': {
                 'status': 'failure',
-                'token': {}
+                'token': {'cardholder_name': 'IchigoKurosaki',}
             },
             'status': 301
         }
