@@ -26,6 +26,10 @@ from nti.dataserver.interfaces import IUser
 
 from nti.property.property import alias
 
+from nti.schema.field import SchemaConfigured
+
+from nti.schema.fieldproperty import createDirectFieldProperties
+
 from nti.store import MessageFactory as _
 
 from nti.store.interfaces import IPurchaseAttempt
@@ -59,13 +63,8 @@ _PayeezyCustomerFactory = an_factory(_PayeezyCustomer)
 
 @component.adapter(IPurchaseAttempt)
 @interface.implementer(IPayeezyPurchaseAttempt)
-class _PayeezyPurchaseAttempt(Persistent, Contained):
-    
-    token = None
-    token_type = None
-    correlation_id = None
-    transaction_id = None
-    transaction_tag = None
+class _PayeezyPurchaseAttempt(SchemaConfigured, Persistent, Contained):
+    createDirectFieldProperties(IPayeezyPurchaseAttempt)
     
     @property
     def purchase(self):

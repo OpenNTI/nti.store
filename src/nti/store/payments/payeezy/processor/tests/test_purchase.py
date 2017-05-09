@@ -56,7 +56,7 @@ class TestPurchase(unittest.TestCase):
             'amount': '100',
             'bank_message': 'Approved',
             'bank_resp_code': '100',
-            'correlation_id': '124.1493661575888',
+            'correlation_id': u'124.1493661575888',
             'currency': u'USD',
             'cvv2': 'I',
             'gateway_message': u'Transaction Normal',

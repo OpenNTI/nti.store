@@ -22,6 +22,7 @@ from nti.schema.field import TextLine
 from nti.schema.field import UniqueIterable
 from nti.schema.field import ValidBytesLine
 
+from nti.store.interfaces import IRefundError
 from nti.store.interfaces import IPurchaseError
 from nti.store.interfaces import IOperationError
 
@@ -67,6 +68,12 @@ class IPayeezyPurchaseError(IPurchaseError, IPayeezyOperationError):
     """
 
 
+class IPayeezyRefundError(IRefundError, IPayeezyOperationError):
+    """
+    Marker interface for Payeezy refund errors
+    """
+
+
 class IPayeezyURLMap(IReadMapping):
     """
     marker interface for URL maps
@@ -100,6 +107,7 @@ class IPayeezyPurchaseAttempt(interface.Interface):
     """
     token = TextLine(title=u"Token value.", required=False)
     token_type = TextLine(title=u"Token type.", required=False)
+    cardholder_name = TextLine(title=u"Card holder name.", required=False)
     correlation_id = TextLine(title=u"The correlation id.", required=False)
     transaction_id = TextLine(title=u"The transaction id.", required=False)
     transaction_tag = TextLine(title=u"The transaction tag.", required=False)

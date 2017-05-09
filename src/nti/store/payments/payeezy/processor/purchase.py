@@ -53,7 +53,8 @@ def get_transaction_runner():
     return component.getUtility(ISiteTransactionRunner)
 
 
-def start_purchase(purchase_id, token, token_type, cardholder_name, username=None):
+def start_purchase(purchase_id, token, token_type, card_expiry, 
+                   cardholder_name, username=None):
     purchase = get_purchase_attempt(purchase_id, username)
     if purchase is None:
         msg = _("Could not find purchase attempt")
@@ -62,11 +63,15 @@ def start_purchase(purchase_id, token, token_type, cardholder_name, username=Non
     if not purchase.is_pending():
         notify(PurchaseAttemptStarted(purchase))
 
+    # save data
+    adapted = IPayeezyPurchaseAttempt(purchase)
+    adapted.token = token
+    adapted.token_type = token_type
+    adapted.card_expiry = card_expiry
+    adapted.cardholder_name = cardholder_name
+    
+    # return a copy of the order
     result = purchase.Order.copy()
-    purchase = IPayeezyPurchaseAttempt(purchase)
-    purchase.token = token
-    purchase.token_type = token_type
-    purchase.cardholder_name = cardholder_name
     return result
 
 
@@ -163,6 +168,7 @@ class PurchaseProcessor(PricingProcessor):
                           token=token,
                           username=username,
                           token_type=card_type,
+                          card_expiry=card_expiry,
                           purchase_id=purchase_id,
                           cardholder_name=cardholder_name)
         try:

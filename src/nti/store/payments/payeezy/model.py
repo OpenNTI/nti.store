@@ -27,10 +27,13 @@ from nti.schema.fieldproperty import createDirectFieldProperties
 
 from nti.store.payments.payeezy.interfaces import IPayeezyFDToken
 from nti.store.payments.payeezy.interfaces import IPayeezyConnectKey
+from nti.store.payments.payeezy.interfaces import IPayeezyRefundError
 from nti.store.payments.payeezy.interfaces import IPayeezyPurchaseError
 from nti.store.payments.payeezy.interfaces import IPayeezyOperationError
 
 from nti.store.purchase_error import PurchaseError
+
+from nti.store.refund_error import RefundError
 
 from nti.store.utils import MetaStoreObject
 
@@ -66,4 +69,10 @@ class PayeezyOperationError(SchemaConfigured):
 @interface.implementer(IPayeezyPurchaseError)
 class PayeezyPurchaseError(PurchaseError):
     Status = FP(IPayeezyPurchaseError['Status'])
+    HttpStatus = alias('Status')
+
+
+@interface.implementer(IPayeezyRefundError)
+class PayeezyRefundError(RefundError):
+    Status = FP(IPayeezyRefundError['Status'])
     HttpStatus = alias('Status')
