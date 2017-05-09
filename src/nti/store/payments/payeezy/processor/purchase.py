@@ -150,7 +150,7 @@ def register_charge_notify(charge, purchase_id, username=None,
 
     # update user transactions
     customer = IPayeezyCustomer(get_user(username or ''), None)
-    if transaction_id:
+    if transaction_id and customer is not None:
         customer.Transactions.add(transaction_id)
     return transaction_id
 
