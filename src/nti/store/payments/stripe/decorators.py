@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -13,7 +13,6 @@ from zope import component
 from zope import interface
 
 from nti.externalization.singleton import SingletonDecorator
-from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalObjectDecorator
 
 from nti.store.decorators import PricedItemDecorator
@@ -24,8 +23,6 @@ from nti.store.payments.stripe import STRIPE
 
 from nti.store.payments.stripe.interfaces import IStripePricedItem
 from nti.store.payments.stripe.interfaces import IStripePurchaseAttempt
-
-LINKS = StandardExternalFields.LINKS
 
 
 @component.adapter(IStripePricedItem)

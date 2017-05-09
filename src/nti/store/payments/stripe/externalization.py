@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -46,7 +46,7 @@ class StripeCouponExternalizer(object):
             result['Duration'] = self.coupon.duration
         if self.coupon.amount_off:
             result['AmountOff'] = self.coupon.amount_off
-            result['Currency'] = _makenone(self.coupon.currency) or 'USD'
+            result['Currency'] = _makenone(self.coupon.currency) or u'USD'
         if self.coupon.percent_off:
             result['PercentOff'] = self.coupon.percent_off
         if self.coupon.duration_in_months:
