@@ -17,12 +17,15 @@ from nti.store.payments.payeezy.processor.interfaces import IPayeezyPaymentProce
 
 from nti.store.payments.payeezy.processor.purchase import PurchaseProcessor
 
+from nti.store.payments.payeezy.processor.refund import RefundProcessor
+
 from nti.store.payments.payeezy.processor.token import TokenProcessor
 
 
 @interface.implementer(IPayeezyPaymentProcessor)
 class PayeezyPaymentProcessor(BasePaymentProcessor, 
                               PurchaseProcessor,
+                              RefundProcessor,
                               TokenProcessor):
 
     def sync_purchase(self, purchase_id, username):

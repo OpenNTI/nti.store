@@ -13,4 +13,25 @@ from nti.store.interfaces import IPaymentProcessor
 
 
 class IPayeezyPaymentProcessor(IPaymentProcessor):
-    pass
+
+    def price_purchase(purchase_id, username):
+        """
+        price a purchase
+        """
+
+    def refund_purchase(purchase_id, username, api_key):
+        """
+        Refund a purchase
+        """
+
+    def process_purchase(purchase_id, username, token,
+                         card_type, cardholder_name, card_expiry,
+                         api_key, expected_amount=None):
+        """
+        Process a purchase attempt
+        """
+
+    def sync_purchase(purchase_id, username, api_key):
+        """
+        Sync a purchase attempt
+        """
