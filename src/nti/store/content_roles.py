@@ -17,7 +17,8 @@ from zope import component
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
-from nti.dataserver import authorization as nauth
+from nti.dataserver.authorization import CONTENT_ROLE_PREFIX
+from nti.dataserver.authorization import role_for_providers_content
 
 from nti.dataserver.interfaces import IMutableGroupMember
 
@@ -49,7 +50,7 @@ def check_item_in_library(item, library=None):
 def get_role_for_item(item):
     provider = ntiids.get_provider(item).lower()
     specific = ntiids.get_specific(item).lower()
-    role = nauth.role_for_providers_content(provider, specific)
+    role = role_for_providers_content(provider, specific)
     return role
 
 
@@ -71,7 +72,7 @@ def add_users_content_roles(user, items, library=None):
     roles_to_add = set()
     member = component.getAdapter(user,
                                   IMutableGroupMember,
-                                  nauth.CONTENT_ROLE_PREFIX)
+                                  CONTENT_ROLE_PREFIX)
     current_roles = {x.id: x for x in member.groups}
 
     for item in items:
@@ -102,7 +103,7 @@ def remove_users_content_roles(user, items, library=None):
 
     member = component.getAdapter(user,
                                   IMutableGroupMember,
-                                  nauth.CONTENT_ROLE_PREFIX)
+                                  CONTENT_ROLE_PREFIX)
     if not member.hasGroups():
         return 0
 
@@ -115,7 +116,7 @@ def remove_users_content_roles(user, items, library=None):
         if item is not None:
             provider = ntiids.get_provider(item).lower()
             specific = ntiids.get_specific(item).lower()
-            role = nauth.role_for_providers_content(provider, specific)
+            role = role_for_providers_content(provider, specific)
             roles_to_remove.add(role.id)
 
     for r in roles_to_remove:
@@ -135,12 +136,12 @@ def get_users_content_roles(user):
     user = get_user(user)
     member = component.getAdapter(user,
                                   IMutableGroupMember,
-                                  nauth.CONTENT_ROLE_PREFIX)
+                                  CONTENT_ROLE_PREFIX)
 
     result = []
     for x in member.groups or ():
-        if x.id.startswith(nauth.CONTENT_ROLE_PREFIX):
-            spl = x.id[len(nauth.CONTENT_ROLE_PREFIX):].split(':')
+        if x.id.startswith(CONTENT_ROLE_PREFIX):
+            spl = x.id[len(CONTENT_ROLE_PREFIX):].split(':')
             if len(spl) >= 2:
                 result.append((spl[0], spl[1]))
     return result
@@ -150,7 +151,7 @@ def get_user_accessible_content(user, library=None):
     user = get_user(user)
     member = component.getAdapter(user,
                                   IMutableGroupMember,
-                                  nauth.CONTENT_ROLE_PREFIX)
+                                  CONTENT_ROLE_PREFIX)
 
     if library is None:
         library = component.queryUtility(IContentPackageLibrary)
@@ -159,7 +160,7 @@ def get_user_accessible_content(user, library=None):
     for package in (library.contentPackages if library is not None else ()):
         provider = ntiids.get_provider(package.ntiid).lower()
         specific = ntiids.get_specific(package.ntiid).lower()
-        role = nauth.role_for_providers_content(provider, specific)
+        role = role_for_providers_content(provider, specific)
         packages[role.id] = package.ntiid
 
     result = set()
