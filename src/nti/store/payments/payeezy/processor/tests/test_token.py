@@ -39,7 +39,7 @@ class TestToken(unittest.TestCase):
                 'correlation_id': u'124.1493659640325',
                 'status': 'success',
                 'token': {
-                    'cardholder_name': 'IchigoKurosaki',
+                    'cardholder_name': u'IchigoKurosaki',
                     'exp_date': '0930',
                     'type': u'visa',
                     'value': u'1130881202230026'
@@ -52,7 +52,7 @@ class TestToken(unittest.TestCase):
         mock_dcr.is_callable().with_args().returns(fake_data)
         token = TokenProcessor.get_token("NTI-TEST",
                                          card_type="visa",
-                                         cardholder_name="Ichigo Kurosaki",
+                                         cardholder_name=u"Ichigo Kurosaki",
                                          card_number="4012000033330026",
                                          card_expiry="0930",
                                          card_cvv="019")
@@ -73,7 +73,7 @@ class TestToken(unittest.TestCase):
         with self.assertRaises(PayeezyTokenException) as e:
             TokenProcessor.get_token("NTI-TEST",
                                      card_type="visa",
-                                     cardholder_name="Ichigo Kurosaki",
+                                     cardholder_name=u"Ichigo Kurosaki",
                                      card_number="4012000033330026",
                                      card_expiry="0930",
                                      card_cvv="019")
@@ -99,7 +99,7 @@ class TestToken(unittest.TestCase):
         with self.assertRaises(PayeezyTokenException) as e:
             TokenProcessor.get_token("NTI-TEST",
                                      card_type="visa",
-                                     cardholder_name="Ichigo Kurosaki",
+                                     cardholder_name=u"Ichigo Kurosaki",
                                      card_number="4012000033330026",
                                      card_expiry="0910",
                                      card_cvv="019")
