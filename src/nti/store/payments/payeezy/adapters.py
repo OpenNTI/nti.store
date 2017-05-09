@@ -22,8 +22,6 @@ from zope.container.contained import Contained
 
 from persistent import Persistent
 
-from nti.base._compat import text_
-
 from nti.dataserver.interfaces import IUser
 
 from nti.property.property import alias
@@ -78,7 +76,7 @@ _PayeezyPurchaseAttemptFactory = an_factory(_PayeezyPurchaseAttempt)
 @interface.implementer(IPayeezyPurchaseError)
 def _string_purchase_error(message):
     result = PayeezyPurchaseError(Type=u"PurchaseError")
-    result.Message = text_(message or u'')
+    result.Message = message or u''
     return result
 
 
@@ -106,7 +104,7 @@ def payeezy_operation_adapter(error, Type, clazz=PayeezyOperationError):
 @interface.implementer(IPayeezyOperationError)
 def _string_operation_error(message):
     result = PayeezyOperationError(Type=u"OperationError")
-    result.Message = text_(message or u'')
+    result.Message = message or u''
     return result
 
 
