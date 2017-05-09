@@ -17,7 +17,6 @@ does_not = is_not
 
 import re
 import unittest
-from datetime import datetime
 
 import simplejson
 
@@ -167,17 +166,3 @@ class TestMethods(unittest.TestCase):
                                 'transaction_tag', is_not(none()),
                                 'transaction_type', 'refund',
                                 'validation_status', 'success'))
-        
-    @unittest.SkipTest
-    def test_reporting(self):
-        now = datetime.now()
-        searchFor = str(now)
-        result = self._do_token_purchase(searchFor)
-        assert_that(result.status_code, is_(201))
-        start_date = now.strftime('%Y%m%d')
-        
-        payeezy = self._get_payeezy()
-        result = payeezy.reporting(start_date, start_date, searchFor)
-        print(result.status_code)
-        print(result.text)
-      

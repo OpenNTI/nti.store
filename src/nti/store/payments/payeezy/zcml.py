@@ -15,7 +15,7 @@ from zope.component.zcml import utility
 
 from zope.configuration import fields
 
-from nti.base._compat import bytes_
+from nti.base._compat import native_
 
 from nti.store.payments.payeezy.interfaces import IPayeezyConnectKey
 
@@ -48,10 +48,10 @@ def registerPayeezyKey(_context, provider, api_key, api_secret, token,
     """
     Register a Payeezy key with the given alias
     """
-    key = PayeezyConnectKey(Token=token,
-                            APIKey=api_key,
+    key = PayeezyConnectKey(APIKey=api_key,
                             Provider=provider,
-                            APISecret=bytes_(decode_key(api_secret)),
+                            Token=native_(token),
+                            APISecret=native_(decode_key(api_secret)),
                             JSSecurityKey=decode_key(js_security_key))
     utility(_context, provides=IPayeezyConnectKey,
             component=key, name=provider)

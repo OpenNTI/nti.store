@@ -35,8 +35,8 @@ class TestModel(unittest.TestCase):
     def test_interface(self):
         key = PayeezyConnectKey(Provider=u'NTI',
                                 APIKey=u"LIpQyLD7p5FmspOs6pPW9gWG",
-                                APISecret=b"3K9VJFyfj0oGIMi7Aeg3HNBp",
-                                Token=u"jBCSE4ACnJBHGItexYhLF8At2PRpLh",
+                                APISecret="3K9VJFyfj0oGIMi7Aeg3HNBp",
+                                Token="jBCSE4ACnJBHGItexYhLF8At2PRpLh",
                                 JSSecurityKey=u"b9d0ee63Aizendbf511a1902")
         assert_that(key, validly_provides(IPayeezyConnectKey))
         assert_that(key, verifiably_provides(IPayeezyConnectKey))
@@ -44,8 +44,8 @@ class TestModel(unittest.TestCase):
     def test_external(self):
         key = PayeezyConnectKey(Provider=u'NTI',
                                 APIKey=u"LIpQyLD7p5FmspOs6pPW9gWG",
-                                APISecret=b"3K9VJFyfj0oGIMi7Aeg3HNBp",
-                                Token=u"jBCSE4ACnJBHGItexYhLF8At2PRpLh",
+                                APISecret="3K9VJFyfj0oGIMi7Aeg3HNBp",
+                                Token="jBCSE4ACnJBHGItexYhLF8At2PRpLh",
                                 JSSecurityKey=u"b9d0ee63Aizendbf511a1902")
 
         extobj = toExternalObject(key)
