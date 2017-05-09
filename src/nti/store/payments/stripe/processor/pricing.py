@@ -34,7 +34,7 @@ def price_purchase(purchase_attempt, name=STRIPE):
 class PricingProcessor(BaseProcessor):
 
     def do_pricing(self, purchase_attempt):
-        result = price_purchase(purchase_attempt, name=self.name,)
+        result = price_purchase(purchase_attempt, name=self.name)
         return result
     _do_pricing = do_pricing  # BWC
 
