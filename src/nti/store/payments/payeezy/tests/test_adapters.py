@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, absolute_import, division
-from nti.store.purchase_attempt import PurchaseAttempt
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -35,6 +34,8 @@ from nti.store.payments.payeezy.interfaces import IPayeezyOperationError
 from nti.store.payments.payeezy.interfaces import IPayeezyPurchaseAttempt
 
 from nti.store.payments.payeezy import PayeezyException
+
+from nti.store.purchase_attempt import PurchaseAttempt
 
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
