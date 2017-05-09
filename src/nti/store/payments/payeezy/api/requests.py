@@ -27,7 +27,7 @@ class PayeezyHTTPRequests(object):
 
     payload = None
 
-    def __init__(self, api_key, api_secret, token, url, 
+    def __init__(self, api_key, api_secret, token, url,
                  js_security_key=None, token_url=None):
         self.token = token
         self.api_key = api_key
@@ -45,11 +45,10 @@ class PayeezyHTTPRequests(object):
     def generate_hmac_authentication_header(self, payload):
         message_data = self.api_key + self.nonce + self.timestamp + self.token + payload
         hmacInHex = hmac.new(self.api_secret,
-                             msg=message_data, 
+                             msg=message_data,
                              digestmod=hashlib.sha256)
         hmacInHex = hmacInHex.hexdigest().encode('ascii')
         return b64encode(hmacInHex)
-
 
     # Generic method to make calls for primary transactions
     def make_card_based_transaction_post_call(self, payload):
@@ -91,7 +90,7 @@ class PayeezyHTTPRequests(object):
         self.payload = payload
         result = response.get(self.token_url, params=self.payload)
         return result
-    
+
     def make_token_post_call(self, payload):
         response = requests.Session()
         self.payload = json.dumps(payload)
@@ -105,4 +104,20 @@ class PayeezyHTTPRequests(object):
                                    'timestamp': self.timestamp,
                                    'Authorization': authorization},
                                data=self.payload)
+        return result
+
+    def make_reporting_get_call(self, payload):
+        response = requests.Session()
+        self.payload = json.dumps(payload)
+        authorization = self.generate_hmac_authentication_header(self.payload)
+        result = response.get(self.url,
+                              headers={
+                                  'Content-type': 'application/json',
+                                  'apikey': self.api_key,
+                                  'token': self.token,
+                                  'nonce': self.nonce,
+                                  'timestamp': self.timestamp,
+                                  'Authorization': authorization
+                              },
+                              params=payload)
         return result

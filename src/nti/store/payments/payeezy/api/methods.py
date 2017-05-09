@@ -129,6 +129,12 @@ class Payeezy(object):
                                                        description=description)
         return self.payeezy.make_token_post_call(self.payload)
 
+    def reporting(self, start_date, end_date, searchFor=None):
+        payload = self.payload = self._make_reporting_payload(start_date,
+                                                              end_date,
+                                                              searchFor)
+        return self.payeezy.make_reporting_get_call(payload)
+
     # payload
 
     def _make_primary_transaction(self, payload):
@@ -309,4 +315,21 @@ class Payeezy(object):
                 "token_data": token_data
             }
         }
+        return payload
+
+    def _make_reporting_payload(self, start_date, end_date, searchFor=None):
+        assert start_date, "Start date cannot be None"
+        if isinstance(start_date, six.string_types):
+            start_date = int(start_date)
+
+        assert end_date, "End date cannot be None"
+        if isinstance(end_date, six.string_types):
+            end_date = int(end_date)
+
+        payload = {
+            "start_date": start_date,
+            "end_date": end_date
+        }
+        if searchFor:
+            payload['searchFor'] = searchFor
         return payload
