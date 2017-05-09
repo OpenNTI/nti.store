@@ -176,11 +176,6 @@ class PurchaseProcessor(PricingProcessor):
             # check priced amount w/ expected amount
             currency = pricing.Currency
             amount = pricing.TotalPurchasePrice
-            if pricing.TotalPurchaseFee:
-                application_fee = pricing.TotalPurchaseFee
-            else:
-                application_fee = None
-
             if      expected_amount is not None and \
                 not math.fabs(expected_amount - amount) <= 0.05:
                 logger.error("Purchase order amount %.2f did not match the " +
@@ -191,12 +186,7 @@ class PurchaseProcessor(PricingProcessor):
             # get priced amount in cents as expected by payeezy
             # round to two decimal places first
             cents_amount = int(round(amount * 100.0, ROUND_DECIMAL))
-            if application_fee:
-                application_fee = round(application_fee * 100.0, ROUND_DECIMAL)
-                application_fee = int(application_fee)
-            else:
-                application_fee = None
-
+    
             # execute payeezy charge outside a DS transaction
             charge = execute_charge(token=token,
                                     currency=currency,
