@@ -6,7 +6,7 @@ Defines purchase error object.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -29,7 +29,7 @@ from nti.store.utils import MetaStoreObject
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
 @interface.implementer(IPurchaseError)
-class PurchaseError(SchemaConfigured):
+class PurchaseError(SchemaConfigured, BaseException):
     __metaclass__ = MetaStoreObject
     createDirectFieldProperties(IPurchaseError)
 
