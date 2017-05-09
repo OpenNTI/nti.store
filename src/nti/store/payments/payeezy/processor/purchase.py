@@ -53,7 +53,7 @@ def get_transaction_runner():
     return component.getUtility(ISiteTransactionRunner)
 
 
-def start_purchase(purchase_id, token, token_type, username=None):
+def start_purchase(purchase_id, token, token_type, cardholder_name, username=None):
     purchase = get_purchase_attempt(purchase_id, username)
     if purchase is None:
         msg = _("Could not find purchase attempt")
@@ -66,6 +66,7 @@ def start_purchase(purchase_id, token, token_type, username=None):
     purchase = IPayeezyPurchaseAttempt(purchase)
     purchase.token = token
     purchase.token_type = token_type
+    purchase.cardholder_name = cardholder_name
     return result
 
 
@@ -162,7 +163,8 @@ class PurchaseProcessor(PricingProcessor):
                           token=token,
                           username=username,
                           token_type=card_type,
-                          purchase_id=purchase_id)
+                          purchase_id=purchase_id,
+                          cardholder_name=cardholder_name)
         try:
             # start the purchase.
             # We notify purchase has started and
@@ -186,16 +188,16 @@ class PurchaseProcessor(PricingProcessor):
             # get priced amount in cents as expected by payeezy
             # round to two decimal places first
             cents_amount = int(round(amount * 100.0, ROUND_DECIMAL))
-    
+
             # execute payeezy charge outside a DS transaction
             charge = execute_charge(token=token,
+                                    api_key=api_key,
                                     currency=currency,
                                     amount=cents_amount,
-                                    description=purchase_id,
                                     card_type=card_type,
-                                    cardholder_name=cardholder_name,
                                     card_expiry=card_expiry,
-                                    api_key=api_key)
+                                    description=purchase_id,
+                                    cardholder_name=cardholder_name)
 
             register_and_notifier = partial(register_charge_notify,
                                             purchase_id=purchase_id,
