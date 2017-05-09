@@ -66,7 +66,7 @@ class TestMethods(unittest.TestCase):
                                 'token',
                                 has_entries(
                                     'token_data',
-                                        has_entry('value', is_not(none())),
+                                    has_entry('value', is_not(none())),
                                     'token_type', 'FDToken'),
                                 'transaction_id', is_not(none()),
                                 'transaction_status', 'approved',
@@ -92,7 +92,7 @@ class TestMethods(unittest.TestCase):
         text = re.sub(r'[\s\n]', '', result.text)
         text = text[len(callback) + 1:-1]
         return simplejson.loads(text)
-        
+
     def test_fd_token(self):
         data = self._get_fd_token()
         assert_that(data,
@@ -104,13 +104,13 @@ class TestMethods(unittest.TestCase):
                                             'token',
                                             has_entries('value', is_not(none()),
                                                         'type', 'visa'))))
-        
+
     def _do_token_purchase(self):
         data = self._get_fd_token()
         token = data['results']['token']['value']
         payeezy = self._get_payeezy()
-        result = payeezy.token_payment(token, '100', 'USD', 
-                                       card_type='visa', 
+        result = payeezy.token_payment(token, '100', 'USD',
+                                       card_type='visa',
                                        cardholder_name="Ichigo Kurosaki",
                                        card_expiry="0930")
         return result
@@ -127,19 +127,41 @@ class TestMethods(unittest.TestCase):
                                 'token',
                                 has_entries(
                                     'token_data',
-                                        has_entry('value', is_not(none())),
+                                    has_entry('value', is_not(none())),
                                     'token_type', 'FDToken'),
                                 'transaction_id', is_not(none()),
                                 'transaction_status', 'approved',
                                 'transaction_tag', is_not(none()),
                                 'transaction_type', 'purchase',
                                 'validation_status', 'success'))
-        
-    def xtest_refund_purchase(self):
+
+    def test_refund_purchase(self):
         result = self._do_token_purchase()
         assert_that(result.status_code, is_(201))
         data = result.json()
-        transaction_id = data['transaction_id']
-        print(transaction_id)
-
-        
+        token = data['token']['token_data']['value']
+        token_type = data['token']['token_data']['type']
+        payeezy = self._get_payeezy()
+        result = payeezy.token_refund(token,
+                                      amount='100',
+                                      currency_code='USD',
+                                      card_type=token_type,
+                                      cardholder_name="Ichigo Kurosaki",
+                                      card_expiry="0930")
+        assert_that(result.status_code, is_(201))
+        data = result.json()
+        assert_that(data,
+                    has_entries('amount', '100',
+                                'correlation_id', is_not(none()),
+                                'currency', 'USD',
+                                'method', 'token',
+                                'token',
+                                has_entries(
+                                    'token_data',
+                                    has_entry('value', is_not(none())),
+                                    'token_type', 'FDToken'),
+                                'transaction_id', is_not(none()),
+                                'transaction_status', 'approved',
+                                'transaction_tag', is_not(none()),
+                                'transaction_type', 'refund',
+                                'validation_status', 'success'))

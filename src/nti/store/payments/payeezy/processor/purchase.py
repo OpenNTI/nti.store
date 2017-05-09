@@ -102,15 +102,19 @@ def execute_charge(api_key, token, amount, currency,
         raise e
 
     data = result.json()
-    status = data['transaction_status']
+    status = data.get('transaction_status') or data.get('validation_status')
     if status not in (SUCCESS, APPROVED):
         msg = _('Purchase failed')
         e = PayeezyPurchaseError(msg)
         e.status = status
-        b_message = data.get('bank_message')
-        g_message = data.get('gateway_message')
-        if g_message or b_message:
-            e.message = '%s - %s' % (g_message, b_message)
+        error_messages = []
+        if 'Error' in data:
+            for m in data.get('messages') or ():
+                error_messages.append(m.get('description') or u'')
+        else:
+            error_messages.append(data.get('bank_message') or u'')
+            error_messages.append(data.get('gateway_message') or u'')
+        e.message = u'. '.join(error_messages) or None
         raise e
     return data
 

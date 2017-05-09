@@ -127,7 +127,7 @@ class Payeezy(object):
                                                        cardholder_name=cardholder_name,
                                                        card_expiry=card_expiry,
                                                        description=description)
-        return self.make_token_post_call(self.payload)
+        return self.payeezy.make_token_post_call(self.payload)
 
     # payload
 
@@ -266,6 +266,8 @@ class Payeezy(object):
 
     def _make_token_payload(self, transaction_type, token, amount, currency_code, card_type,
                             cardholder_name, card_expiry=None, card_cvv=None,  description=None):
+
+        assert transaction_type is not None, "Transaction type cannot be None"
 
         assert token is not None, "Token cannot be None"
         if isinstance(token, six.integer_types):
