@@ -107,7 +107,11 @@ class IPayeezyPurchaseAttempt(interface.Interface):
     """
     token = TextLine(title=u"Token value.", required=False)
     token_type = TextLine(title=u"Token type.", required=False)
+    
+    card_expiry = Variant((TextLine(title=u"The card expiry."),
+                           Number(title=u"The card expiry.")), required=False)
     cardholder_name = TextLine(title=u"Card holder name.", required=False)
+    
     correlation_id = TextLine(title=u"The correlation id.", required=False)
     transaction_id = TextLine(title=u"The transaction id.", required=False)
     transaction_tag = TextLine(title=u"The transaction tag.", required=False)
