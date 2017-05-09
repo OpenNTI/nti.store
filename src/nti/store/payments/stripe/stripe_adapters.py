@@ -72,7 +72,10 @@ class _StripeCustomer(Contained, Persistent):
 
     charges = alias('Charges')
     customer_id = alias('CustomerID')
-_StripeCustomerFactory = an_factory(_StripeCustomer)
+    
+STRIPE_CUSTOMER_KEY = u'nti.store.payments.stripe.stripe_adapters._StripeCustomer'
+_StripeCustomerFactory = an_factory(_StripeCustomer, 
+                                    STRIPE_CUSTOMER_KEY)
 
 
 @component.adapter(IPurchaseAttempt)
@@ -88,8 +91,16 @@ class _StripePurchaseAttempt(Contained, Persistent):
 
     token_id = alias('TokenID')
     charge_id = alias('ChargeID')
-_StripePurchase = _StripePurchaseAttempt  # BWC
-_StripePurchaseAttemptFactory = an_factory(_StripePurchaseAttempt)
+    
+STRIPE_PURCHASE_KEY = u'nti.store.payments.stripe.stripe_adapters._StripePurchaseAttempt'
+_StripePurchaseAttemptFactory = an_factory(_StripePurchaseAttempt,
+                                           STRIPE_PURCHASE_KEY)
+
+import zope.deferredimport
+zope.deferredimport.initialize()
+zope.deferredimport.deprecated(
+    "Import from _StripePurchaseAttempt instead",
+    _StripePurchase='nti.store.payments.stripe.stripe_adapters._StripePurchaseAttempt')
 
 
 @component.adapter(basestring)
