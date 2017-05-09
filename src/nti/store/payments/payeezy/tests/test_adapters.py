@@ -61,7 +61,7 @@ class TestAdapters(unittest.TestCase):
         assert_that(attempt, is_not(none()))
 
     def test_string_errors(self):
-        error = IPayeezyPurchaseError('ichigo', None)
+        error = IPayeezyPurchaseError(u'ichigo', None)
         assert_that(error, is_not(none()))
         assert_that(error, validly_provides(IPayeezyPurchaseError))
         assert_that(error, verifiably_provides(IPayeezyPurchaseError))
@@ -72,7 +72,7 @@ class TestAdapters(unittest.TestCase):
                                 'Type', 'PurchaseError',
                                 'Class', 'PayeezyPurchaseError'))
 
-        error = IPayeezyOperationError('ichigo', None)
+        error = IPayeezyOperationError(u'ichigo', None)
         assert_that(error, is_not(none()))
         assert_that(error, validly_provides(IPayeezyOperationError))
         assert_that(error, verifiably_provides(IPayeezyOperationError))
@@ -87,7 +87,7 @@ class TestAdapters(unittest.TestCase):
 
         @interface.implementer(IPayeezyError)
         class O(object):
-            args = ('Ichigo',)
+            args = (u'Ichigo',)
             status = 403
 
         o = O()
@@ -97,7 +97,7 @@ class TestAdapters(unittest.TestCase):
                                           'Message', is_('Ichigo')))
 
     def test_payeezy_exception(self):
-        ex = PayeezyException('Ichigo')
+        ex = PayeezyException(u'Ichigo')
         ex.status = 403
         error = IPayeezyOperationError(ex, None)
         assert_that(error, is_not(none()))
