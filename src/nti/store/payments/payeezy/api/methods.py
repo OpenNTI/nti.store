@@ -20,8 +20,8 @@ class Payeezy(object):
 
     payload = None
     transaction_id = None
-    
-    def __init__(self, api_key, api_secret, token, url, 
+
+    def __init__(self, api_key, api_secret, token, url,
                  js_security_key=None, token_url=None):
         self.token = token
         self.api_key = api_key
@@ -43,23 +43,24 @@ class Payeezy(object):
     def authorize(self, amount=None, currency_code=None, description=None,
                   card_type=None, cardholder_name=None, card_number=None,
                   card_expiry=None, card_cvv=None):
+        """
+        Credit card purchase
+        """
+        payload = self._make_payload(amount=amount,
+                                     currency_code=currency_code,
+                                     card_type=card_type,
+                                     cardholder_name=cardholder_name,
+                                     card_number=card_number,
+                                     card_expiry=card_expiry,
+                                     card_cvv=card_cvv,
+                                     description=description,
+                                     transaction_type='authorize')
 
-        _make_payload_output = self._make_payload(amount=amount,
-                                                  currency_code=currency_code,
-                                                  card_type=card_type,
-                                                  cardholder_name=cardholder_name,
-                                                  card_number=card_number,
-                                                  card_expiry=card_expiry,
-                                                  card_cvv=card_cvv,
-                                                  description=description,
-                                                  transaction_type='authorize')
-
-        return self._make_primary_transaction(payload=_make_payload_output['payload'])
+        return self._make_primary_transaction(payload=payload['payload'])
 
     def purchase(self, amount=None, currency_code=None, description=None,
                  card_type=None, cardholder_name=None, card_number=None,
                  card_expiry=None, card_cvv=None):
-
         """
         Credit card purchase
         """
@@ -76,45 +77,22 @@ class Payeezy(object):
         payload["partial_redemption"] = "false"  # always
         return self._make_primary_transaction(payload=payload)
 
-    def capture(self, amount=None, currency_code=None, description=None,
-                transaction_tag=None, transaction_id=None):
-
-        _make_payload_output = self._make_payload(amount=amount,
-                                                  currency_code=currency_code,
-                                                  transaction_tag=transaction_tag,
-                                                  transaction_id=transaction_id,
-                                                  description=description,
-                                                  transaction_type='capture')
-
-        return self._make_secondary_transaction(payload=_make_payload_output['payload'],
-                                                transaction_id=_make_payload_output['transaction_id'])
-
-    def void(self,  payload):
-        self.payload = payload
-        self.transaction_type = "void"
-        return self._make_secondary_transaction(self.transaction_type, self.payload)
-
-    def refund(self,  payload):
-        self.payload = payload
-        self.transaction_type = "refund"
-        return self._make_secondary_transaction(self.transaction_type, self.payload)
-
-    def fd_token(self, card_type=None, cardholder_name=None, card_number=None, 
+    def fd_token(self, card_type=None, cardholder_name=None, card_number=None,
                  card_expiry=None, card_cvv=None, callback=None,
                  street=None, city=None, state=None, zip_code=None, country=None):
         """
-        Process an FDToken token
+        Get an FDToken token
         """
 
         payload = self._make_fd_token_payload(callback=callback,
-                                              card_type=card_type, 
-                                              cardholder_name=cardholder_name, 
-                                              card_number=card_number, 
+                                              card_type=card_type,
+                                              cardholder_name=cardholder_name,
+                                              card_number=card_number,
                                               card_expiry=card_expiry,
-                                              card_cvv=card_cvv, 
+                                              card_cvv=card_cvv,
                                               street=street,
-                                              city=city, 
-                                              state=state, 
+                                              city=city,
+                                              state=state,
                                               zip_code=zip_code,
                                               country=country)
         payload['apikey'] = self.api_key
@@ -124,16 +102,32 @@ class Payeezy(object):
 
     def token_payment(self, token, amount, currency_code, card_type, cardholder_name,
                       card_expiry=None,  description=None):
-        
+        """
+        Process a FDToken token payment
+        """
         payload = self._make_token_purchase_payload(token=token,
                                                     amount=amount,
                                                     currency_code=currency_code,
-                                                    card_type=card_type, 
-                                                    cardholder_name=cardholder_name, 
+                                                    card_type=card_type,
+                                                    cardholder_name=cardholder_name,
                                                     card_expiry=card_expiry,
                                                     description=description)
         self.payload = payload
         return self.payeezy.make_token_post_call(payload)
+
+    def token_refund(self,  token, amount, currency_code, card_type, cardholder_name,
+                     card_expiry=None, description=None):
+        """
+        Process a FDToken token refund
+        """
+        self.payload = self._make_token_refund_payload(token=token,
+                                                       amount=amount,
+                                                       currency_code=currency_code,
+                                                       card_type=card_type,
+                                                       cardholder_name=cardholder_name,
+                                                       card_expiry=card_expiry,
+                                                       description=description)
+        return self.make_token_post_call(self.payload)
 
     # payload
 
@@ -141,13 +135,7 @@ class Payeezy(object):
         self.payload = payload
         return self.payeezy.make_card_based_transaction_post_call(self.payload)
 
-    def _make_secondary_transaction(self, payload, transaction_id):
-        self.payload = payload
-        self.transaction_id = transaction_id
-        return self.payeezy.make_capture_void_refund_post_call(self.payload,
-                                                               self.transaction_id)
-
-    def _make_payload(self, amount=None, currency_code='USD',  description=None,
+    def _make_payload(self, amount=None, currency_code='USD', description=None,
                       card_type=None, cardholder_name=None, card_number=None,
                       card_expiry=None, card_cvv=None, transaction_type=None,
                       transaction_tag=None, transaction_id=None):
@@ -209,7 +197,7 @@ class Payeezy(object):
 
         return {'payload': payload, 'transaction_id': transaction_id}
 
-    def _make_fd_token_payload(self, card_type=None, cardholder_name=None, card_number=None, 
+    def _make_fd_token_payload(self, card_type=None, cardholder_name=None, card_number=None,
                                card_expiry=None, card_cvv=None, callback=None,
                                street=None, city=None, state=None, zip_code=None, country=None):
 
@@ -230,11 +218,11 @@ class Payeezy(object):
             card_expiry = str(card_expiry)
 
         payload = {
-            "ta_token": "NOIW", 
+            "ta_token": "NOIW",
             "type": "FDToken",
             "callback": callback,
             "credit_card.type": card_type,
-            "credit_card.cardholder_name": cardholder_name, 
+            "credit_card.cardholder_name": cardholder_name,
             "credit_card.card_number": card_number,
             "credit_card.exp_date": card_expiry,
             "credit_card.cvv": card_cvv
@@ -251,12 +239,36 @@ class Payeezy(object):
             payload['billing_address.zip_postal_code'] = str(zip_code)
 
         return payload
-    
+
     def _make_token_purchase_payload(self, token, amount, currency_code, card_type, cardholder_name,
-                                     card_expiry=None, card_cvv=None,  description=None):
+                                     card_expiry=None,  description=None):
+
+        return self._make_token_payload('purchase',
+                                        token=token,
+                                        amount=amount,
+                                        currency_code=currency_code,
+                                        card_type=card_type,
+                                        cardholder_name=cardholder_name,
+                                        card_expiry=card_expiry,
+                                        description=description)
+
+    def _make_token_refund_payload(self, token, amount, currency_code, card_type, cardholder_name,
+                                   card_expiry, description=None):
+
+        return self._make_token_payload('refund',
+                                        token=token,
+                                        amount=amount,
+                                        currency_code=currency_code,
+                                        card_type=card_type,
+                                        cardholder_name=cardholder_name,
+                                        card_expiry=card_expiry,
+                                        description=description)
+
+    def _make_token_payload(self, transaction_type, token, amount, currency_code, card_type,
+                            cardholder_name, card_expiry=None, card_cvv=None,  description=None):
 
         assert token is not None, "Token cannot be None"
-        if isinstance(amount, six.integer_types):
+        if isinstance(token, six.integer_types):
             token = str(token)
 
         assert amount is not None, "Amount cannot be None"
@@ -268,15 +280,13 @@ class Payeezy(object):
 
         if isinstance(card_expiry, six.integer_types):
             card_expiry = str(card_expiry)
-            
+
         # fill some description
         if description is None:
             msg = "%s transaction for amount: %s"
             description = msg % (card_type, amount)
 
-        assert cardholder_name, "Card name was not provided"
-        if isinstance(card_expiry, six.integer_types):
-            card_expiry = str(card_expiry)
+        assert cardholder_name, "Card holder name was not provided"
 
         token_data = {
             "type": card_type,
@@ -285,10 +295,10 @@ class Payeezy(object):
         }
         if card_expiry:
             token_data['exp_date'] = card_expiry
-        
+
         payload = {
             "merchant_ref": description,
-            "transaction_type": 'purchase',
+            "transaction_type": transaction_type,
             "method": "token",
             "amount": amount,
             "currency_code": currency_code.upper(),
@@ -297,5 +307,4 @@ class Payeezy(object):
                 "token_data": token_data
             }
         }
-
         return payload

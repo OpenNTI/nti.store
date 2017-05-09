@@ -105,7 +105,7 @@ class TestMethods(unittest.TestCase):
                                             has_entries('value', is_not(none()),
                                                         'type', 'visa'))))
         
-    def _do_purchase(self):
+    def _do_token_purchase(self):
         data = self._get_fd_token()
         token = data['results']['token']['value']
         payeezy = self._get_payeezy()
@@ -116,7 +116,7 @@ class TestMethods(unittest.TestCase):
         return result
 
     def test_token_purchase(self):
-        result = self._do_purchase()
+        result = self._do_token_purchase()
         assert_that(result.status_code, is_(201))
         data = result.json()
         assert_that(data,
@@ -134,5 +134,12 @@ class TestMethods(unittest.TestCase):
                                 'transaction_tag', is_not(none()),
                                 'transaction_type', 'purchase',
                                 'validation_status', 'success'))
+        
+    def xtest_refund_purchase(self):
+        result = self._do_token_purchase()
+        assert_that(result.status_code, is_(201))
+        data = result.json()
+        transaction_id = data['transaction_id']
+        print(transaction_id)
 
         

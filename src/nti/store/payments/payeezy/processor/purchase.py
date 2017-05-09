@@ -53,7 +53,7 @@ def get_transaction_runner():
     return component.getUtility(ISiteTransactionRunner)
 
 
-def start_purchase(purchase_id, token, username=None):
+def start_purchase(purchase_id, token, token_type, username=None):
     purchase = get_purchase_attempt(purchase_id, username)
     if purchase is None:
         msg = _("Could not find purchase attempt")
@@ -65,6 +65,7 @@ def start_purchase(purchase_id, token, username=None):
     result = purchase.Order.copy()
     purchase = IPayeezyPurchaseAttempt(purchase)
     purchase.token = token
+    purchase.token_type = token_type
     return result
 
 
@@ -156,6 +157,7 @@ class PurchaseProcessor(PricingProcessor):
         starter = partial(start_purchase,
                           token=token,
                           username=username,
+                          token_type=card_type,
                           purchase_id=purchase_id)
         try:
             # start the purchase.

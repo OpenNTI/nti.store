@@ -99,6 +99,7 @@ class IPayeezyPurchaseAttempt(interface.Interface):
     Marker interface for Payeezy purchase attempts
     """
     token = TextLine(title=u"Token value.", required=False)
+    token_type = TextLine(title=u"Token type.", required=False)
     correlation_id = TextLine(title=u"The correlation id.", required=False)
     transaction_id = TextLine(title=u"The transaction id.", required=False)
     transaction_tag = TextLine(title=u"The transaction tag.", required=False)
