@@ -18,21 +18,21 @@ from nti.store.payments.payeezy import PAYEEZY
 from nti.store.purchase_history import get_purchase_attempt
 
 
-def price_order(order, name=PAYEEZY, registry=component):
-    pricer = registry.getUtility(IPurchasablePricer, name=name)
-    result = pricer.evaluate(order, registry=registry)
+def price_order(order, name=PAYEEZY):
+    pricer = component.getUtility(IPurchasablePricer, name=name)
+    result = pricer.evaluate(order)
     return result
 
 
 class PricingProcessor(object):
 
     @classmethod
-    def do_pricing(cls, purchase_attempt, registry=component):
-        result = price_order(purchase_attempt.Order, registry=registry)
+    def do_pricing(cls, purchase_attempt):
+        result = price_order(purchase_attempt.Order)
         return result
 
     @classmethod
-    def price_purchase(cls, purchase_id, username, registry=component):
+    def price_purchase(cls, purchase_id, username):
         purchase = get_purchase_attempt(purchase_id, username)
-        result = cls.do_pricing(purchase, registry=registry)
+        result = cls.do_pricing(purchase)
         return result

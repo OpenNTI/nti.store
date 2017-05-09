@@ -110,8 +110,8 @@ class RefundProcessor(object):
             # round to two decimal places first
             cents_amount = int(round(amount * 100.0, ROUND_DECIMAL))
     
-            purchase = IPayeezyPurchaseAttempt(purchase)
-            token = purchase.token
+            adapted = IPayeezyPurchaseAttempt(purchase)
+            token = adapted.token
             if not token:
                 msg = _("Cannot find FDToken for purchase")
                 raise RefundException(msg, purchase_id)
@@ -120,15 +120,15 @@ class RefundProcessor(object):
                            currency=currency,
                            amount=cents_amount,
                            description=purchase_id,
-                           card_type=purchase.token_type,
-                           card_expiry=purchase.card_expiry,
-                           cardholder_name=purchase.cardholder_name,
+                           card_type=adapted.token_type,
+                           card_expiry=adapted.card_expiry,
+                           cardholder_name=adapted.cardholder_name,
                            api_key=api_key)
 
             payment_charge = PaymentCharge(Amount=float(amount),
                                            Currency=currency,
                                            Created=time.time(),
-                                           Name=purchase.cardholder_nam)
+                                           Name=adapted.cardholder_name)
             notify(PurchaseAttemptRefunded(purchase, payment_charge, request))
 
         except RefundException:
