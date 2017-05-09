@@ -40,9 +40,8 @@ from nti.store.payments.payeezy.interfaces import IPayeezyPurchaseAttempt
 from nti.store.payments.payeezy.model import PayeezyPurchaseError
 
 from nti.store.payments.payeezy.processor import get_payeezy
+from nti.store.payments.payeezy.processor import safe_error_message
 from nti.store.payments.payeezy.processor import adapt_to_purchase_error
-
-from nti.store.payments.payeezy.processor.model import safe_error_message
 
 from nti.store.payments.payeezy.processor.pricing import price_order
 from nti.store.payments.payeezy.processor.pricing import PricingProcessor

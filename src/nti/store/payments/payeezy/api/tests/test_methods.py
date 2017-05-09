@@ -105,7 +105,7 @@ class TestMethods(unittest.TestCase):
                                             has_entries('value', is_not(none()),
                                                         'type', 'visa'))))
         
-    def test_token_purchase(self):
+    def _do_purchase(self):
         data = self._get_fd_token()
         token = data['results']['token']['value']
         payeezy = self._get_payeezy()
@@ -113,6 +113,10 @@ class TestMethods(unittest.TestCase):
                                        card_type='visa', 
                                        cardholder_name="Ichigo Kurosaki",
                                        card_expiry="0930")
+        return result
+
+    def test_token_purchase(self):
+        result = self._do_purchase()
         assert_that(result.status_code, is_(201))
         data = result.json()
         assert_that(data,

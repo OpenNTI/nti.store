@@ -23,7 +23,7 @@ from nti.store.payments.payeezy.model import PayeezyFDToken
 
 from nti.store.payments.payeezy.processor import get_payeezy
 
-from nti.store.payments.payeezy.processor.model import safe_error_message
+from nti.store.payments.payeezy.processor import safe_error_message
 
 
 class TokenProcessor(object):

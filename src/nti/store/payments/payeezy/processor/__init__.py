@@ -51,3 +51,11 @@ def adapt_to_purchase_error(e):
         message = u' '.join(map(str, e.args()))
         result.Message = message
     return result
+
+
+def safe_error_message(result):
+    try:
+        data = result.json()
+        return data['message']
+    except Exception:
+        return None

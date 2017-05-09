@@ -15,17 +15,15 @@ from nti.store.payments import BasePaymentProcessor
 
 from nti.store.payments.payeezy.processor.interfaces import IPayeezyPaymentProcessor
 
+from nti.store.payments.payeezy.processor.purchase import PurchaseProcessor
 
-def safe_error_message(result):
-    try:
-        data = result.json()
-        return data['message']
-    except Exception:
-        return None
+from nti.store.payments.payeezy.processor.token import TokenProcessor
 
 
 @interface.implementer(IPayeezyPaymentProcessor)
-class PayeezyPaymentProcessor(BasePaymentProcessor):
+class PayeezyPaymentProcessor(BasePaymentProcessor, 
+                              PurchaseProcessor,
+                              TokenProcessor):
 
     def sync_purchase(self, purchase_id, username):
         pass
