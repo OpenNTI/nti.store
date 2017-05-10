@@ -28,6 +28,7 @@ from nti.store.payments.payeezy.interfaces import IPayeezyPurchaseAttempt
 
 from nti.store.payments.payeezy.model import PayeezyRefundError
 
+from nti.store.payments.payeezy.processor import get_api_key
 from nti.store.payments.payeezy.processor import get_payeezy
 from nti.store.payments.payeezy.processor import safe_error_message
 from nti.store.payments.payeezy.processor import adapt_to_purchase_error
@@ -94,12 +95,16 @@ class RefundProcessor(object):
     def refund_purchase(cls, purchase_id, username=None, api_key=None, request=None):
         purchase = find_purchase(purchase_id, username)
         if purchase is None:
-            msg = _("Could not find purchase attempt")
+            msg = _(u"Could not find purchase attempt")
             raise RefundException(msg, purchase_id)
 
+        api_key = api_key or get_api_key(purchase)
+        if not api_key:
+            msg = _(u"Could not find a Payeezy connection key")
+            raise RefundException(msg, purchase_id)
         try:
             if not purchase.has_succeeded():
-                msg = _("Purchase cannot be refunded")
+                msg = _(u"Purchase cannot be refunded")
                 raise RefundException(msg, purchase_id)
         
             pricing = purchase.Pricing
@@ -113,7 +118,7 @@ class RefundProcessor(object):
             adapted = IPayeezyPurchaseAttempt(purchase)
             token = adapted.token
             if not token:
-                msg = _("Cannot find FDToken for purchase")
+                msg = _(u"Cannot find FDToken for purchase")
                 raise RefundException(msg, purchase_id)
             
             execute_refund(token=token,
