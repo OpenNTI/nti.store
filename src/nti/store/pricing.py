@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Defines priced objects.
-
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -47,19 +45,19 @@ class PricedItem(Priceable):
 
 
 def create_priced_item(ntiid, purchase_price, purchase_fee=None,
-                       non_discounted_price=None, quantity=1, currency='USD'):
+                       non_discounted_price=None, quantity=1, currency=u'USD'):
     quantity = 1 if quantity is None else int(quantity)
     purchase_fee = float(purchase_fee) if purchase_fee is not None else None
     if non_discounted_price is not None:
         non_discounted_price = float(non_discounted_price)
     else:
-        non_discounted_price =  None
-    result = PricedItem(NTIID=ntiid, 
+        non_discounted_price = None
+    result = PricedItem(NTIID=ntiid,
+                        Currency=currency,
+                        Quantity=quantity,
+                        PurchaseFee=purchase_fee,
                         PurchasePrice=float(purchase_price),
-                        PurchaseFee=purchase_fee, 
-                        NonDiscountedPrice=non_discounted_price,
-                        Quantity=quantity, 
-                        Currency=currency)
+                        NonDiscountedPrice=non_discounted_price)
     return result
 
 
@@ -71,18 +69,18 @@ class PricingResults(SchemaConfigured):
 
 
 def create_pricing_results(items=None, purchase_price=0.0, purchase_fee=0.0,
-                           non_discounted_price=None, currency='USD'):
+                           non_discounted_price=None, currency=u'USD'):
     items = list() if items is None else items
     purchase_fee = float(purchase_fee) if purchase_fee is not None else None
     if non_discounted_price is not None:
         non_discounted_price = float(non_discounted_price)
     else:
         non_discounted_price = None
-    result = PricingResults(Items=items, 
-							TotalPurchasePrice=purchase_price,
+    result = PricingResults(Items=items,
+                            Currency=currency,
                             TotalPurchaseFee=purchase_fee,
-                            TotalNonDiscountedPrice=non_discounted_price,
-                            Currency=currency)
+                            TotalPurchasePrice=purchase_price,
+                            TotalNonDiscountedPrice=non_discounted_price)
     return result
 
 
@@ -126,6 +124,7 @@ class DefaultPurchasablePricer(object):
             result.TotalPurchasePrice += priced.PurchasePrice
 
         if len(currencies) != 1:
-            raise PricingException(_("Multi-Currency pricing is not supported"))
+            msg =  _(u"Multi-Currency pricing is not supported")
+            raise PricingException(msg)
         result.Currency = currencies.pop()
         return result
