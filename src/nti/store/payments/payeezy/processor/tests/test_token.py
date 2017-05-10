@@ -50,12 +50,12 @@ class TestToken(unittest.TestCase):
         }
         mock_fdt.is_callable().with_args().returns(fake_response)
         mock_dcr.is_callable().with_args().returns(fake_data)
-        token = TokenProcessor.get_token("NTI-TEST",
-                                         card_type="visa",
-                                         cardholder_name=u"Ichigo Kurosaki",
-                                         card_number="4012000033330026",
-                                         card_expiry="0930",
-                                         card_cvv="019")
+        token = TokenProcessor.create_token("NTI-TEST",
+                                             card_type="visa",
+                                             cardholder_name=u"Ichigo Kurosaki",
+                                             card_number="4012000033330026",
+                                             card_expiry="0930",
+                                             card_cvv="019")
         assert_that(token, is_not(none))
         assert_that(token, has_property('type', is_('visa')))
         assert_that(token, has_property('value', is_('1130881202230026')))
@@ -71,12 +71,12 @@ class TestToken(unittest.TestCase):
 
         mock_fdt.is_callable().with_args().returns(fake_response)
         with self.assertRaises(PayeezyTokenException) as e:
-            TokenProcessor.get_token("NTI-TEST",
-                                     card_type="visa",
-                                     cardholder_name=u"Ichigo Kurosaki",
-                                     card_number="4012000033330026",
-                                     card_expiry="0930",
-                                     card_cvv="019")
+            TokenProcessor.create_token("NTI-TEST",
+                                        card_type="visa",
+                                        cardholder_name=u"Ichigo Kurosaki",
+                                        card_number="4012000033330026",
+                                        card_expiry="0930",
+                                        card_cvv="019")
             assert_that(e, has_property('status', is_(403)))
             assert_that(e, 
                         has_property('message', is_('HMAC validation Failure')))
@@ -97,10 +97,10 @@ class TestToken(unittest.TestCase):
         mock_dcr.is_callable().with_args().returns(fake_data)
         mock_fdt.is_callable().with_args().returns(fake_response)
         with self.assertRaises(PayeezyTokenException) as e:
-            TokenProcessor.get_token("NTI-TEST",
-                                     card_type="visa",
-                                     cardholder_name=u"Ichigo Kurosaki",
-                                     card_number="4012000033330026",
-                                     card_expiry="0910",
-                                     card_cvv="019")
+            TokenProcessor.create_token("NTI-TEST",
+                                        card_type="visa",
+                                        cardholder_name=u"Ichigo Kurosaki",
+                                        card_number="4012000033330026",
+                                        card_expiry="0910",
+                                        card_cvv="019")
             assert_that(e, has_property('status', is_(301)))

@@ -87,12 +87,12 @@ class TestPurchase(unittest.TestCase):
         
         with mock_dataserver.mock_db_trans(self.ds):
             PurchaseProcessor.process_purchase(purchase_id, 
+                                               username=username,
                                                token=u"7297812665630026", 
                                                card_type=u"visa", 
                                                cardholder_name=u'Ichigo Kurosaki', 
                                                card_expiry=u"0930", 
-                                               api_key='NTI-TEST',
-                                               username=username)
+                                               api_key='NTI-TEST')
         
        
         with mock_dataserver.mock_db_trans(self.ds):

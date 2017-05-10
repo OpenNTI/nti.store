@@ -91,7 +91,7 @@ def find_purchase(key, username=None):
 class RefundProcessor(object):
 
     @classmethod
-    def refund_purchase(cls, purchase_id, api_key, username=None, request=None):
+    def refund_purchase(cls, purchase_id, username=None, api_key=None, request=None):
         purchase = find_purchase(purchase_id, username)
         if purchase is None:
             msg = _("Could not find purchase attempt")

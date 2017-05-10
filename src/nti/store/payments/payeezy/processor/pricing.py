@@ -32,7 +32,7 @@ class PricingProcessor(object):
         return result
 
     @classmethod
-    def price_purchase(cls, purchase_id, username):
+    def price_purchase(cls, purchase_id, username=None):
         purchase = get_purchase_attempt(purchase_id, username)
         result = cls.do_pricing(purchase)
         return result

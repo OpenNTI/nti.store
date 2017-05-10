@@ -54,8 +54,8 @@ class TokenProcessor(object):
                                 callback=cls.__callback__)
 
     @classmethod
-    def get_token(cls, key, card_type, cardholder_name, card_number, card_expiry, card_cvv,
-                  street=None, city=None, state=None, zip_code=None, country=None):
+    def create_token(cls, key, card_type, cardholder_name, card_number, card_expiry, card_cvv,
+                     street=None, city=None, state=None, zip_code=None, country=None):
         try:
             payeezy = get_payeezy(key)
             result = cls.fd_token(payeezy,
@@ -69,7 +69,7 @@ class TokenProcessor(object):
                                   zip_code=zip_code,
                                   country=country)
             if result.status_code != 200:
-                msg = _("Invalid status code during token operation")
+                msg = _(u"Invalid status code during token operation")
                 e = PayeezyTokenException(msg)
                 e.status = result.status_code
                 e.message = safe_error_message(result)
@@ -80,13 +80,13 @@ class TokenProcessor(object):
             results = data.get('results') or {}
             token = results.get('token')
             if not token:
-                msg = _("Missing token response")
+                msg = _(u"Missing token response")
                 e = PayeezyTokenException(msg)
                 e.status = status
                 raise e
             status = results.get('status')
             if status != SUCCESS:
-                msg = _("Could not compute token")
+                msg = _(u"Could not compute token")
                 e = PayeezyTokenException(msg)
                 e.status = status
                 raise e
@@ -99,6 +99,6 @@ class TokenProcessor(object):
             raise
         except Exception:
             logger.exception("Cannot get FDToken")
-            msg = _("Cannot get FDToken")
+            msg = _(u"Cannot get FDToken")
             e = PayeezyTokenException(msg)
             raise e

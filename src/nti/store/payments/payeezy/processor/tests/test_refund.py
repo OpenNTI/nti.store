@@ -98,8 +98,8 @@ class TestRefund(unittest.TestCase):
 
         with mock_dataserver.mock_db_trans(self.ds):
             RefundProcessor.refund_purchase(purchase_id,
-                                            'NTI-TEST',
-                                            username=username)
+                                            username=username,
+                                            api_key='NTI-TEST')
 
         with mock_dataserver.mock_db_trans(self.ds):
             pa = get_purchase_attempt(purchase_id, username)

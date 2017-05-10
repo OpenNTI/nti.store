@@ -9,6 +9,7 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import six
 import sys
 import math
 import time
@@ -57,7 +58,7 @@ def start_purchase(purchase_id, token, token_type, card_expiry,
                    cardholder_name, username=None):
     purchase = get_purchase_attempt(purchase_id, username)
     if purchase is None:
-        msg = _("Could not find purchase attempt")
+        msg = _(u"Could not find purchase attempt.")
         raise PurchaseException(msg, purchase_id)
 
     if not purchase.is_pending():
@@ -101,7 +102,7 @@ def execute_charge(api_key, token, amount, currency,
                            card_expiry=card_expiry,
                            description=description)
     if result.status_code != 201:
-        msg = _('Invalid status code during purchase')
+        msg = _(u'Invalid status code during purchase.')
         e = PayeezyPurchaseError(msg)
         e.message = safe_error_message(result)
         e.status = result.status_code
@@ -110,7 +111,7 @@ def execute_charge(api_key, token, amount, currency,
     data = result.json()
     status = data.get('transaction_status') or data.get('validation_status')
     if status not in (SUCCESS, APPROVED):
-        msg = _('Purchase failed')
+        msg = _(u'Purchase failed.')
         e = PayeezyPurchaseError(msg)
         e.status = status
         error_messages = []
@@ -160,7 +161,7 @@ class PurchaseProcessor(PricingProcessor):
     @classmethod
     def process_purchase(cls, purchase_id, token,
                          card_type, cardholder_name, card_expiry,
-                         api_key, username=None, expected_amount=None, request=None):
+                         username=None, expected_amount=None, api_key=None, request=None):
 
         transaction_runner = get_transaction_runner()
 
@@ -188,7 +189,7 @@ class PurchaseProcessor(PricingProcessor):
                 not math.fabs(expected_amount - amount) <= 0.05:
                 logger.error("Purchase order amount %.2f did not match the " +
                              "expected amount %.2f", amount, expected_amount)
-                msg = _("Purchase order amount did not match the expected amount")
+                msg = _(u"Purchase order amount did not match the expected amount.")
                 raise PurchaseException(msg)
 
             # get priced amount in cents as expected by payeezy
@@ -226,3 +227,26 @@ class PurchaseProcessor(PricingProcessor):
             transaction_runner(fail_purchase)
 
             raise t, v, tb
+
+    def get_payment_charge(self, purchase, username=None):
+        purchase_id = purchase  # save original
+        if isinstance(purchase, six.string_types):
+            purchase = get_purchase_attempt(purchase, username)
+
+        if purchase is None:
+            msg = _(u"Could not find purchase attempt.")
+            raise PurchaseException(msg, purchase_id)
+        if purchase.is_pending():
+            msg = _(u"Purchase is being processed.")
+            raise PurchaseException(msg, purchase_id)
+        
+        pricing = purchase.Pricing
+        currency = pricing.Currency
+        amount = pricing.TotalPurchasePrice
+        
+        adapted = IPayeezyPurchaseAttempt(purchase)
+        result = PaymentCharge(Amount=float(amount),
+                               Currency=currency,
+                               Created=purchase.StartTime,
+                               Name=adapted.cardholder_name)
+        return result
