@@ -54,10 +54,10 @@ class TokenProcessor(object):
                                 callback=cls.__callback__)
 
     @classmethod
-    def create_token(cls, key, card_type, cardholder_name, card_number, card_expiry, card_cvv,
+    def create_token(cls, api_key, card_type, cardholder_name, card_number, card_expiry, card_cvv,
                      street=None, city=None, state=None, zip_code=None, country=None):
         try:
-            payeezy = get_payeezy(key)
+            payeezy = get_payeezy(api_key)
             result = cls.fd_token(payeezy,
                                   cardholder_name=cardholder_name,
                                   card_number=card_number,
