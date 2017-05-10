@@ -9,6 +9,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from zope import component
+
 from nti.store.interfaces import IPurchaseError
 
 from nti.store.payments.payeezy import PAY_URL
@@ -20,10 +22,21 @@ from nti.store.payments.payeezy import get_credentials
 from nti.store.payments.payeezy.api.methods import Payeezy
 
 from nti.store.payments.payeezy.interfaces import IPayeezyError
+from nti.store.payments.payeezy.interfaces import IPayeezyConnectKey
 from nti.store.payments.payeezy.interfaces import IPayeezyPurchaseError
 from nti.store.payments.payeezy.interfaces import IPayeezyOperationError
 
 from nti.store.payments.payeezy.model import PayeezyPurchaseError
+
+from nti.store.purchase_attempt import get_providers
+
+
+def get_api_key(purchase):
+    providers = get_providers(purchase)
+    provider = providers[0] if providers else '' # pick first provider
+    stripe_key = component.queryUtility(IPayeezyConnectKey, provider)
+    result = stripe_key.PrivateKey if stripe_key else None
+    return result
 
 
 def get_payeezy(name):
