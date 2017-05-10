@@ -24,6 +24,8 @@ from persistent import Persistent
 
 from nti.dataserver.interfaces import IUser
 
+from nti.externalization.representation import WithRepr
+
 from nti.property.property import alias
 
 from nti.schema.field import SchemaConfigured
@@ -61,6 +63,7 @@ class _PayeezyCustomer(Persistent, Contained):
 _PayeezyCustomerFactory = an_factory(_PayeezyCustomer)
 
 
+@WithRepr
 @component.adapter(IPurchaseAttempt)
 @interface.implementer(IPayeezyPurchaseAttempt)
 class _PayeezyPurchaseAttempt(SchemaConfigured, Persistent, Contained):

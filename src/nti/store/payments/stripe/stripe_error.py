@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -28,17 +28,19 @@ from nti.store.purchase_error import PurchaseError
 
 from nti.store.utils import MetaStoreObject
 
+
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
 @interface.implementer(IStripeOperationError)
 class StripeOperationError(SchemaConfigured):
-	__metaclass__ = MetaStoreObject
-	createDirectFieldProperties(IStripeOperationError)
+    __metaclass__ = MetaStoreObject
+    createDirectFieldProperties(IStripeOperationError)
 
-	def __str__(self):
-		return self.Message
+    def __str__(self):
+        return self.Message
+
 
 @interface.implementer(IStripePurchaseError)
 class StripePurchaseError(PurchaseError):
-	Param = FP(IStripePurchaseError['Param'])
-	HttpStatus = FP(IStripePurchaseError['HttpStatus'])
+    Param = FP(IStripePurchaseError['Param'])
+    HttpStatus = FP(IStripePurchaseError['HttpStatus'])
