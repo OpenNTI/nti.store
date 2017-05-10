@@ -42,7 +42,8 @@
 	<include package="nti.externalization" />
 
 	<ext:registerAutoPackageIO
-		root_interfaces=".interfaces.IPayeezyConnectKey
+		root_interfaces=".interfaces.IPayeezyFDToken
+						 .interfaces.IPayeezyConnectKey
 						 .interfaces.IPayeezyPurchaseError
 						 .interfaces.IPayeezyOperationError"
 		modules=".model" />
