@@ -40,7 +40,8 @@ from nti.store.payments.payeezy.interfaces import IPayeezyPurchaseAttempt
 
 from nti.store.payments.payeezy.model import PayeezyPurchaseError
 
-from nti.store.payments.payeezy.processor import get_payeezy
+from nti.store.payments.payeezy.processor import get_api_key
+from nti.store.payments.payeezy.processor import get_payeezy 
 from nti.store.payments.payeezy.processor import safe_error_message
 from nti.store.payments.payeezy.processor import adapt_to_purchase_error
 
@@ -55,10 +56,15 @@ def get_transaction_runner():
 
 
 def start_purchase(purchase_id, token, token_type, card_expiry, 
-                   cardholder_name, username=None):
+                   cardholder_name, username=None, api_key=None):
     purchase = get_purchase_attempt(purchase_id, username)
     if purchase is None:
         msg = _(u"Could not find purchase attempt.")
+        raise PurchaseException(msg, purchase_id)
+
+    api_key = api_key or get_api_key(purchase)
+    if not api_key:
+        msg = _(u"Could not find a Payeezy connection key")
         raise PurchaseException(msg, purchase_id)
 
     if not purchase.is_pending():
@@ -72,8 +78,8 @@ def start_purchase(purchase_id, token, token_type, card_expiry,
     adapted.cardholder_name = cardholder_name
     
     # return a copy of the order
-    result = purchase.Order.copy()
-    return result
+    order = purchase.Order.copy()
+    return order, api_key
 
 
 def fail_purchase(purchase_id, error, username=None):
@@ -167,6 +173,7 @@ class PurchaseProcessor(PricingProcessor):
 
         starter = partial(start_purchase,
                           token=token,
+                          api_key=api_key,
                           username=username,
                           token_type=card_type,
                           card_expiry=card_expiry,
@@ -176,7 +183,7 @@ class PurchaseProcessor(PricingProcessor):
             # start the purchase.
             # We notify purchase has started and
             # return the order to price
-            order = transaction_runner(starter)
+            order, api_key = transaction_runner(starter)
 
             # price the purchasable order
             pricer = partial(price_order, order)
