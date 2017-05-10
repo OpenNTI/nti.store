@@ -28,5 +28,5 @@ class PayeezyPaymentProcessor(BasePaymentProcessor,
                               RefundProcessor,
                               TokenProcessor):
 
-    def sync_purchase(self, purchase_id, username):
+    def sync_purchase(self, purchase_id, username, request=None):
         pass
