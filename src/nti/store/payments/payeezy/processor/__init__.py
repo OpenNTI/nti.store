@@ -34,14 +34,13 @@ from nti.store.purchase_attempt import get_providers
 def get_api_key(purchase):
     providers = get_providers(purchase)
     provider = providers[0] if providers else '' # pick first provider
-    stripe_key = component.queryUtility(IPayeezyConnectKey, provider)
-    result = stripe_key.PrivateKey if stripe_key else None
-    return result
+    payeezy_key = component.queryUtility(IPayeezyConnectKey, provider)
+    return payeezy_key
 
 
-def get_payeezy(name):
+def get_payeezy(context):
     url_map = get_url_map()
-    credentials = get_credentials(name)
+    credentials = get_credentials(context)
     result = Payeezy(api_key=credentials.APIKey,
                      api_secret=credentials.APISecret,
                      token=credentials.Token,

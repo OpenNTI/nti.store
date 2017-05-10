@@ -9,6 +9,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import six
+
 from zope import component
 from zope import interface
 
@@ -33,8 +35,12 @@ class PayeezyTokenException(PayeezyException):
     pass
 
 
-def get_credentials(name):
-    return component.getUtility(IPayeezyConnectKey, name=name)
+def get_credentials(context):
+    if isinstance(context, six.string_types):
+        return component.getUtility(IPayeezyConnectKey, name=context)
+    elif IPayeezyConnectKey.providedBy(context):
+        return context
+    return None
 
 
 def get_url_map():
