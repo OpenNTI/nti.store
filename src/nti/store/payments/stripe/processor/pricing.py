@@ -20,21 +20,21 @@ from nti.store.payments.stripe.processor.base import BaseProcessor
 from nti.store.purchase_history import get_purchase_attempt
 
 
-def price_order(order, name=STRIPE):
-    pricer = component.getUtility(IPurchasablePricer, name=name)
+def price_order(order):
+    pricer = component.getUtility(IPurchasablePricer, name=STRIPE)
     result = pricer.evaluate(order)
     return result
 
 
-def price_purchase(purchase_attempt, name=STRIPE):
-    result = price_order(purchase_attempt.Order, name=name)
+def price_purchase(purchase_attempt):
+    result = price_order(purchase_attempt.Order)
     return result
 
 
 class PricingProcessor(BaseProcessor):
 
     def do_pricing(self, purchase_attempt):
-        result = price_purchase(purchase_attempt, name=self.name)
+        result = price_purchase(purchase_attempt)
         return result
 
     def price_purchase(self, purchase_id, username=None):
