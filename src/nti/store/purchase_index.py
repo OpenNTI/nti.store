@@ -4,10 +4,12 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
+
+from zope import component
 
 from zope.component.hooks import getSite
 
@@ -17,9 +19,7 @@ from zope.intid.interfaces import IIntIds
 
 from zope.location import locate
 
-from nti.base._compat import unicode_
-
-from nti.store import CATALOG_NAME
+from nti.base._compat import text_
 
 from nti.store.interfaces import IPurchaseAttempt
 from nti.store.interfaces import IRedeemedPurchaseAttempt
@@ -37,6 +37,8 @@ from nti.zope_catalog.index import IntegerValueIndex as RawIntegerValueIndex
 
 from nti.zope_catalog.string import StringTokenNormalizer
 
+CATALOG_NAME = 'nti.dataserver.++etc++purchase-catalog'
+
 IX_SITE = 'site'
 IX_ITEMS = 'items'
 IX_STATE = 'state'
@@ -49,13 +51,13 @@ IX_STARTTIME = IX_CREATEDTIME = 'startTime'
 
 class ValidatingSiteName(object):
 
-    __slots__ = (b'site',)
+    __slots__ = ('site',)
 
     def __init__(self, obj, default=None):
         if IPurchaseAttempt.providedBy(obj):
             site = getSite()
             if site is not None:
-                self.site = unicode_(site.__name__)
+                self.site = text_(site.__name__)
 
     def __reduce__(self):
         raise TypeError()
@@ -78,7 +80,7 @@ class RedemptionCodeIndex(ValueIndex):
 
 class ValidatingCreator(object):
 
-    __slots__ = (b'creator',)
+    __slots__ = ('creator',)
 
     def __init__(self, obj, default=None):
         try:
@@ -136,7 +138,7 @@ def StateIndex(family=None):
 
 class RevItems(object):
 
-    __slots__ = (b'context',)
+    __slots__ = ('context',)
 
     def __init__(self, context, default=None):
         self.context = context
@@ -156,6 +158,11 @@ def RevItemsIndex(family=None):
 
 class StoreCatalog(Catalog):
     pass
+
+
+def get_purchase_catalog():
+    catalog = component.queryUtility(ICatalog, name=CATALOG_NAME)
+    return catalog
 
 
 def install_purchase_catalog(site_manager_container, intids=None):

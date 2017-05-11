@@ -27,6 +27,9 @@ from nti.store.interfaces import IPurchaseException
 from nti.store.interfaces import INTIStoreException
 from nti.store.interfaces import IRedemptionException
 
+from nti.store.purchase_index import CATALOG_NAME
+from nti.store.purchase_index import get_purchase_catalog
+
 #: Pricing round decimal
 ROUND_DECIMAL = 2
 
@@ -48,9 +51,6 @@ PURCHASABLE_COURSE_CHOICE_BUNDLE = 'purchasable_course_choice_bundle'
 #: Tuple of purchasable NTIID types
 PURCHASABLE_NTIID_TYPES = (PURCHASABLE, PURCHASABLE_COURSE, PURCHASABLE_CONTENT,
                            PURCHASABLE_CHOICE_BUNDLE, PURCHASABLE_COURSE_CHOICE_BUNDLE)
-
-#: Purchases index name
-CATALOG_NAME = 'nti.dataserver.++etc++purchase-catalog'
 
 
 @interface.implementer(INTIStoreException)
@@ -90,6 +90,5 @@ def get_user(user):
     return result
 
 
-def get_purchase_catalog():
-    return component.getUtility(ICatalog, name=CATALOG_NAME)
-get_catalog = get_purchase_catalog
+get_catalog = get_purchase_catalog # BWC
+
