@@ -12,10 +12,7 @@ logger = __import__('logging').getLogger(__name__)
 import zope.i18nmessageid
 MessageFactory = zope.i18nmessageid.MessageFactory('nti.dataserver')
 
-from zope import component
 from zope import interface
-
-from zope.catalog.interfaces import ICatalog
 
 from nti.dataserver.interfaces import IUser
 
@@ -28,7 +25,6 @@ from nti.store.interfaces import INTIStoreException
 from nti.store.interfaces import IRedemptionException
 
 from nti.store.purchase_index import CATALOG_NAME
-from nti.store.purchase_index import get_purchase_catalog
 
 #: Pricing round decimal
 ROUND_DECIMAL = 2
@@ -90,5 +86,5 @@ def get_user(user):
     return result
 
 
-get_catalog = get_purchase_catalog # BWC
-
+from nti.store.purchase_index import get_purchase_catalog
+get_catalog = get_purchase_catalog  # BWC
