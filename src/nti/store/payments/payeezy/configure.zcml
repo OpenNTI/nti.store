@@ -37,6 +37,11 @@
 	<utility factory=".pricing.PayeezyPurchasablePricer"
 			 name="payeezy" />
 	
+	<!-- Decorators -->
+	<subscriber factory=".decorators.PurchaseAttemptDecorator"
+				for="...interfaces.IPurchaseAttempt"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator" />
+				
 	<!-- Externalization -->
 	<include package="nti.externalization" file="meta.zcml" />
 	<include package="nti.externalization" />
