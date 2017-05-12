@@ -15,7 +15,11 @@ from zope import interface
 from nti.externalization.singleton import SingletonDecorator
 from nti.externalization.interfaces import IExternalObjectDecorator
 
+from nti.ntiids.ntiids import get_provider
+
 from nti.store.interfaces import IPurchasable
+
+from nti.store.payments.interfaces import IConnectKey
 
 
 @component.adapter(IPurchasable)
@@ -25,5 +29,11 @@ class PurchasableDecorator(object):
     __metaclass__ = SingletonDecorator
 
     def decorateExternalObject(self, original, external):
-        pass
-
+        added = []
+        provider = get_provider(original.NTIID)
+        for name, key in list(component.getUtilitiesFor(IConnectKey)):
+            if name == provider:
+                added.append(key)
+        if added:
+            payments = external.setdefault("Payments", [])
+            payments.extend(added)
