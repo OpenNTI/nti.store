@@ -30,6 +30,7 @@ from nti.store.interfaces import IPurchaseOrder
 from nti.store.interfaces import IOperationError
 from nti.store.interfaces import IPaymentProcessor
 
+from nti.store.payments.interfaces import IConnectKey
 from nti.store.payments.interfaces import RegisterPurchaseData
 from nti.store.payments.interfaces import IRegisterPurchaseData
 
@@ -147,7 +148,7 @@ class RegisterStripeCharge(RegisterPurchaseData):
 # object interfaces
 
 
-class IStripeConnectKey(interface.Interface):
+class IStripeConnectKey(IConnectKey):
     Alias = ValidTextLine(title=u'Key name or alias', required=True)
     LiveMode = Bool(title=u"Live mode flag", required=False)
 

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, absolute_import, division
+
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -13,6 +14,9 @@ from hamcrest import is_not
 from hamcrest import assert_that
 from hamcrest import has_property
 does_not = is_not
+
+from nti.testing.matchers import validly_provides
+from nti.testing.matchers import verifiably_provides
 
 from zope import component
 
@@ -50,7 +54,9 @@ class TestZcml(nti.testing.base.ConfiguringTestBase):
 
         key = component.queryUtility(IPayeezyConnectKey, name="NTI")
         assert_that(key, is_not(none()))
-
+        assert_that(key, validly_provides(IPayeezyConnectKey))
+        assert_that(key, verifiably_provides(IPayeezyConnectKey))
+        
         assert_that(key, 
                     has_property('Provider', is_("NTI")))
         

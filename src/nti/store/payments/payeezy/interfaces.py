@@ -26,6 +26,8 @@ from nti.store.interfaces import IRefundError
 from nti.store.interfaces import IPurchaseError
 from nti.store.interfaces import IOperationError
 
+from nti.store.payments.interfaces import IConnectKey
+
 FAILED = u'failed'
 SUCCESS = u'success'
 FAILURE = u'failure'
@@ -80,7 +82,7 @@ class IPayeezyURLMap(IReadMapping):
     """
 
 
-class IPayeezyConnectKey(interface.Interface):
+class IPayeezyConnectKey(IConnectKey):
     Provider = TextLine(title=u"The key name.", required=True)
 
     APIKey = TextLine(title=u"The api key.", required=True)

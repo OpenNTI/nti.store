@@ -16,6 +16,10 @@ from nti.store.interfaces import IPriceable
 from nti.store.interfaces import IPurchaseAttempt
 
 
+class IConnectKey(interface.Interface):
+    Provider = ValidTextLine(title=u'Key name or alias', required=True)
+
+
 class ICouponPriceable(IPriceable):
     Coupon = ValidTextLine(title=u"The coupon", required=False)
 

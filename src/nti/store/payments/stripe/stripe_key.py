@@ -37,4 +37,4 @@ class StripeConnectKey(SchemaConfigured):
     __metaclass__ = MetaStoreObject
 
     key = _a('PrivateKey')
-    alias = name = _a('Alias')
+    alias = name = Provider = _a('Alias')

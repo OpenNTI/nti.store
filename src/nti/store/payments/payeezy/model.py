@@ -45,7 +45,7 @@ class PayeezyConnectKey(SchemaConfigured):
     __metaclass__ = MetaStoreObject
     createDirectFieldProperties(IPayeezyConnectKey)
 
-    Alias = alias('Provider')
+    Alias = name = alias('Provider')
 
 
 @WithRepr
