@@ -25,6 +25,8 @@ from nti.schema.field import SchemaConfigured
 
 from nti.schema.fieldproperty import createDirectFieldProperties
 
+from nti.store.payments.payeezy import PAYEEZY
+
 from nti.store.payments.payeezy.interfaces import IPayeezyFDToken
 from nti.store.payments.payeezy.interfaces import IPayeezyConnectKey
 from nti.store.payments.payeezy.interfaces import IPayeezyRefundError
@@ -45,6 +47,7 @@ class PayeezyConnectKey(SchemaConfigured):
     __metaclass__ = MetaStoreObject
     createDirectFieldProperties(IPayeezyConnectKey)
 
+    Processor = PAYEEZY
     Alias = name = alias('Provider')
 
 

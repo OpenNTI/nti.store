@@ -29,11 +29,11 @@ class PurchasableDecorator(object):
     __metaclass__ = SingletonDecorator
 
     def decorateExternalObject(self, original, external):
-        added = []
+        added = {}
         provider = get_provider(original.NTIID)
         for name, key in list(component.getUtilitiesFor(IConnectKey)):
             if name == provider:
-                added.append(key)
+                added[key.Processor] = key
         if added:
-            payments = external.setdefault("Payments", [])
-            payments.extend(added)
+            payments = external.setdefault("Payments", {})
+            payments.update(added)

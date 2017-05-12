@@ -17,6 +17,9 @@ from nti.store.interfaces import IPurchaseAttempt
 
 
 class IConnectKey(interface.Interface):
+    Processor = ValidTextLine(title=u'Payment procesor', 
+                              required=True,
+                              readonly=True)
     Provider = ValidTextLine(title=u'Key name or alias', required=True)
 
 

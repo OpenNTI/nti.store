@@ -23,6 +23,8 @@ from nti.schema.field import SchemaConfigured
 
 from nti.schema.fieldproperty import createDirectFieldProperties
 
+from nti.store.payments.stripe import STRIPE
+
 from nti.store.payments.stripe.interfaces import IStripeConnectKey
 
 from nti.store.utils import MetaStoreObject
@@ -38,3 +40,5 @@ class StripeConnectKey(SchemaConfigured):
 
     key = _a('PrivateKey')
     alias = name = Provider = _a('Alias')
+
+    Processor = STRIPE
