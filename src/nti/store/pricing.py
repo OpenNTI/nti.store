@@ -124,7 +124,7 @@ class DefaultPurchasablePricer(object):
             result.TotalPurchasePrice += priced.PurchasePrice
 
         if len(currencies) != 1:
-            msg =  _(u"Multi-Currency pricing is not supported")
+            msg = _(u"Multi-Currency pricing is not supported")
             raise PricingException(msg)
         result.Currency = currencies.pop()
         return result

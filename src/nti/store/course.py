@@ -6,7 +6,7 @@ Defines course object and operations on them
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -48,7 +48,7 @@ class PurchasableCourseChoiceBundle(PurchasableCourse):
     IsPurchasable = False
 
 
-def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
+def create_course(ntiid, name=None, provider=None, amount=None, currency=u'USD',
                   items=(), fee=None, title=None, license_=None, author=None,
                   description=None, icon=None, thumbnail=None, discountable=False,
                   bulk_purchase=False, public=True, giftable=False, redeemable=False,
@@ -76,8 +76,10 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency='USD',
         return result
     startdate = _parse_time(startdate)
 
-    vendor = DefaultPurchasableVendorInfo(vendor_info) \
-        if vendor_info and isinstance(vendor_info, Mapping) else None
+    if vendor_info and isinstance(vendor_info, Mapping):
+        vendor = DefaultPurchasableVendorInfo(vendor_info)
+    else:
+        vendor = None
 
     result = factory()
 

@@ -6,7 +6,7 @@ Defines purchasable object and operations on them
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -44,92 +44,101 @@ from nti.store.utils import to_frozenset
 from nti.store.utils import to_collection
 from nti.store.utils import MetaStoreObject
 
+
 @interface.implementer(IPurchasableVendorInfo, IInternalObjectExternalizer)
 class DefaultPurchasableVendorInfo(dict):
-	"""
-	The default representation of vendor info.
-	"""
+    """
+    The default representation of vendor info.
+    """
 
-	def toExternalObject(self, *args, **kwargs):
-		return dict(self)
+    def toExternalObject(self, *args, **kwargs):
+        return dict(self)
+
 
 @WithRepr
 @EqHash('NTIID',)
 @interface.implementer(IPurchasable, IContained, IContentTypeAware)
 class Purchasable(PersistentCreatedModDateTrackingObject, ItemBundle):
 
-	__metaclass__ = MetaStoreObject
+    __metaclass__ = MetaStoreObject
 
-	createDirectFieldProperties(IPurchasable)
-	Description = AdaptingFieldProperty(IPurchasable['Description'])
+    createDirectFieldProperties(IPurchasable)
+    Description = AdaptingFieldProperty(IPurchasable['Description'])
 
-	creator = SYSTEM_USER_ID
+    creator = SYSTEM_USER_ID
 
-	IsPurchasable = True
+    IsPurchasable = True
 
-	isPublic = alias('Public')
-	isGiftable = alias('Giftable')
+    isPublic = alias('Public')
+    isGiftable = alias('Giftable')
 
-	__parent__ = None
-	__name__ = ntiid = alias('NTIID')
+    __parent__ = None
+    __name__ = ntiid = alias('NTIID')
 
-	def isPublic(self):
-		return self.Public
-	is_public = isPublic
-	
+    def isPublic(self):
+        return self.Public
+    is_public = isPublic
+
+
 @interface.implementer(IPurchasableChoiceBundle)
 class PurchasableChoiceBundle(Purchasable):
-	__external_class_name__ = 'Purchasable'
-	IsPurchasable = False
+    __external_class_name__ = 'Purchasable'
+    IsPurchasable = False
 
-def create_purchasable(ntiid, provider, amount, currency='USD', items=(), fee=None,
-					   title=None, license_=None, author=None, description=None,
-					   icon=None, thumbnail=None, discountable=False, giftable=False,
-					   redeem_cutoff_date=None, purchase_cutoff_date=None,
-					   redeemable=False, bulk_purchase=True, public=True,
-					   vendor_info=None, factory=Purchasable, **kwargs):
 
-	fee = float(fee) if fee is not None else None
-	amount = float(amount) if amount is not None else amount
-	items = to_frozenset(items) if items else frozenset((ntiid,))
-	vendor = IPurchasableVendorInfo(vendor_info, None)
+def create_purchasable(ntiid, provider, amount, currency=u'USD', items=(), fee=None,
+                       title=None, license_=None, author=None, description=None,
+                       icon=None, thumbnail=None, discountable=False, giftable=False,
+                       redeem_cutoff_date=None, purchase_cutoff_date=None,
+                       redeemable=False, bulk_purchase=True, public=True,
+                       vendor_info=None, factory=Purchasable, **kwargs):
 
-	result = factory(NTIID=ntiid, Provider=provider, Title=title, Author=author,
-					 Items=items, Description=description, Amount=amount,
-					 Currency=currency, Fee=fee, License=license_, Giftable=giftable,
-					 Redeemable=redeemable, Discountable=discountable,
-					 BulkPurchase=bulk_purchase, Icon=icon, Thumbnail=thumbnail,
-					 Public=public, RedeemCutOffDate=redeem_cutoff_date,
-					 PurchaseCutOffDate=purchase_cutoff_date, VendorInfo=vendor)
-	return result
+    fee = float(fee) if fee is not None else None
+    amount = float(amount) if amount is not None else amount
+    items = to_frozenset(items) if items else frozenset((ntiid,))
+    vendor = IPurchasableVendorInfo(vendor_info, None)
+
+    result = factory(NTIID=ntiid, Provider=provider, Title=title, Author=author,
+                     Items=items, Description=description, Amount=amount,
+                     Currency=currency, Fee=fee, License=license_, Giftable=giftable,
+                     Redeemable=redeemable, Discountable=discountable,
+                     BulkPurchase=bulk_purchase, Icon=icon, Thumbnail=thumbnail,
+                     Public=public, RedeemCutOffDate=redeem_cutoff_date,
+                     PurchaseCutOffDate=purchase_cutoff_date, VendorInfo=vendor)
+    return result
+
 
 def get_purchasable(pid, registry=component):
-	result = registry.queryUtility(IPurchasable, pid)
-	return result
+    result = registry.queryUtility(IPurchasable, pid)
+    return result
+
 
 def get_purchasables(registry=component, provided=IPurchasable):
-	result = LocatedExternalList()
-	for _, purchasable in list(registry.getUtilitiesFor(provided)):
-		result.append(purchasable)
-	return result
+    result = LocatedExternalList()
+    for _, purchasable in list(registry.getUtilitiesFor(provided)):
+        result.append(purchasable)
+    return result
 get_all_purchasables = get_purchasables
 
+
 def get_purchasable_choice_bundles(registry=component):
-	return get_purchasables(registry=registry, provided=IPurchasableChoiceBundle)
+    return get_purchasables(registry=registry, provided=IPurchasableChoiceBundle)
+
 
 def expand_purchase_item_ids(context, registry=component):
-	"""
-	return the ids of the items that were purchased
-	"""
-	result = set()
-	context = getattr(context, 'Items', context)
-	purchasables_ids = to_collection(context)
-	for item in purchasables_ids:
-		p = get_purchasable(item, registry=registry)
-		if p is not None:
-			result.update(p.Items)
-	return result
+    """
+    return the ids of the items that were purchased
+    """
+    result = set()
+    context = getattr(context, 'Items', context)
+    purchasables_ids = to_collection(context)
+    for item in purchasables_ids:
+        p = get_purchasable(item, registry=registry)
+        if p is not None:
+            result.update(p.Items)
+    return result
+
 
 def get_providers(purchasables):
-	result = {p.Provider for p in purchasables or ()}
-	return sorted(result)
+    result = {p.Provider for p in purchasables or ()}
+    return sorted(result)
