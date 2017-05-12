@@ -12,8 +12,9 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
-from nti.externalization.singleton import SingletonDecorator
 from nti.externalization.interfaces import IExternalObjectDecorator
+
+from nti.externalization.singleton import SingletonDecorator
 
 from nti.store.interfaces import IPurchaseAttempt
 

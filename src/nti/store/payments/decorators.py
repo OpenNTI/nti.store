@@ -12,10 +12,9 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
-from nti.externalization.singleton import SingletonDecorator
 from nti.externalization.interfaces import IExternalObjectDecorator
 
-from nti.ntiids.ntiids import get_provider
+from nti.externalization.singleton import SingletonDecorator
 
 from nti.store.interfaces import IPurchasable
 
@@ -30,7 +29,7 @@ class PurchasableDecorator(object):
 
     def decorateExternalObject(self, original, external):
         added = {}
-        provider = get_provider(original.NTIID)
+        provider = original.Provider
         for name, key in list(component.getUtilitiesFor(IConnectKey)):
             if name == provider:
                 added[key.Processor] = key
