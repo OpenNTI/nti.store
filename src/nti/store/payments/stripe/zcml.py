@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -56,4 +56,3 @@ def registerStripeKey(_context, alias, private_key, live_mode=None, stripe_user_
                           PrivateKey=decode_key(private_key),
                           RefreshToken=decode_key(refresh_token),)
     utility(_context, provides=IStripeConnectKey, component=sk, name=alias)
-    logger.debug("Stripe key %s has been registered", alias)
