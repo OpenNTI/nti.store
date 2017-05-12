@@ -3,7 +3,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -21,24 +21,24 @@ from nti.store import PURCHASABLE_COURSE_CHOICE_BUNDLE
 from nti.store.interfaces import ICopier
 
 #: Store MimeType base
-STORE_MIME_BASE = MIME_BASE + b'.store'
+STORE_MIME_BASE = MIME_BASE + '.store'
 
 #: Invitation purchase attempt
 INVITATION_PURCHASE_ATTEMPT_MIME_TYPE = \
-    STORE_MIME_BASE + b'.invitationpurchaseattempt'
+    STORE_MIME_BASE + '.invitationpurchaseattempt'
 
 #: Redeem purchase attempt
-REDEEM_PURCHASE_ATTEMPT_MIME_TYPE = STORE_MIME_BASE + b'.redeemedpurchaseattempt'
+REDEEM_PURCHASE_ATTEMPT_MIME_TYPE = STORE_MIME_BASE + '.redeemedpurchaseattempt'
 
 #: Non-Gift purchase attempt MimeTypes
 NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES = \
-    tuple([STORE_MIME_BASE + x for x in (b'.purchaseattempt',
-                                         b'.invitationpurchaseattempt',
-                                         b'.redeemedpurchaseattempt')])
+    tuple([STORE_MIME_BASE + x for x in ('.purchaseattempt',
+                                         '.invitationpurchaseattempt',
+                                         '.redeemedpurchaseattempt')])
 
 #: Gift purchase attempt MimeTypes
 GIFT_PURCHASE_ATTEMPT_MIME_TYPES = \
-    tuple([STORE_MIME_BASE + b'.giftpurchaseattempt'])
+    tuple([STORE_MIME_BASE + '.giftpurchaseattempt'])
 
 #: Purchase attempt MimeTypes
 PURCHASE_ATTEMPT_MIME_TYPES = \
@@ -46,10 +46,10 @@ PURCHASE_ATTEMPT_MIME_TYPES = \
 
 #: Purchasables MimeTypes
 PURCHASABLE_MIME_TYPES = []
-PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + b'.purchasable')
-PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + b'.purchasablecourse')
-PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + b'.purchasablechoicebundle')
-PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + b'.purchasablecoursechoicebundle')
+PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + '.purchasable')
+PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + '.purchasablecourse')
+PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + '.purchasablechoicebundle')
+PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + '.purchasablecoursechoicebundle')
 PURCHASABLE_MIME_TYPES = tuple(PURCHASABLE_MIME_TYPES)
 
 #: All store MimeTypes
@@ -123,7 +123,7 @@ class MetaStoreObject(type):
             if 'mimeType' in ancestor.__dict__:
                 break
         if ancestor is not cls:
-            clazzname = b'.' + name.encode('ascii').lower()
+            clazzname = '.' + name.encode('ascii').lower()
             cls.mime_type = cls.mimeType = STORE_MIME_BASE + clazzname
             cls.parameters = dict()
         return cls
