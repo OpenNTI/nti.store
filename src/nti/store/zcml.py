@@ -90,7 +90,7 @@ class IRegisterPurchasableDirective(interface.Interface):
                                   required=False,
                                   default=None)
 
-    items = fields.Tokens(value_type=schema.TextLine(title=u'The item identifier'),
+    items = fields.Tokens(schema.TextLine(title=u'The item identifier'),
                           title=u"Items to purchase",
                           required=False)
 
