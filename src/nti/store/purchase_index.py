@@ -56,8 +56,7 @@ class ValidatingSiteName(object):
     def __init__(self, obj, default=None):
         if IPurchaseAttempt.providedBy(obj):
             site = getSite()
-            if site is not None:
-                self.site = text_(site.__name__)
+            self.site = text_(getattr(site, '__name__', None))
 
     def __reduce__(self):
         raise TypeError()
