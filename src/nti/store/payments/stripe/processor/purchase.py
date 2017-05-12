@@ -206,7 +206,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
                                       api_key=api_key)
 
     def process_purchase(self, purchase_id, token, username=None, expected_amount=None,
-                         api_key=None, request=None):
+                         api_key=None, request=None, site_name=None):
         """
         Executes the process purchase.
         This function may be called in a greenlet
@@ -215,8 +215,12 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
         """
         charge = None
         success = False
-        transaction_runner = get_transaction_runner()
 
+        # prepare transaction runner
+        transaction_runner = get_transaction_runner()
+        transaction_runner = partial(transaction_runner,
+                                     site_names=(site_name,) if site_name else ())
+        
         start_purchase = partial(_start_purchase,
                                  purchase_id=purchase_id,
                                  username=username,
