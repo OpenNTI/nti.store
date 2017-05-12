@@ -85,7 +85,7 @@
 
 	<!-- Test keys -->
 	<configure zcml:condition="have devmode">
-		<include file="stripe_keys.zcml" />
+		<include file="_test_keys.zcml" />
 	</configure>
 
 </configure>
