@@ -167,9 +167,13 @@ class PurchaseProcessor(PricingProcessor):
     @classmethod
     def process_purchase(cls, purchase_id, token,
                          card_type, cardholder_name, card_expiry,
-                         username=None, expected_amount=None, api_key=None, request=None):
+                         username=None, expected_amount=None, api_key=None, 
+                         request=None, site_name=None):
 
+        # prepare transaction runner
         transaction_runner = get_transaction_runner()
+        transaction_runner = partial(transaction_runner,
+                                     site_names=(site_name,) if site_name else ())
 
         starter = partial(start_purchase,
                           token=token,
