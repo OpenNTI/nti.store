@@ -59,11 +59,11 @@ ALL_STORE_MIME_TYPES = tuple(ALL_STORE_MIME_TYPES)
 
 
 def get_ntiid_type(mimeType):
-    if mimeType == PURCHASABLE_MIME_TYPES[0]:  # purchasable
+    if mimeType == PURCHASABLE_MIME_TYPES[0]: # purchasable
         return PURCHASABLE
-    elif mimeType == PURCHASABLE_MIME_TYPES[1]:  # purchasable course
+    elif mimeType == PURCHASABLE_MIME_TYPES[1]: # purchasable course
         return PURCHASABLE_COURSE
-    elif mimeType == PURCHASABLE_CHOICE_BUNDLE[2]:  # purchasable choice bundle
+    elif mimeType == PURCHASABLE_CHOICE_BUNDLE[2]: # purchasable choice bundle
         return PURCHASABLE_CHOICE_BUNDLE
     # purchasable course choice bundle
     elif mimeType == PURCHASABLE_COURSE_CHOICE_BUNDLE[3]:
@@ -73,7 +73,7 @@ def get_ntiid_type(mimeType):
 
 def from_delimited(value, delim=' '):
     result = value.split(delim)
-    result = re.findall("[^\s]+", value) if len(result) <= 1 else result
+    result = re.findall(r"[^\s]+", value) if len(result) <= 1 else result
     return result
 
 
@@ -84,7 +84,7 @@ def to_collection(items=None, factory=list, delim=' '):
     elif isinstance(items, factory):
         result = items
     elif isinstance(items, six.string_types):
-        result = factory(from_delimited(unicode(items), delim))
+        result = factory(from_delimited(items, delim))
     else:
         result = factory(items)
     return result
