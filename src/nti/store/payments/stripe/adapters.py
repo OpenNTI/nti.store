@@ -6,7 +6,7 @@ Stripe purchase adapters.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -72,8 +72,9 @@ class _StripeCustomer(Contained, Persistent):
 
     charges = alias('Charges')
     customer_id = alias('CustomerID')
-    
-STRIPE_CUSTOMER_KEY = u'nti.store.payments.stripe.stripe_adapters._StripeCustomer'
+
+#: Annotation key for stripe customer (legacy) 
+STRIPE_CUSTOMER_KEY = 'nti.store.payments.stripe.stripe_adapters._StripeCustomer'
 _StripeCustomerFactory = an_factory(_StripeCustomer, 
                                     STRIPE_CUSTOMER_KEY)
 
@@ -92,7 +93,8 @@ class _StripePurchaseAttempt(Contained, Persistent):
     token_id = alias('TokenID')
     charge_id = alias('ChargeID')
     
-STRIPE_PURCHASE_KEY = u'nti.store.payments.stripe.stripe_adapters._StripePurchaseAttempt'
+#: Annotation key for stripe purchase attempt (legacy) 
+STRIPE_PURCHASE_KEY = 'nti.store.payments.stripe.stripe_adapters._StripePurchaseAttempt'
 _StripePurchaseAttemptFactory = an_factory(_StripePurchaseAttempt,
                                            STRIPE_PURCHASE_KEY)
 

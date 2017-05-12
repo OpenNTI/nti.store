@@ -17,14 +17,32 @@
 	<subscriber handler=".subscribers.stripe_customer_created" />
 	<subscriber handler=".subscribers.stripe_customer_deleted" />
 	
-	<adapter factory=".stripe_adapters._StripeCustomerFactory"
+	<!-- Adapters -->
+	<adapter factory=".adapters._StripeCustomerFactory"
 			 for="nti.dataserver.interfaces.IUser"
 			 provides=".interfaces.IStripeCustomer" />
 
-	<adapter factory=".stripe_adapters._StripePurchaseAttemptFactory"
+	<adapter factory=".adapters._StripePurchaseAttemptFactory"
 			 for="...interfaces.IPurchaseAttempt"
 			 provides=".interfaces.IStripePurchaseAttempt" />
 
+	<adapter factory=".adapters._string_purchase_error"
+			 provides=".interfaces.IStripePurchaseError"
+			 for="basestring" />
+			 
+	<adapter factory=".adapters.stripe_exception_adpater"
+			 provides=".interfaces.IStripePurchaseError"
+			 for=".interfaces.IStripeException" />
+		
+	<adapter factory=".adapters.no_such_stripe_coupon_adpater"
+			 provides=".interfaces.IStripePurchaseError"
+			 for=".interfaces.INoSuchStripeCoupon" />
+			
+	<adapter factory=".adapters.invalid_stripe_coupon_adpater"
+			 provides=".interfaces.IStripePurchaseError"
+			 for=".interfaces.IInvalidStripeCoupon" /> 	 
+
+	<!-- Copy -->
 	<adapter factory=".stripe_purchase._stripe_priceable_copier"
 			 provides="...interfaces.ICopier"
 			 for=".interfaces.IStripePriceable" />
@@ -37,13 +55,16 @@
 			 provides="...interfaces.ICopier"
 			 for=".interfaces.IStripePurchaseOrder" />
 
+	<!-- Pricing -->
 	<utility factory=".stripe_pricing.StripePurchasablePricer"
 			 name="stripe" />
 	
+	<!-- Payment -->
 	<utility factory=".stripe_processor.StripePaymentProcessor"
 			 provides=".interfaces.IStripePaymentProcessor"
 			 name="stripe" />
 		
+	<!-- Decorators -->
 	<subscriber factory=".decorators.StripePricedItemDecorator"
 				for=".interfaces.IStripePricedItem"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
@@ -52,22 +73,6 @@
 				for="...interfaces.IPurchaseAttempt"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator" />
 	
-	<adapter factory=".stripe_adapters._string_purchase_error"
-			 provides=".interfaces.IStripePurchaseError"
-			 for="basestring" />
-			 
-	<adapter factory=".stripe_adapters.stripe_exception_adpater"
-			 provides=".interfaces.IStripePurchaseError"
-			 for=".interfaces.IStripeException" />
-		
-	<adapter factory=".stripe_adapters.no_such_stripe_coupon_adpater"
-			 provides=".interfaces.IStripePurchaseError"
-			 for=".interfaces.INoSuchStripeCoupon" />
-			
-	<adapter factory=".stripe_adapters.invalid_stripe_coupon_adpater"
-			 provides=".interfaces.IStripePurchaseError"
-			 for=".interfaces.IInvalidStripeCoupon" /> 	 
-
 	<!-- Externalization -->
 	<adapter factory=".externalization.StripeCouponExternalizer" />
 		

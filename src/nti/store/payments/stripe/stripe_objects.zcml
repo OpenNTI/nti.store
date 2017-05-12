@@ -35,31 +35,31 @@
 		<implements interface=".interfaces.IStripeAuthenticationError" />
 	</class>
 	
-	<adapter factory=".stripe_adapters._string_operation_error"
+	<adapter factory=".adapters._string_operation_error"
 			 provides=".interfaces.IStripeOperationError"
 			 for="basestring" />
 
-	<adapter factory=".stripe_adapters.stripe_error_adpater"
+	<adapter factory=".adapters.stripe_error_adpater"
 			 provides=".interfaces.IStripeOperationError"
 			 for=".interfaces.IStripeError" />
 	
-	<adapter factory=".stripe_adapters.stripe_api_error_adpater"
+	<adapter factory=".adapters.stripe_api_error_adpater"
 			 provides=".interfaces.IStripeOperationError"
 			 for=".interfaces.IStripeAPIError" />	
 			 
-	<adapter factory=".stripe_adapters.stripe_api_connection_error_adpater"
+	<adapter factory=".adapters.stripe_api_connection_error_adpater"
 			 provides=".interfaces.IStripeOperationError"
 			 for=".interfaces.IStripeAPIConnectionError" />			
 			 
-	<adapter factory=".stripe_adapters.stripe_card_error_adpater"
+	<adapter factory=".adapters.stripe_card_error_adpater"
 			 provides=".interfaces.IStripeOperationError"
 			 for=".interfaces.IStripeCardError" />	 
 			 
-	<adapter factory=".stripe_adapters.stripe_invalid_request_error_adpater"
+	<adapter factory=".adapters.stripe_invalid_request_error_adpater"
 			 provides=".interfaces.IStripeOperationError"
 			 for=".interfaces.IStripeInvalidRequestError" />	
 		
-	<adapter factory=".stripe_adapters.stripe_auth_error_adpater"
+	<adapter factory=".adapters.stripe_auth_error_adpater"
 			 provides=".interfaces.IStripeOperationError"
 			 for=".interfaces.IStripeAuthenticationError" />
 
