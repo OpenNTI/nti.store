@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -59,52 +59,62 @@ from nti.store.purchase_history import remove_purchase_attempt as remove_hist_pu
 
 from nti.store.redeem import make_redeem_purchase_attempt
 
+
 # Purchasables
+
+
 get_purchasable = get_purchasable
 get_all_purchasables = get_purchasables
 
+
 def register_purchasable(item, name=None, provided=None, registry=None):
-	name = name or item.NTIID
-	registry = registry if registry is not None else component.getSiteManager()
-	if provided is None:
-		provided = find_most_derived_interface(item, IPurchasable)
-	if registry.queryUtility(provided, name=name) is None:
-		registerUtility(registry, item, provided=provided, name=name)
-		connection = IConnection(registry, None)
-		if connection is not None:
-			connection.add(item)
-			lifecycleevent.added(item)
-			item.__parent__ = registry # parent
-		return item
-	return None
+    name = name or item.NTIID
+    registry = registry if registry is not None else component.getSiteManager()
+    if provided is None:
+        provided = find_most_derived_interface(item, IPurchasable)
+    if registry.queryUtility(provided, name=name) is None:
+        registerUtility(registry, item, provided=provided, name=name)
+        connection = IConnection(registry, None)
+        if connection is not None:
+            connection.add(item)
+            lifecycleevent.added(item)
+            item.__parent__ = registry  # parent
+        return item
+    return None
+
 
 def remove_purchasable(item, provided=None, registry=None):
-	name = getattr(item, 'NTIID', item)
-	registry = registry if registry is not None else component.getSiteManager()
-	if provided is None:
-		if IPurchasable.providedBy(item):
-			provided = find_most_derived_interface(item, IPurchasable)
-		else:
-			provided = IPurchasable
-	result = unregisterUtility(registry,
-							   name=name,
-							   provided=provided)
-	if IPurchasable.providedBy(item):
-		lifecycleevent.removed(item)
-		item.__parent__ = None # ground
-	return result
+    name = getattr(item, 'NTIID', item)
+    registry = registry if registry is not None else component.getSiteManager()
+    if provided is None:
+        if IPurchasable.providedBy(item):
+            provided = find_most_derived_interface(item, IPurchasable)
+        else:
+            provided = IPurchasable
+    result = unregisterUtility(registry,
+                               name=name,
+                               provided=provided)
+    if IPurchasable.providedBy(item):
+        lifecycleevent.removed(item)
+        item.__parent__ = None  # ground
+    return result
+
 
 # Transaction codes
+
 
 get_gift_code = get_invitation_code
 get_transaction_code = get_invitation_code
 get_purchase_by_code = get_purchase_by_code
 
+
 # Item activation
+
 
 activate_items = activate_items
 deactivate_items = deactivate_items
 is_item_activated = is_item_activated
+
 
 # Purchase attempt
 
@@ -115,35 +125,39 @@ get_user_purchase_history = get_user_purchase_history
 register_purchase_attempt = register_purchase_attempt
 get_purchase_history_by_item = get_purchase_history_by_item
 
+
 def get_purchase_attempt(purchase_id, user=None):
-	result = find_object_with_ntiid(purchase_id) if purchase_id else None
-	result = result if IPurchaseAttempt.providedBy(result) else None
-	if result is not None and user:
-		if IGiftPurchaseAttempt.providedBy(result):
-			username = getattr(user, 'username', user)
-			result = None if result.creator.lower() != username.lower() else result
-		elif IPurchaseAttempt.providedBy(result):
-			user = get_user(user)
-			if user is not None:
-				result = None if result.creator != user else result
-	return result
+    result = find_object_with_ntiid(purchase_id) if purchase_id else None
+    result = result if IPurchaseAttempt.providedBy(result) else None
+    if result is not None and user:
+        if IGiftPurchaseAttempt.providedBy(result):
+            username = getattr(user, 'username', user)
+            result = None if result.creator.lower() != username.lower() else result
+        elif IPurchaseAttempt.providedBy(result):
+            user = get_user(user)
+            if user is not None:
+                result = None if result.creator != user else result
+    return result
+
 
 def remove_purchase_attempt(purchase, user=None):
-	if not IPurchaseAttempt.providedBy(purchase):
-		purchase = get_purchase_attempt(purchase, user)
-	
-	# Order matters
-	if IGiftPurchaseAttempt.providedBy(purchase):
-		username = user or purchase.creator
-		result = remove_gift_purchase_attempt(purchase, username)
-	elif IPurchaseAttempt.providedBy(purchase):
-		user = get_user(user or purchase.creator)
-		result = remove_hist_purchase_attempt(purchase, user)
-	else:
-		result = False
-	return result
+    if not IPurchaseAttempt.providedBy(purchase):
+        purchase = get_purchase_attempt(purchase, user)
+
+    # Order matters
+    if IGiftPurchaseAttempt.providedBy(purchase):
+        username = user or purchase.creator
+        result = remove_gift_purchase_attempt(purchase, username)
+    elif IPurchaseAttempt.providedBy(purchase):
+        user = get_user(user or purchase.creator)
+        result = remove_hist_purchase_attempt(purchase, user)
+    else:
+        result = False
+    return result
+
 
 # Gift registry
+
 
 get_gift_registry = get_gift_registry
 get_gift_purchase_history = get_gift_purchase_history
@@ -151,33 +165,40 @@ get_gift_pending_purchases = get_gift_pending_purchases
 create_gift_purchase_attempt = create_gift_purchase_attempt
 register_gift_purchase_attempt = register_gift_purchase_attempt
 
+
 # Purchase history
 
 has_history_by_item = has_history_by_item
 
+
 def get_purchase_history_annotation_key():
-	annotation_key = "%s.%s" % (PurchaseHistory.__module__, PurchaseHistory.__name__)
-	return annotation_key
+    annotation_key = "%s.%s" % (PurchaseHistory.__module__,
+							    PurchaseHistory.__name__)
+    return annotation_key
+
 
 def get_purchase_history(user, safe=True):
-	if safe:
-		result = IPurchaseHistory(user)
-	else:
-		annotations = IAnnotations(user)
-		annotation_key = get_purchase_history_annotation_key()
-		result = annotations.get(annotation_key, None)
-	return result
+    if safe:
+        result = IPurchaseHistory(user)
+    else:
+        annotations = IAnnotations(user)
+        annotation_key = get_purchase_history_annotation_key()
+        result = annotations.get(annotation_key, None)
+    return result
+
 
 def delete_purchase_history(user):
-	history = get_purchase_history(user, safe=False)
-	if history is not None:
-		history.clear()
-		annotations = IAnnotations(user)
-		annotation_key = get_purchase_history_annotation_key()
-		annotations.pop(annotation_key, None)
-		return True
-	return False
+    history = get_purchase_history(user, safe=False)
+    if history is not None:
+        history.clear()
+        annotations = IAnnotations(user)
+        annotation_key = get_purchase_history_annotation_key()
+        annotations.pop(annotation_key, None)
+        return True
+    return False
+
 
 # Redeem
+
 
 make_redeem_purchase_attempt = make_redeem_purchase_attempt

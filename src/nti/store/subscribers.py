@@ -68,8 +68,8 @@ from nti.store.redeem import make_redeem_purchase_attempt
 from nti.store.store import get_gift_code
 from nti.store.store import get_invitation_code
 from nti.store.store import get_purchase_by_code
-from nti.store.store import get_purchase_history
 from nti.store.store import get_transaction_code
+from nti.store.store import delete_purchase_history
 
 
 def _parse_datetime(t):
@@ -244,6 +244,4 @@ def _gift_purchase_attempt_refunded(purchase, event):
 @component.adapter(IUser, IObjectRemovedEvent)
 def _on_user_removed(user, event):
     logger.info("Removing purchase data for user %s", user)
-    history = get_purchase_history(user, safe=False)
-    if history is not None:
-        history.clear()
+    delete_purchase_history(user)
