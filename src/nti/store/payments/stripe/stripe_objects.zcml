@@ -61,5 +61,6 @@
 		
 	<adapter factory=".stripe_adapters.stripe_auth_error_adpater"
 			 provides=".interfaces.IStripeOperationError"
-			 for=".interfaces.IStripeAuthenticationError" />	
+			 for=".interfaces.IStripeAuthenticationError" />
+
 </configure>
