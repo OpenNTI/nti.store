@@ -9,4 +9,9 @@
 	<include package=".stripe" />
 	<include package=".payeezy" />
 
+	<!-- Decorators -->
+	<subscriber factory=".decorators.PurchasableDecorator"
+				for="..interfaces.IPurchasable"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator" />
+
 </configure>
