@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -13,17 +13,18 @@ from hamcrest import assert_that
 
 import stripe
 
-from nti.store.tests import SharedConfiguringTestLayer
-
 from nti.store.payments.stripe.tests import create_user
 from nti.store.payments.stripe.tests import create_purchase
 from nti.store.payments.stripe.tests import create_random_user
 from nti.store.payments.stripe.tests import create_purchase_attempt
 from nti.store.payments.stripe.tests import create_and_register_purchase_attempt
 
+from nti.store.tests import SharedConfiguringTestLayer
+
 from nti.testing.layers import find_test
 
 TEST_WITH_STRIPE = True
+
 
 class StripeProcessorTestLayer(SharedConfiguringTestLayer):
 
@@ -35,7 +36,7 @@ class StripeProcessorTestLayer(SharedConfiguringTestLayer):
     @classmethod
     def testSetUp(cls, test=None):
         cls.test = test or find_test()
-        cls.test.book_id = 'xyz-book'
+        cls.test.book_id = u'xyz-book'
 
     @classmethod
     def tearDown(cls):
