@@ -35,7 +35,7 @@ from nti.store.payments.payeezy.interfaces import IPayeezyRefundError
 from nti.store.payments.payeezy.interfaces import IPayeezyPurchaseError
 from nti.store.payments.payeezy.interfaces import IPayeezyOperationError
 
-from nti.store.refund_error import RefundError
+from nti.store.model import RefundError
 
 from nti.store.utils import MetaStoreObject
 
