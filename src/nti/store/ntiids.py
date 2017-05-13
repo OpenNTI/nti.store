@@ -21,5 +21,5 @@ class _PurchasableResolver(object):
 
     __slots__ = ()
 
-    def resolve(self, ntiid_string):
-        return get_purchasable(ntiid_string)
+    def resolve(self, nttid):
+        return get_purchasable(nttid)
