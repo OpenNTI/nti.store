@@ -24,8 +24,6 @@ from nti.store.interfaces import IPurchaseException
 from nti.store.interfaces import INTIStoreException
 from nti.store.interfaces import IRedemptionException
 
-from nti.store.purchase_index import CATALOG_NAME
-
 #: Pricing round decimal
 ROUND_DECIMAL = 2
 
@@ -45,8 +43,11 @@ PURCHASABLE_CHOICE_BUNDLE = 'purchasable_choice_bundle'
 PURCHASABLE_COURSE_CHOICE_BUNDLE = 'purchasable_course_choice_bundle'
 
 #: Tuple of purchasable NTIID types
-PURCHASABLE_NTIID_TYPES = (PURCHASABLE, PURCHASABLE_COURSE, PURCHASABLE_CONTENT,
-                           PURCHASABLE_CHOICE_BUNDLE, PURCHASABLE_COURSE_CHOICE_BUNDLE)
+PURCHASABLE_NTIID_TYPES = (PURCHASABLE,
+                           PURCHASABLE_COURSE,
+                           PURCHASABLE_CONTENT,
+                           PURCHASABLE_CHOICE_BUNDLE,
+                           PURCHASABLE_COURSE_CHOICE_BUNDLE)
 
 
 @interface.implementer(INTIStoreException)
@@ -88,3 +89,9 @@ def get_user(user):
 
 from nti.store.purchase_index import get_purchase_catalog
 get_catalog = get_purchase_catalog  # BWC
+
+
+# wait till module has been loaded to path
+from nti.store._patch import patch
+patch()
+del patch

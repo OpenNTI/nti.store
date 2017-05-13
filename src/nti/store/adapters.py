@@ -28,11 +28,10 @@ from nti.store.interfaces import IRedemptionException
 from nti.store.interfaces import IPurchasableVendorInfo
 from nti.store.interfaces import IPurchaseAttemptContext
 
-from nti.store.pricing_error import PricingError
+from nti.store.model import PricingError
+from nti.store.model import PurchaseError
 
 from nti.store.purchasable import DefaultPurchasableVendorInfo
-
-from nti.store.purchase_error import PurchaseError
 
 from nti.store.purchase_attempt import DefaultPurchaseAttemptContext
 

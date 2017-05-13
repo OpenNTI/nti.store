@@ -142,8 +142,8 @@
 						 .interfaces.IPurchaseAttemptContext
 						 .interfaces.IRedeemedPurchaseAttempt
 						 .interfaces.IInvitationPurchaseAttempt"
-		modules=".purchase_order .purchase_error .purchase_attempt 
-				 .purchasable .priceable .pricing .pricing_error
+		modules=".purchase_order .purchase_attempt .model
+				 .purchasable .priceable .pricing
 				 .refund_error .redemption_error .course" />
 
 	<adapter factory=".externalization._PurchasableSummaryExternalizer"

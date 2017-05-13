@@ -21,10 +21,10 @@ from nti.schema.field import SchemaConfigured
 
 from nti.schema.fieldproperty import createDirectFieldProperties
 
+from nti.store.model import PurchaseError
+
 from nti.store.payments.stripe.interfaces import IStripePurchaseError
 from nti.store.payments.stripe.interfaces import IStripeOperationError
-
-from nti.store.purchase_error import PurchaseError
 
 from nti.store.utils import MetaStoreObject
 
