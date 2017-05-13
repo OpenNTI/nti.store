@@ -42,7 +42,8 @@ def create_random_user():
     return user
 
 
-def create_purchase_attempt(item, processor, quantity=None, description=None, coupon=None):
+def create_purchase_attempt(item, processor, quantity=None, 
+                            description=None, coupon=None):
     item = create_stripe_purchase_item(item, 1)
     order = create_stripe_purchase_order(item, 
                                          quantity=quantity, 
@@ -53,8 +54,9 @@ def create_purchase_attempt(item, processor, quantity=None, description=None, co
     return result
 
 
-def create_and_register_purchase_attempt(username, item, quantity=None, processor=None,
-                                         coupon=None, description=u"my charge"):
+def create_and_register_purchase_attempt(username, item, quantity=None,
+                                         processor=None,coupon=None, 
+                                         description=u"my charge"):
     pa = create_purchase_attempt(item, quantity=quantity, processor=processor,
                                  coupon=coupon, description=description)
     purchase_id = register_purchase_attempt(pa, username)
