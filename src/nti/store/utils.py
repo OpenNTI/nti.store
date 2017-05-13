@@ -49,7 +49,8 @@ PURCHASABLE_MIME_TYPES = []
 PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + '.purchasable')
 PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + '.purchasablecourse')
 PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + '.purchasablechoicebundle')
-PURCHASABLE_MIME_TYPES.append(STORE_MIME_BASE + '.purchasablecoursechoicebundle')
+PURCHASABLE_MIME_TYPES.append(
+    STORE_MIME_BASE + '.purchasablecoursechoicebundle')
 PURCHASABLE_MIME_TYPES = tuple(PURCHASABLE_MIME_TYPES)
 
 #: All store MimeTypes
@@ -59,11 +60,11 @@ ALL_STORE_MIME_TYPES = tuple(ALL_STORE_MIME_TYPES)
 
 
 def get_ntiid_type(mimeType):
-    if mimeType == PURCHASABLE_MIME_TYPES[0]: # purchasable
+    if mimeType == PURCHASABLE_MIME_TYPES[0]:  # purchasable
         return PURCHASABLE
-    elif mimeType == PURCHASABLE_MIME_TYPES[1]: # purchasable course
+    elif mimeType == PURCHASABLE_MIME_TYPES[1]:  # purchasable course
         return PURCHASABLE_COURSE
-    elif mimeType == PURCHASABLE_CHOICE_BUNDLE[2]: # purchasable choice bundle
+    elif mimeType == PURCHASABLE_CHOICE_BUNDLE[2]:  # purchasable choice bundle
         return PURCHASABLE_CHOICE_BUNDLE
     # purchasable course choice bundle
     elif mimeType == PURCHASABLE_COURSE_CHOICE_BUNDLE[3]:
@@ -71,13 +72,13 @@ def get_ntiid_type(mimeType):
     return None
 
 
-def from_delimited(value, delim=' '):
-    result = value.split(delim)
+def from_delimited(value, delim='\s'):
+    result = re.split(delim, value)
     result = re.findall(r"[^\s]+", value) if len(result) <= 1 else result
     return result
 
 
-def to_collection(items=None, factory=list, delim=' '):
+def to_collection(items=None, factory=list, delim='\s'):
     result = None
     if not items:
         result = factory()
@@ -90,15 +91,15 @@ def to_collection(items=None, factory=list, delim=' '):
     return result
 
 
-def to_set(items=None, delim=' '):
+def to_set(items=None, delim='\s'):
     return to_collection(items, set, delim)
 
 
-def to_list(items=None, delim=' '):
+def to_list(items=None, delim='\s'):
     return to_collection(items, list, delim)
 
 
-def to_frozenset(items=None, delim=' '):
+def to_frozenset(items=None, delim='\s'):
     return to_collection(items, frozenset, delim)
 
 
