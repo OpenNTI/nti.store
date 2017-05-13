@@ -191,7 +191,9 @@ class PurchaseHistory(Contained, Persistent):
 			item._check()
 			BTrees.check.check(item)
 
-_PurchaseHistoryFactory = an_factory(PurchaseHistory)
+PURCHASE_HISTORY_ANNOTATION_KEY = 'nti.store.purchase_history.PurchaseHistory'
+_PurchaseHistoryFactory = an_factory(PurchaseHistory,
+									 PURCHASE_HISTORY_ANNOTATION_KEY)
 
 # functions
 

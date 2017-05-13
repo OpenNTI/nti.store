@@ -46,8 +46,9 @@ from nti.store.purchase_attempt import create_purchase_attempt
 from nti.store.purchase_attempt import create_gift_purchase_attempt
 from nti.store.purchase_attempt import get_purchasables as get_purchase_purchasables
 
+from nti.store.purchase_history import PURCHASE_HISTORY_ANNOTATION_KEY
+
 from nti.store.purchase_history import activate_items
-from nti.store.purchase_history import PurchaseHistory
 from nti.store.purchase_history import deactivate_items
 from nti.store.purchase_history import is_item_activated
 from nti.store.purchase_history import has_history_by_item
@@ -168,13 +169,8 @@ register_gift_purchase_attempt = register_gift_purchase_attempt
 
 # Purchase history
 
+
 has_history_by_item = has_history_by_item
-
-
-def get_purchase_history_annotation_key():
-    annotation_key = "%s.%s" % (PurchaseHistory.__module__,
-							    PurchaseHistory.__name__)
-    return annotation_key
 
 
 def get_purchase_history(user, safe=True):
@@ -182,8 +178,7 @@ def get_purchase_history(user, safe=True):
         result = IPurchaseHistory(user)
     else:
         annotations = IAnnotations(user)
-        annotation_key = get_purchase_history_annotation_key()
-        result = annotations.get(annotation_key, None)
+        result = annotations.get(PURCHASE_HISTORY_ANNOTATION_KEY, None)
     return result
 
 
@@ -192,8 +187,7 @@ def delete_purchase_history(user):
     if history is not None:
         history.clear()
         annotations = IAnnotations(user)
-        annotation_key = get_purchase_history_annotation_key()
-        annotations.pop(annotation_key, None)
+        annotations.pop(PURCHASE_HISTORY_ANNOTATION_KEY, None)
         return True
     return False
 
