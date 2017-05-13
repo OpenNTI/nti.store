@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Defines purchase charge object.
-
 .. $Id$
 """
 
@@ -38,13 +36,11 @@ class UserAddress(SchemaConfigured):
 
     __metaclass__ = MetaStoreObject
 
-    Street = FP(IUserAddress['Street'])
+    Zip = FP(IUserAddress['Zip'])
     City = FP(IUserAddress['City'])
     State = FP(IUserAddress['State'])
-    Zip = FP(IUserAddress['Zip'])
+    Street = FP(IUserAddress['Street'])
     Country = FP(IUserAddress['Country'])
-
-    parameters = {}  # IContentTypeAware
 
     def __str__(self):
         return "%s\n%s,%s %s\n%s" % (self.Street,
@@ -54,13 +50,14 @@ class UserAddress(SchemaConfigured):
                                      self.Country)
 
     @classmethod
-    def create(cls, address_line1, address_line2=None, city=None, state=None,
-               zip_=None, country=None):
+    def create(cls, address_line1, address_line2=None, city=None, 
+               state=None, zip_=None, country=None):
         city = city or u''
         zip_ = zip_ or IUserAddress['Zip'].default
         country = country or IUserAddress['Country'].default
         street = "%s\n%s" % (address_line1, address_line2 or u'')
-        result = UserAddress(Street=street.strip(), City=city, State=state,
+        result = UserAddress(Street=street.strip(), 
+                             City=city, State=state,
                              Zip=zip_, Country=country)
         return result
 
@@ -75,11 +72,11 @@ class PaymentCharge(SchemaConfigured):
 
     Name = FP(IPaymentCharge['Name'])
     Amount = FP(IPaymentCharge['Amount'])
-    Currency = FP(IPaymentCharge['Currency'])
-    Created = FP(IPaymentCharge['Created'])
-    CardLast4 = FP(IPaymentCharge['CardLast4'])
     Address = FP(IPaymentCharge['Address'])
-
+    Created = FP(IPaymentCharge['Created'])
+    Currency = FP(IPaymentCharge['Currency'])
+    CardLast4 = FP(IPaymentCharge['CardLast4'])
+    
     def __str__(self):
         return "%s:%s" % (self.Currency, self.Amount)
 
