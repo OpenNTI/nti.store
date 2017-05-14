@@ -35,6 +35,9 @@ from nti.store.interfaces import IPurchaseAttempt
 from nti.store.payments.stripe import StripePurchaseError
 from nti.store.payments.stripe import StripeOperationError
 
+from nti.store.payments.stripe.interfaces import STRIPE_CUSTOMER_KEY
+from nti.store.payments.stripe.interfaces import STRIPE_PURCHASE_KEY
+
 from nti.store.payments.stripe.interfaces import IStripeError
 from nti.store.payments.stripe.interfaces import IStripeAPIError
 from nti.store.payments.stripe.interfaces import IStripeCustomer
@@ -73,8 +76,6 @@ class _StripeCustomer(Contained, Persistent):
     charges = alias('Charges')
     customer_id = alias('CustomerID')
 
-#: Annotation key for stripe customer (legacy) 
-STRIPE_CUSTOMER_KEY = 'nti.store.payments.stripe.stripe_adapters._StripeCustomer'
 _StripeCustomerFactory = an_factory(_StripeCustomer, 
                                     STRIPE_CUSTOMER_KEY)
 
@@ -93,8 +94,7 @@ class _StripePurchaseAttempt(Contained, Persistent):
     token_id = alias('TokenID')
     charge_id = alias('ChargeID')
     
-#: Annotation key for stripe purchase attempt (legacy) 
-STRIPE_PURCHASE_KEY = 'nti.store.payments.stripe.stripe_adapters._StripePurchaseAttempt'
+
 _StripePurchaseAttemptFactory = an_factory(_StripePurchaseAttempt,
                                            STRIPE_PURCHASE_KEY)
 
@@ -102,7 +102,7 @@ import zope.deferredimport
 zope.deferredimport.initialize()
 zope.deferredimport.deprecated(
     "Import from _StripePurchaseAttempt instead",
-    _StripePurchase='nti.store.payments.stripe.stripe_adapters._StripePurchaseAttempt')
+    _StripePurchase='nti.store.payments.stripe.adapters._StripePurchaseAttempt')
 
 
 @component.adapter(basestring)

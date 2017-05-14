@@ -13,6 +13,8 @@ from zope import component
 
 from zope.annotation import IAnnotations
 
+from nti.store.payments.stripe.interfaces import STRIPE_CUSTOMER_KEY
+
 from nti.store.payments.stripe.interfaces import IStripeCustomer
 from nti.store.payments.stripe.interfaces import IRegisterStripeToken
 from nti.store.payments.stripe.interfaces import IRegisterStripeCharge
@@ -35,8 +37,7 @@ def stripe_customer_deleted(event):
     su = IStripeCustomer(user, None)
     if su is not None:
         su.customer_id = None
-        module = "%s.%s" % (su.__class__.__module__, su.__class__.__name__)
-        IAnnotations(user).pop(module, None)
+        IAnnotations(user).pop(STRIPE_CUSTOMER_KEY, None)
 
 
 @component.adapter(IRegisterStripeToken)

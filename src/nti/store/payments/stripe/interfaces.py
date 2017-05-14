@@ -34,6 +34,12 @@ from nti.store.payments.interfaces import IConnectKey
 from nti.store.payments.interfaces import RegisterPurchaseData
 from nti.store.payments.interfaces import IRegisterPurchaseData
 
+#: Annotation key for stripe customer (legacy) 
+STRIPE_CUSTOMER_KEY = 'nti.store.payments.stripe.stripe_adapters._StripeCustomer'
+
+#: Annotation key for stripe purchase attempt (legacy) 
+STRIPE_PURCHASE_KEY = 'nti.store.payments.stripe.stripe_adapters._StripePurchaseAttempt'
+
 
 # stripe marker interfaces
 

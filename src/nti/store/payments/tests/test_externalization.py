@@ -8,6 +8,7 @@ __docformat__ = "restructuredtext en"
 # pylint: disable=W0212,R0904
 
 from hamcrest import is_
+from hamcrest import none
 from hamcrest import is_not
 from hamcrest import has_entry
 from hamcrest import assert_that
@@ -58,6 +59,6 @@ class TestPaymentsExternal(unittest.TestCase):
         hist.add_purchase(pa)
 
         ext = to_external_object(pa)
-        assert_that(ext, has_entry('ChargeID', is_(None)))
-        assert_that(ext, has_entry('TokenID', is_(None)))
-        assert_that(ext, has_entry('OID', is_not(None)))
+        assert_that(ext, has_entry('ChargeID', is_(none())))
+        assert_that(ext, has_entry('TokenID', is_(none())))
+        assert_that(ext, has_entry('OID', is_not(none())))

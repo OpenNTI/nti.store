@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -28,19 +28,19 @@ from nti.store.interfaces import IRedemptionException
 ROUND_DECIMAL = 2
 
 #: Purchasable NTIID type
-PURCHASABLE = 'purchasable'
+PURCHASABLE = u'purchasable'
 
 #: Purchasable course NTIID type
-PURCHASABLE_COURSE = 'purchasable_course'
+PURCHASABLE_COURSE = u'purchasable_course'
 
 #: Purchasable content NTIID type
-PURCHASABLE_CONTENT = 'purchasable_content'
+PURCHASABLE_CONTENT = u'purchasable_content'
 
 #: Purchasable choice bundle NTIID type
-PURCHASABLE_CHOICE_BUNDLE = 'purchasable_choice_bundle'
+PURCHASABLE_CHOICE_BUNDLE = u'purchasable_choice_bundle'
 
 #: Purchasable course choice bundle NTIID type
-PURCHASABLE_COURSE_CHOICE_BUNDLE = 'purchasable_course_choice_bundle'
+PURCHASABLE_COURSE_CHOICE_BUNDLE = u'purchasable_course_choice_bundle'
 
 #: Tuple of purchasable NTIID types
 PURCHASABLE_NTIID_TYPES = (PURCHASABLE,
