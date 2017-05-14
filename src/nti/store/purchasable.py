@@ -18,7 +18,7 @@ from zope.location.interfaces import IContained
 
 from zope.mimetype.interfaces import IContentTypeAware
 
-from nti.dataserver.interfaces import SYSTEM_USER_ID
+from nti.coremetadata.interfaces import SYSTEM_USER_ID
 
 from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
