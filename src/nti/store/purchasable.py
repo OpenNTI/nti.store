@@ -34,11 +34,11 @@ from nti.schema.eqhash import EqHash
 from nti.schema.fieldproperty import AdaptingFieldProperty
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from nti.store.item_bundle import ItemBundle
-
 from nti.store.interfaces import IPurchasable
 from nti.store.interfaces import IPurchasableVendorInfo
 from nti.store.interfaces import IPurchasableChoiceBundle
+
+from nti.store.model import ItemBundle
 
 from nti.store.utils import to_frozenset
 from nti.store.utils import to_collection
