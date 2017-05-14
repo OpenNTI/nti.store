@@ -54,7 +54,7 @@ class InvitationCapacityExceeded(InvitationValidationError):
 class StorePurchaseInvitation(Invitation):
     createDirectFieldProperties(IStorePurchaseInvitation)
 
-    mimeType = mime_type = u'application/vnd.nextthought.store.purchaseinvitation'
+    mimeType = mime_type = 'application/vnd.nextthought.store.purchaseinvitation'
 
     target = alias('redeemed_purchase')
     purchase = source = alias('source_purchase')
@@ -118,8 +118,9 @@ def create_store_purchase_invitation(purchase, receiver):
     result = StorePurchaseInvitation(purchase=purchase)
     result.receiver = getattr(receiver, 'username', receiver)
     result.expirationTime = getattr(purchase, 'ExpirationTime', None) or 0
-    result.creator = getattr(
-        purchase.creator, 'username', purchase.creator)  # sender
+    result.creator = getattr(purchase.creator, 
+                             'username', 
+                             purchase.creator)  # sender
     return result
 
 
