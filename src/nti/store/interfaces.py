@@ -40,7 +40,6 @@ from nti.namedfile.interfaces import IFileConstrained
 
 from nti.schema.field import Int
 from nti.schema.field import Bool
-from nti.schema.field import Float
 from nti.schema.field import Choice
 from nti.schema.field import Number
 from nti.schema.field import Object
@@ -97,7 +96,8 @@ class IItemBundle(interface.Interface):
     Author = ValidTextLine(title=u'Content bundle author', required=False)
 
     Description = HTMLContentFragment(title=u'Content bundle description',
-                                      required=False, default='')
+                                      required=False, 
+                                      default=u'')
 
     Items = UniqueIterable(value_type=ValidTextLine(title=u'The item identifier'),
                            title=u"Bundle items")
@@ -118,18 +118,26 @@ class IPurchasableVendorInfo(IEnumerableMapping):
 
 
 class IPurchasable(IItemBundle, IFileConstrained):
-    Amount = Float(title=u"Cost amount", required=True, min=0.0)
+
+    Amount = Number(title=u"Cost amount", 
+                    required=True, 
+                    min=0.0)
 
     Currency = ValidTextLine(title=u'Currency amount',
-                             required=True, default='USD')
+                             required=True,
+                             default=u'USD')
 
     Discountable = Bool(title=u"Discountable flag",
-                        required=True, default=False)
+                        required=True, 
+                        default=False)
 
     BulkPurchase = Bool(title=u"Bulk purchase flag",
-                        required=True, default=False)
+                        required=True, 
+                        default=False)
 
-    Fee = Float(title=u"Percentage fee", required=False, min=0.0)
+    Fee = Number(title=u"Percentage fee",
+                 required=False, 
+                 min=0.0)
 
     Icon = Variant((ValidTextLine(title=u"Icon name"),
                     ValidURI(title=u"Icon source uri"),
@@ -152,7 +160,9 @@ class IPurchasable(IItemBundle, IFileConstrained):
     RedeemCutOffDate = DateTime(title=u"Redeem cutoff date", required=False)
 
     IsPurchasable = Bool(title=u"Can be purchased",
-                         required=True, default=True, readonly=True)
+                         required=True, 
+                         default=True,
+                         readonly=True)
 
     PurchaseCutOffDate = DateTime(title=u"Purchase cutoff date",
                                   required=False)
@@ -176,13 +186,15 @@ class IPurchasableChoiceBundle(IPurchasable):
 
 
 class IPurchasableCourse(IPurchasable):
-    Name = ValidTextLine(title=u'Course Name', required=False)
+
+    Name = ValidTextLine(title=u'Course Name', 
+                         required=False)
 
     # overrides
-    Amount = Float(title=u"Cost amount",
-                   required=False,
-                   min=0.0,
-                   default=0.0)
+    Amount = Number(title=u"Cost amount",
+                    required=False,
+                    min=0.0,
+                    default=0.0)
 
     Provider = ValidTextLine(title=u'Course provider',
                              required=False)
@@ -219,12 +231,11 @@ class IPurchasableCourse(IPurchasable):
     VendorInfo = Object(IPurchasableVendorInfo,
                         title=u"vendor info", required=False)
     VendorInfo.setTaggedValue('_ext_excluded_out', False)
-
-
 ICourse = IPurchasableCourse  # alias BWC
 
 
-class IPurchasableCourseChoiceBundle(IPurchasableChoiceBundle, IPurchasableCourse):
+class IPurchasableCourseChoiceBundle(IPurchasableChoiceBundle,
+                                     IPurchasableCourse):
     pass
 
 
@@ -240,8 +251,13 @@ class ICopier(interface.Interface):
 
 
 class IPriceable(interface.Interface):
+
     NTIID = TextLine(title=u'Purchasable item NTTID', required=True)
-    Quantity = Int(title=u"Quantity", required=False, default=1, min=0)
+
+    Quantity = Int(title=u"Quantity", 
+                   required=False,
+                   default=1,
+                   min=0)
 
     def copy():
         """
@@ -274,52 +290,87 @@ class IPurchaseOrder(IMinimalSequence):
 
 
 class IPricedItem(IPriceable):
-    PurchaseFee = Float(title=u"Fee Amount", required=False)
+
+    PurchaseFee = Number(title=u"Fee Amount", required=False)
     PurchaseFee.setTaggedValue('_ext_excluded_out', True)
 
-    PurchasePrice = Float(title=u"Cost amount", required=True)
-    NonDiscountedPrice = Float(title=u"Non discounted price", required=False)
+    PurchasePrice = Number(title=u"Cost amount", required=True)
+
+    NonDiscountedPrice = Number(title=u"Non discounted price", 
+                                required=False)
+
     Currency = ValidTextLine(title=u'Currency ISO code',
-                             required=True, default='USD')
+                             required=True,
+                             default=u'USD')
 
 
 class IPricingResults(interface.Interface):
-    Items = ListOrTuple(value_type=Object(IPricedItem), title=u'The priced items',
+
+    Items = ListOrTuple(value_type=Object(IPricedItem), 
+                        title=u'The priced items',
                         required=True, min_length=0)
 
-    TotalPurchaseFee = Float(title=u"Fee Amount", required=False)
+    TotalPurchaseFee = Number(title=u"Fee Amount", required=False)
     TotalPurchaseFee.setTaggedValue('_ext_excluded_out', True)
 
-    TotalPurchasePrice = Float(title=u"Cost amount", required=True)
-    TotalNonDiscountedPrice = Float(
-        title=u"Non discounted price", required=False)
+    TotalPurchasePrice = Number(title=u"Cost amount", 
+                                required=True)
+
+    TotalNonDiscountedPrice = Number(title=u"Non discounted price",
+                                     required=False)
+
     Currency = ValidTextLine(title=u'Currency ISO code',
-                             required=True, default='USD')
+                             required=True, 
+                             default=u'USD')
 
 
 class IUserAddress(interface.Interface):
+
     Street = ValidText(title=u'Street address', required=False)
+
     City = ValidTextLine(title=u'The city name', required=False)
+
     State = ValidTextLine(title=u'The state', required=False)
-    Zip = ValidTextLine(title=u'The zip code', required=False, default=u'')
+
+    Zip = ValidTextLine(title=u'The zip code',
+                        required=False, 
+                        default=u'')
+
     Country = ValidTextLine(title=u'The country',
-                            required=False, default='USA')
+                            required=False, 
+                            default=u'USA')
 
 
 class IPaymentCharge(interface.Interface):
-    Amount = Float(title=u"Change amount", required=True)
-    Created = Float(title=u"Created timestamp", required=True)
+
+    Amount = Number(title=u"Change amount", 
+                    required=True)
+
+    Created = Number(title=u"Created timestamp",
+                     required=True)
+
     Currency = ValidTextLine(title=u'Currency amount',
-                             required=True, default='USD')
-    CardLast4 = Int(title=u'CreditCard last 4 digits', required=False)
-    Name = ValidTextLine(title=u'The customer/charge name', required=False)
-    Address = Object(IUserAddress, title=u'User address', required=False)
+                             required=True, 
+                             default=u'USD')
+
+    CardLast4 = Int(title=u'CreditCard last 4 digits', 
+                    required=False)
+
+    Name = ValidTextLine(title=u'The customer/charge name',
+                        required=False)
+
+    Address = Object(IUserAddress, 
+                     title=u'User address', 
+                     required=False)
 
 
 class IOperationError(interface.Interface):
     Type = TextLine(title=u'Error type', required=True)
+
     Code = TextLine(title=u'Error code', required=False)
-    Message = ValidText(title=u'Error message', required=True)
+
+    Message = ValidText(title=u'Error message', 
+                        required=True)
 
 
 class IPricingError(IOperationError):
@@ -431,13 +482,17 @@ class IPurchaseAttemptContext(IEnumerableMapping):
 
 
 class IPurchaseAttempt(IContained):
+
     Processor = Choice(vocabulary=PAYMENT_PROCESSORS_VOCABULARY,
-                       title=u'purchase processor', required=True)
+                       title=u'purchase processor',
+                       required=True)
 
     State = Choice(vocabulary=PA_STATE_VOCABULARY, title=u'Purchase state',
                    required=True)
 
-    Order = Object(IPurchaseOrder, title=u"Purchase order", required=True)
+    Order = Object(IPurchaseOrder, 
+                   title=u"Purchase order", 
+                   required=True)
 
     Description = ValidTextLine(title=u'A purchase description',
                                 required=False)
@@ -446,14 +501,20 @@ class IPurchaseAttempt(IContained):
 
     EndTime = Number(title=u'Completion time', required=False)
 
-    Pricing = Object(IPricingResults, title=u'Pricing results', required=False)
+    Pricing = Object(IPricingResults, 
+                     title=u'Pricing results',
+                     required=False)
 
-    Error = Object(IOperationError, title=u'Error object', required=False)
+    Error = Object(IOperationError, 
+                   title=u'Error object',
+                   required=False)
 
     Synced = Bool(title=u'if the item has been synchronized with the processors data',
-                  required=True, default=False)
+                  required=True, 
+                  default=False)
 
-    Context = Object(IPurchaseAttemptContext, title=u"Purchase attempt context",
+    Context = Object(IPurchaseAttemptContext, 
+                     title=u"Purchase attempt context",
                      required=False)
     Context.setTaggedValue('_ext_excluded_out', True)
 
@@ -517,7 +578,8 @@ class IPurchaseAttempt(IContained):
 
 class IInvitationPurchaseAttempt(IPurchaseAttempt):
 
-    ExpirationTime = Number(title=u"The expirtation time", required=False)
+    ExpirationTime = Number(title=u"The expirtation time", 
+                            required=False)
 
     def isExpired(now=None):
         """
@@ -607,13 +669,11 @@ class IPurchaseAttemptStarted(IPurchaseAttemptStateEvent):
 
 class IPurchaseAttemptSuccessful(IPurchaseAttemptStateEvent):
     charge = interface.Attribute('Purchase charge')
-
     request = interface.Attribute('Purchase pyramid request')
 
 
 class IPurchaseAttemptRefunded(IPurchaseAttemptStateEvent):
     charge = interface.Attribute('Purchase charge')
-
     request = interface.Attribute('Purchase pyramid request')
 
 
@@ -631,9 +691,7 @@ class IPurchaseAttemptFailed(IPurchaseAttemptStateEvent):
 
 class IGiftPurchaseAttemptRedeemed(IPurchaseAttemptEvent):
     user = Object(IUser, title=u"The gift receiver")
-
     code = TextLine(title=u"The gift code", required=False)
-
     request = interface.Attribute('Purchase request')
 
 
@@ -782,7 +840,8 @@ class IStorePurchaseInvitationActor(IPurchaseInvitationActor):
 
 
 class IStoreGiftInvitation(IPurchaseInvitation):
-    item = ValidTextLine(title=u"Purchase item NTIID", required=False)
+    item = ValidTextLine(title=u"Purchase item NTIID", 
+                         required=False)
 
 
 class IStoreGiftInvitationActor(IPurchaseInvitationActor):
