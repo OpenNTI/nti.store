@@ -48,7 +48,6 @@ from nti.schema.field import Variant
 from nti.schema.field import Datetime
 from nti.schema.field import TextLine
 from nti.schema.field import ValidURI
-from nti.schema.field import FrozenSet
 from nti.schema.field import Timedelta
 from nti.schema.field import ValidText
 from nti.schema.field import ListOrTuple
@@ -100,7 +99,7 @@ class IItemBundle(interface.Interface):
     Description = HTMLContentFragment(title=u'Content bundle description',
                                       required=False, default='')
 
-    Items = UniqueIterable(ValidTextLine(title=u'The item identifier'),
+    Items = UniqueIterable(value_type=ValidTextLine(title=u'The item identifier'),
                            title=u"Bundle items")
 
 
@@ -205,8 +204,9 @@ class IPurchasableCourse(IPurchasable):
     Signature = ValidText(title=u'Course/Professor Signature',
                           required=False)
 
-    Communities = FrozenSet(value_type=ValidTextLine(title=u'The community identifier'),
-                            title=u"Communities", required=False)
+    Communities = UniqueIterable(value_type=ValidTextLine(title=u'The community identifier'),
+                                 title=u"Communities", 
+                                 required=False)
 
     Duration = Timedelta(title=u"The length of the course",
                          description="Currently optional, may be None",
