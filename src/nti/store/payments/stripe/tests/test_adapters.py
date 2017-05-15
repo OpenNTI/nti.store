@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -107,7 +107,7 @@ class TestStripeAdapters(unittest.TestCase):
         assert_that(adapted.Type, is_('OperationError'))
         assert_that(adapted.Message, is_('my error message'))
 
-        e = stripe.InvalidRequestError("++invalidtoken++", 'token id')
+        e = stripe.InvalidRequestError(u"++invalidtoken++", u'token id')
         adapted = IStripeOperationError(e, None)
         assert_that(adapted, validly_provides(IStripeOperationError))
         assert_that(adapted, verifiably_provides(IStripeOperationError))

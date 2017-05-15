@@ -28,6 +28,8 @@ from persistent.mapping import PersistentMapping
 
 import BTrees
 
+from nti.base._compat import text_
+
 from nti.base.interfaces import ICreated
 
 from nti.dataserver.users.interfaces import IUserProfile
@@ -381,7 +383,7 @@ def create_redeemed_purchase_attempt(purchase, redemption_code, items=(),
                                      Synced=purchase.Synced,
                                      Context=context,
                                      RedemptionTime=float(redemption_time),
-                                     RedemptionCode=redemption_code,
+                                     RedemptionCode=text_(redemption_code),
                                      SourcePurchaseID=to_external_ntiid_oid(purchase))
     return result
 
