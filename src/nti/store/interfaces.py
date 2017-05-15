@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -221,7 +221,7 @@ class IPurchasableCourse(IPurchasable):
                                  required=False)
 
     Duration = Timedelta(title=u"The length of the course",
-                         description="Currently optional, may be None",
+                         description=u"Currently optional, may be None",
                          required=False)
 
     EndDate = Datetime(title=u"The date on which the course ends",
@@ -229,7 +229,8 @@ class IPurchasableCourse(IPurchasable):
 
     # For purchaseables, we want to share this.
     VendorInfo = Object(IPurchasableVendorInfo,
-                        title=u"vendor info", required=False)
+                        title=u"vendor info", 
+                        required=False)
     VendorInfo.setTaggedValue('_ext_excluded_out', False)
 ICourse = IPurchasableCourse  # alias BWC
 
@@ -278,7 +279,7 @@ class IPurchaseOrder(IMinimalSequence):
     Quantity = Int(title=u'Purchase bulk quantity (overwrites-item quantity)',
                    required=False)
 
-    NTIIDs = interface.Attribute("Purchasable NTIIDs")
+    NTIIDs = interface.Attribute(u"Purchasable NTIIDs")
     NTIIDs.setTaggedValue('_ext_excluded_out', True)
 
     def copy(purchasables=None):
@@ -487,7 +488,8 @@ class IPurchaseAttempt(IContained):
                        title=u'purchase processor',
                        required=True)
 
-    State = Choice(vocabulary=PA_STATE_VOCABULARY, title=u'Purchase state',
+    State = Choice(vocabulary=PA_STATE_VOCABULARY, 
+                   title=u'Purchase state',
                    required=True)
 
     Order = Object(IPurchaseOrder, 
@@ -519,7 +521,7 @@ class IPurchaseAttempt(IContained):
     Context.setTaggedValue('_ext_excluded_out', True)
 
     # CS. these fields are readonly and must not be created
-    Items = interface.Attribute("Purchasable NTIIDs")
+    Items = interface.Attribute(u"Purchasable NTIIDs")
     Items.setTaggedValue('_ext_excluded_out', True)
 
     Profile = interface.Attribute('user profile')
@@ -588,11 +590,14 @@ class IInvitationPurchaseAttempt(IPurchaseAttempt):
 
 
 class IRedeemedPurchaseAttempt(IPurchaseAttempt):
-    RedemptionTime = Number(title=u'Redemption time', required=True)
+    RedemptionTime = Number(title=u'Redemption time', 
+                            required=True)
 
-    RedemptionCode = TextLine(title=u'Redemption Code', required=True)
+    RedemptionCode = TextLine(title=u'Redemption Code', 
+                              required=True)
 
-    SourcePurchaseID = TextLine(title=u'Source Purchase ID', required=False)
+    SourcePurchaseID = TextLine(title=u'Source Purchase ID', 
+                                required=False)
 
 
 class IGiftPurchaseAttempt(IPurchaseAttempt):
@@ -603,23 +608,27 @@ class IGiftPurchaseAttempt(IPurchaseAttempt):
     Receiver = ValidTextLine(title=u'Receiver Email/username',
                              required=False,
                              constraint=checkEmailAddress)
-    ReceiverName = ValidTextLine(title=u'Receiver name', required=False)
 
-    Message = ValidText(title=u'Gift message', required=False)
+    ReceiverName = ValidTextLine(title=u'Receiver name', 
+                                 required=False)
+
+    Message = ValidText(title=u'Gift message', 
+                        required=False)
 
     TargetPurchaseID = TextLine(title=u'NTIID of target purchase',
                                 required=False)
     TargetPurchaseID.setTaggedValue('_ext_excluded_out', True)
 
-    DeliveryDate = Datetime(title=u"The gift delivery date", required=False)
+    DeliveryDate = Datetime(title=u"The gift delivery date", 
+                            required=False)
 
-    Sender = interface.Attribute("Alias for Creator")
+    Sender = interface.Attribute(u"Alias for Creator")
     Sender.setTaggedValue('_ext_excluded_out', True)
 
-    From = interface.Attribute("alias for Creator")
+    From = interface.Attribute(u"alias for Creator")
     From.setTaggedValue('_ext_excluded_out', True)
 
-    To = interface.Attribute("alias for Receiver Name")
+    To = interface.Attribute(u"alias for Receiver Name")
     To.setTaggedValue('_ext_excluded_out', True)
 
     def is_redeemed():
@@ -660,7 +669,7 @@ class IPurchaseAttemptVoided(IPurchaseAttemptEvent):
 
 
 class IPurchaseAttemptStateEvent(IPurchaseAttemptEvent):
-    state = interface.Attribute('Purchase state')
+    state = interface.Attribute(u'Purchase state')
 
 
 class IPurchaseAttemptStarted(IPurchaseAttemptStateEvent):
@@ -668,13 +677,13 @@ class IPurchaseAttemptStarted(IPurchaseAttemptStateEvent):
 
 
 class IPurchaseAttemptSuccessful(IPurchaseAttemptStateEvent):
-    charge = interface.Attribute('Purchase charge')
-    request = interface.Attribute('Purchase pyramid request')
+    charge = interface.Attribute(u'Purchase charge')
+    request = interface.Attribute(u'Purchase pyramid request')
 
 
 class IPurchaseAttemptRefunded(IPurchaseAttemptStateEvent):
-    charge = interface.Attribute('Purchase charge')
-    request = interface.Attribute('Purchase pyramid request')
+    charge = interface.Attribute(u'Purchase charge')
+    request = interface.Attribute(u'Purchase pyramid request')
 
 
 class IPurchaseAttemptDisputed(IPurchaseAttemptStateEvent):
@@ -686,13 +695,13 @@ class IPurchaseAttemptReserved(IPurchaseAttemptStateEvent):
 
 
 class IPurchaseAttemptFailed(IPurchaseAttemptStateEvent):
-    error = interface.Attribute('Failure error')
+    error = interface.Attribute(u'Failure error')
 
 
 class IGiftPurchaseAttemptRedeemed(IPurchaseAttemptEvent):
     user = Object(IUser, title=u"The gift receiver")
     code = TextLine(title=u"The gift code", required=False)
-    request = interface.Attribute('Purchase request')
+    request = interface.Attribute(u'Purchase request')
 
 
 @interface.implementer(IPurchaseAttemptEvent)
@@ -770,6 +779,21 @@ class GiftPurchaseAttemptRedeemed(PurchaseAttemptEvent):
         self.user = user
         self.code = code
         self.request = request
+
+
+class IRedeemedPurchaseAttemptRegistered(IPurchaseAttemptEvent):
+    user = Object(IUser, title=u"The gift receiver")
+    code = TextLine(title=u"The gift code", 
+                    required=False)
+
+
+@interface.implementer(IRedeemedPurchaseAttemptRegistered)
+class RedeemedPurchaseAttemptRegistered(PurchaseAttemptEvent):
+
+    def __init__(self, purchase, user, code=None):
+        super(RedeemedPurchaseAttemptRegistered, self).__init__(purchase)
+        self.user = user
+        self.code = code
 
 
 # user purchase history
@@ -911,4 +935,5 @@ class IEnrollmentAttempt(IPurchaseAttempt):
 
 deprecated('IEnrollmentPurchaseAttempt', 'Use new course enrollment')
 class IEnrollmentPurchaseAttempt(IEnrollmentAttempt):
-    Processor = ValidTextLine(title=u'Enrollment institution', required=False)
+    Processor = ValidTextLine(title=u'Enrollment institution', 
+                              required=False)

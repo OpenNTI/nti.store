@@ -9,7 +9,11 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from zope.event import notify
+
 from nti.store.content_roles import add_users_content_roles
+
+from nti.store.interfaces import RedeemedPurchaseAttemptRegistered
 
 from nti.store.purchase_attempt import create_redeemed_purchase_attempt
 
@@ -27,4 +31,5 @@ def make_redeem_purchase_attempt(user, original, code, activate_roles=True):
     if activate_roles:
         lib_items = expand_purchase_item_ids(original.Items)
         add_users_content_roles(user, lib_items)
+    notify(RedeemedPurchaseAttemptRegistered(redeemed, user, code))
     return result
