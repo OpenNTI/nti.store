@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -55,7 +55,7 @@ class TestZcml(nti.testing.base.ConfiguringTestBase):
 		self.configure_string(ZCML_STRING)
 		
 		name = "tag:nextthought.com,2011-10:PRMIA-purchasable-RiskCourse"		
-		description = "also here is some text & some more text <p>html paragraph</p>"
+		description = u"also here is some text & some more text <p>html paragraph</p>"
 		purchasable = component.getUtility(IPurchasable, name=name)
 		assert_that(purchasable, verifiably_provides(IPurchasable))
 		assert_that(purchasable, has_property('Description', description))
