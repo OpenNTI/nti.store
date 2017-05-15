@@ -32,6 +32,8 @@ from nti.base._compat import text_
 
 from nti.base.interfaces import ICreated
 
+from nti.dataserver.interfaces import IUser
+
 from nti.dataserver.users.interfaces import IUserProfile
 
 from nti.dataserver.users.user_profile import get_searchable_realname_parts
@@ -82,6 +84,8 @@ from nti.store.purchase_order import get_purchasables as get_purchasables_from_o
 
 from nti.store.utils import copy_object
 from nti.store.utils import MetaStoreObject
+
+from nti.traversal.traversal import find_interface
 
 from nti.zodb import minmax
 
@@ -141,8 +145,7 @@ class PurchaseAttempt(ModDateTrackingObject,
 
     @property
     def creator(self):
-        result = getattr(self.__parent__, 'user', None)
-        return result
+        return find_interface(self, IUser, strict=False)
     Creator = creator
 
     @property
