@@ -86,7 +86,7 @@
 						 .interfaces.IStripePurchaseOrder
 						 .interfaces.IStripePurchaseError
 						 .interfaces.IStripeOperationError"
-		modules=".stripe_purchase .stripe_key .stripe_error" />
+		modules=".stripe_purchase .model" />
 
 	<!-- Test keys -->
 	<configure zcml:condition="have devmode">

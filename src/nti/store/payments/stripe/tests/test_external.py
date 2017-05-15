@@ -19,61 +19,65 @@ import unittest
 
 from nti.externalization.externalization import toExternalObject
 
-from nti.store.payments.stripe import StripePurchaseError
-from nti.store.payments.stripe.stripe_purchase import create_stripe_priceable, StripePricedPurchasable
+from nti.store.payments.stripe.model import StripePurchaseError
+
+from nti.store.payments.stripe.stripe_purchase import create_stripe_priceable
+
+from nti.store.payments.stripe.stripe_purchase import StripePricedPurchasable
 
 from nti.store.tests import SharedConfiguringTestLayer
 
+
 class TestExternal(unittest.TestCase):
 
-	layer = SharedConfiguringTestLayer
+    layer = SharedConfiguringTestLayer
 
-	def setUp(self):
-		super(TestExternal, self).setUp()
-		self.api_key = stripe.api_key
-		stripe.api_key = u'sk_test_3K9VJFyfj0oGIMi7Aeg3HNBp'
+    def setUp(self):
+        super(TestExternal, self).setUp()
+        self.api_key = stripe.api_key
+        stripe.api_key = u'sk_test_3K9VJFyfj0oGIMi7Aeg3HNBp'
 
-	def tearDown(self):
-		super(TestExternal, self).tearDown()
-		stripe.api_key = self.api_key
+    def tearDown(self):
+        super(TestExternal, self).tearDown()
+        stripe.api_key = self.api_key
 
-	def test_stripe_coupon(self):
-		code = str(uuid.uuid4())
-		c = stripe.Coupon.create(percent_off=25, duration='once', id=code)
-		ext = toExternalObject(c)
-		assert_that(ext, is_not(none()))
-		assert_that(ext, has_entry('ID', code))
-		assert_that(ext, has_entry('Duration', 'once'))
-		assert_that(ext, has_entry('PercentOff', 25))
-		c.delete()
+    def test_stripe_coupon(self):
+        code = str(uuid.uuid4())
+        c = stripe.Coupon.create(percent_off=25, duration='once', id=code)
+        ext = toExternalObject(c)
+        assert_that(ext, is_not(none()))
+        assert_that(ext, has_entry('ID', code))
+        assert_that(ext, has_entry('Duration', 'once'))
+        assert_that(ext, has_entry('PercentOff', 25))
+        c.delete()
 
-	def test_purchase_error(self):
-		spe = StripePurchaseError(Type=u"Error", Message=u"My message",
-								  Code=u"My code", Param=u"My param")
-		ext = toExternalObject(spe)
-		assert_that(ext, is_not(none()))
-		assert_that(ext, has_entry('Type', 'Error'))
-		assert_that(ext, has_entry('Message', 'My message'))
-		assert_that(ext, has_entry('Code', "My code"))
-		assert_that(ext, has_entry('Param', "My param"))
+    def test_purchase_error(self):
+        spe = StripePurchaseError(Type=u"Error", Message=u"My message",
+                                  Code=u"My code", Param=u"My param")
+        ext = toExternalObject(spe)
+        assert_that(ext, is_not(none()))
+        assert_that(ext, has_entry('Type', 'Error'))
+        assert_that(ext, has_entry('Message', 'My message'))
+        assert_that(ext, has_entry('Code', "My code"))
+        assert_that(ext, has_entry('Param', "My param"))
 
-	def test_stripe_priceable(self):
-		p = create_stripe_priceable("bleach", 10, 'mycoupon')
-		ext = toExternalObject(p)
-		assert_that(ext, is_not(none()))
-		assert_that(ext, has_entry('NTIID', 'bleach'))
-		assert_that(ext, has_entry('Quantity', 10))
-		assert_that(ext, has_entry('Coupon', "mycoupon"))
+    def test_stripe_priceable(self):
+        p = create_stripe_priceable(u"bleach", 10, u'mycoupon')
+        ext = toExternalObject(p)
+        assert_that(ext, is_not(none()))
+        assert_that(ext, has_entry('NTIID', 'bleach'))
+        assert_that(ext, has_entry('Quantity', 10))
+        assert_that(ext, has_entry('Coupon', "mycoupon"))
 
-	def test_stripe_priced_purchasable(self):
-		p = StripePricedPurchasable(NTIID="bleach", Quantity=10, Coupon='mycoupon',
-									PurchaseFee=5.0, PurchasePrice=100.0,
-									NonDiscountedPrice=105.0)
-		ext = toExternalObject(p)
-		assert_that(ext, is_not(none()))
-		assert_that(ext, has_entry('NTIID', 'bleach'))
-		assert_that(ext, has_entry('Quantity', 10))
-		assert_that(ext, has_entry('Coupon', "mycoupon"))
-		assert_that(ext, is_not(has_key('PurchaseFee')))
-		assert_that(ext, has_entry('PurchasePrice', 100))
-		assert_that(ext, has_entry('NonDiscountedPrice', 105))
+    def test_stripe_priced_purchasable(self):
+        p = StripePricedPurchasable(NTIID=u"bleach", Quantity=10, Coupon=u'mycoupon',
+                                    PurchaseFee=5.0, PurchasePrice=100.0,
+                                    NonDiscountedPrice=105.0)
+        ext = toExternalObject(p)
+        assert_that(ext, is_not(none()))
+        assert_that(ext, has_entry('NTIID', 'bleach'))
+        assert_that(ext, has_entry('Quantity', 10))
+        assert_that(ext, has_entry('Coupon', "mycoupon"))
+        assert_that(ext, is_not(has_key('PurchaseFee')))
+        assert_that(ext, has_entry('PurchasePrice', 100))
+        assert_that(ext, has_entry('NonDiscountedPrice', 105))

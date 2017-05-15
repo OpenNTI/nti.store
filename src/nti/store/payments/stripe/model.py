@@ -13,7 +13,11 @@ from zope import interface
 
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
+from zope.mimetype.interfaces import IContentTypeAware
+
 from nti.externalization.representation import WithRepr
+
+from nti.property.property import alias as _a
 
 from nti.schema.eqhash import EqHash
 
@@ -23,6 +27,9 @@ from nti.schema.fieldproperty import createDirectFieldProperties
 
 from nti.store.model import PurchaseError
 
+from nti.store.payments.stripe import STRIPE
+
+from nti.store.payments.stripe.interfaces import IStripeConnectKey
 from nti.store.payments.stripe.interfaces import IStripePurchaseError
 from nti.store.payments.stripe.interfaces import IStripeOperationError
 
@@ -44,3 +51,17 @@ class StripeOperationError(SchemaConfigured):
 class StripePurchaseError(PurchaseError):
     Param = FP(IStripePurchaseError['Param'])
     HttpStatus = FP(IStripePurchaseError['HttpStatus'])
+
+
+@WithRepr
+@EqHash('Alias',)
+@interface.implementer(IStripeConnectKey, IContentTypeAware)
+class StripeConnectKey(SchemaConfigured):
+    createDirectFieldProperties(IStripeConnectKey)
+
+    __metaclass__ = MetaStoreObject
+
+    key = _a('PrivateKey')
+    alias = name = Provider = _a('Alias')
+
+    Processor = STRIPE

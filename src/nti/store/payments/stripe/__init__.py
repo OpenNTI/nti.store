@@ -20,9 +20,6 @@ from nti.store.payments.stripe.interfaces import IStripeException
 from nti.store.payments.stripe.interfaces import INoSuchStripeCoupon
 from nti.store.payments.stripe.interfaces import IInvalidStripeCoupon
 
-from nti.store.payments.stripe.stripe_error import StripePurchaseError  # re-export
-from nti.store.payments.stripe.stripe_error import StripeOperationError  # re-export
-
 STRIPE = u"stripe"
 
 

@@ -17,7 +17,7 @@ from zope.configuration import fields
 
 from nti.store.payments.stripe.interfaces import IStripeConnectKey
 
-from nti.store.payments.stripe.stripe_key import StripeConnectKey
+from nti.store.payments.stripe.model import StripeConnectKey
 
 from nti.utils.cypher import get_plaintext
 

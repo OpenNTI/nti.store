@@ -17,6 +17,9 @@ def _patch():
         moved('nti.store.pricing_error', 'nti.store.model')
         moved('nti.store.purchase_error', 'nti.store.model')
         moved('nti.store.redemption_error', 'nti.store.model')
+        # stripe
+        moved('nti.store.payments.stripe.stripe_error',
+              'nti.store.payments.stripe.model')
     except ImportError:
         pass
 

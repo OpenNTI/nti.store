@@ -32,9 +32,6 @@ from nti.store import MessageFactory as _
 
 from nti.store.interfaces import IPurchaseAttempt
 
-from nti.store.payments.stripe import StripePurchaseError
-from nti.store.payments.stripe import StripeOperationError
-
 from nti.store.payments.stripe.interfaces import STRIPE_CUSTOMER_KEY
 from nti.store.payments.stripe.interfaces import STRIPE_PURCHASE_KEY
 
@@ -51,6 +48,9 @@ from nti.store.payments.stripe.interfaces import IStripePurchaseAttempt
 from nti.store.payments.stripe.interfaces import IStripeAPIConnectionError
 from nti.store.payments.stripe.interfaces import IStripeAuthenticationError
 from nti.store.payments.stripe.interfaces import IStripeInvalidRequestError
+
+from nti.store.payments.stripe.model import StripePurchaseError
+from nti.store.payments.stripe.model import StripeOperationError
 
 from nti.store.payments.stripe.utils import makenone
 
