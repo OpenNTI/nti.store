@@ -359,6 +359,7 @@ def create_purchase_attempt(order, processor, state=None, description=None,
 def create_redeemed_purchase_attempt(purchase, redemption_code, items=(),
                                      redemption_time=None):
 
+    items = items or purchase.Items
     redemption_time = redemption_time if redemption_time else time.time()
 
     # copy with order quantity none and item quantity to 1

@@ -25,7 +25,7 @@ from nti.store.purchasable import expand_purchase_item_ids
 
 def make_redeem_purchase_attempt(user, original, code, activate_roles=True):
     # create and register a purchase attempt for accepting user
-    redeemed = create_redeemed_purchase_attempt(original, code)
+    redeemed = create_redeemed_purchase_attempt(original, code, original.Items)
     result = register_purchase_attempt(redeemed, user)
     activate_items(user, redeemed.Items)
     if activate_roles:
