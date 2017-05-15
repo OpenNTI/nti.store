@@ -60,7 +60,7 @@
 			 name="stripe" />
 	
 	<!-- Payment -->
-	<utility factory=".stripe_processor.StripePaymentProcessor"
+	<utility factory=".processor.model.StripePaymentProcessor"
 			 provides=".interfaces.IStripePaymentProcessor"
 			 name="stripe" />
 		
