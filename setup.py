@@ -58,6 +58,7 @@ setup(
         'nti.property',
         'nti.schema',
         'nti.site',
+        'nti.traversal',
         'nti.zope_catalog',
         'persistent',
         'requests',
