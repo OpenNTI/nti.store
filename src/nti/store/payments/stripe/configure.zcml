@@ -56,7 +56,7 @@
 			 for=".interfaces.IStripePurchaseOrder" />
 
 	<!-- Pricing -->
-	<utility factory=".stripe_pricing.StripePurchasablePricer"
+	<utility factory=".pricing.StripePurchasablePricer"
 			 name="stripe" />
 	
 	<!-- Payment -->
