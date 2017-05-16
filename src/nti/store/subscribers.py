@@ -32,9 +32,6 @@ from nti.store import MessageFactory as _
 from nti.store import PurchaseException
 from nti.store import RedemptionException
 
-from nti.store.content_roles import add_users_content_roles
-from nti.store.content_roles import remove_users_content_roles
-
 from nti.store.interfaces import PA_STATE_FAILED
 from nti.store.interfaces import PA_STATE_STARTED
 from nti.store.interfaces import PA_STATE_SUCCESS
@@ -54,8 +51,6 @@ from nti.store.interfaces import IRedeemedPurchaseAttempt
 from nti.store.interfaces import IInvitationPurchaseAttempt
 from nti.store.interfaces import IPurchaseAttemptSuccessful
 from nti.store.interfaces import IGiftPurchaseAttemptRedeemed
-
-from nti.store.purchasable import expand_purchase_item_ids
 
 from nti.store.purchase_attempt import get_purchasables
 
@@ -112,9 +107,6 @@ def _gift_purchase_attempt_started(purchase, event):
 def _activate_items(purchase, user=None, add_roles=True):
     user = user or purchase.creator
     activate_items(user, purchase.Items)
-    if add_roles:
-        lib_items = expand_purchase_item_ids(purchase.Items)
-        add_users_content_roles(user, lib_items)
 
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptSuccessful)
@@ -133,9 +125,6 @@ def _return_items(purchase, user=None, remove_roles=True):
     if purchase is not None:
         user = user or purchase.creator
         deactivate_items(user, purchase.Items)
-        if remove_roles:
-            lib_items = expand_purchase_item_ids(purchase.Items)
-            remove_users_content_roles(user, lib_items)
 
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptRefunded)
