@@ -100,7 +100,7 @@ class StripePurchasablePricer(DefaultPurchasablePricer):
             result.TotalNonDiscountedPrice += total
 
         if len(currencies) != 1:
-            msg = _(u"Multi-Provider coupon purchase is not supported.")
+            msg = _(u"Multi-Currency pricing is not supported.")
             raise PricingException(msg)
         result.Currency = currencies.pop()
 
