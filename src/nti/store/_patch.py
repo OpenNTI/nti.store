@@ -9,9 +9,10 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from nti.base.deprecation import moved
+
 
 def _patch():
-    from nti.base.deprecation import moved
     moved('nti.store.refund_error', 'nti.store.model')
     moved('nti.store.pricing_error', 'nti.store.model')
     moved('nti.store.purchase_error', 'nti.store.model')
