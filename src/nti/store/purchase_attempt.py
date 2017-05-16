@@ -440,9 +440,9 @@ class DefaultPurchaseAttemptFactory(object):
 # deprecated
 
 
-from nti.common.deprecated import hiding_warnings
+from nti.base.deprecation import hiding_warnings
 with hiding_warnings():
-    from .interfaces import IEnrollmentPurchaseAttempt
+    from nti.store.interfaces import IEnrollmentPurchaseAttempt
 
 from zope.deprecation import deprecated
 
