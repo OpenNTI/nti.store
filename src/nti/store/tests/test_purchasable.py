@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, unicode_literals, absolute_import, division
-from nti.store.interfaces import IPurchasable, IPurchasableChoiceBundle
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -28,13 +27,17 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.schema.interfaces import find_most_derived_interface
 
+from nti.store.interfaces import IPurchasable
+from nti.store.interfaces import IPurchasableChoiceBundle
+
 from nti.store.purchasable import get_purchasable
 from nti.store.purchasable import PurchasableChoiceBundle
 from nti.store.purchasable import expand_purchase_item_ids
 
+from nti.store.purchase_attempt import create_purchase_attempt
+
 from nti.store.purchase_order import create_purchase_item
 from nti.store.purchase_order import create_purchase_order
-from nti.store.purchase_attempt import create_purchase_attempt
 
 from nti.store.tests import SharedConfiguringTestLayer
 
