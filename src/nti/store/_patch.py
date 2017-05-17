@@ -13,6 +13,10 @@ from nti.base.deprecation import moved
 
 
 def _patch():
+    """
+    move old modules that contained persitent objects to their
+    new location. DO NOT Remove
+    """
     moved('nti.store.refund_error', 'nti.store.model')
     moved('nti.store.pricing_error', 'nti.store.model')
     moved('nti.store.purchase_error', 'nti.store.model')
