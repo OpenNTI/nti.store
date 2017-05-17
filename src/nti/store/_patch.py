@@ -20,7 +20,8 @@ def _patch():
     # stripe
     moved('nti.store.payments.stripe.stripe_error',
           'nti.store.payments.stripe.model')
-
+    moved('nti.store.payments.stripe.stripe_adapters',
+          'nti.store.payments.stripe.adapters')
 
 _patch()
 del _patch

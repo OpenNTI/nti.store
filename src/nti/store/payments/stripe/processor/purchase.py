@@ -75,7 +75,7 @@ def _start_purchase(purchase_id, token, username=None):
     if username:
         user = get_user(username)
         adapted = IStripeCustomer(user, None)
-        customer_id = adapted.customer_id if adapted else None
+        customer_id = adapted.CustomerID if adapted is not None else None
 
     context = purchase.Context
     order = purchase.Order.copy()  # make a copy of the order
