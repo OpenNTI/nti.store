@@ -57,12 +57,15 @@ from nti.store.payments.stripe.utils import makenone
 
 @component.adapter(IUser)
 @interface.implementer(IStripeCustomer)
-class _StripeCustomer(Contained, Persistent):
+class _StripeCustomer(Persistent, Contained):
 
     family = BTrees.family64
 
     CustomerID = None
-
+    
+    charges = alias('Charges')
+    customer_id = alias('CustomerID')
+    
     def __init__(self):
         self.Charges = self.family.OO.OOTreeSet()
 
@@ -73,26 +76,23 @@ class _StripeCustomer(Contained, Persistent):
     def __contains__(self, charge):
         return charge in self.Charges
 
-    charges = alias('Charges')
-    customer_id = alias('CustomerID')
-
 _StripeCustomerFactory = an_factory(_StripeCustomer, 
                                     STRIPE_CUSTOMER_KEY)
 
 
 @component.adapter(IPurchaseAttempt)
 @interface.implementer(IStripePurchaseAttempt)
-class _StripePurchaseAttempt(Contained, Persistent):
+class _StripePurchaseAttempt(Persistent, Contained):
 
     TokenID = None
     ChargeID = None
 
+    token_id = alias('TokenID')
+    charge_id = alias('ChargeID')
+
     @property
     def purchase(self):
         return self.__parent__
-
-    token_id = alias('TokenID')
-    charge_id = alias('ChargeID')
     
 
 _StripePurchaseAttemptFactory = an_factory(_StripePurchaseAttempt,

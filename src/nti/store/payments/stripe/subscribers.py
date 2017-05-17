@@ -28,7 +28,7 @@ def stripe_customer_created(event):
     user = event.user
     su = IStripeCustomer(user, None)
     if su is not None:
-        su.customer_id = event.customer_id
+        su.CustomerID = event.customer_id
 
 
 @component.adapter(IStripeCustomerDeleted)
@@ -36,7 +36,7 @@ def stripe_customer_deleted(event):
     user = event.user
     su = IStripeCustomer(user, None)
     if su is not None:
-        su.customer_id = None
+        su.CustomerID = None
         IAnnotations(user).pop(STRIPE_CUSTOMER_KEY, None)
 
 

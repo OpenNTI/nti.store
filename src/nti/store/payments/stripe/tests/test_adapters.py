@@ -12,6 +12,7 @@ from hamcrest import none
 from hamcrest import is_in
 from hamcrest import is_not
 from hamcrest import assert_that
+from hamcrest import has_property
 
 from nti.testing.matchers import validly_provides
 from nti.testing.matchers import verifiably_provides
@@ -54,14 +55,14 @@ class TestStripeAdapters(unittest.TestCase):
     def test_stripe_customer_adapter(self):
         user = self._create_user()
         adapted = IStripeCustomer(user)
-        assert_that(adapted, is_not(None))
-        assert_that(adapted.customer_id, is_(None))
+        assert_that(adapted, is_not(none()))
+        assert_that(adapted, has_property('CustomerID', is_(none())))
 
         adapted.Charges.add(u'ch_id')
         assert_that('ch_id', is_in(adapted))
 
         adapted.customer_id = u'xyz'
-        assert_that(adapted.customer_id, is_('xyz'))
+        assert_that(adapted, has_property('CustomerID', is_(is_('xyz'))))
 
     def _create_purchase_attempt(self, item=u'xyz-book', quantity=None, 
 								 state=None, description=u'my purchase'):

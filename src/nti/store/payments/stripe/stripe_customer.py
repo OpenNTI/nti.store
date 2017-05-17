@@ -57,11 +57,11 @@ def delete_customer(user, api_key=None):
     user = get_user(user)
     if user is not None:
         adapted = IStripeCustomer(user)
-        customer_id = adapted.customer_id
+        customer_id = adapted.CustomerID
         if customer_id:
             result = delete_stripe_customer(customer_id=customer_id,
                                             api_key=api_key)
-            notify(StripeCustomerDeleted(user, adapted.customer_id))
+            notify(StripeCustomerDeleted(user, customer_id))
         return result
     return False
 
@@ -73,7 +73,7 @@ def update_customer(user, customer=None, coupon=None, api_key=None):
         params['coupon'] = coupon
         params['api_key'] = api_key
         if customer is None:
-            customer = IStripeCustomer(user).customer_id
+            customer = IStripeCustomer(user).CustomerID
         params['customer'] = customer
         result = update_stripe_customer(**params)
         return result
@@ -83,7 +83,7 @@ def update_customer(user, customer=None, coupon=None, api_key=None):
 def get_customer(user, api_key=None):
     user = get_user(user)
     if user is not None:
-        customer_id = IStripeCustomer(user).customer_id
+        customer_id = IStripeCustomer(user).CustomerID
         result = get_stripe_customer(customer_id, api_key=api_key)
         return result
     return None
