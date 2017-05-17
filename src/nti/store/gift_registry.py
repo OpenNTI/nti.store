@@ -4,12 +4,10 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
-
-from collections import MutableMapping
 
 from zope import component
 from zope import interface
@@ -26,6 +24,8 @@ from ZODB.interfaces import IConnection
 from persistent import Persistent
 
 from nti.containers.containers import CaseInsensitiveCheckingLastModifiedBTreeContainer
+
+from nti.containers.dicts import LastModifiedDict
 
 from nti.externalization.interfaces import LocatedExternalList
 
@@ -59,11 +59,8 @@ class UserGiftHistory(Contained, Persistent):
 
 
 deprecated('GiftRecordMap', 'Use new gift purchase storage')
-class GiftRecordMap(Persistent, MutableMapping, Contained):
-
-    def __init__(self, username=None):
-        dict.__init__(self)
-        self.username = username
+class GiftRecordMap(LastModifiedDict, Contained):
+    pass
 
 
 class GiftRecordContainer(CaseInsensitiveCheckingLastModifiedBTreeContainer,
