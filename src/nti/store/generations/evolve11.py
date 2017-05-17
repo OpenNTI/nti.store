@@ -57,18 +57,18 @@ def do_evolve(context, generation=generation):
         lsm = ds_folder.getSiteManager()
         intids = lsm.getUtility(IIntIds)
         registry = get_gift_registry()
-        for username, old in list(registry.values()): # mutating
+        for username, old in tuple(registry.items()): # mutating
             if isinstance(old, GiftRecordContainer):
                 continue
             intids.unregister(old)
-            del registry[old]
+            del registry[username]
             locate(old, None, None)
             # new container
             container = GiftRecordContainer()
             intids.register(container)
             registry[username] = container
             # move gift purchases
-            for name, purchase in old.values():
+            for name, purchase in old.items():
                 container._setitemf(name, purchase)
                 result +=1
             old.clear()
