@@ -9,6 +9,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from collections import MutableMapping
+
 from zope import component
 from zope import interface
 from zope import lifecycleevent
@@ -19,21 +21,19 @@ from zope.deprecation import deprecated
 
 from zope.intid.interfaces import IIntIds
 
-from zope.location import locate
-
 from ZODB.interfaces import IConnection
 
 from persistent import Persistent
 
 from nti.containers.containers import CaseInsensitiveCheckingLastModifiedBTreeContainer
 
-from nti.containers.dicts import LastModifiedDict
-
 from nti.externalization.interfaces import LocatedExternalList
 
 from nti.externalization.oids import to_external_ntiid_oid
 
 from nti.ntiids.ntiids import find_object_with_ntiid
+
+from nti.property.property import alias
 
 from nti.store import get_purchase_catalog
 
@@ -58,11 +58,22 @@ class UserGiftHistory(Contained, Persistent):
     pass
 
 
-class GiftRecordMap(LastModifiedDict, Contained):
+deprecated('GiftRecordMap', 'Use new gift purchase storage')
+class GiftRecordMap(Persistent, MutableMapping, Contained):
 
     def __init__(self, username=None):
-        LastModifiedDict.__init__(self)
+        dict.__init__(self)
         self.username = username
+
+
+class GiftRecordContainer(CaseInsensitiveCheckingLastModifiedBTreeContainer,
+                          Contained):
+
+    username = alias('__name__')
+
+    def append(self, value):
+        key = to_external_ntiid_oid(value, use_cache=False)
+        self[key] = value
 
 
 @interface.implementer(IGiftRegistry)
@@ -82,35 +93,27 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 
     def register_purchase(self, username, purchase):
         assert IGiftPurchaseAttempt.providedBy(purchase)
-
         try:
             index = self[username]
         except KeyError:
-            index = GiftRecordMap(username)
+            index = GiftRecordContainer()
             self[username] = index
-
-        # locate before firing events
-        locate(purchase, index)
-        # add to connection and fire events
-        IConnection(self).add(purchase)
-        lifecycleevent.created(purchase)
-        lifecycleevent.added(purchase)  # get an iid
-        # now we can get an OID/NTIID and set creator
+           
         purchase.creator = username
-        purchase.id = unicode(to_external_ntiid_oid(purchase))
-        index[purchase.id] = purchase
+        IConnection(self).add(purchase)
+        lifecycleevent.created(purchase) 
+        index.append(purchase)
         return purchase
     add = append = add_purchase = register_purchase
 
     def remove_purchase(self, username, purchase):
-        if username in self:
+        try:
             index = self[username]
-            pid = getattr(purchase, 'id', purchase)
-            if index.pop(pid) is not None:
-                lifecycleevent.removed(purchase)  # remove iid
-                locate(purchase, None)
-                return True
-        return False
+            key = getattr(purchase, 'id', purchase)
+            del index[key]
+            return True
+        except KeyError:
+            return False
     remove = remove_purchase
 
     def get_purchases(self, username):
