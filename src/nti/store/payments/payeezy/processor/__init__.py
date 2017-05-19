@@ -68,6 +68,6 @@ def adapt_to_purchase_error(e):
 def safe_error_message(result):
     try:
         data = result.json()
-        return data['message']
+        return data.get('message') or data.get('error')
     except Exception:
         return None
