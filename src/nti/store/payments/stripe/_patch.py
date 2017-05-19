@@ -17,10 +17,10 @@ def _patch():
     move old modules that contained persitent objects to their
     new location. DO NOT Remove
     """
-    moved('nti.store.refund_error', 'nti.store.model')
-    moved('nti.store.pricing_error', 'nti.store.model')
-    moved('nti.store.purchase_error', 'nti.store.model')
-    moved('nti.store.redemption_error', 'nti.store.model')
+    moved('nti.store.payments.stripe.stripe_error',
+          'nti.store.payments.stripe.model')
+    moved('nti.store.payments.stripe.stripe_adapters',
+          'nti.store.payments.stripe.adapters')
 
 _patch()
 del _patch

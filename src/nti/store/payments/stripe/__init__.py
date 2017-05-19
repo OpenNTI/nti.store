@@ -41,3 +41,9 @@ class NoSuchStripeCoupon(StripeException):
 # Reduce verbosity of stripe logger
 from stripe.util import logger as stripe_logger
 stripe_logger.setLevel(logging.ERROR)
+
+
+# wait till module has been loaded to patch
+from nti.store._patch import patch
+patch()
+del patch
