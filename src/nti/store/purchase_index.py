@@ -164,19 +164,9 @@ def get_purchase_catalog():
     return catalog
 
 
-def install_purchase_catalog(site_manager_container, intids=None):
-    lsm = site_manager_container.getSiteManager()
-    intids = intids if intids is not None else lsm.getUtility(IIntIds)
-    catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME)
-    if catalog is not None:
-        return catalog
-
-    catalog = StoreCatalog(family=intids.family)
-    catalog.__name__ = CATALOG_NAME
-    catalog.__parent__ = site_manager_container
-    intids.register(catalog)
-    lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_NAME)
-
+def create_purchase_catalog(catalog=None, family=None):
+    if catalog is None:
+        catalog = StoreCatalog(family=family)
     for name, clazz in ((IX_SITE, SiteIndex),
                         (IX_ITEMS, ItemsIndex),
                         (IX_STATE, StateIndex),
@@ -185,8 +175,23 @@ def install_purchase_catalog(site_manager_container, intids=None):
                         (IX_REV_ITEMS, RevItemsIndex),
                         (IX_CREATEDTIME, StartTimeIndex),
                         (IX_REDEMPTION_CODE, RedemptionCodeIndex)):
-        index = clazz(family=intids.family)
-        intids.register(index)
+        index = clazz(family=family)
         locate(index, catalog, name)
         catalog[name] = index
+    return catalog
+
+
+def install_purchase_catalog(site_manager_container, intids=None):
+    lsm = site_manager_container.getSiteManager()
+    intids = intids if intids is not None else lsm.getUtility(IIntIds)
+    catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME)
+    if catalog is not None:
+        return catalog
+
+    catalog = create_purchase_catalog(family=intids.family)
+    locate(catalog, site_manager_container, CATALOG_NAME)
+    intids.register(catalog)
+    lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_NAME)
+    for index in catalog.values():
+        intids.register(index)
     return catalog
