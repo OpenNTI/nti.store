@@ -122,7 +122,7 @@ class DefaultPurchasablePricer(object):
             currencies.add(priceable.Currency)
             result.TotalPurchaseFee += priced.PurchaseFee
             result.TotalPurchasePrice += priced.PurchasePrice
-
+        result.TotalNonDiscountedPrice = result.TotalPurchasePrice
         if len(currencies) != 1:
             msg = _(u"Multi-Currency pricing is not supported")
             raise PricingException(msg)
