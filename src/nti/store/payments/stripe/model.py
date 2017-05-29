@@ -29,6 +29,7 @@ from nti.store.model import PurchaseError
 
 from nti.store.payments.stripe import STRIPE
 
+from nti.store.payments.stripe.interfaces import IStripeToken
 from nti.store.payments.stripe.interfaces import IStripeConnectKey
 from nti.store.payments.stripe.interfaces import IStripePurchaseError
 from nti.store.payments.stripe.interfaces import IStripeOperationError
@@ -65,3 +66,12 @@ class StripeConnectKey(SchemaConfigured):
     alias = name = Provider = _a('Alias')
 
     Processor = STRIPE
+
+
+@WithRepr
+@interface.implementer(IStripeToken, IContentTypeAware)
+class StripeToken(SchemaConfigured):
+    __metaclass__ = MetaStoreObject
+    createDirectFieldProperties(IStripeToken)
+    
+    ID = _a('Value')

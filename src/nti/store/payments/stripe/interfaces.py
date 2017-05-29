@@ -18,7 +18,9 @@ from nti.property.property import alias as _alias
 from nti.schema.field import Int
 from nti.schema.field import Set
 from nti.schema.field import Bool
+from nti.schema.field import Number
 from nti.schema.field import Object
+from nti.schema.field import Variant
 from nti.schema.field import ValidTextLine
 
 from nti.store.interfaces import IPriceable
@@ -151,6 +153,7 @@ class RegisterStripeCharge(RegisterPurchaseData):
         super(RegisterStripeCharge, self).__init__(purchase)
         self.charge_id = charge_id
 
+
 # object interfaces
 
 
@@ -179,6 +182,13 @@ class IStripePurchaseError(IPurchaseError, IStripeOperationError):
 
 class IStripePricingError(IPricingError):
     pass
+
+
+class IStripeToken(interface.Interface):
+    Type = ValidTextLine(title=u"The token type name.", required=False)
+    Value = Variant((ValidTextLine(title=u"The token value."),
+                     Number(title=u"The token value.")), required=True)
+    CardID = ValidTextLine(title=u"The card id.", required=False)
 
 
 class IStripePurchaseAttempt(interface.Interface):

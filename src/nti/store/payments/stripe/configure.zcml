@@ -80,7 +80,8 @@
 	<include package="nti.externalization" />
 
 	<ext:registerAutoPackageIO
-		root_interfaces=".interfaces.IStripePriceable
+		root_interfaces=".interfaces.IStripeToken
+						 .interfaces.IStripePriceable
 						 .interfaces.IStripePricedItem
 						 .interfaces.IStripeConnectKey
 						 .interfaces.IStripePurchaseOrder
