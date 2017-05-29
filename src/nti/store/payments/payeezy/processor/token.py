@@ -59,6 +59,7 @@ class TokenProcessor(object):
         try:
             payeezy = get_payeezy(api_key)
             result = cls.fd_token(payeezy,
+                                  card_type=card_type,
                                   cardholder_name=cardholder_name,
                                   card_number=card_number,
                                   card_expiry=card_expiry,
