@@ -56,21 +56,27 @@ def validate_credit_card(number, exp_month, exp_year, cvc=None):
     return True
 
 
+AMEX_CC_RE = re.compile(r"^3[47][0-9]{13}$")
+VISA_CC_RE = re.compile(r"^4[0-9]{12}(?:[0-9]{3})?$")
+MASTERCARD_CC_RE = re.compile(r"^5[1-5][0-9]{14}$")
+DISCOVER_CC_RE = re.compile(r"^6(?:011|5[0-9]{2})[0-9]{12}$")
+
+CC_MAP = {"AMEX": AMEX_CC_RE, "VISA": VISA_CC_RE,
+          "MASTERCARD": MASTERCARD_CC_RE, "DISCOVER": DISCOVER_CC_RE}
+
+
 def credit_card_type(cc_number):
     """
     Function determines type of CC by the given number.
-    
+
     http://code.activestate.com/recipes/577815-determine-credit-card-type-by-number/
     """
-    AMEX_CC_RE = re.compile(r"^3[47][0-9]{13}$")
-    VISA_CC_RE = re.compile(r"^4[0-9]{12}(?:[0-9]{3})?$")
-    MASTERCARD_CC_RE = re.compile(r"^5[1-5][0-9]{14}$")
-    DISCOVER_CC_RE = re.compile(r"^6(?:011|5[0-9]{2})[0-9]{12}$")
-    
-    CC_MAP = {"AMEX": AMEX_CC_RE, "VISA": VISA_CC_RE,
-              "MASTERCARD": MASTERCARD_CC_RE, "Discover": DISCOVER_CC_RE}    
-    
     for type_, regexp in CC_MAP.items():
         if regexp.match(str(cc_number)):
-            return type_    
+            return type_
     return None
+
+
+def is_valid_credit_card_type(type_):
+    type_ = type_.upper() if type else ''
+    return type_ in CC_MAP
