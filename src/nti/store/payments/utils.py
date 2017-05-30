@@ -78,5 +78,5 @@ def credit_card_type(cc_number):
 
 
 def is_valid_credit_card_type(type_):
-    type_ = type_.upper() if type else ''
+    type_ = type_.upper() if type_ else ''
     return type_ in CC_MAP
