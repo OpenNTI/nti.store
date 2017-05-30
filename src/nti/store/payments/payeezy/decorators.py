@@ -32,6 +32,6 @@ class PurchaseAttemptDecorator(object):
     def decorateExternalObject(self, original, external):
         if original.Processor == PAYEEZY:
             ps = IPayeezyPurchaseAttempt(original)
-            external['TokenID'] = ps.token
-            external['TokeType'] = ps.token_type
-            external['TransactionId'] = ps.transaction_id
+            external['PayeezyTokenID'] = ps.token
+            external['PayeezyTokenType'] = ps.token_type
+            external['PayeezyTransactionID'] = ps.transaction_id
