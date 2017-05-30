@@ -59,4 +59,4 @@ class TestPaymentUtils(unittest.TestCase):
         assert_that(credit_card_type('4024007141696'), is_('VISA'))
         assert_that(credit_card_type(5424000000000015), is_('MASTERCARD'))
         assert_that(credit_card_type('370000000000002'), is_('AMEX'))
-        assert_that(credit_card_type('6011000000000012'), is_('Discover'))
+        assert_that(credit_card_type('6011000000000012'), is_('DISCOVER'))
