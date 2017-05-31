@@ -172,8 +172,8 @@
 			 provides=".interfaces.IStorePurchaseInvitationActor"
 			 for=".interfaces.IStorePurchaseInvitation" />
 
-	<!-- Metadata -->
-	<configure zcml:condition="installed nti.metadata">
+	<!-- Metadata 
+
 		<subscriber	factory=".predicates._PurchaseAttemptPrincipalObjects"
 					provides="nti.dataserver.interfaces.IPrincipalMetadataObjects" />
 			
@@ -182,8 +182,8 @@
 
 		<subscriber	factory=".predicates._GiftPurchaseAttemptPrincipalObjects"
 					provides="nti.dataserver.interfaces.IPrincipalMetadataObjects" />
-	</configure>
-		 
+	-->
+	
 	<!-- Test purchasables -->
 	<configure zcml:condition="have devmode">
 		<include file="_sample.zcml" />
