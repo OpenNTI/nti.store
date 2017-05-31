@@ -177,7 +177,7 @@
 				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
 			
 	<subscriber	factory=".predicates._PurchasablesPrincipalObjects"
-				provides="nti.dataserver.metadata.root_interfaces.IPrincipalMetadataObjects" />
+				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
 
 	<subscriber	factory=".predicates._GiftPurchaseAttemptPrincipalObjects"
 				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
