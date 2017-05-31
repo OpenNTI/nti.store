@@ -172,18 +172,16 @@
 			 provides=".interfaces.IStorePurchaseInvitationActor"
 			 for=".interfaces.IStorePurchaseInvitation" />
 
-	<!-- Metadata 
-
-		<subscriber	factory=".predicates._PurchaseAttemptPrincipalObjects"
-					provides="nti.dataserver.interfaces.IPrincipalMetadataObjects" />
+	<!-- Metadata -->
+	<subscriber	factory=".predicates._PurchaseAttemptPrincipalObjects"
+				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
 			
-		<subscriber	factory=".predicates._PurchasablesPrincipalObjects"
-					provides="nti.dataserver.interfaces.IPrincipalMetadataObjects" />
+	<subscriber	factory=".predicates._PurchasablesPrincipalObjects"
+				provides="nti.dataserver.metadata.root_interfaces.IPrincipalMetadataObjects" />
 
-		<subscriber	factory=".predicates._GiftPurchaseAttemptPrincipalObjects"
-					provides="nti.dataserver.interfaces.IPrincipalMetadataObjects" />
-	-->
-	
+	<subscriber	factory=".predicates._GiftPurchaseAttemptPrincipalObjects"
+				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
+
 	<!-- Test purchasables -->
 	<configure zcml:condition="have devmode">
 		<include file="_sample.zcml" />

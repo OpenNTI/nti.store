@@ -16,7 +16,7 @@ from zope.component.hooks import site as current_site
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.interfaces import ISystemUserPrincipal
 
-from nti.metadata.predicates import BasePrincipalObjects
+from nti.dataserver.metadata.predicates import BasePrincipalObjects
 
 from nti.site.hostpolicy import get_all_host_sites
 
