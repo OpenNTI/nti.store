@@ -286,4 +286,4 @@ class TestPurchaseHistory(unittest.TestCase):
         m = get_available_items('nt@nti.com')
         assert_that(m, is_not(has_key('iid_3')))
         
-        assert_that(is_item_activated(user, u'iid_3'), is_(True))
+        assert_that(is_item_activated(user, 'iid_3'), is_(True))
