@@ -925,7 +925,7 @@ class IStorePurchaseMetadataProvider(interface.Interface):
         pass
 
 
-# depreecated interfaces
+# deprecated interfaces
 
 
 deprecated('IEnrollmentAttempt', 'Use new course enrollment')
