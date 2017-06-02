@@ -11,6 +11,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import six
+
 from zope import component
 from zope import interface
 from zope import lifecycleevent
@@ -47,24 +49,30 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 from nti.store import get_user
 from nti.store import get_purchase_catalog
 
+from nti.store.interfaces import PA_STATE_SUCCESS
+
 from nti.store.interfaces import IPurchaseAttempt
 from nti.store.interfaces import IPurchaseHistory
 
 from nti.store.purchasable import get_purchasable
 from nti.store.purchasable import get_purchasables
 
-from nti.store.purchase_index import IX_ITEMS
+from nti.store.purchase_index import IX_ITEMS, IX_SITE
+from nti.store.purchase_index import IX_STATE
 from nti.store.purchase_index import IX_CREATOR
 from nti.store.purchase_index import IX_MIMETYPE
 from nti.store.purchase_index import IX_CREATEDTIME
 
+from nti.store.utils import PURCHASE_ATTEMPT_MIME_TYPE
 from nti.store.utils import NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES as NONGIFT_MIME_TYPES
 
 from nti.store.utils import to_frozenset
 
 from nti.zope_catalog.catalog import ResultSet
 
+
 # classes
+
 
 deprecated('_PurchaseIndex', 'Use new purchase storage')
 class _PurchaseIndex(Persistent):
@@ -221,13 +229,22 @@ def deactivate_items(user, items):
     return None
 
 
-def is_item_activated(user, item):
+def is_item_activated(user, item, site=None):
     user = get_user(user)
-    if user is not None:
-        hist = IPurchaseHistory(user)
-        result = hist.is_item_activated(item)
-        return result
-    return False
+    catalog = get_purchase_catalog()
+    query = {
+        IX_CREATOR: {'any_of': (user.username,)},
+        IX_STATE: {'any_of': (PA_STATE_SUCCESS,)},
+        IX_MIMETYPE: {'any_of': (PURCHASE_ATTEMPT_MIME_TYPE,)},
+    }
+    if isinstance(site, six.string_types):
+        sites = site.split()
+        query[IX_SITE] = {'any_of': sites}
+    if isinstance(item, six.string_types):
+        items = item.split()
+        query[IX_ITEMS] = {'any_of': items}
+    doc_ids = catalog.apply(query) or ()
+    return bool(doc_ids)
 
 
 def get_purchase_attempt(purchase_id, user=None):
