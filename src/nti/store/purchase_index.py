@@ -19,6 +19,8 @@ from zope.intid.interfaces import IIntIds
 
 from zope.location import locate
 
+import BTrees
+
 from nti.base._compat import text_
 
 from nti.site.interfaces import IHostPolicyFolder
@@ -169,7 +171,7 @@ def get_purchase_catalog(registry=component):
     return catalog
 
 
-def create_purchase_catalog(catalog=None, family=None):
+def create_purchase_catalog(catalog=None, family=BTrees.family64):
     if catalog is None:
         catalog = StoreCatalog(family=family)
     for name, clazz in ((IX_SITE, SiteIndex),
@@ -279,7 +281,7 @@ def get_purchasable_catalog(registry=component):
     return catalog
 
 
-def create_purchasable_catalog(catalog=None, family=None):
+def create_purchasable_catalog(catalog=None, family=BTrees.family64):
     if catalog is None:
         catalog = PurchasableCatalog(family=family)
     for name, clazz in ((IX_SITE, PurchasableSiteIndex),
