@@ -18,6 +18,10 @@ from nti.store.interfaces import ICopier
 #: Store MimeType base
 STORE_MIME_BASE = MIME_BASE + '.store'
 
+#: Purchase attempt mime type
+PURCHASE_ATTEMPT_MIME_TYPE = \
+    STORE_MIME_BASE + '.purchaseattempt'
+
 #: Invitation purchase attempt
 INVITATION_PURCHASE_ATTEMPT_MIME_TYPE = \
     STORE_MIME_BASE + '.invitationpurchaseattempt'
