@@ -21,8 +21,13 @@ from zope.location import locate
 
 from nti.base._compat import text_
 
+from nti.site.interfaces import IHostPolicyFolder
+
+from nti.store.interfaces import IPurchasable
 from nti.store.interfaces import IPurchaseAttempt
 from nti.store.interfaces import IRedeemedPurchaseAttempt
+
+from nti.traversal.traversal import find_interface
 
 from nti.zope_catalog.catalog import Catalog
 
@@ -159,8 +164,8 @@ class StoreCatalog(Catalog):
     pass
 
 
-def get_purchase_catalog():
-    catalog = component.queryUtility(ICatalog, name=CATALOG_NAME)
+def get_purchase_catalog(registry=component):
+    catalog = registry.queryUtility(ICatalog, name=CATALOG_NAME)
     return catalog
 
 
@@ -184,14 +189,122 @@ def create_purchase_catalog(catalog=None, family=None):
 def install_purchase_catalog(site_manager_container, intids=None):
     lsm = site_manager_container.getSiteManager()
     intids = intids if intids is not None else lsm.getUtility(IIntIds)
-    catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME)
+    catalog = get_purchase_catalog(lsm)
     if catalog is not None:
         return catalog
 
     catalog = create_purchase_catalog(family=intids.family)
     locate(catalog, site_manager_container, CATALOG_NAME)
     intids.register(catalog)
-    lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_NAME)
+    lsm.registerUtility(catalog, 
+                        provided=ICatalog, 
+                        name=CATALOG_NAME)
+    for index in catalog.values():
+        intids.register(index)
+    return catalog
+
+
+# purchasable index
+
+
+PURCHASABLE_CATALOG_NAME = 'nti.dataserver.++etc++purchasable-catalog'
+
+
+class ValidatingPurchasableSiteName(object):
+
+    __slots__ = ('site',)
+
+    def __init__(self, obj, default=None):
+        if IPurchasable.providedBy(obj):
+            folder = find_interface(obj, IHostPolicyFolder, strict=False)
+            self.site = text_(getattr(folder, '__name__', None))
+
+    def __reduce__(self):
+        raise TypeError()
+
+
+class PurchasableSiteIndex(ValueIndex):
+    default_field_name = 'site'
+    default_interface = ValidatingPurchasableSiteName
+    
+
+class PurchasableItemsRawIndex(RawSetIndex):
+    pass
+
+
+def PurchasableItemsIndex(family=None):
+    return NormalizationWrapper(field_name='Items',
+                                interface=IPurchasable,
+                                normalizer=StringTokenNormalizer(),
+                                index=PurchasableItemsRawIndex(family=family),
+                                is_collection=True)
+
+
+class PurchasableRevItems(object):
+
+    __slots__ = ('context',)
+
+    def __init__(self, context, default=None):
+        self.context = context
+
+    @property
+    def items(self):
+        if IPurchasable.providedBy(self.context):
+            result = self.context.Items
+            return result
+
+
+def PurchasableRevItemsIndex(family=None):
+    return AttributeKeywordIndex(field_name='items',
+                                 interface=PurchasableRevItems,
+                                 family=family)
+
+
+class PurchasableMimeTypeIndex(ValueIndex):
+    default_field_name = 'mimeType'
+    default_interface = IPurchasable
+
+
+class PurchasableNTIIDIndex(ValueIndex):
+    default_field_name = 'NTIID'
+    default_interface = IPurchasable
+
+
+class PurchasableCatalog(Catalog):
+    pass
+
+
+def get_purchasable_catalog(registry=component):
+    catalog = registry.queryUtility(ICatalog, name=PURCHASABLE_CATALOG_NAME)
+    return catalog
+
+
+def create_purchasable_catalog(catalog=None, family=None):
+    if catalog is None:
+        catalog = PurchasableCatalog(family=family)
+    for name, clazz in ((IX_SITE, PurchasableSiteIndex),
+                        (IX_ITEMS, PurchasableItemsIndex),
+                        (IX_MIMETYPE, PurchasableMimeTypeIndex),
+                        (IX_REV_ITEMS, PurchasableRevItemsIndex)):
+        index = clazz(family=family)
+        locate(index, catalog, name)
+        catalog[name] = index
+    return catalog
+
+
+def install_purchasable_catalog(site_manager_container, intids=None):
+    lsm = site_manager_container.getSiteManager()
+    intids = intids if intids is not None else lsm.getUtility(IIntIds)
+    catalog = get_purchasable_catalog(lsm)
+    if catalog is not None:
+        return catalog
+
+    catalog = create_purchasable_catalog(family=intids.family)
+    locate(catalog, site_manager_container, PURCHASABLE_CATALOG_NAME)
+    intids.register(catalog)
+    lsm.registerUtility(catalog, 
+                        provided=ICatalog, 
+                        name=PURCHASABLE_CATALOG_NAME)
     for index in catalog.values():
         intids.register(index)
     return catalog
