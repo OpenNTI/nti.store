@@ -9,8 +9,6 @@ __docformat__ = "restructuredtext en"
 
 from hamcrest import is_
 from hamcrest import none
-from hamcrest import is_not
-from hamcrest import has_key
 from hamcrest import not_none
 from hamcrest import has_length
 from hamcrest import assert_that
@@ -40,7 +38,6 @@ from nti.store.interfaces import PurchaseAttemptRefunded
 from nti.store.purchase_attempt import create_purchase_attempt
 
 from nti.store.purchase_history import is_item_activated
-from nti.store.purchase_history import get_available_items
 from nti.store.purchase_history import get_purchase_attempt
 from nti.store.purchase_history import get_pending_purchases
 from nti.store.purchase_history import register_purchase_attempt
@@ -270,20 +267,9 @@ class TestPurchaseHistory(unittest.TestCase):
             assert_that(lst, has_length(0))
 
     @WithMockDSTrans
-    def test_available(self):
-        self._create_user()
-        m = get_available_items('nt@nti.com')
-        assert_that(m, has_key('iid_1'))
-        assert_that(m, has_key('iid_2'))
-
-    @WithMockDSTrans
     def test_purchased(self):
         user = self._create_user()
         hist = IPurchaseHistory(user, None)
         pa = self._create_purchase_attempt(u'iid_3', state=PA_STATE_SUCCESS)
         hist.add_purchase(pa)
-
-        m = get_available_items('nt@nti.com')
-        assert_that(m, is_not(has_key('iid_3')))
-        
         assert_that(is_item_activated(user, 'iid_3'), is_(True))

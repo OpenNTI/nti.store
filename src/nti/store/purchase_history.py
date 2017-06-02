@@ -39,7 +39,6 @@ from nti.base._compat import text_
 
 from nti.dataserver.interfaces import IUser
 
-from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import LocatedExternalList
 
 from nti.externalization.oids import to_external_ntiid_oid
@@ -335,25 +334,4 @@ add_purchase_attempt = register_purchase_attempt
 
 def get_purchasable_ids(registry=component):
     result = LocatedExternalList(p.NTIID for p in get_purchasables(registry))
-    return result
-
-
-def get_available_items(user, registry=component):
-    """
-    Return all item that can be purchased
-    """
-    result = LocatedExternalDict()
-    all_ids = set(get_purchasable_ids(registry=registry))
-    if all_ids:
-        # get purchase history
-        purchased = set()
-        user = get_user(user)
-        history = IPurchaseHistory(user)
-        for p in history:
-            if p.has_succeeded() or p.is_pending():
-                purchased.update(p.Items)
-        available = all_ids - purchased
-        result.update({
-            key: get_purchasable(key, registry=registry) for key in available
-        })
     return result
