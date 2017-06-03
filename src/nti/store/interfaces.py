@@ -89,11 +89,11 @@ class IStore(interface.Interface):
 
 
 class IItemBundle(interface.Interface):
-    NTIID = ValidTextLine(title=u'Content bundle NTTID', required=True)
+    NTIID = ValidTextLine(title=u'Item bundle NTTID', required=True)
 
-    Title = ValidTextLine(title=u'Content bundle title', required=False)
+    Title = ValidTextLine(title=u'Item bundle title', required=False)
 
-    Author = ValidTextLine(title=u'Content bundle author', required=False)
+    Author = ValidTextLine(title=u'Item bundle author', required=False)
 
     Description = HTMLContentFragment(title=u'Content bundle description',
                                       required=False, 
@@ -101,8 +101,9 @@ class IItemBundle(interface.Interface):
 
     Items = UniqueIterable(value_type=ValidTextLine(title=u'The item identifier'),
                            title=u"Bundle items")
-
-
+    
+    Label = ValidTextLine(title=u'Item bundle label', required=False)
+    Label.setTaggedValue('_ext_excluded_out', True)
 IContentBundle = IItemBundle  # BWC
 
 

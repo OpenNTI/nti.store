@@ -13,6 +13,8 @@ from zope import interface
 
 from zope.annotation.interfaces import IAttributeAnnotatable
 
+from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
+
 from nti.externalization.representation import WithRepr
 
 from nti.property.property import alias
@@ -39,6 +41,7 @@ from nti.store.utils import MetaStoreObject
 class ItemBundle(SchemaConfigured):
     createDirectFieldProperties(IItemBundle)
 
+    Label = FP(IItemBundle['Label'])
     Description = AdaptingFieldProperty(IItemBundle['Description'])
 
     id = ntiid = alias('NTIID')

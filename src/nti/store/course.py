@@ -17,6 +17,8 @@ from collections import Mapping
 from zope import component
 from zope import interface
 
+from zope.cachedescriptors.property import readproperty
+
 from nti.externalization.representation import WithRepr
 
 from nti.schema.eqhash import EqHash
@@ -39,7 +41,12 @@ from nti.store.utils import to_frozenset
 @interface.implementer(IPurchasableCourse)
 class PurchasableCourse(Purchasable):
     createDirectFieldProperties(IPurchasableCourse)
+
     Description = AdaptingFieldProperty(IPurchasableCourse['Description'])
+
+    @readproperty
+    def Label(self):
+        return self.Name
 
 
 @interface.implementer(IPurchasableCourseChoiceBundle)
@@ -66,8 +73,8 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency=u'USD',
 
     fee = float(fee) if fee is not None else None
     amount = float(amount) if amount is not None else amount
-    communities = to_frozenset(communities) if items else None
     items = to_frozenset(items) if items else frozenset((ntiid,))
+    communities = to_frozenset(communities) if communities else None
 
     def _parse_time(field):
         result = field
