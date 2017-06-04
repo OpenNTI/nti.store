@@ -211,6 +211,11 @@ def install_purchase_catalog(site_manager_container, intids=None):
 
 PURCHASABLE_CATALOG_NAME = 'nti.dataserver.++etc++purchasable-catalog'
 
+IX_LABEL = 'label'
+IX_NTIID = 'ntiid'
+IX_PUBLIC = 'public'
+IX_PROVIDER = 'provider'
+
 
 class ValidatingPurchasableSiteName(object):
 
@@ -272,6 +277,21 @@ class PurchasableNTIIDIndex(ValueIndex):
     default_interface = IPurchasable
 
 
+class PurchasableLabelIndex(ValueIndex):
+    default_field_name = 'Label'
+    default_interface = IPurchasable
+
+
+class PurchasableProviderIndex(ValueIndex):
+    default_field_name = 'Provider'
+    default_interface = IPurchasable
+    
+
+class PurchasablePublicIndex(ValueIndex):
+    default_field_name = 'Public'
+    default_interface = IPurchasable
+
+
 class PurchasableCatalog(Catalog):
     pass
 
@@ -285,7 +305,11 @@ def create_purchasable_catalog(catalog=None, family=BTrees.family64):
     if catalog is None:
         catalog = PurchasableCatalog(family=family)
     for name, clazz in ((IX_SITE, PurchasableSiteIndex),
+                        (IX_LABEL, PurchasableLabelIndex),
+                        (IX_NTIID, PurchasableNTIIDIndex),
                         (IX_ITEMS, PurchasableItemsIndex),
+                        (IX_PUBLIC, PurchasablePublicIndex),
+                        (IX_PROVIDER, PurchasableProviderIndex),
                         (IX_MIMETYPE, PurchasableMimeTypeIndex),
                         (IX_REV_ITEMS, PurchasableRevItemsIndex)):
         index = clazz(family=family)

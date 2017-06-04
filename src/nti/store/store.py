@@ -79,7 +79,6 @@ def register_purchasable(item, name=None, provided=None, registry=None):
         if connection is not None:
             connection.add(item)
             lifecycleevent.added(item)
-            item.__parent__ = registry  # parent
         return item
     return None
 
