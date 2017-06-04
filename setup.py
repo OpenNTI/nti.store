@@ -1,8 +1,6 @@
 import codecs
 from setuptools import setup, find_packages
 
-VERSION = '0.0.0'
-
 entry_points = {
     'console_scripts': [
     ],
@@ -13,6 +11,7 @@ TESTS_REQUIRE = [
     'zope.testrunner',
 ]
 
+
 def _read(fname):
     with codecs.open(fname, encoding='utf-8') as f:
         return f.read()
@@ -20,20 +19,21 @@ def _read(fname):
 
 setup(
     name='nti.store',
-    version=VERSION,
+    version=_read('version.txt').strip(),
     author='Jason Madden',
     author_email='jason@nextthought.com',
     description="NTI Store",
-    long_description=_read('README.rst'),
-    license='Proprietary',
-    keywords='Store purchase',
+    long_description=(_read('README.rst') + '\n\n' + _read("CHANGES.rst")),
+    url="https://github.com/NextThought/nti.store",
+    license='Apache',
+    keywords='store purchase',
     classifiers=[
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: Implementation :: CPython'
+        'Programming Language :: Python :: Implementation :: CPython',
     ],
     zip_safe=True,
     packages=find_packages('src'),
@@ -57,7 +57,7 @@ setup(
         'nti.property',
         'nti.schema',
         'nti.site',
-        'nti.traversal',
+        'nti.store',
         'nti.zope_catalog',
         'persistent',
         'requests',
@@ -84,12 +84,13 @@ setup(
         'zope.schema',
         'zope.security',
     ],
-     extras_require={
+    extras_require={
         'test': TESTS_REQUIRE,
         ':python_version == "2.7"': [
             # Not ported to Py3
             'dolmen.builtins',
         ],
     },
-    entry_points=entry_points
+    entry_points=entry_points,
+    test_suite="nti.store.tests",
 )
