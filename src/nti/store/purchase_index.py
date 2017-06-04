@@ -42,6 +42,8 @@ from nti.zope_catalog.index import ValueIndex as RawValueIndex
 from nti.zope_catalog.index import AttributeValueIndex as ValueIndex
 from nti.zope_catalog.index import IntegerValueIndex as RawIntegerValueIndex
 
+from nti.zope_catalog.number import FloatToNormalized64BitIntNormalizer
+
 from nti.zope_catalog.string import StringTokenNormalizer
 
 CATALOG_NAME = 'nti.dataserver.++etc++purchase-catalog'
@@ -167,8 +169,7 @@ class StoreCatalog(Catalog):
 
 
 def get_purchase_catalog(registry=component):
-    catalog = registry.queryUtility(ICatalog, name=CATALOG_NAME)
-    return catalog
+    return registry.queryUtility(ICatalog, name=CATALOG_NAME)
 
 
 def create_purchase_catalog(catalog=None, family=BTrees.family64):
@@ -214,6 +215,8 @@ PURCHASABLE_CATALOG_NAME = 'nti.dataserver.++etc++purchasable-catalog'
 IX_LABEL = 'label'
 IX_NTIID = 'ntiid'
 IX_PUBLIC = 'public'
+IX_AMOUNT = 'Amount'
+IX_CURRENCY = 'currency'
 IX_PROVIDER = 'provider'
 
 
@@ -292,6 +295,22 @@ class PurchasablePublicIndex(ValueIndex):
     default_interface = IPurchasable
 
 
+class PurchasableAmountRawIndex(RawIntegerValueIndex):
+    pass
+
+
+def PurchasableAmountIndex(family=None):
+    return NormalizationWrapper(field_name='Amount',
+                                interface=IPurchasable,
+                                index=PurchasableAmountRawIndex(family=family),
+                                normalizer=FloatToNormalized64BitIntNormalizer())
+
+
+class PurchasableCurrencyIndex(ValueIndex):
+    default_field_name = 'Currency'
+    default_interface = IPurchasable
+
+
 class PurchasableCatalog(Catalog):
     pass
 
@@ -308,7 +327,9 @@ def create_purchasable_catalog(catalog=None, family=BTrees.family64):
                         (IX_LABEL, PurchasableLabelIndex),
                         (IX_NTIID, PurchasableNTIIDIndex),
                         (IX_ITEMS, PurchasableItemsIndex),
+                        (IX_AMOUNT, PurchasableAmountIndex),
                         (IX_PUBLIC, PurchasablePublicIndex),
+                        (IX_CURRENCY, PurchasableCurrencyIndex),
                         (IX_PROVIDER, PurchasableProviderIndex),
                         (IX_MIMETYPE, PurchasableMimeTypeIndex),
                         (IX_REV_ITEMS, PurchasableRevItemsIndex)):
