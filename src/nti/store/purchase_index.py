@@ -19,11 +19,11 @@ from zope.intid.interfaces import IIntIds
 
 from zope.location import locate
 
+from zope.site.interfaces import IFolder
+
 import BTrees
 
 from nti.base._compat import text_
-
-from nti.site.interfaces import IHostPolicyFolder
 
 from nti.store.interfaces import IPurchasable
 from nti.store.interfaces import IPurchaseAttempt
@@ -223,7 +223,7 @@ class ValidatingPurchasableSiteName(object):
 
     def __init__(self, obj, default=None):
         if IPurchasable.providedBy(obj):
-            folder = find_interface(obj, IHostPolicyFolder, strict=False)
+            folder = find_interface(obj, IFolder, strict=False)
             self.site = text_(getattr(folder, '__name__', None))
 
     def __reduce__(self):
