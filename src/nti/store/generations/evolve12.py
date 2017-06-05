@@ -23,9 +23,9 @@ from nti.dataserver.interfaces import IOIDResolver
 
 from nti.site.hostpolicy import get_all_host_sites
 
-from nti.store.interfaces import IPurchasable
+from nti.store.index import install_purchasable_catalog
 
-from nti.store.purchase_index import install_purchasable_catalog
+from nti.store.interfaces import IPurchasable
 
 
 @interface.implementer(IDataserver)

@@ -20,7 +20,9 @@ def _patch():
     moved('nti.store.refund_error', 'nti.store.model')
     moved('nti.store.pricing_error', 'nti.store.model')
     moved('nti.store.purchase_error', 'nti.store.model')
+    moved('nti.store.purchase_index', 'nti.store.index')
     moved('nti.store.redemption_error', 'nti.store.model')
+
 
 _patch()
 del _patch

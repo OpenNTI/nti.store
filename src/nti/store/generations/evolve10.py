@@ -26,14 +26,14 @@ from nti.dataserver.interfaces import IOIDResolver
 from nti.site.hostpolicy import get_host_site
 from nti.site.hostpolicy import get_all_host_sites
 
+from nti.store.index import IX_SITE
+from nti.store.index import IX_MIMETYPE
+
+from nti.store.index import SiteIndex
+from nti.store.index import install_purchase_catalog
+
 from nti.store.interfaces import IPurchasable
 from nti.store.interfaces import IPurchaseAttempt
-
-from nti.store.purchase_index import IX_SITE
-from nti.store.purchase_index import IX_MIMETYPE
-
-from nti.store.purchase_index import SiteIndex
-from nti.store.purchase_index import install_purchase_catalog
 
 
 @interface.implementer(IDataserver)

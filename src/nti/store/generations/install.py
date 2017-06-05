@@ -19,10 +19,10 @@ from zope.intid.interfaces import IIntIds
 
 from nti.store.gift_registry import GiftRegistry
 
-from nti.store.interfaces import IGiftRegistry
+from nti.store.index import install_purchase_catalog
+from nti.store.index import install_purchasable_catalog
 
-from nti.store.purchase_index import install_purchase_catalog
-from nti.store.purchase_index import install_purchasable_catalog
+from nti.store.interfaces import IGiftRegistry
 
 
 class _StoreSchemaManager(SchemaManager):

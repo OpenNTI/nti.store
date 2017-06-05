@@ -35,15 +35,15 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.property.property import alias
 
-from nti.store import get_purchase_catalog
+from nti.store.index import get_purchase_catalog
 
 from nti.store.interfaces import IGiftRegistry
 from nti.store.interfaces import IUserGiftHistory
 from nti.store.interfaces import IGiftPurchaseAttempt
 
-from nti.store.purchase_index import IX_CREATOR
-from nti.store.purchase_index import IX_MIMETYPE
-from nti.store.purchase_index import IX_CREATEDTIME
+from nti.store.index import IX_CREATOR
+from nti.store.index import IX_MIMETYPE
+from nti.store.index import IX_CREATEDTIME
 
 from nti.store.utils import GIFT_PURCHASE_ATTEMPT_MIME_TYPES
 

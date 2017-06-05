@@ -46,7 +46,8 @@ from nti.externalization.oids import to_external_ntiid_oid
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.store import get_user
-from nti.store import get_purchase_catalog
+
+from nti.store.index import get_purchase_catalog
 
 from nti.store.interfaces import PA_STATE_SUCCESS
 
@@ -56,11 +57,11 @@ from nti.store.interfaces import IPurchaseHistory
 from nti.store.purchasable import get_purchasable
 from nti.store.purchasable import get_purchasables
 
-from nti.store.purchase_index import IX_ITEMS, IX_SITE
-from nti.store.purchase_index import IX_STATE
-from nti.store.purchase_index import IX_CREATOR
-from nti.store.purchase_index import IX_MIMETYPE
-from nti.store.purchase_index import IX_CREATEDTIME
+from nti.store.index import IX_ITEMS, IX_SITE
+from nti.store.index import IX_STATE
+from nti.store.index import IX_CREATOR
+from nti.store.index import IX_MIMETYPE
+from nti.store.index import IX_CREATEDTIME
 
 from nti.store.utils import PURCHASE_ATTEMPT_MIME_TYPE
 from nti.store.utils import NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES as NONGIFT_MIME_TYPES

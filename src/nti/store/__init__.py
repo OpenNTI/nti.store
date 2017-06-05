@@ -87,10 +87,6 @@ def get_user(user):
     return result
 
 
-from nti.store.purchase_index import get_purchase_catalog
-get_catalog = get_purchase_catalog  # BWC
-
-
 # wait till module has been loaded to patch
 from nti.store._patch import patch
 patch()

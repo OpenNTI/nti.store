@@ -17,11 +17,11 @@ from nti.testing.matchers import is_empty
 
 import unittest
 
-from nti.store.purchase_index import StoreCatalog
-from nti.store.purchase_index import PurchasableCatalog
+from nti.store.index import StoreCatalog
+from nti.store.index import PurchasableCatalog
 
-from nti.store.purchase_index import create_purchase_catalog
-from nti.store.purchase_index import create_purchasable_catalog
+from nti.store.index import create_purchase_catalog
+from nti.store.index import create_purchasable_catalog
 
 from nti.store.store import get_purchasable
 
