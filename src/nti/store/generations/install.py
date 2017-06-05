@@ -22,6 +22,7 @@ from nti.store.gift_registry import GiftRegistry
 from nti.store.interfaces import IGiftRegistry
 
 from nti.store.purchase_index import install_purchase_catalog
+from nti.store.purchase_index import install_purchasable_catalog
 
 
 class _StoreSchemaManager(SchemaManager):
@@ -36,13 +37,16 @@ class _StoreSchemaManager(SchemaManager):
             package_name='nti.store.generations')
 
 
-def install_catalog(context):
+def install_catalogs(context):
     conn = context.connection
     root = conn.root()
+
     dataserver_folder = root['nti.dataserver']
     lsm = dataserver_folder.getSiteManager()
     intids = lsm.getUtility(IIntIds)
+
     install_purchase_catalog(dataserver_folder, intids)
+    install_purchasable_catalog(dataserver_folder, intids)
 
 
 def install_gift_registry(context):
@@ -62,5 +66,5 @@ def install_gift_registry(context):
 
 
 def evolve(context):
-    install_catalog(context)
+    install_catalogs(context)
     install_gift_registry(context)
