@@ -166,9 +166,9 @@ def get_gift_pending_purchases(username, items=None):
     return result
 
 
-def get_gift_purchase_history(username, start_time=None, end_time=None, catalog=None):
+def get_gift_purchase_history(username, start_time=None, end_time=None):
+    catalog = get_purchase_catalog()
     intids = component.getUtility(IIntIds)
-    catalog = get_purchase_catalog() if catalog is None else catalog
     query = {
         IX_CREATOR: {'any_of': (username,)},
         IX_CREATEDTIME: {'between': (start_time, end_time)},
