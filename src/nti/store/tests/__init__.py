@@ -45,6 +45,3 @@ class StoreTestLayer(ZopeComponentLayer,
     @classmethod
     def testTearDown(cls):
         pass
-
-
-SharedConfiguringTestLayer = StoreTestLayer  # BWC
