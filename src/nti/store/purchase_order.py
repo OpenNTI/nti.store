@@ -95,7 +95,7 @@ def get_purchasables(order):
         p = get_purchasable(item)
         if p is not None:
             result.append(p)
-    return tuple(result)
+    return result
 
 
 def get_providers(order):
@@ -131,7 +131,7 @@ def create_purchase_order(items=None, quantity=None, cls=PurchaseOrder):
     return result
 
 
-def copy_purchase_order(source, *args, **kwargs):
+def copy_purchase_order(source, *unused, **kwargs):
     items = to_list(kwargs.get('items'))
     if items:
         result = []
@@ -149,5 +149,5 @@ def copy_purchase_order(source, *args, **kwargs):
     return result
 
 
-def _purchase_order_copier(context):
+def _purchase_order_copier(unused):
     return copy_purchase_order
