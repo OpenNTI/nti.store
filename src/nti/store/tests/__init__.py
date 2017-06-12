@@ -17,10 +17,10 @@ from nti.dataserver.tests.mock_dataserver import DSInjectorMixin
 import zope.testing.cleanup
 
 
-class StoreTestLayer(ZopeComponentLayer,
-                     GCLayerMixin,
-                     ConfiguringLayerMixin,
-                     DSInjectorMixin):
+class SharedConfiguringTestLayer(ZopeComponentLayer,
+                                 GCLayerMixin,
+                                 ConfiguringLayerMixin,
+                                 DSInjectorMixin):
 
     set_up_packages = ('nti.dataserver',
                        'nti.invitations',
