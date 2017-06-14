@@ -12,10 +12,10 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
-from dolmen.builtins import IDict
-from dolmen.builtins import IString
-
 from nti.base._compat import text_
+
+from nti.base.interfaces import IDict
+from nti.base.interfaces import IString
 
 from nti.store.interfaces import IRefundError
 from nti.store.interfaces import IPricingError
