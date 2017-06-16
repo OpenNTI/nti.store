@@ -57,7 +57,8 @@ from nti.store.interfaces import IPurchaseHistory
 from nti.store.purchasable import get_purchasable
 from nti.store.purchasable import get_purchasables
 
-from nti.store.index import IX_ITEMS, IX_SITE
+from nti.store.index import IX_SITE
+from nti.store.index import IX_ITEMS 
 from nti.store.index import IX_STATE
 from nti.store.index import IX_CREATOR
 from nti.store.index import IX_MIMETYPE
@@ -67,8 +68,6 @@ from nti.store.utils import PURCHASE_ATTEMPT_MIME_TYPE
 from nti.store.utils import NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES as NONGIFT_MIME_TYPES
 
 from nti.store.utils import to_frozenset
-
-from nti.zope_catalog.catalog import ResultSet
 
 
 # classes
@@ -288,8 +287,11 @@ def get_purchase_history(user, start_time=None, end_time=None, catalog=None):
             IX_MIMETYPE: {'any_of': NONGIFT_MIME_TYPES},
             IX_CREATEDTIME: {'between': (start_time, end_time)}
         }
-        doc_ids = catalog.apply(query) or ()
-        result = LocatedExternalList(ResultSet(doc_ids, intids, True))
+        result = LocatedExternalList()
+        for doc_id in catalog.apply(query) or ():
+            obj = intids.queryObject(doc_id)
+            if IPurchaseAttempt.providedBy(obj):
+                result.append(obj)
     return result
 
 
@@ -309,9 +311,13 @@ def get_purchase_history_by_item(user, purchasable_id):
     if user is None:
         result = ()
     else:
+        result = LocatedExternalList()
         intids = component.getUtility(IIntIds)
         doc_ids = get_purchase_ids_by_items(user, purchasable_id)
-        result = LocatedExternalList(ResultSet(doc_ids, intids, True))
+        for doc_id in doc_ids or ():
+            obj = intids.queryObject(doc_id)
+            if IPurchaseAttempt.providedBy(obj):
+                result.append(obj)
     return result
 
 
