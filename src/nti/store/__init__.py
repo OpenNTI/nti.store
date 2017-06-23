@@ -42,13 +42,6 @@ PURCHASABLE_CHOICE_BUNDLE = u'purchasable_choice_bundle'
 #: Purchasable course choice bundle NTIID type
 PURCHASABLE_COURSE_CHOICE_BUNDLE = u'purchasable_course_choice_bundle'
 
-#: Tuple of purchasable NTIID types
-PURCHASABLE_NTIID_TYPES = (PURCHASABLE,
-                           PURCHASABLE_COURSE,
-                           PURCHASABLE_CONTENT,
-                           PURCHASABLE_CHOICE_BUNDLE,
-                           PURCHASABLE_COURSE_CHOICE_BUNDLE)
-
 
 @interface.implementer(INTIStoreException)
 class NTIStoreException(Exception):
