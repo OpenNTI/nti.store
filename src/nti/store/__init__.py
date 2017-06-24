@@ -33,9 +33,6 @@ PURCHASABLE = u'purchasable'
 #: Purchasable course NTIID type
 PURCHASABLE_COURSE = u'purchasable_course'
 
-#: Purchasable content NTIID type
-PURCHASABLE_CONTENT = u'purchasable_content'
-
 #: Purchasable choice bundle NTIID type
 PURCHASABLE_CHOICE_BUNDLE = u'purchasable_choice_bundle'
 
