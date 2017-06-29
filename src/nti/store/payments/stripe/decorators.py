@@ -41,5 +41,5 @@ class PurchaseAttemptDecorator(object):
     def decorateExternalObject(self, original, external):
         if original.Processor == STRIPE:
             ps = IStripePurchaseAttempt(original)
-            external['TokenID'] = ps.token_id
-            external['ChargeID'] = ps.charge_id
+            external['TokenID'] = ps.TokenID
+            external['ChargeID'] = ps.ChargeID
