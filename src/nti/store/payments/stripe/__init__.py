@@ -44,6 +44,6 @@ stripe_logger.setLevel(logging.ERROR)
 
 
 # wait till module has been loaded to patch
-from nti.store._patch import patch
+from nti.store.payments.stripe._patch import patch
 patch()
 del patch
