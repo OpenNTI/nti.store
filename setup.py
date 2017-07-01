@@ -87,5 +87,4 @@ setup(
         'test': TESTS_REQUIRE,
     },
     entry_points=entry_points,
-    test_suite="nti.store.tests",
 )
