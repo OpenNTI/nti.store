@@ -21,6 +21,8 @@ from zope.cachedescriptors.property import CachedProperty
 
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
+from nti.base._compat import text_
+
 from nti.externalization.representation import WithRepr
 
 from nti.schema.eqhash import EqHash
@@ -48,7 +50,7 @@ class PurchaseItem(Priceable):
 
 def create_purchase_item(ntiid, quantity=1, cls=PurchaseItem):
     quantity = 1 if quantity is None else int(quantity)
-    result = cls(NTIID=unicode(ntiid), Quantity=quantity)
+    result = cls(NTIID=text_(ntiid), Quantity=quantity)
     return result
 
 

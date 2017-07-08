@@ -23,6 +23,8 @@ from zope.event import notify
 
 from zope.intid.interfaces import IIntIds
 
+from nti.base._compat import text_
+
 from nti.dataserver.users import User
 
 from nti.externalization.oids import to_external_ntiid_oid
@@ -226,7 +228,7 @@ class TestPurchaseHistory(unittest.TestCase):
             return hist
 
         for i in range(0, 100):
-            item = unicode(i)
+            item = text_(str(i))
             with mock_dataserver.mock_db_trans(self.ds):
                 hist = _get_hist()
                 pa = self._create_purchase_attempt(item)

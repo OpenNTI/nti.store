@@ -125,7 +125,7 @@ def adapt_to_purchase_error(e):
     if result is None and isinstance(e, Exception):
         result = StripePurchaseError(Type=u"PurchaseError")
         args = getattr(e, 'args', ())
-        message = unicode(' '.join(map(str, args)))
+        message = u' '.join(map(str, args))
         result.Message = message
     return result
 
