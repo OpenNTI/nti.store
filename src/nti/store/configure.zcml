@@ -113,9 +113,7 @@
 	<utility factory=".purchase_attempt.DefaultPurchaseAttemptFactory" />
 	
 	<utility factory=".ntiids._PurchasableResolver" name="purchasable" />
-	<utility factory=".ntiids._PurchasableResolver" name="purchasable_course" />
 	<utility factory=".ntiids._PurchasableResolver" name="purchasable_choice_bundle" />
-	<utility factory=".ntiids._PurchasableResolver" name="purchasable_course_choice_bundle" />
 	
 	<!-- Externalization -->
 	<include package="nti.externalization" file="meta.zcml" />

@@ -30,14 +30,8 @@ ROUND_DECIMAL = 2
 #: Purchasable NTIID type
 PURCHASABLE = u'purchasable'
 
-#: Purchasable course NTIID type
-PURCHASABLE_COURSE = u'purchasable_course'
-
 #: Purchasable choice bundle NTIID type
 PURCHASABLE_CHOICE_BUNDLE = u'purchasable_choice_bundle'
-
-#: Purchasable course choice bundle NTIID type
-PURCHASABLE_COURSE_CHOICE_BUNDLE = u'purchasable_course_choice_bundle'
 
 
 @interface.implementer(INTIStoreException)
