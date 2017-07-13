@@ -9,6 +9,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from functools import total_ordering
+
 from zope import interface
 
 from zope.annotation.interfaces import IAttributeAnnotatable
@@ -26,6 +28,7 @@ from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import AdaptingFieldProperty
 from nti.schema.fieldproperty import createDirectFieldProperties
 
+from nti.store.interfaces import IPrice
 from nti.store.interfaces import IItemBundle
 from nti.store.interfaces import IRefundError
 from nti.store.interfaces import IPricingError
@@ -113,3 +116,26 @@ class RefundError(SchemaConfigured, BaseException):
 def create_refund_error(message, type_=None, code=None):
     result = RefundError(Message=message, Type=type_, Code=code)
     return result
+
+
+@WithRepr
+@total_ordering
+@EqHash('Amount', 'Currency')
+@interface.implementer(IPrice)
+class Price(SchemaConfigured):
+    createDirectFieldProperties(IPrice)
+
+    amount = alias('Amount')
+    currency = alias('Currency')
+
+    def __lt__(self, other):
+        try:
+            return (self.Amount, self.Currency) < (other.Amount, other.Currency)
+        except AttributeError:  # pragma: no cover
+            return NotImplemented
+
+    def __gt__(self, other):
+        try:
+            return (self.Amount, self.Currency) > (other.Amount, other.Currency)
+        except AttributeError:  # pragma: no cover
+            return NotImplemented

@@ -122,7 +122,8 @@
 	<include package="nti.externalization" />
 
 	<ext:registerAutoPackageIO
-		root_interfaces=".interfaces.IPriceable
+		root_interfaces=".interfaces.IPrice
+						 .interfaces.IPriceable
 						 .interfaces.IPricedItem
 						 .interfaces.IPurchasable
 						 .interfaces.IPurchasableChoiceBundle

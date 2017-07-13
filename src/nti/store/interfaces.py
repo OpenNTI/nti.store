@@ -252,6 +252,15 @@ class ICopier(interface.Interface):
         """
 
 
+class IPrice(interface.Interface):
+
+    Amount = Number(title=u"The price amount", required=True)
+
+    Currency = ValidTextLine(title=u"The currency",
+                             required=False,
+                             default=u'USD')
+
+
 class IPriceable(interface.Interface):
 
     NTIID = TextLine(title=u'Purchasable item NTTID', required=True)
