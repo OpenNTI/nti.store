@@ -25,7 +25,7 @@ from nti.store.interfaces import IPurchasableCourseChoiceBundle
 
 @component.adapter(IPurchasable)
 @interface.implementer(IInternalObjectExternalizer)
-class _PurchasableSummaryExternalizer(object):
+class PurchasableSummaryExternalizer(object):
 
     fields_to_remove = ('Icon', 'Thumbnail', 'License', 'Public', 'Description',
                         StandardExternalFields.CREATED_TIME,
@@ -43,6 +43,7 @@ class _PurchasableSummaryExternalizer(object):
         for name in self.fields_to_remove:
             result.pop(name, None)
         return result
+_PurchasableSummaryExternalizer = PurchasableSummaryExternalizer
 
 
 @component.adapter(IPurchasableChoiceBundle)
