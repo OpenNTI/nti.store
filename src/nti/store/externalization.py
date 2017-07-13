@@ -18,9 +18,7 @@ from nti.externalization.interfaces import IInternalObjectExternalizer
 from nti.externalization.datastructures import InterfaceObjectIO
 
 from nti.store.interfaces import IPurchasable
-from nti.store.interfaces import IPurchasableCourse
 from nti.store.interfaces import IPurchasableChoiceBundle
-from nti.store.interfaces import IPurchasableCourseChoiceBundle
 
 
 @component.adapter(IPurchasable)
@@ -49,19 +47,3 @@ _PurchasableSummaryExternalizer = PurchasableSummaryExternalizer
 @component.adapter(IPurchasableChoiceBundle)
 class _PurchasableChoiceBundleSummaryExternalizer(_PurchasableSummaryExternalizer):
     interface = IPurchasableChoiceBundle
-
-
-@component.adapter(IPurchasableCourse)
-class _PurchasableCourseSummaryExternalizer(_PurchasableSummaryExternalizer):
-
-    fields_to_remove = _PurchasableSummaryExternalizer.fields_to_remove + \
-                        ('Featured', 'Preview', 'StartDate', 'Department',
-                         'Signature', 'Communities', 'Duration', 'EndDate')
-
-    interface = IPurchasableCourse
-
-
-@component.adapter(IPurchasableCourseChoiceBundle)
-@interface.implementer(IInternalObjectExternalizer)
-class _PurchasableCourseChoiceBundleSummaryExternalizer(_PurchasableCourseSummaryExternalizer):
-    interface = IPurchasableCourseChoiceBundle

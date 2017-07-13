@@ -18,7 +18,6 @@ from nti.externalization.singleton import SingletonDecorator
 
 from nti.store.interfaces import IPricedItem
 from nti.store.interfaces import IPurchaseAttempt
-from nti.store.interfaces import IPurchasableCourse
 from nti.store.interfaces import IGiftPurchaseAttempt
 from nti.store.interfaces import IInvitationPurchaseAttempt
 
@@ -79,18 +78,3 @@ class PricedItemDecorator(object):
         external['Provider'] = original.Provider
         external['Amount'] = original.Amount
         external['Currency'] = original.Currency
-
-
-@component.adapter(IPurchasableCourse)
-@interface.implementer(IExternalObjectDecorator)
-class PurchasableCourseDecorator(object):
-
-    __metaclass__ = SingletonDecorator
-
-    def decorateExternalObject(self, original, external):
-        # remove deprecated / legacy if no value is specified
-        for name in ('Featured', 'Preview', 'StartDate', 'Department',
-                     'Signature', 'Communities', 'Duration', 'EndDate'):
-            value = external.get(name)
-            if value is None:
-                external.pop(name, None)

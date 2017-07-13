@@ -103,10 +103,6 @@
 				for=".interfaces.IPricedItem"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
 				
-	<subscriber factory=".decorators.PurchasableCourseDecorator"
-				for=".interfaces.IPurchasableCourse"
-				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
-				
 	<!-- Utilities -->
 	<utility factory=".pricing.DefaultPurchasablePricer" />
 
@@ -125,8 +121,6 @@
 						 .interfaces.IPricedItem
 						 .interfaces.IPurchasable
 						 .interfaces.IPurchasableChoiceBundle
-						 .interfaces.IPurchasableCourse
-						 .interfaces.IPurchasableCourseChoiceBundle
 						 .interfaces.IPurchaseOrder
 						 .interfaces.IPurchaseItem
 						 .interfaces.IPricingError
@@ -150,16 +144,6 @@
 		
 	<adapter factory=".externalization._PurchasableChoiceBundleSummaryExternalizer"
 			 for=".interfaces.IPurchasableChoiceBundle"
-			 provides="nti.externalization.interfaces.IInternalObjectExternalizer"
-			 name="summary" />
-			 
-	<adapter factory=".externalization._PurchasableCourseSummaryExternalizer"
-			 for=".interfaces.IPurchasableCourse"
-			 provides="nti.externalization.interfaces.IInternalObjectExternalizer"
-			 name="summary" />
-
-	<adapter factory=".externalization._PurchasableCourseChoiceBundleSummaryExternalizer"
-			 for=".interfaces.IPurchasableCourseChoiceBundle"
 			 provides="nti.externalization.interfaces.IInternalObjectExternalizer"
 			 name="summary" />
 		 	

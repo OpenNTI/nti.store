@@ -47,7 +47,6 @@ from nti.schema.field import Variant
 from nti.schema.field import Datetime
 from nti.schema.field import TextLine
 from nti.schema.field import ValidURI
-from nti.schema.field import Timedelta
 from nti.schema.field import ValidText
 from nti.schema.field import ListOrTuple
 from nti.schema.field import ValidTextLine
@@ -185,60 +184,15 @@ class IPurchasableChoiceBundle(IPurchasable):
     Buyers can buy/redeem one item from the Items list.
     """
 
-
-class IPurchasableCourse(IPurchasable):
-
-    Name = ValidTextLine(title=u'Course Name', 
-                         required=False)
-
-    # overrides
-    Amount = Number(title=u"Cost amount",
-                    required=False,
-                    min=0.0,
-                    default=0.0)
-
-    Provider = ValidTextLine(title=u'Course provider',
-                             required=False)
-
-    # Deprecated/Legacy fields
-    Featured = Bool(title=u'Featured flag',
-                    required=False,
-                    default=False)
-
-    Preview = Bool(title=u'Course preview flag',
-                   required=False)
-
-    StartDate = ValidTextLine(title=u"Course start date",
-                              required=False)
-
-    Department = ValidTextLine(title=u'Course Department',
-                               required=False)
-
-    Signature = ValidText(title=u'Course/Professor Signature',
-                          required=False)
-
-    Communities = UniqueIterable(value_type=ValidTextLine(title=u'The community identifier'),
-                                 title=u"Communities", 
-                                 required=False)
-
-    Duration = Timedelta(title=u"The length of the course",
-                         description=u"Currently optional, may be None",
-                         required=False)
-
-    EndDate = Datetime(title=u"The date on which the course ends",
-                       required=False)
-
-    # For purchaseables, we want to share this.
-    VendorInfo = Object(IPurchasableVendorInfo,
-                        title=u"vendor info", 
-                        required=False)
-    VendorInfo.setTaggedValue('_ext_excluded_out', False)
-ICourse = IPurchasableCourse  # alias BWC
-
-
-class IPurchasableCourseChoiceBundle(IPurchasableChoiceBundle,
-                                     IPurchasableCourse):
-    pass
+import zope.deferredimport
+zope.deferredimport.initialize()
+zope.deferredimport.deprecatedFrom(
+    "Moved to nti.app.products.courseware_store.interfaces",
+    "nti.app.products.courseware_store.interfaces",
+    "ICourse",
+    "IPurchasableCourse",
+    "IPurchasableCourseChoiceBundle"
+)
 
 
 class ICopier(interface.Interface):
