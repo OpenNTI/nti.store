@@ -14,7 +14,6 @@ logger = __import__('logging').getLogger(__name__)
 import datetime
 from collections import Mapping
 
-from zope import component
 from zope import interface
 
 from zope.cachedescriptors.property import readproperty
@@ -27,7 +26,6 @@ from nti.schema.fieldproperty import AdaptingFieldProperty
 from nti.schema.fieldproperty import createDirectFieldProperties
 
 from nti.store.purchasable import Purchasable
-from nti.store.purchasable import get_purchasable
 from nti.store.purchasable import DefaultPurchasableVendorInfo
 
 from nti.store.interfaces import IPurchasableCourse
@@ -127,11 +125,6 @@ def create_course(ntiid, name=None, provider=None, amount=None, currency=u'USD',
     result.Department = department
     result.Communities = communities
 
-    return result
-
-
-def get_course(course_id, registry=component):
-    result = get_purchasable(course_id, registry=registry)
     return result
 
 
