@@ -12,12 +12,12 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
-from zope.component.interfaces import IPossibleSite
-
 from nti.base._compat import text_
 
 from nti.base.interfaces import IDict
 from nti.base.interfaces import IString
+
+from nti.site.interfaces import IHostPolicyFolder
 
 from nti.store.interfaces import IPurchasable
 from nti.store.interfaces import IRefundError
@@ -44,9 +44,9 @@ from nti.traversal.traversal import find_interface
 
 
 @component.adapter(IPurchasable)
-@interface.implementer(IPossibleSite)
+@interface.implementer(IHostPolicyFolder)
 def purchasable_to_site(context):
-    return find_interface(context, IPossibleSite, strict=False)
+    return find_interface(context, IHostPolicyFolder, strict=False)
 
 
 @component.adapter(IDict)

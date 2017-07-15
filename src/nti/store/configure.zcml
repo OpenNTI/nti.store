@@ -20,7 +20,7 @@
 				 
 	<!-- Adapters -->
 	<adapter factory=".adapters.purchasable_to_site"
-			 provides="zope.component.interfaces.IPossibleSite"
+			 provides="nti.site.interfaces.IHostPolicyFolder"
 			 for=".interfaces.IPurchasable" />
 
 	<adapter factory=".purchase_history._PurchaseHistoryFactory"
