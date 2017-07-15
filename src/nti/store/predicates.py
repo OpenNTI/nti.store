@@ -11,14 +11,10 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import component
 
-from zope.component.hooks import site as current_site
-
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.interfaces import ISystemUserPrincipal
 
 from nti.dataserver.metadata.predicates import BasePrincipalObjects
-
-from nti.site.hostpolicy import get_all_host_sites
 
 from nti.store.interfaces import IPurchaseHistory
 
@@ -40,19 +36,14 @@ class _PurchaseAttemptPrincipalObjects(BasePrincipalObjects):
 class _PurchasablesPrincipalObjects(BasePrincipalObjects):
 
     def iter_objects(self):
-        seen = set()
-        for site in get_all_host_sites():
-            with current_site(site):
-                for purchasable in get_all_purchasables():
-                    if purchasable.NTIID not in seen:
-                        seen.add(purchasable.NTIID)
-                        yield purchasable
+        for purchasable in get_all_purchasables():
+            yield purchasable
 
 
 @component.adapter(ISystemUserPrincipal)
 class _GiftPurchaseAttemptPrincipalObjects(BasePrincipalObjects):
 
-    def iter_objects(self, intids=None):
+    def iter_objects(self):
         registry = get_gift_registry()
         for username in list(registry.keys()):  # snapshot
             for gift in registry.get_purchases(username):

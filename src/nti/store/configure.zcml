@@ -19,6 +19,10 @@
 	<include package=".payments" file="configure.zcml" />
 				 
 	<!-- Adapters -->
+	<adapter factory=".adapters.purchasable_to_site"
+			 provides="zope.component.interfaces.IPossibleSite"
+			 for=".interfaces.IPurchasable" />
+
 	<adapter factory=".purchase_history._PurchaseHistoryFactory"
 			 provides=".interfaces.IPurchaseHistory"
 			 for="nti.dataserver.interfaces.IUser" />
