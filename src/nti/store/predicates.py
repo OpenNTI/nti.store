@@ -26,9 +26,8 @@ from nti.store.store import get_all_purchasables
 class _PurchaseAttemptPrincipalObjects(BasePrincipalObjects):
 
     def iter_objects(self):
-        user = self.user
-        history = IPurchaseHistory(user)
-        for purchase in list(history):  # snapshot
+        history = IPurchaseHistory(self.user)
+        for purchase in history:  # snapshot
             yield purchase
 
 
@@ -45,6 +44,6 @@ class _GiftPurchaseAttemptPrincipalObjects(BasePrincipalObjects):
 
     def iter_objects(self):
         registry = get_gift_registry()
-        for username in list(registry.keys()):  # snapshot
+        for username in registry.keys():
             for gift in registry.get_purchases(username):
                 yield gift
