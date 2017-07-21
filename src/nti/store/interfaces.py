@@ -26,6 +26,8 @@ from zope.interface.interfaces import IObjectEvent
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 
+from nti.base.interfaces import IFile
+
 from nti.contentfragments.schema import HTMLContentFragment
 
 from nti.dataserver.interfaces import IUser
@@ -35,7 +37,6 @@ from nti.dataserver.users.interfaces import checkEmailAddress
 from nti.invitations.interfaces import IInvitation
 from nti.invitations.interfaces import IInvitationActor
 
-from nti.namedfile.interfaces import INamedFile
 from nti.namedfile.interfaces import IFileConstrained
 
 from nti.schema.field import Int
@@ -139,9 +140,9 @@ class IPurchasable(IItemBundle, IFileConstrained):
                  required=False, 
                  min=0.0)
 
-    Icon = Variant((ValidTextLine(title=u"Icon name"),
+    Icon = Variant((ValidTextLine(title=u"Icon source url"),
                     ValidURI(title=u"Icon source uri"),
-                    Object(INamedFile, title=u"Icon file")),
+                    Object(IFile, title=u"Icon file")),
                    title=u"Purchasable icon",
                    required=False)
 
