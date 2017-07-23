@@ -59,7 +59,7 @@ class TestStoreExternal(unittest.TestCase):
         order = create_purchase_order(item, quantity=quantity)
         result = create_purchase_attempt(order, processor=self.processor,
                                          description=description,
-                                           state=state)
+                                         state=state)
         return result
 
     @WithMockDSTrans
@@ -70,7 +70,7 @@ class TestStoreExternal(unittest.TestCase):
         pa = self._create_purchase_attempt(description=u'my charge',
                                            quantity=2)
         pa.Error = create_purchase_error(u"An error",
-                                         type_=u'foo', 
+                                         type_=u'foo',
                                          code=u"a code")
         hist.add_purchase(pa)
 
@@ -87,7 +87,7 @@ class TestStoreExternal(unittest.TestCase):
         assert_that(ext, has_entry('EndTime', is_(none())))
         assert_that(ext, has_entry('Description', is_('my charge')))
         assert_that(ext, has_entry('InvitationCode', is_not(none())))
-        assert_that(ext, 
+        assert_that(ext,
                     has_entry('Error', has_entry('Message', pa.Error.Message)))
         assert_that(ext, does_not(has_key('Items')))
         assert_that(ext, does_not(has_key('Profile')))
@@ -179,8 +179,8 @@ class TestStoreExternal(unittest.TestCase):
         assert_that(ext, has_entry('Class', 'Priceable'))
 
     def test_priced_item(self):
-        pp = create_priced_item(ntiid=u'iid_3', 
-                                purchase_price=100, 
+        pp = create_priced_item(ntiid=u'iid_3',
+                                purchase_price=100,
                                 purchase_fee=2)
         ext = to_external_object(pp)
         assert_that(ext, has_key('MimeType'))

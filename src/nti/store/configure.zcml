@@ -162,14 +162,16 @@
 			 for=".interfaces.IStorePurchaseInvitation" />
 
 	<!-- Metadata -->
-	<subscriber	factory=".predicates._PurchaseAttemptPrincipalObjects"
-				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
-			
-	<subscriber	factory=".predicates._PurchasablesPrincipalObjects"
-				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
-
-	<subscriber	factory=".predicates._GiftPurchaseAttemptPrincipalObjects"
-				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
+	<configure zcml:condition="installed nti.metadata">
+		<subscriber	factory=".predicates._PurchaseAttemptPrincipalObjects"
+					provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
+				
+		<subscriber	factory=".predicates._PurchasablesPrincipalObjects"
+					provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
+	
+		<subscriber	factory=".predicates._GiftPurchaseAttemptPrincipalObjects"
+					provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
+	</configure>
 
 	<!-- Test purchasables -->
 	<configure zcml:condition="have devmode">

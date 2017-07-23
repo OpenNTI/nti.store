@@ -15,17 +15,11 @@ from zope import lifecycleevent
 
 from zope.container.contained import Contained
 
-from zope.deprecation import deprecated
-
 from zope.intid.interfaces import IIntIds
 
 from ZODB.interfaces import IConnection
 
-from persistent import Persistent
-
 from nti.containers.containers import CaseInsensitiveCheckingLastModifiedBTreeContainer
-
-from nti.containers.dicts import LastModifiedDict
 
 from nti.externalization.interfaces import LocatedExternalList
 
@@ -49,20 +43,8 @@ from nti.store.utils import GIFT_PURCHASE_ATTEMPT_MIME_TYPES
 
 from nti.store.utils import to_frozenset
 
-from nti.zope_catalog.catalog import ResultSet
 
-
-deprecated('UserGiftHistory', 'Use new gift purchase storage')
 @interface.implementer(IUserGiftHistory)
-class UserGiftHistory(Contained, Persistent):
-    pass
-
-
-deprecated('GiftRecordMap', 'Use new gift purchase storage')
-class GiftRecordMap(LastModifiedDict, Contained):
-    pass
-
-
 class GiftRecordContainer(CaseInsensitiveCheckingLastModifiedBTreeContainer,
                           Contained):
 
@@ -134,13 +116,11 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
         return result or ()
 
     def get_purchase_history(self, username, start_time=None, end_time=None):
-        result = get_gift_purchase_history(username, start_time, end_time)
-        return result
+        return get_gift_purchase_history(username, start_time, end_time)
 
 
 def get_gift_registry(registry=component):
-    result = registry.getUtility(IGiftRegistry)
-    return result
+    return registry.getUtility(IGiftRegistry)
 
 
 def get_gift_purchase_attempt(purchase_id, username=None):
@@ -155,15 +135,13 @@ def remove_gift_purchase_attempt(purchase_id, username):
     purchase = get_gift_purchase_attempt(purchase_id, username)
     if purchase is not None and username:
         registry = get_gift_registry()
-        result = registry.remove_purchase(username, purchase)
-        return result
+        return registry.remove_purchase(username, purchase)
     return False
 
 
 def get_gift_pending_purchases(username, items=None):
     registry = get_gift_registry()
-    result = registry.get_pending_purchases(username, items)
-    return result
+    return registry.get_pending_purchases(username, items)
 
 
 def get_gift_purchase_history(username, start_time=None, end_time=None):
@@ -174,8 +152,12 @@ def get_gift_purchase_history(username, start_time=None, end_time=None):
         IX_CREATEDTIME: {'between': (start_time, end_time)},
         IX_MIMETYPE: {'any_of': GIFT_PURCHASE_ATTEMPT_MIME_TYPES}
     }
-    doc_ids = catalog.apply(query) or ()
-    return LocatedExternalList(ResultSet(doc_ids, intids, True))
+    result = LocatedExternalList()
+    for doc_id in catalog.apply(query) or ():
+        obj = intids.queryObject(doc_id)
+        if IGiftPurchaseAttempt.providedBy(obj):
+            result.append(obj)
+    return result
 
 
 def register_gift_purchase_attempt(username, purchase):

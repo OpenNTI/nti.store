@@ -19,11 +19,11 @@ from zope.intid.interfaces import IIntIds
 
 from zope.location import locate
 
-from zope.site.interfaces import IFolder
-
 import BTrees
 
 from nti.base._compat import text_
+
+from nti.site.interfaces import IHostPolicyFolder
 
 from nti.store.interfaces import IPurchasable
 from nti.store.interfaces import IPurchaseAttempt
@@ -103,7 +103,7 @@ class ValidatingCreator(object):
         raise TypeError()
 
 
-def CreatorIndex(family=None):
+def CreatorIndex(family=BTrees.family64):
     return NormalizationWrapper(field_name='creator',
                                 interface=ValidatingCreator,
                                 index=RawValueIndex(family=family),
@@ -114,7 +114,7 @@ class ItemsRawIndex(RawSetIndex):
     pass
 
 
-def ItemsIndex(family=None):
+def ItemsIndex(family=BTrees.family64):
     return NormalizationWrapper(field_name='Items',
                                 interface=IPurchaseAttempt,
                                 normalizer=StringTokenNormalizer(),
@@ -126,7 +126,7 @@ class StartTimeRawIndex(RawIntegerValueIndex):
     pass
 
 
-def StartTimeIndex(family=None):
+def StartTimeIndex(family=BTrees.family64):
     return NormalizationWrapper(field_name='StartTime',
                                 interface=IPurchaseAttempt,
                                 index=StartTimeRawIndex(family=family),
@@ -137,7 +137,7 @@ class StateRawIndex(RawValueIndex):
     pass
 
 
-def StateIndex(family=None):
+def StateIndex(family=BTrees.family64):
     return NormalizationWrapper(field_name='State',
                                 interface=IPurchaseAttempt,
                                 index=StateRawIndex(family=family),
@@ -158,7 +158,7 @@ class RevItems(object):
             return result
 
 
-def RevItemsIndex(family=None):
+def RevItemsIndex(family=BTrees.family64):
     return AttributeKeywordIndex(field_name='items',
                                  interface=RevItems,
                                  family=family)
@@ -226,7 +226,7 @@ class ValidatingPurchasableSiteName(object):
 
     def __init__(self, obj, default=None):
         if IPurchasable.providedBy(obj):
-            folder = find_interface(obj, IFolder, strict=False)
+            folder = find_interface(obj, IHostPolicyFolder, strict=False)
             self.site = text_(getattr(folder, '__name__', None))
 
     def __reduce__(self):
@@ -242,7 +242,7 @@ class PurchasableItemsRawIndex(RawSetIndex):
     pass
 
 
-def PurchasableItemsIndex(family=None):
+def PurchasableItemsIndex(family=BTrees.family64):
     return NormalizationWrapper(field_name='Items',
                                 interface=IPurchasable,
                                 normalizer=StringTokenNormalizer(),
@@ -264,7 +264,7 @@ class PurchasableRevItems(object):
             return result
 
 
-def PurchasableRevItemsIndex(family=None):
+def PurchasableRevItemsIndex(family=BTrees.family64):
     return AttributeKeywordIndex(field_name='items',
                                  interface=PurchasableRevItems,
                                  family=family)
@@ -299,7 +299,7 @@ class PurchasableAmountRawIndex(RawIntegerValueIndex):
     pass
 
 
-def PurchasableAmountIndex(family=None):
+def PurchasableAmountIndex(family=BTrees.family64):
     return NormalizationWrapper(field_name='Amount',
                                 interface=IPurchasable,
                                 index=PurchasableAmountRawIndex(family=family),

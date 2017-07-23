@@ -24,14 +24,14 @@ class TestUtils(unittest.TestCase):
 
     def test_from_delimited(self):
         a = [
-            u'tag:nextthought.com,2011-10:CMU-HTML-04630_main.04_630:_computer_science_for_practicing_engineers',
-            u'tag:nextthought.com,2011-10:MN-HTML-MiladyCosmetology.cosmetology'
+            'tag:nextthought.com,2011-10:CMU-HTML-04630_main.04_630:_computer_science_for_practicing_engineers',
+            'tag:nextthought.com,2011-10:MN-HTML-MiladyCosmetology.cosmetology'
         ]
-        a = u' '.join(a)
+        a = ' '.join(a)
         items = from_delimited(a)
         assert_that(items, has_length(2))
 
-        a = u'tag:nextthought.com,2011-10:MN-HTML-MiladyCosmetology.cosmetology'
+        a = 'tag:nextthought.com,2011-10:MN-HTML-MiladyCosmetology.cosmetology'
         items = from_delimited(a)
         assert_that(items, has_length(1))
         assert_that(items[0], is_(a))

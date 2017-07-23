@@ -202,8 +202,8 @@ class TestPurchaseHistory(unittest.TestCase):
         user_2 = self._create_user(username=u'nt2@nti.com',)
         book = u'tag:nextthought.com,2011-10:MN-HTML-MiladyCosmetology.cosmetology'
 
-        pa_1 = self._create_purchase_attempt(book, quantity=5, 
-											 state=PA_STATE_SUCCESS)
+        pa_1 = self._create_purchase_attempt(book, quantity=5,
+                                             state=PA_STATE_SUCCESS)
         register_purchase_attempt(pa_1, user_1)
 
         pa_2 = self._create_purchase_attempt(book, state=PA_STATE_SUCCESS)
@@ -254,8 +254,8 @@ class TestPurchaseHistory(unittest.TestCase):
             lst = list(hist.get_purchase_history(start_time=start - 1000))
             assert_that(lst, has_length(100))
 
-            lst = list(hist.get_purchase_history(start_time=start, 
-												 end_time=100))
+            lst = list(hist.get_purchase_history(start_time=start,
+                                                 end_time=100))
             assert_that(lst, has_length(0))
 
             lst = list(hist.get_purchase_history_by_item(u'10'))

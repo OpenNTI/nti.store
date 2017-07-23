@@ -131,23 +131,23 @@ class TestGiftRegistry(unittest.TestCase):
 
         with mock_dataserver.mock_db_trans(self.ds):
             attempt = get_purchase_attempt(pid)
-            assert_that(attempt, 
+            assert_that(attempt,
                         has_property('Profile', has_property('email', username)))
 
-            assert_that(attempt, 
-                        has_property('Profile', 
+            assert_that(attempt,
+                        has_property('Profile',
                                      has_property('realname', 'Ichigo Kurosaki')))
 
             assert_that(attempt,
-                        has_property('Profile', 
+                        has_property('Profile',
                                      has_property('alias', 'Ichigo Kurosaki')))
-            
+
             assert_that(attempt,
-                         has_property('Profile', 
-                                      has_property('backgroundURL', is_(none()))))
-            
+                        has_property('Profile',
+                                     has_property('backgroundURL', is_(none()))))
+
             assert_that(attempt,
-                        has_property('Profile', 
+                        has_property('Profile',
                                      has_property('avatarURL', is_(none()))))
 
         removal = remove_gift_purchase_attempt(pid, username)
