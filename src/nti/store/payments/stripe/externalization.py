@@ -18,10 +18,14 @@ from nti.externalization.datastructures import InterfaceObjectIO
 
 from nti.externalization.interfaces import IInternalObjectIO
 from nti.externalization.interfaces import LocatedExternalDict
+from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IInternalObjectExternalizer
 
 from nti.store.payments.stripe.interfaces import IStripeCoupon
 from nti.store.payments.stripe.interfaces import IStripePurchaseError
+
+ID = StandardExternalFields.ID
+MIMETYPE = StandardExternalFields.MIMETYPE
 
 
 def _makenone(s):
@@ -39,9 +43,10 @@ class StripeCouponExternalizer(object):
     def __init__(self, coupon):
         self.coupon = coupon
 
-    def toExternalObject(self, **kwargs):
+    def toExternalObject(self, **unused_kwargs):
         result = LocatedExternalDict()
-        result['ID'] = self.coupon.id
+        result[ID] = self.coupon.id
+        result[MIMETYPE] = 'application/vnd.nextthought.store.stripecoupon'
         if _makenone(self.coupon.duration):
             result['Duration'] = self.coupon.duration
         if self.coupon.amount_off:
