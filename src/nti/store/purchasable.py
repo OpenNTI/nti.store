@@ -22,7 +22,9 @@ from nti.coremetadata.interfaces import SYSTEM_USER_ID
 
 from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
+from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import LocatedExternalList
+from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IInternalObjectExternalizer
 
 from nti.externalization.representation import WithRepr
@@ -44,6 +46,8 @@ from nti.store.utils import to_frozenset
 from nti.store.utils import to_collection
 from nti.store.utils import MetaStoreObject
 
+MIMETYPE = StandardExternalFields.MIMETYPE
+
 
 @interface.implementer(IPurchasableVendorInfo, IInternalObjectExternalizer)
 class DefaultPurchasableVendorInfo(dict):
@@ -51,8 +55,10 @@ class DefaultPurchasableVendorInfo(dict):
     The default representation of vendor info.
     """
 
-    def toExternalObject(self, *args, **kwargs):
-        return dict(self)
+    def toExternalObject(self, **unused_kwargs):
+        result = LocatedExternalDict(self)
+        result[MIMETYPE] = 'application/vnd.nextthought.store.purchasablevendorinfo'
+        return result
 
 
 @WithRepr
@@ -91,7 +97,7 @@ def create_purchasable(ntiid, provider, amount, currency=u'USD', items=(), fee=N
                        icon=None, thumbnail=None, discountable=False, giftable=False,
                        redeem_cutoff_date=None, purchase_cutoff_date=None,
                        redeemable=False, bulk_purchase=True, public=True,
-                       vendor_info=None, factory=Purchasable, **kwargs):
+                       vendor_info=None, factory=Purchasable, **unused_kwargs):
 
     fee = float(fee) if fee is not None else None
     amount = float(amount) if amount is not None else amount
