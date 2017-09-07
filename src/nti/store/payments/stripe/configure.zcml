@@ -6,9 +6,7 @@
 			xmlns:stripe="http://nextthought.com/ntp/stripe">
 
 	<include package="zope.component" file="meta.zcml" />
-	<include package="zope.security" file="meta.zcml" />
 	<include package="zope.component" />
-	<include package="zope.security" />
 
 	<include package="." file="stripe_objects.zcml" />
 	
