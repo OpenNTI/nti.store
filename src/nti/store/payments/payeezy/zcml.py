@@ -17,11 +17,11 @@ from zope.configuration import fields
 
 from nti.base._compat import native_
 
+from nti.common.cypher import get_plaintext
+
 from nti.store.payments.payeezy.interfaces import IPayeezyConnectKey
 
 from nti.store.payments.payeezy.model import PayeezyConnectKey
-
-from nti.utils.cypher import get_plaintext
 
 
 class IRegisterPayeezyKeyDirective(interface.Interface):

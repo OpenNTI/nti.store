@@ -15,11 +15,11 @@ from zope.component.zcml import utility
 
 from zope.configuration import fields
 
+from nti.common.cypher import get_plaintext
+
 from nti.store.payments.stripe.interfaces import IStripeConnectKey
 
 from nti.store.payments.stripe.model import StripeConnectKey
-
-from nti.utils.cypher import get_plaintext
 
 
 class IRegisterStripeKeyDirective(interface.Interface):
