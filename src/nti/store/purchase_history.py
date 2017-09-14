@@ -41,9 +41,9 @@ from nti.dataserver.interfaces import IUser
 
 from nti.externalization.interfaces import LocatedExternalList
 
-from nti.externalization.oids import to_external_ntiid_oid
-
 from nti.ntiids.ntiids import find_object_with_ntiid
+
+from nti.ntiids.oids import to_external_ntiid_oid
 
 from nti.store import get_user
 

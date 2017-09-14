@@ -23,9 +23,9 @@ from nti.containers.containers import CaseInsensitiveCheckingLastModifiedBTreeCo
 
 from nti.externalization.interfaces import LocatedExternalList
 
-from nti.externalization.oids import to_external_ntiid_oid
-
 from nti.ntiids.ntiids import find_object_with_ntiid
+
+from nti.ntiids.oids import to_external_ntiid_oid
 
 from nti.property.property import alias
 

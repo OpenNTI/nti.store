@@ -25,9 +25,9 @@ from zope.intid.interfaces import IIntIds
 
 from nti.base._compat import text_
 
-from nti.dataserver.users import User
+from nti.dataserver.users.users import User
 
-from nti.externalization.oids import to_external_ntiid_oid
+from nti.ntiids.oids import to_external_ntiid_oid
 
 from nti.store.interfaces import PA_STATE_STARTED
 from nti.store.interfaces import PA_STATE_SUCCESS

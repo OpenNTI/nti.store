@@ -42,13 +42,13 @@ from nti.dublincore.time_mixins import ModifiedTimeMixin as ModDateTrackingObjec
 
 from nti.externalization.interfaces import IInternalObjectExternalizer
 
-from nti.externalization.oids import to_external_ntiid_oid
-
 from nti.externalization.representation import WithRepr
 
 from nti.mimetype.mimetype import MIME_BASE
 
 from nti.ntiids.ntiids import find_object_with_ntiid
+
+from nti.ntiids.oids import to_external_ntiid_oid
 
 from nti.property.property import alias
 
