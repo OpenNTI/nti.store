@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import component
 from zope import interface
@@ -40,6 +39,9 @@ from nti.store.interfaces import IStorePurchaseInvitation
 from nti.store.interfaces import IStorePurchaseInvitationActor
 
 from nti.store.redeem import make_redeem_purchase_attempt
+
+logger = __import__('logging').getLogger(__name__)
+
 
 InvitationExpired = InvitationExpiredError  # BWC
 InvitationAlreadyAccepted = InvitationAlreadyAcceptedError  # BWC

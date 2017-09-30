@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import component
 
@@ -20,8 +19,6 @@ from zope.intid.interfaces import IIntIds
 from zope.location import locate
 
 import BTrees
-
-from nti.base._compat import text_
 
 from nti.site.interfaces import IHostPolicyFolder
 
@@ -57,15 +54,17 @@ IX_REV_ITEMS = 'revItems'
 IX_REDEMPTION_CODE = 'redemptionCode'
 IX_STARTTIME = IX_CREATEDTIME = 'startTime'
 
+logger = __import__('logging').getLogger(__name__)
+
 
 class ValidatingSiteName(object):
 
     __slots__ = ('site',)
 
-    def __init__(self, obj, default=None):
+    def __init__(self, obj, unused_default=None):
         if IPurchaseAttempt.providedBy(obj):
             site = getSite()
-            self.site = text_(getattr(site, '__name__', None))
+            self.site = getattr(site, '__name__', None)
 
     def __reduce__(self):
         raise TypeError()
@@ -90,7 +89,7 @@ class ValidatingCreator(object):
 
     __slots__ = ('creator',)
 
-    def __init__(self, obj, default=None):
+    def __init__(self, obj, unused_default=None):
         try:
             if IPurchaseAttempt.providedBy(obj):
                 username = getattr(obj.creator, 'username', obj.creator)
@@ -148,7 +147,7 @@ class RevItems(object):
 
     __slots__ = ('context',)
 
-    def __init__(self, context, default=None):
+    def __init__(self, context, unused_default=None):
         self.context = context
 
     @property
@@ -224,10 +223,10 @@ class ValidatingPurchasableSiteName(object):
 
     __slots__ = ('site',)
 
-    def __init__(self, obj, default=None):
+    def __init__(self, obj, unused_default=None):
         if IPurchasable.providedBy(obj):
             folder = find_interface(obj, IHostPolicyFolder, strict=False)
-            self.site = text_(getattr(folder, '__name__', None))
+            self.site = getattr(folder, '__name__', None)
 
     def __reduce__(self):
         raise TypeError()
@@ -254,7 +253,7 @@ class PurchasableRevItems(object):
 
     __slots__ = ('context',)
 
-    def __init__(self, context, default=None):
+    def __init__(self, context, unused_default=None):
         self.context = context
 
     @property

@@ -4,10 +4,11 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
+import six
 
 from zope import interface
 
@@ -35,12 +36,14 @@ from nti.store.priceable import Priceable
 
 from nti.store.utils import MetaStoreObject
 
+logger = __import__('logging').getLogger(__name__)
 
+
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @EqHash('NTIID',)
 @interface.implementer(IPricedItem, IContentTypeAware)
 class PricedItem(Priceable):
-    __metaclass__ = MetaStoreObject
     createDirectFieldProperties(IPricedItem)
 
 
@@ -61,10 +64,10 @@ def create_priced_item(ntiid, purchase_price, purchase_fee=None,
     return result
 
 
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @interface.implementer(IPricingResults, IContentTypeAware)
 class PricingResults(SchemaConfigured):
-    __metaclass__ = MetaStoreObject
     createDirectFieldProperties(IPricingResults)
 
 

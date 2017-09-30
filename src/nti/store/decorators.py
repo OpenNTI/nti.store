@@ -4,10 +4,11 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
+import six
 
 from zope import component
 from zope import interface
@@ -25,23 +26,29 @@ from nti.store.store import get_gift_code
 from nti.store.store import get_invitation_code
 from nti.store.store import get_transaction_code
 
+logger = __import__('logging').getLogger(__name__)
 
+
+@six.add_metaclass(SingletonDecorator)
 @component.adapter(IPurchaseAttempt)
 @interface.implementer(IExternalObjectDecorator)
 class PurchaseAttemptDecorator(object):
 
-    __metaclass__ = SingletonDecorator
+    def __init__(self, *args):
+        pass
 
     def decorateExternalObject(self, original, external):
         code = get_transaction_code(original)
         external['TransactionID'] = code
 
 
+@six.add_metaclass(SingletonDecorator)
 @component.adapter(IInvitationPurchaseAttempt)
 @interface.implementer(IExternalObjectDecorator)
 class InvitationPurchaseAttemptDecorator(object):
 
-    __metaclass__ = SingletonDecorator
+    def __init__(self, *args):
+        pass
 
     def decorateExternalObject(self, original, external):
         code = get_invitation_code(original)
@@ -51,11 +58,13 @@ class InvitationPurchaseAttemptDecorator(object):
         external['RemainingInvitations'] = original.tokens
 
 
+@six.add_metaclass(SingletonDecorator)
 @component.adapter(IGiftPurchaseAttempt)
 @interface.implementer(IExternalObjectDecorator)
 class GiftPurchaseAttemptDecorator(object):
 
-    __metaclass__ = SingletonDecorator
+    def __init__(self, *args):
+        pass
 
     def decorateExternalObject(self, original, external):
         code = get_gift_code(original)
@@ -65,11 +74,13 @@ class GiftPurchaseAttemptDecorator(object):
             external['RedemptionCode'] = external['GiftCode'] = code
 
 
+@six.add_metaclass(SingletonDecorator)
 @component.adapter(IPricedItem)
 @interface.implementer(IExternalObjectDecorator)
 class PricedItemDecorator(object):
 
-    __metaclass__ = SingletonDecorator
+    def __init__(self, *args):
+        pass
 
     def decorateExternalObject(self, original, external):
         non_dist_price = external.get('NonDiscountedPrice', None)

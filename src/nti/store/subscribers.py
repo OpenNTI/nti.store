@@ -6,10 +6,9 @@ Store event subscribers
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import time
 import isodate
@@ -66,6 +65,8 @@ from nti.store.store import get_purchase_by_code
 from nti.store.store import get_transaction_code
 from nti.store.store import delete_purchase_history
 
+logger = __import__('logging').getLogger(__name__)
+
 
 def _parse_datetime(t):
     result = isodate.parse_datetime(t) if t else None
@@ -81,7 +82,7 @@ def _update_state(purchase, state):
 
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptStarted)
-def _purchase_attempt_started(purchase, event):
+def _purchase_attempt_started(purchase, unused_event):
     now = datetime.now()
     purchasables = get_purchasables(purchase)
     for purchasable in purchasables:
@@ -94,7 +95,7 @@ def _purchase_attempt_started(purchase, event):
 
 
 @component.adapter(IGiftPurchaseAttempt, IPurchaseAttemptStarted)
-def _gift_purchase_attempt_started(purchase, event):
+def _gift_purchase_attempt_started(purchase, unused_event):
     now = datetime.now()
     purchasables = get_purchasables(purchase)
     for purchasable in purchasables:
@@ -104,13 +105,13 @@ def _gift_purchase_attempt_started(purchase, event):
             raise RedemptionException(msg)
 
 
-def _activate_items(purchase, user=None, add_roles=True):
+def _activate_items(purchase, user=None, unused_add_roles=True):
     user = user or purchase.creator
     activate_items(user, purchase.Items)
 
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptSuccessful)
-def _purchase_attempt_successful(purchase, event):
+def _purchase_attempt_successful(purchase, unused_event):
     purchase.EndTime = time.time()
     _update_state(purchase, PA_STATE_SUCCESS)
     # CS: We are assuming a non null quantity is for a bulk purchase
@@ -121,14 +122,14 @@ def _purchase_attempt_successful(purchase, event):
                 purchase.id, get_transaction_code(purchase))
 
 
-def _return_items(purchase, user=None, remove_roles=True):
+def _return_items(purchase, user=None, unused_remove_roles=True):
     if purchase is not None:
         user = user or purchase.creator
         deactivate_items(user, purchase.Items)
 
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptRefunded)
-def _purchase_attempt_refunded(purchase, event):
+def _purchase_attempt_refunded(purchase, unused_event):
     purchase.EndTime = time.time()
     _update_state(purchase, PA_STATE_REFUNDED)
     if not purchase.Quantity:
@@ -137,7 +138,7 @@ def _purchase_attempt_refunded(purchase, event):
 
 
 @component.adapter(IInvitationPurchaseAttempt, IPurchaseAttemptRefunded)
-def _invitation_purchase_attempt_refunded(purchase, event):
+def _invitation_purchase_attempt_refunded(purchase, unused_event):
     # set all tokens to zero
     purchase.reset()
     # return all items from linked purchases (redemptions) and refund them
@@ -149,7 +150,7 @@ def _invitation_purchase_attempt_refunded(purchase, event):
 
 
 @component.adapter(IRedeemedPurchaseAttempt, IPurchaseAttemptRefunded)
-def _redeemed_purchase_attempt_refunded(purchase, event):
+def _redeemed_purchase_attempt_refunded(purchase, unused_event):
     code = purchase.RedemptionCode
     source = get_purchase_by_code(code)
     if IInvitationPurchaseAttempt.providedBy(source):
@@ -163,7 +164,7 @@ def _redeemed_purchase_attempt_refunded(purchase, event):
 
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptDisputed)
-def _purchase_attempt_disputed(purchase, event):
+def _purchase_attempt_disputed(purchase, unused_event):
     _update_state(purchase, PA_STATE_DISPUTED)
     logger.info('%s has been disputed', purchase.id)
 
@@ -177,7 +178,7 @@ def _purchase_attempt_failed(purchase, event):
 
 
 @component.adapter(IPurchaseAttempt, IPurchaseAttemptSynced)
-def _purchase_attempt_synced(purchase, event):
+def _purchase_attempt_synced(purchase, unused_event):
     purchase = removeAllProxies(purchase)
     purchase.Synced = True
     purchase.updateLastMod()
@@ -186,7 +187,7 @@ def _purchase_attempt_synced(purchase, event):
 
 
 @component.adapter(IGiftPurchaseAttempt, IPurchaseAttemptSuccessful)
-def _gift_purchase_attempt_successful(purchase, event):
+def _gift_purchase_attempt_successful(purchase, unused_event):
     logger.info('Gift purchase by %s completed successfully. Gift code %s',
                 purchase.Creator, get_gift_code(purchase))
 
@@ -219,7 +220,7 @@ def _gift_purchase_attempt_redeemed(purchase, event):
 
 
 @component.adapter(IGiftPurchaseAttempt, IPurchaseAttemptRefunded)
-def _gift_purchase_attempt_refunded(purchase, event):
+def _gift_purchase_attempt_refunded(purchase, unused_event):
     target = purchase.TargetPurchaseID
     if target:
         attempt = get_purchase_attempt(target)
@@ -231,6 +232,6 @@ def _gift_purchase_attempt_refunded(purchase, event):
 
 
 @component.adapter(IUser, IObjectRemovedEvent)
-def _on_user_removed(user, event):
+def _on_user_removed(user, unused_event):
     logger.info("Removing purchase data for user %s", user)
     delete_purchase_history(user)

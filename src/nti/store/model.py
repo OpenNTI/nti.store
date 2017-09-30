@@ -4,11 +4,11 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
-
+import six
 from functools import total_ordering
 
 from zope import interface
@@ -37,6 +37,8 @@ from nti.store.interfaces import IRedemptionError
 
 from nti.store.utils import MetaStoreObject
 
+logger = __import__('logging').getLogger(__name__)
+
 
 @WithRepr
 @EqHash('NTIID',)
@@ -54,11 +56,12 @@ class ItemBundle(SchemaConfigured):
 ContentBundle = ItemBundle  # BWC
 
 
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
 @interface.implementer(IPricingError)
 class PricingError(SchemaConfigured, BaseException):
-    __metaclass__ = MetaStoreObject
+
     createDirectFieldProperties(IPricingError)
 
     def __str__(self):
@@ -70,11 +73,11 @@ def create_pricing_error(message, type_=None, code=None):
     return result
 
 
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
 @interface.implementer(IPurchaseError)
 class PurchaseError(SchemaConfigured, BaseException):
-    __metaclass__ = MetaStoreObject
     createDirectFieldProperties(IPurchaseError)
 
     def __str__(self):
@@ -86,11 +89,11 @@ def create_purchase_error(message, type_=None, code=None):
     return result
 
 
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
 @interface.implementer(IRedemptionError)
 class RedemptionError(SchemaConfigured):
-    __metaclass__ = MetaStoreObject
     createDirectFieldProperties(IRedemptionError)
 
     def __str__(self):
@@ -102,11 +105,11 @@ def create_redemption_error(message, type_=None, code=None):
     return result
 
 
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
 @interface.implementer(IRefundError)
 class RefundError(SchemaConfigured, BaseException):
-    __metaclass__ = MetaStoreObject
     createDirectFieldProperties(IRefundError)
 
     def __str__(self):

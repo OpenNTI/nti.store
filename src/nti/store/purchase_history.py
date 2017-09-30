@@ -6,10 +6,9 @@ Defines purchase history.
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import six
 
@@ -68,6 +67,8 @@ from nti.store.utils import PURCHASE_ATTEMPT_MIME_TYPE
 from nti.store.utils import NONGIFT_PURCHASE_ATTEMPT_MIME_TYPES as NONGIFT_MIME_TYPES
 
 from nti.store.utils import to_frozenset
+
+logger = __import__('logging').getLogger(__name__)
 
 
 # classes

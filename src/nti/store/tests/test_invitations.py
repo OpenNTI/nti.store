@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -11,11 +12,9 @@ from hamcrest import is_
 from hamcrest import not_none
 from hamcrest import assert_that
 
-from nose.tools import assert_raises
-
 import unittest
 
-from nti.dataserver.users import User
+from nti.dataserver.users.users import User
 
 from nti.store.interfaces import IPurchaseHistory
 from nti.store.interfaces import IStorePurchaseInvitationActor
@@ -68,7 +67,7 @@ class TestInvitations(unittest.TestCase):
         actor.accept(user2, invitation)
 
         user3 = self._create_user(username=u'nt3@nti.com')
-        with assert_raises(InvitationCapacityExceeded):
+        with self.assertRaises(InvitationCapacityExceeded):
             actor = IStorePurchaseInvitationActor(invitation)
             actor.accept(user3, invitation)
 
@@ -82,7 +81,7 @@ class TestInvitations(unittest.TestCase):
 
         invitation = create_store_purchase_invitation(purchase, u'nt3@nti.com')
         user3 = self._create_user(username=u'nt3@nti.com')
-        with assert_raises(InvitationExpired):
+        with self.assertRaises(InvitationExpired):
             actor = IStorePurchaseInvitationActor(invitation)
             actor.accept(user3, invitation)
 

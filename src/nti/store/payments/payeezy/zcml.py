@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import interface
 
@@ -17,11 +16,11 @@ from zope.configuration import fields
 
 from nti.base._compat import native_
 
-from nti.common.cypher import get_plaintext
-
 from nti.store.payments.payeezy.interfaces import IPayeezyConnectKey
 
 from nti.store.payments.payeezy.model import PayeezyConnectKey
+
+logger = __import__('logging').getLogger(__name__)
 
 
 class IRegisterPayeezyKeyDirective(interface.Interface):
@@ -36,13 +35,6 @@ class IRegisterPayeezyKeyDirective(interface.Interface):
     token = fields.TextLine(title=u"Reporting token", required=False)
 
 
-def decode_key(key):
-    try:
-        return get_plaintext(key)
-    except Exception:
-        return key
-
-
 def registerPayeezyKey(_context, provider, api_key, api_secret, token,
                        js_security_key=None):
     """
@@ -51,7 +43,7 @@ def registerPayeezyKey(_context, provider, api_key, api_secret, token,
     key = PayeezyConnectKey(APIKey=api_key,
                             Provider=provider,
                             Token=native_(token),
-                            APISecret=native_(decode_key(api_secret)),
-                            JSSecurityKey=decode_key(js_security_key))
+                            APISecret=native_(api_secret),
+                            JSSecurityKey=js_security_key)
     utility(_context, provides=IPayeezyConnectKey,
             component=key, name=provider)

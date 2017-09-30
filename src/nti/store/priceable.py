@@ -6,10 +6,11 @@ Defines priceable object.
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
+import six
 
 from zope import interface
 
@@ -29,14 +30,14 @@ from nti.store.purchasable import get_purchasable
 
 from nti.store.utils import MetaStoreObject
 
+logger = __import__('logging').getLogger(__name__)
 
+
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @EqHash('NTIID', 'Quantity')
 @interface.implementer(IPriceable, IContentTypeAware)
 class Priceable(SchemaConfigured):
-
-    __metaclass__ = MetaStoreObject
-
     NTIID = FP(IPriceable['NTIID'])
     Quantity = FP(IPriceable['Quantity'])
 
@@ -78,7 +79,7 @@ def create_priceable(ntiid, quantity=1, factory=Priceable):
     return result
 
 
-def copy_priceable(source, *args, **kwargs):
+def copy_priceable(source, *unused_args, **kwargs):
     quantity = kwargs.get('quantity')
     ntiid = kwargs.get('ntiid') or source.NTIID
     quantity = source.Quantity if quantity is None else quantity
@@ -86,5 +87,5 @@ def copy_priceable(source, *args, **kwargs):
     return result
 
 
-def _priceable_copier(context):
+def _priceable_copier(unused_context):
     return copy_priceable

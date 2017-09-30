@@ -4,10 +4,11 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
+import six
 
 from zope import interface
 
@@ -36,12 +37,14 @@ from nti.store.payments.stripe.interfaces import IStripeOperationError
 
 from nti.store.utils import MetaStoreObject
 
+logger = __import__('logging').getLogger(__name__)
 
+
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
 @interface.implementer(IStripeOperationError)
 class StripeOperationError(SchemaConfigured):
-    __metaclass__ = MetaStoreObject
     createDirectFieldProperties(IStripeOperationError)
 
     def __str__(self):
@@ -54,13 +57,12 @@ class StripePurchaseError(PurchaseError):
     HttpStatus = FP(IStripePurchaseError['HttpStatus'])
 
 
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @EqHash('Alias',)
 @interface.implementer(IStripeConnectKey, IContentTypeAware)
 class StripeConnectKey(SchemaConfigured):
     createDirectFieldProperties(IStripeConnectKey)
-
-    __metaclass__ = MetaStoreObject
 
     key = _a('PrivateKey')
     alias = name = Provider = _a('Alias')
@@ -68,10 +70,10 @@ class StripeConnectKey(SchemaConfigured):
     Processor = STRIPE
 
 
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @interface.implementer(IStripeToken, IContentTypeAware)
 class StripeToken(SchemaConfigured):
-    __metaclass__ = MetaStoreObject
     createDirectFieldProperties(IStripeToken)
     
     ID = _a('Value')

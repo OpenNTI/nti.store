@@ -4,11 +4,11 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
-
+import six
 from functools import total_ordering
 
 from zope import interface
@@ -28,13 +28,14 @@ from nti.store.interfaces import IPaymentCharge
 
 from nti.store.utils import MetaStoreObject
 
+logger = __import__('logging').getLogger(__name__)
 
+
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @EqHash('Zip', 'City', 'State', 'Street', 'Country')
 @interface.implementer(IUserAddress, IContentTypeAware)
 class UserAddress(SchemaConfigured):
-
-    __metaclass__ = MetaStoreObject
 
     Zip = FP(IUserAddress['Zip'])
     City = FP(IUserAddress['City'])
@@ -62,13 +63,12 @@ class UserAddress(SchemaConfigured):
         return result
 
 
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @total_ordering
 @EqHash('Name', 'Amount', 'Created', 'Currency')
 @interface.implementer(IPaymentCharge, IContentTypeAware)
 class PaymentCharge(SchemaConfigured):
-
-    __metaclass__ = MetaStoreObject
 
     Name = FP(IPaymentCharge['Name'])
     Amount = FP(IPaymentCharge['Amount'])

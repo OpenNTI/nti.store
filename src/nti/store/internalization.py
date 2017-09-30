@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import schema
 from zope import component
@@ -23,6 +22,8 @@ from nti.store.interfaces import IPurchasable
 from nti.store.utils import to_frozenset
 
 ITEMS = StandardExternalFields.ITEMS
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def get_readonly_fields(iface):
@@ -48,7 +49,7 @@ class _PurchasableUpdater(object):
     def __init__(self, obj):
         self.obj = obj
 
-    def updateFromExternalObject(self, parsed, *args, **kwargs):
+    def updateFromExternalObject(self, parsed, *unused_args, **unused_kwargs):
         remove_readonly_fields(parsed, IPurchasable)
         parsed[ITEMS] = to_frozenset(parsed.get(ITEMS))
         result = InterfaceObjectIO(

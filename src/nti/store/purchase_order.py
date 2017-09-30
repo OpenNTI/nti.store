@@ -6,11 +6,11 @@ Defines purchase order.
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
-
+import six
 from collections import Sequence
 
 from zope import interface
@@ -42,10 +42,13 @@ from nti.store.utils import to_list
 from nti.store.utils import copy_object
 from nti.store.utils import MetaStoreObject
 
+logger = __import__('logging').getLogger(__name__)
 
+
+@six.add_metaclass(MetaStoreObject)
 @interface.implementer(IPurchaseItem)
 class PurchaseItem(Priceable):
-    __metaclass__ = MetaStoreObject
+    pass
 
 
 def create_purchase_item(ntiid, quantity=1, cls=PurchaseItem):
@@ -54,13 +57,11 @@ def create_purchase_item(ntiid, quantity=1, cls=PurchaseItem):
     return result
 
 
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @EqHash('Items', 'Quantity')
 @interface.implementer(IPurchaseOrder, IAttributeAnnotatable)
 class PurchaseOrder(SchemaConfigured):
-
-    __metaclass__ = MetaStoreObject
-
     Items = FP(IPurchaseOrder['Items'])
     Quantity = FP(IPurchaseOrder['Quantity'])  # override items quantity
 

@@ -4,10 +4,11 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
+import six
 
 from zope import component
 from zope import interface
@@ -20,12 +21,16 @@ from nti.store.interfaces import IPurchasable
 
 from nti.store.payments.interfaces import IConnectKey
 
+logger = __import__('logging').getLogger(__name__)
 
+
+@six.add_metaclass(SingletonDecorator)
 @component.adapter(IPurchasable)
 @interface.implementer(IExternalObjectDecorator)
 class PurchasableDecorator(object):
 
-    __metaclass__ = SingletonDecorator
+    def __init__(self, *args):
+        pass
 
     def decorateExternalObject(self, original, external):
         added = {}

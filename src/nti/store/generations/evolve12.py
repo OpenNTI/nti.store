@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 generation = 12
 
@@ -26,6 +25,8 @@ from nti.site.hostpolicy import get_all_host_sites
 from nti.store.index import install_purchasable_catalog
 
 from nti.store.interfaces import IPurchasable
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @interface.implementer(IDataserver)

@@ -4,10 +4,11 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
+import six
 
 from zope import interface
 
@@ -39,30 +40,31 @@ from nti.store.model import RefundError
 
 from nti.store.utils import MetaStoreObject
 
+logger = __import__('logging').getLogger(__name__)
 
+
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @EqHash('Provider',)
 @interface.implementer(IPayeezyConnectKey, IContentTypeAware)
 class PayeezyConnectKey(SchemaConfigured):
-    __metaclass__ = MetaStoreObject
     createDirectFieldProperties(IPayeezyConnectKey)
 
     Processor = PAYEEZY
     Alias = name = alias('Provider')
 
 
-@WithRepr
+@six.add_metaclass(MetaStoreObject)
 @interface.implementer(IPayeezyFDToken, IContentTypeAware)
 class PayeezyFDToken(SchemaConfigured):
-    __metaclass__ = MetaStoreObject
     createDirectFieldProperties(IPayeezyFDToken)
 
 
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @EqHash('Type', 'Code', 'Message')
 @interface.implementer(IPayeezyOperationError)
 class PayeezyOperationError(SchemaConfigured):
-    __metaclass__ = MetaStoreObject
     createDirectFieldProperties(IPayeezyOperationError)
 
     def __str__(self):

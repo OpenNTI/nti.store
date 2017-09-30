@@ -4,11 +4,11 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
-
+import six
 import copy
 import time
 from functools import total_ordering
@@ -91,6 +91,8 @@ from nti.zodb import minmax
 
 from nti.zodb.persistentproperty import PersistentPropertyHolder
 
+logger = __import__('logging').getLogger(__name__)
+
 
 @interface.implementer(IPurchaseAttemptContext, IInternalObjectExternalizer)
 class DefaultPurchaseAttemptContext(PersistentMapping):
@@ -98,7 +100,7 @@ class DefaultPurchaseAttemptContext(PersistentMapping):
     The default representation of context info.
     """
 
-    def toExternalObject(self, *args, **kwargs):
+    def toExternalObject(self, *unused_args, **unused_kwargs):
         return dict(self)
 
 
@@ -111,6 +113,7 @@ def empty_purchase_attempt_context():
     return DefaultPurchaseAttemptContext()
 
 
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @total_ordering
 @EqHash("Order", "StartTime", "Processor")
@@ -122,13 +125,11 @@ class PurchaseAttempt(ModDateTrackingObject,
                       SchemaConfigured,
                       Contained,
                       PersistentPropertyHolder):
-
-    __metaclass__ = MetaStoreObject
-    __external_class_name__ = "PurchaseAttempt"
-
     createDirectFieldProperties(IPurchaseAttempt)
 
     Context = FP(IPurchaseAttempt['Context'])
+    
+    __external_class_name__ = "PurchaseAttempt"
 
     id = alias('__name__')
     state = alias('State')

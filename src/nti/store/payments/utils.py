@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import re
 import six
@@ -18,6 +17,7 @@ from z3c.schema.payments import isValidCreditCard
 from z3c.schema.payments import ISO7812CreditCard
 from z3c.schema.payments import NotValidISO7812CreditCard
 
+logger = __import__('logging').getLogger(__name__)
 
 _cc = ISO7812CreditCard()
 

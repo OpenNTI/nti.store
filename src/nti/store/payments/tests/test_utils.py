@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
 from hamcrest import is_
 from hamcrest import assert_that
-
-from nose.tools import assert_raises
 
 import unittest
 
@@ -43,16 +42,16 @@ class TestPaymentUtils(unittest.TestCase):
 
         validate_credit_card(348728112862781, "01", "12", "647")
 
-        with assert_raises(ValidationError):
+        with self.assertRaises(ValidationError):
             validate_credit_card(5105105105105101, "01", "12", "647")
 
-        with assert_raises(ValidationError):
+        with self.assertRaises(ValidationError):
             validate_credit_card("5105105105105100", "1", "12", "647")
 
-        with assert_raises(ValidationError):
+        with self.assertRaises(ValidationError):
             validate_credit_card("5105105105105100", "10", "3", "647")
 
-        with assert_raises(ValidationError):
+        with self.assertRaises(ValidationError):
             validate_credit_card("5105105105105100", "01", "13", "xx")
             
     def test_credit_card_type(self):
