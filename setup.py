@@ -8,6 +8,7 @@ entry_points = {
 
 TESTS_REQUIRE = [
     'nti.testing',
+    'zope.dottedname',
     'zope.testrunner',
 ]
 
@@ -24,7 +25,6 @@ setup(
     author_email='jason@nextthought.com',
     description="NTI Store",
     long_description=(_read('README.rst') + '\n\n' + _read("CHANGES.rst")),
-    url="https://github.com/NextThought/nti.store",
     license='Apache',
     keywords='store purchase',
     classifiers=[
@@ -35,6 +35,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: Implementation :: CPython',
     ],
+    url="https://github.com/NextThought/nti.store",
     zip_safe=True,
     packages=find_packages('src'),
     package_dir={'': 'src'},
@@ -84,6 +85,11 @@ setup(
     ],
     extras_require={
         'test': TESTS_REQUIRE,
+        'docs': [
+            'Sphinx',
+            'repoze.sphinx.autointerface',
+            'sphinx_rtd_theme',
+        ],
     },
     entry_points=entry_points,
 )
