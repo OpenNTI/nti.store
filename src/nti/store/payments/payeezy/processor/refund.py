@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import time
 
@@ -35,6 +34,8 @@ from nti.store.payments.payeezy.processor import adapt_to_purchase_error
 
 from nti.store.store import get_purchase_attempt
 from nti.store.store import get_purchase_by_code
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def refund_payment(payeezy, token, amount, currency,

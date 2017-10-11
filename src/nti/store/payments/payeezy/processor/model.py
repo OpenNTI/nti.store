@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import interface
 
@@ -20,6 +19,8 @@ from nti.store.payments.payeezy.processor.purchase import PurchaseProcessor
 from nti.store.payments.payeezy.processor.refund import RefundProcessor
 
 from nti.store.payments.payeezy.processor.token import TokenProcessor
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @interface.implementer(IPayeezyPaymentProcessor)

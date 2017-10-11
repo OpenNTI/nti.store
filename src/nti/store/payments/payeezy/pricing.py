@@ -12,8 +12,6 @@ from nti.store.payments.payeezy import PAYEEZY
 
 from nti.store.pricing import DefaultPurchasablePricer
 
-logger = __import__('logging').getLogger(__name__)
-
 
 class PayeezyPurchasablePricer(DefaultPurchasablePricer):
     processor = PAYEEZY
