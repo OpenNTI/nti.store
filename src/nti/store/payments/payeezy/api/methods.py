@@ -4,16 +4,17 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import six
 
 from zope.cachedescriptors.property import Lazy
 
 from nti.store.payments.payeezy.api import requests
+
+logger = __import__('logging').getLogger(__name__)
 
 
 class Payeezy(object):
@@ -271,8 +272,9 @@ class Payeezy(object):
                                         description=description)
 
     def _make_token_payload(self, transaction_type, token, amount, currency_code, card_type,
-                            cardholder_name, card_expiry=None, card_cvv=None,  description=None):
+                            cardholder_name, card_expiry=None, card_cvv=None, description=None):
 
+        __traceback_info__ = card_cvv
         assert transaction_type is not None, "Transaction type cannot be None"
 
         assert token is not None, "Token cannot be None"

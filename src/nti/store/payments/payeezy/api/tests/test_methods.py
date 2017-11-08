@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -158,8 +159,7 @@ class TestMethods(unittest.TestCase):
                                 'method', 'token',
                                 'token',
                                 has_entries(
-                                    'token_data',
-                                    has_entry('value', is_not(none())),
+                                    'token_data', has_entry('value', is_not(none())),
                                     'token_type', 'FDToken'),
                                 'transaction_id', is_not(none()),
                                 'transaction_status', 'approved',

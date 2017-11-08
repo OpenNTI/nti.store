@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os
 import hmac
@@ -19,6 +18,8 @@ from base64 import b64encode
 import simplejson as json
 
 import requests
+
+logger = __import__('logging').getLogger(__name__)
 
 os.urandom(1)
 
@@ -50,9 +51,14 @@ class PayeezyHTTPRequests(object):
         hmacInHex = hmacInHex.hexdigest().encode('ascii')
         return b64encode(hmacInHex)
 
+    def session(self):
+        result = requests.Session()
+        result.verify = True
+        return result
+
     # Generic method to make calls for primary transactions
     def make_card_based_transaction_post_call(self, payload):
-        response = requests.Session()
+        response = self.session()
         self.payload = json.dumps(payload)
         authorization = self.generate_hmac_authentication_header(self.payload)
         result = response.post(self.url,
@@ -69,7 +75,7 @@ class PayeezyHTTPRequests(object):
 
     # Generic method to make calls for secondary transactions
     def make_capture_void_refund_post_call(self, payload, transaction_id):
-        response = requests.Session()
+        response = self.session()
         self.url = self.url + '/' + transaction_id
         self.payload = json.dumps(payload)
         authorization = self.generate_hmac_authentication_header(self.payload)
@@ -86,13 +92,13 @@ class PayeezyHTTPRequests(object):
         return result
 
     def make_token_get_call(self, payload):
-        response = requests.Session()
+        response = self.session()
         self.payload = payload
         result = response.get(self.token_url, params=self.payload)
         return result
 
     def make_token_post_call(self, payload):
-        response = requests.Session()
+        response = self.session()
         self.payload = json.dumps(payload)
         authorization = self.generate_hmac_authentication_header(self.payload)
         result = response.post(self.url,  # transaction
@@ -107,7 +113,7 @@ class PayeezyHTTPRequests(object):
         return result
 
     def make_reporting_get_call(self, payload):
-        response = requests.Session()
+        response = self.session()
         self.payload = json.dumps(payload)
         authorization = self.generate_hmac_authentication_header(self.payload)
         result = response.get(self.url,
