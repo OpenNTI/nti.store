@@ -53,7 +53,7 @@ class PayeezyHTTPRequests(object):
 
     def session(self):
         result = requests.Session()
-        result.verify = True
+        result.verify = False  # for now
         return result
 
     # Generic method to make calls for primary transactions
