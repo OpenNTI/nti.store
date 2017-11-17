@@ -176,7 +176,7 @@
 	</configure>
 
 	<!-- Test purchasables -->
-	<configure zcml:condition="have devmode">
+	<configure zcml:condition="have testmode">
 		<include file="_sample.zcml" />
 	</configure>
 
