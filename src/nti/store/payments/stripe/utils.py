@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import six
 import time
@@ -29,6 +28,8 @@ from nti.store.payments.stripe.interfaces import IStripePurchaseError
 from nti.store.payments.stripe.interfaces import IStripeOperationError
 
 from nti.store.payments.stripe.model import StripePurchaseError
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def makenone(s, default=None):
@@ -125,7 +126,7 @@ def adapt_to_purchase_error(e):
     if result is None and isinstance(e, Exception):
         result = StripePurchaseError(Type=u"PurchaseError")
         args = getattr(e, 'args', ())
-        message = u' '.join(map(str, args))
+        message = u' '.join(text_(x) for x in args)
         result.Message = message
     return result
 
