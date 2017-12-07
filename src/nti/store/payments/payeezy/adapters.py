@@ -10,6 +10,8 @@ from __future__ import absolute_import
 
 import BTrees
 
+from persistent import Persistent
+
 from zope import component
 from zope import interface
 
@@ -17,7 +19,7 @@ from zope.annotation import factory as an_factory
 
 from zope.container.contained import Contained
 
-from persistent import Persistent
+from nti.base._compat import text_
 
 from nti.dataserver.interfaces import IUser
 
@@ -87,7 +89,7 @@ def _string_purchase_error(message):
 def payeezy_exception_adapter(error):
     result = PayeezyPurchaseError(Type=u"PurchaseError")
     args = getattr(error, 'args', ())
-    message = u' '.join(map(str, args))
+    message = u' '.join(text_(x) for x in args)
     result.Status = getattr(error, 'status', None)
     result.Message = message or _(u'Unspecified Payeezy Purchase Exception')
     return result
