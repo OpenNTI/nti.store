@@ -15,7 +15,7 @@ from zope import interface
 
 from nti.dataserver.interfaces import IUser
 
-from nti.dataserver.users import User
+from nti.dataserver.users.users import User
 
 from nti.store.interfaces import IRefundException
 from nti.store.interfaces import IPricingException
