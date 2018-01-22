@@ -26,7 +26,7 @@ class TestZopeTestrunner(unittest.TestCase):
 	def test_zope_testrunner_gets_bitchy_if_there_are_no_tests(self):
 		pass
 
-@unittest.SkipTest
+@unittest.skip
 class TestStripeIO(unittest.TestCase):
 
 	@classmethod
