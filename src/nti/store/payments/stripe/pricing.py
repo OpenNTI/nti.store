@@ -41,7 +41,7 @@ def get_coupon(coupon=None, api_key=None, processor=STRIPE):
         if isinstance(coupon, six.string_types):
             try:
                 coupon = manager.get_coupon(coupon, api_key=api_key)
-            except stripe.InvalidRequestError as e:
+            except stripe.error.InvalidRequestError as e:
                 logger.error("Cannot retrieve coupon %s. %s", coupon, e)
                 raise NoSuchStripeCoupon()
         if coupon is not None:
