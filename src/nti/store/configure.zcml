@@ -39,7 +39,7 @@
 		 	 
 	<adapter factory=".adapters._string_purchase_error"
 			 provides=".interfaces.IPurchaseError"
-			 for="basestring" />
+			 for="nti.base.interfaces.IBasestring" />
 		
 	<adapter factory=".adapters._purchase_exception_adpater"
 			 provides=".interfaces.IPurchaseError"
