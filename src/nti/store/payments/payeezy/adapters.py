@@ -57,6 +57,7 @@ class _PayeezyCustomer(Persistent, Contained):
     family = BTrees.family64
 
     def __init__(self):
+        # pylint: disable=no-member
         self.Transactions = self.family.OO.OOTreeSet()
 
     def __contains__(self, txid):
