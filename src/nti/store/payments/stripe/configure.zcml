@@ -26,7 +26,7 @@
 
 	<adapter factory=".adapters._string_purchase_error"
 			 provides=".interfaces.IStripePurchaseError"
-			 for="basestring" />
+			 for="nti.base.interfaces.IBasestring" />
 			 
 	<adapter factory=".adapters.stripe_exception_adpater"
 			 provides=".interfaces.IStripePurchaseError"
