@@ -9,6 +9,8 @@ Stripe Payment interfaces
 from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
+# pylint: disable=inherit-non-class,expression-not-assigned
+
 from zope import interface
 
 from nti.dataserver.interfaces import IUser
