@@ -21,6 +21,8 @@ from zope.container.contained import Contained
 
 from nti.base._compat import text_
 
+from nti.base.interfaces import IBasestring
+
 from nti.dataserver.interfaces import IUser
 
 from nti.externalization.representation import WithRepr
@@ -104,7 +106,7 @@ def payeezy_operation_adapter(error, Type, clazz=PayeezyOperationError):
     return result
 
 
-@component.adapter(basestring)
+@component.adapter(IBasestring)
 @interface.implementer(IPayeezyOperationError)
 def _string_operation_error(message):
     result = PayeezyOperationError(Type=u"OperationError")
