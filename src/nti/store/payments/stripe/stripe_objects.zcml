@@ -10,33 +10,33 @@
 		<implements interface=".interfaces.IStripeCoupon" />
 	</class>
 	
-	<class class="stripe.StripeError">
+	<class class="stripe.error.StripeError">
 		<implements interface=".interfaces.IStripeError" />
 	</class>
 
-	<class class="stripe.APIError">
+	<class class="stripe.error.APIError">
 		<implements interface=".interfaces.IStripeAPIError" />
 	</class>
 	
-	<class class="stripe.APIConnectionError">
+	<class class="stripe.error.APIConnectionError">
 		<implements interface=".interfaces.IStripeAPIConnectionError" />
 	</class>
 	
-	<class class="stripe.CardError">
+	<class class="stripe.error.CardError">
 		<implements interface=".interfaces.IStripeCardError" />
 	</class>
 	
-	<class class="stripe.InvalidRequestError">
+	<class class="stripe.error.InvalidRequestError">
 		<implements interface=".interfaces.IStripeInvalidRequestError" />
 	</class>
 	
-	<class class="stripe.AuthenticationError">
+	<class class="stripe.error.AuthenticationError">
 		<implements interface=".interfaces.IStripeAuthenticationError" />
 	</class>
 	
 	<adapter factory=".adapters._string_operation_error"
 			 provides=".interfaces.IStripeOperationError"
-			 for="basestring" />
+			 for="nti.base.interfaces.IBasestring" />
 
 	<adapter factory=".adapters.stripe_error_adpater"
 			 provides=".interfaces.IStripeOperationError"

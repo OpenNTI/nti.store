@@ -24,6 +24,8 @@ from persistent import Persistent
 
 from nti.base._compat import text_
 
+from nti.base.interfaces import IBasestring
+
 from nti.dataserver.interfaces import IUser
 
 from nti.property.property import alias
@@ -105,7 +107,7 @@ zope.deferredimport.deprecated(
     _StripePurchase='nti.store.payments.stripe.adapters._StripePurchaseAttempt')
 
 
-@component.adapter(basestring)
+@component.adapter(IBasestring)
 @interface.implementer(IStripePurchaseError)
 def _string_purchase_error(message):
     result = StripePurchaseError(Type=u"PurchaseError")
@@ -148,7 +150,7 @@ def stripe_operation_adpater(error, Type, clazz=StripeOperationError):
     return result
 
 
-@component.adapter(basestring)
+@component.adapter(IBasestring)
 @interface.implementer(IStripeOperationError)
 def _string_operation_error(message):
     result = StripeOperationError(Type=u"OperationError")

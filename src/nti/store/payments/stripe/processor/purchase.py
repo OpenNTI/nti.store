@@ -14,7 +14,7 @@ import sys
 import math
 from functools import partial
 
-from stripe import InvalidRequestError
+from stripe.error import InvalidRequestError
 
 from zope import component
 

@@ -21,11 +21,11 @@
 
 	<adapter factory=".adapters._string_purchase_error"
 			 provides=".interfaces.IPayeezyPurchaseError"
-			 for="basestring" />
+			 for="nti.base.interfaces.IBasestring" />
 
 	<adapter factory=".adapters._string_operation_error"
 			 provides=".interfaces.IPayeezyOperationError"
-			 for="basestring" />
+			 for="nti.base.interfaces.IBasestring" />
 		 
 	<adapter factory=".adapters.payeezy_exception_adapter"
 			 provides=".interfaces.IPayeezyPurchaseError"
