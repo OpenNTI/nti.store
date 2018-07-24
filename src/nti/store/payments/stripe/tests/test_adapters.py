@@ -92,7 +92,7 @@ class TestStripeAdapters(unittest.TestCase):
         assert_that(adapted.Message, is_('my exception'))
 
     def test_stripe_error_adapters(self):
-        e = stripe.CardError(u'my error', u'my param', u'my code')
+        e = stripe.error.CardError(u'my error', u'my param', u'my code')
         adapted = IStripeOperationError(e, None)
         assert_that(adapted, is_not(none()))
         assert_that(adapted.Type, is_('CardError'))
@@ -108,7 +108,7 @@ class TestStripeAdapters(unittest.TestCase):
         assert_that(adapted.Type, is_('OperationError'))
         assert_that(adapted.Message, is_('my error message'))
 
-        e = stripe.InvalidRequestError(u"++invalidtoken++", u'token id')
+        e = stripe.error.InvalidRequestError(u"++invalidtoken++", u'token id')
         adapted = IStripeOperationError(e, None)
         assert_that(adapted, validly_provides(IStripeOperationError))
         assert_that(adapted, verifiably_provides(IStripeOperationError))
