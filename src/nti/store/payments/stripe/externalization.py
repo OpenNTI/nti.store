@@ -16,7 +16,6 @@ from zope import interface
 
 from nti.externalization.datastructures import InterfaceObjectIO
 
-from nti.externalization.interfaces import IInternalObjectIO
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IInternalObjectExternalizer
@@ -65,7 +64,6 @@ class StripeCouponExternalizer(object):
         return result
 
 
-@interface.implementer(IInternalObjectIO)
 @component.adapter(IStripePurchaseError)
 class StripePurchaseErrorExternal(InterfaceObjectIO):
     _ext_iface_upper_bound = IStripePurchaseError
