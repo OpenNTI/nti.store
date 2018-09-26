@@ -4,16 +4,19 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
+# pylint: disable=inherit-non-class,expression-not-assigned
 
 from zope import interface
 
 from zope.component.zcml import utility
 
-from zope.configuration import fields
+from zope.configuration.fields import Bool
+
+from zope.schema import TextLine
 
 from nti.common.cypher import get_plaintext
 
@@ -21,26 +24,32 @@ from nti.store.payments.stripe.interfaces import IStripeConnectKey
 
 from nti.store.payments.stripe.model import StripeConnectKey
 
+logger = __import__('logging').getLogger(__name__)
+
 
 class IRegisterStripeKeyDirective(interface.Interface):
     """
     The arguments needed for registering a key
     """
-    alias = fields.TextLine(title=u"The human readable/writable key alias",
-                            required=True)
-    private_key = fields.TextLine(title=u"The private key value. Should not contain spaces",
-                                  required=True)
-    live_mode = fields.Bool(title=u"Live mode flag", required=False)
-    stripe_user_id = fields.TextLine(title=u"Stripe user id", required=False)
-    refresh_token = fields.TextLine(title=u"Refresh token", required=False)
-    public_key = fields.TextLine(title=u"The public key, Should not contain spaces",
-                                 required=False)
+    alias = TextLine(title=u"The human readable/writable key alias",
+                     required=True)
+    private_key = TextLine(title=u"The private key value. Should not contain spaces",
+                           required=True)
+
+    live_mode = Bool(title=u"Live mode flag", required=False)
+
+    stripe_user_id = TextLine(title=u"Stripe user id", required=False)
+
+    refresh_token = TextLine(title=u"Refresh token", required=False)
+
+    public_key = TextLine(title=u"The public key, Should not contain spaces",
+                          required=False)
 
 
 def decode_key(key):
     try:
         return get_plaintext(key)
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         return key
 
 
