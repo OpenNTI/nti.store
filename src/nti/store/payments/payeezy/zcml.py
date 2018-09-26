@@ -8,11 +8,13 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+# pylint: disable=inherit-non-class,expression-not-assigned
+
 from zope import interface
 
 from zope.component.zcml import utility
 
-from zope.configuration import fields
+from zope.schema import TextLine
 
 from nti.base._compat import native_
 
@@ -27,12 +29,16 @@ class IRegisterPayeezyKeyDirective(interface.Interface):
     """
     The arguments needed for registering a key
     """
-    provider = fields.TextLine(title=u"The key provider/alias.", required=True)
-    api_key = fields.TextLine(title=u"The API key value.", required=True)
-    api_secret = fields.TextLine(title=u"The API secret value.", required=True)
-    js_security_key = fields.TextLine(title=u"The JS security key.", 
-                                      required=True)
-    token = fields.TextLine(title=u"Reporting token", required=False)
+    provider = TextLine(title=u"The key provider/alias.", required=True)
+
+    api_key = TextLine(title=u"The API key value.", required=True)
+
+    api_secret = TextLine(title=u"The API secret value.", required=True)
+
+    js_security_key = TextLine(title=u"The JS security key.",
+                               required=True)
+
+    token = TextLine(title=u"Reporting token", required=False)
 
 
 def registerPayeezyKey(_context, provider, api_key, api_secret, token,

@@ -16,7 +16,7 @@
 			 provides=".interfaces.IPayeezyCustomer" />
 
 	<adapter factory=".adapters._PayeezyPurchaseAttemptFactory"
-			 for="...interfaces.IPurchaseAttempt"
+			 for="nti.store.interfaces.IPurchaseAttempt"
 			 provides=".interfaces.IPayeezyPurchaseAttempt" />
 
 	<adapter factory=".adapters._string_purchase_error"
@@ -39,7 +39,7 @@
 	
 	<!-- Decorators -->
 	<subscriber factory=".decorators.PurchaseAttemptDecorator"
-				for="...interfaces.IPurchaseAttempt"
+				for="nti.store.interfaces.IPurchaseAttempt"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator" />
 				
 	<!-- Externalization -->
