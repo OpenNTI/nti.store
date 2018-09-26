@@ -8,6 +8,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+# pylint: disable=inherit-non-class
+
 from functools import partial
 
 from zope import schema
@@ -15,7 +17,11 @@ from zope import interface
 
 from zope.component.zcml import utility
 
-from zope.configuration import fields
+from zope.configuration.fields import Bool
+from zope.configuration.fields import Tokens
+
+from zope.schema import Float
+from zope.schema import TextLine
 
 from nti.store.interfaces import IPurchasable
 
@@ -31,55 +37,55 @@ class IRegisterPurchasableDirective(interface.Interface):
     The arguments needed for registering a purchasable item
     """
 
-    ntiid = fields.TextLine(title=u"Purchasable item NTIID", required=True)
+    ntiid = TextLine(title=u"Purchasable item NTIID", required=True)
 
-    title = fields.TextLine(title=u"Purchasable item title", required=False)
+    title = TextLine(title=u"Purchasable item title", required=False)
 
-    author = fields.TextLine(title=u"Purchasable item author", required=False)
+    author = TextLine(title=u"Purchasable item author", required=False)
 
-    description = fields.TextLine(title=u"Purchasable item description",
-                                  required=False,
-                                  description=u"If you do not provide, this can come "
-                                  u"from the body text of the element. It will be "
-                                  u"interpreted as HTML.")
+    description = TextLine(title=u"Purchasable item description",
+                           required=False,
+                           description=u"If you do not provide, this can come "
+                           u"from the body text of the element. It will be "
+                           u"interpreted as HTML.")
 
     amount = schema.Float(title=u"Cost amount", required=True)
 
-    currency = fields.TextLine(title=u"Currency amount",
-                               required=False,
-                               default=u'USD')
+    currency = TextLine(title=u"Currency amount",
+                        required=False,
+                        default=u'USD')
 
-    discountable = fields.Bool(title=u"Discountable flag",
-                               required=False,
-                               default=False)
+    discountable = Bool(title=u"Discountable flag",
+                        required=False,
+                        default=False)
 
-    bulk_purchase = fields.Bool(title=u"Bulk purchase flag",
-                                required=False,
-                                default=True)
-
-    icon = fields.TextLine(title=u'Icon URL', required=False)
-
-    thumbnail = fields.TextLine(title=u'Thumbnail URL', required=False)
-
-    fee = schema.Float(title=u"Percentage fee", required=False)
-
-    provider = fields.TextLine(title=u'Purchasable item provider',
-                               required=True)
-
-    license = fields.TextLine(title=u'Purchasable License',
-                              required=False)
-
-    public = fields.Bool(title=u"Public flag",
+    bulk_purchase = Bool(title=u"Bulk purchase flag",
                          required=False,
                          default=True)
 
-    giftable = fields.Bool(title=u"Giftable flag",
-                           required=False,
-                           default=False)
+    icon = TextLine(title=u'Icon URL', required=False)
 
-    redeemable = fields.Bool(title=u"Redeemable flag",
-                             required=False,
-                             default=False)
+    thumbnail = TextLine(title=u'Thumbnail URL', required=False)
+
+    fee = Float(title=u"Percentage fee", required=False)
+
+    provider = TextLine(title=u'Purchasable item provider',
+                        required=True)
+
+    license = TextLine(title=u'Purchasable License',
+                       required=False)
+
+    public = Bool(title=u"Public flag",
+                  required=False,
+                  default=True)
+
+    giftable = Bool(title=u"Giftable flag",
+                    required=False,
+                    default=False)
+
+    redeemable = Bool(title=u"Redeemable flag",
+                      required=False,
+                      default=False)
 
     purchase_cutoff_date = DateTime(title=u"Purchase cutoff date",
                                     required=False,
@@ -89,9 +95,9 @@ class IRegisterPurchasableDirective(interface.Interface):
                                   required=False,
                                   default=None)
 
-    items = fields.Tokens(schema.TextLine(title=u'The item identifier'),
-                          title=u"Items to purchase",
-                          required=False)
+    items = Tokens(TextLine(title=u'The item identifier'),
+                   title=u"Items to purchase",
+                   required=False)
 
 
 def registerPurchasable(_context, ntiid, provider, title, description=None, amount=None,

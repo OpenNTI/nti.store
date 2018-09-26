@@ -8,8 +8,9 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-import six
 from functools import total_ordering
+
+import six
 
 from zope import interface
 
@@ -23,10 +24,10 @@ from nti.property.property import alias
 
 from nti.schema.eqhash import EqHash
 
-from nti.schema.field import SchemaConfigured
-
 from nti.schema.fieldproperty import AdaptingFieldProperty
 from nti.schema.fieldproperty import createDirectFieldProperties
+
+from nti.schema.schema import SchemaConfigured
 
 from nti.store.interfaces import IPrice
 from nti.store.interfaces import IItemBundle
@@ -52,6 +53,7 @@ class ItemBundle(SchemaConfigured):
     id = ntiid = alias('NTIID')
 
     def __str__(self):
+        # pylint: disable=no-member
         return self.NTIID
 ContentBundle = ItemBundle  # BWC
 
@@ -65,6 +67,7 @@ class PricingError(SchemaConfigured, BaseException):
     createDirectFieldProperties(IPricingError)
 
     def __str__(self):
+        # pylint: disable=no-member
         return self.Message
 
 
@@ -81,6 +84,7 @@ class PurchaseError(SchemaConfigured, BaseException):
     createDirectFieldProperties(IPurchaseError)
 
     def __str__(self):
+        # pylint: disable=no-member
         return self.Message
 
 
@@ -97,6 +101,7 @@ class RedemptionError(SchemaConfigured):
     createDirectFieldProperties(IRedemptionError)
 
     def __str__(self):
+        # pylint: disable=no-member
         return self.Message
 
 
@@ -113,6 +118,7 @@ class RefundError(SchemaConfigured, BaseException):
     createDirectFieldProperties(IRefundError)
 
     def __str__(self):
+        # pylint: disable=no-member
         return self.Message
 
 
