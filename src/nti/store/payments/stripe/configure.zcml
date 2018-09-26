@@ -21,7 +21,7 @@
 			 provides=".interfaces.IStripeCustomer" />
 
 	<adapter factory=".adapters._StripePurchaseAttemptFactory"
-			 for="...interfaces.IPurchaseAttempt"
+			 for="nti.store.interfaces.IPurchaseAttempt"
 			 provides=".interfaces.IStripePurchaseAttempt" />
 
 	<adapter factory=".adapters._string_purchase_error"
@@ -42,15 +42,15 @@
 
 	<!-- Copy -->
 	<adapter factory=".stripe_purchase._stripe_priceable_copier"
-			 provides="...interfaces.ICopier"
+			 provides="nti.store.interfaces.ICopier"
 			 for=".interfaces.IStripePriceable" />
 
 	<adapter factory=".stripe_purchase._stripe_priced_item_copier"
-			 provides="...interfaces.ICopier"
+			 provides="nti.store.interfaces.ICopier"
 			 for=".interfaces.IStripePricedItem" />
 
 	<adapter factory=".stripe_purchase._stripe_purchase_order_copier"
-			 provides="...interfaces.ICopier"
+			 provides="nti.store.interfaces.ICopier"
 			 for=".interfaces.IStripePurchaseOrder" />
 
 	<!-- Pricing -->
@@ -68,7 +68,7 @@
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
 			
 	<subscriber factory=".decorators.PurchaseAttemptDecorator"
-				for="...interfaces.IPurchaseAttempt"
+				for="nti.store.interfaces.IPurchaseAttempt"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator" />
 	
 	<!-- Externalization -->

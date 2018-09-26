@@ -11,7 +11,7 @@
 
 	<!-- Decorators -->
 	<subscriber factory=".decorators.PurchasableDecorator"
-				for="..interfaces.IPurchasable"
+				for="nti.store.interfaces.IPurchasable"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator" />
 
 </configure>
