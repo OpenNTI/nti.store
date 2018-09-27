@@ -22,9 +22,9 @@ from nti.property.property import alias as _a
 
 from nti.schema.eqhash import EqHash
 
-from nti.schema.field import SchemaConfigured
-
 from nti.schema.fieldproperty import createDirectFieldProperties
+
+from nti.schema.schema import SchemaConfigured
 
 from nti.store.model import PurchaseError
 
@@ -48,6 +48,7 @@ class StripeOperationError(SchemaConfigured):
     createDirectFieldProperties(IStripeOperationError)
 
     def __str__(self):
+        # pylint: disable=no-member
         return self.Message
 
 

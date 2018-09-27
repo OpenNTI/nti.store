@@ -11,8 +11,9 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import time
-import isodate
 from datetime import datetime
+
+import isodate
 
 from zope import component
 

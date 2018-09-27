@@ -63,11 +63,7 @@ class RedemptionException(NTIStoreException):
 
 
 def get_user(user):
-    if user and not IUser.providedBy(user):
-        result = User.get_user(str(user))
-    else:
-        result = user
-    return result
+    return User.get_user(user)
 
 
 # wait till module has been loaded to patch

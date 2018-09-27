@@ -10,7 +10,13 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+import BTrees
+
+from persistent import Persistent
+
 import six
+
+from ZODB.interfaces import IConnection
 
 from zope import component
 from zope import interface
@@ -27,12 +33,6 @@ from zope.intid.interfaces import IIntIds
 from zope.location import locate
 
 from zope.location.interfaces import ISublocations
-
-from ZODB.interfaces import IConnection
-
-import BTrees
-
-from persistent import Persistent
 
 from nti.base._compat import text_
 
@@ -57,7 +57,7 @@ from nti.store.purchasable import get_purchasable
 from nti.store.purchasable import get_purchasables
 
 from nti.store.index import IX_SITE
-from nti.store.index import IX_ITEMS 
+from nti.store.index import IX_ITEMS
 from nti.store.index import IX_STATE
 from nti.store.index import IX_CREATOR
 from nti.store.index import IX_MIMETYPE
@@ -89,6 +89,7 @@ class PurchaseHistory(Contained, Persistent):
         self.reset()
 
     def reset(self):
+        # pylint: disable=no-member
         self._purchases = self.family.OO.OOBTree()
         self._items_activated = self.family.OO.OOTreeSet()
 
@@ -126,6 +127,7 @@ class PurchaseHistory(Contained, Persistent):
         # locate before firing events
         locate(purchase, self)
         # add to connection and fire event
+        # pylint: disable=too-many-function-args
         IConnection(self).add(purchase)
         lifecycleevent.created(purchase)
         lifecycleevent.added(purchase)  # get an iid
@@ -162,7 +164,7 @@ class PurchaseHistory(Contained, Persistent):
     def get_pending_purchases(self, items=None):
         items = to_frozenset(items) if items else None
         for p in self.values():
-            if         (p.is_pending() or p.is_unknown()) \
+            if      (p.is_pending() or p.is_unknown()) \
                 and (not items or to_frozenset(p.Items).intersection(items)):
                 yield p
 
@@ -197,9 +199,9 @@ class PurchaseHistory(Contained, Persistent):
             yield purchase
 
     def _v_check(self):
-        import BTrees.check
+        import BTrees.check  # pylint: disable=redefined-outer-name
         for item in (self._items_activated, self._purchases):
-            item._check()
+            item._check()  # pylint: disable=protected-access
             BTrees.check.check(item)
 
 
@@ -262,6 +264,7 @@ def remove_purchase_attempt(purchase, user=None):
     if user is not None:
         hist = IPurchaseHistory(user)
         hist.deactivate_items(purchase.Items)
+        # pylint: disable=too-many-function-args
         result = hist.remove_purchase(purchase)
         return result
     return False
@@ -270,6 +273,7 @@ def remove_purchase_attempt(purchase, user=None):
 def get_pending_purchases(user, items=None):
     user = get_user(user)
     if user is not None:
+        # pylint: disable=too-many-function-args
         hist = IPurchaseHistory(user)
         result = LocatedExternalList(hist.get_pending_purchases(items))
         return result
@@ -334,6 +338,7 @@ def register_purchase_attempt(purchase, user):
     user = get_user(user)
     if user is not None:
         hist = IPurchaseHistory(user)
+        # pylint: disable=too-many-function-args
         hist.add_purchase(purchase)
         return purchase.id
     return None

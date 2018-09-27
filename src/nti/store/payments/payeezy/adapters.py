@@ -29,9 +29,9 @@ from nti.externalization.representation import WithRepr
 
 from nti.property.property import alias
 
-from nti.schema.field import SchemaConfigured
-
 from nti.schema.fieldproperty import createDirectFieldProperties
+
+from nti.schema.schema import SchemaConfigured
 
 from nti.store import MessageFactory as _
 

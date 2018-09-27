@@ -101,7 +101,6 @@ _StorePurchaseInvitation = StorePurchaseInvitation  # BWC
 def get_invitation_code(purchase):
     if purchase is not None:
         iid = component.getUtility(IIntIds).getId(removeAllProxies(purchase))
-        __traceback_info__ = purchase, iid
         result = to_external_string(iid)
         return result
     return None
@@ -109,6 +108,7 @@ def get_invitation_code(purchase):
 
 def get_purchase_by_code(code):
     if code is not None:
+        # pylint: disable=unused-variable
         __traceback_info__ = code
         iid = from_external_string(code)
         result = component.getUtility(IIntIds).queryObject(iid)
@@ -117,6 +117,7 @@ def get_purchase_by_code(code):
 
 
 def create_store_purchase_invitation(purchase, receiver):
+    # pylint: disable=attribute-defined-outside-init
     result = StorePurchaseInvitation(purchase=purchase)
     result.receiver = getattr(receiver, 'username', receiver)
     result.expirationTime = getattr(purchase, 'ExpirationTime', None) or 0
@@ -140,7 +141,7 @@ class StorePurchaseInvitationActor(object):
             raise InvitationExpired(invitation)
         original = invitation.purchase
 
-        # XXX This is the redemption code to be used to link back to the
+        # This is the redemption code to be used to link back to the
         # invitaion purchase. See refund subscribers
         redemption_code = get_invitation_code(purchase)
 
