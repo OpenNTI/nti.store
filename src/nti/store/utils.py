@@ -8,6 +8,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import re
+
 import six
 
 from nti.mimetype.mimetype import MIME_BASE
@@ -46,13 +47,13 @@ PURCHASE_ATTEMPT_MIME_TYPES = \
 logger = __import__('logging').getLogger(__name__)
 
 
-def from_delimited(value, delim='\s'):
+def from_delimited(value, delim=r'\s'):
     result = re.split(delim, value)
     result = re.findall(r"[^\s]+", value) if len(result) <= 1 else result
     return result
 
 
-def to_collection(items=None, factory=list, delim='\s'):
+def to_collection(items=None, factory=list, delim=r'\s'):
     result = None
     if not items:
         result = factory()
@@ -65,15 +66,15 @@ def to_collection(items=None, factory=list, delim='\s'):
     return result
 
 
-def to_set(items=None, delim='\s'):
+def to_set(items=None, delim=r'\s'):
     return to_collection(items, set, delim)
 
 
-def to_list(items=None, delim='\s'):
+def to_list(items=None, delim=r'\s'):
     return to_collection(items, list, delim)
 
 
-def to_frozenset(items=None, delim='\s'):
+def to_frozenset(items=None, delim=r'\s'):
     return to_collection(items, frozenset, delim)
 
 

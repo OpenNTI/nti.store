@@ -99,6 +99,7 @@ class Payeezy(object):
         payload['apikey'] = self.api_key
         payload['js_security_key'] = self.js_security_key
         self.payload = payload
+        # pylint: disable=no-member
         return self.payeezy.make_token_get_call(payload)
 
     def token_payment(self, token, amount, currency_code, card_type, cardholder_name,
@@ -114,6 +115,7 @@ class Payeezy(object):
                                                     card_expiry=card_expiry,
                                                     description=description)
         self.payload = payload
+        # pylint: disable=no-member
         return self.payeezy.make_token_post_call(payload)
 
     def token_refund(self,  token, amount, currency_code, card_type, cardholder_name,
@@ -128,17 +130,20 @@ class Payeezy(object):
                                                        cardholder_name=cardholder_name,
                                                        card_expiry=card_expiry,
                                                        description=description)
+        # pylint: disable=no-member
         return self.payeezy.make_token_post_call(self.payload)
 
     def reporting(self, start_date, end_date, searchFor=None):
         payload = self.payload = self._make_reporting_payload(start_date,
                                                               end_date,
                                                               searchFor)
+        # pylint: disable=no-member
         return self.payeezy.make_reporting_get_call(payload)
 
     # payload
 
     def _make_primary_transaction(self, payload):
+        # pylint: disable=no-member
         self.payload = payload
         return self.payeezy.make_card_based_transaction_post_call(self.payload)
 
@@ -273,7 +278,7 @@ class Payeezy(object):
 
     def _make_token_payload(self, transaction_type, token, amount, currency_code, card_type,
                             cardholder_name, card_expiry=None, card_cvv=None, description=None):
-
+        # pylint: disable=unused-variable
         __traceback_info__ = card_cvv
         assert transaction_type is not None, "Transaction type cannot be None"
 

@@ -10,8 +10,9 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-import six
 from collections import Sequence
+
+import six
 
 from zope import interface
 
@@ -27,7 +28,7 @@ from nti.externalization.representation import WithRepr
 
 from nti.schema.eqhash import EqHash
 
-from nti.schema.field import SchemaConfigured
+from nti.schema.schema import SchemaConfigured
 
 from nti.store.interfaces import IPriceable
 from nti.store.interfaces import IPurchaseItem
@@ -134,7 +135,7 @@ def create_purchase_order(items=None, quantity=None, cls=PurchaseOrder):
     return result
 
 
-def copy_purchase_order(source, *unused, **kwargs):
+def copy_purchase_order(source, *unused_args, **kwargs):
     items = to_list(kwargs.get('items'))
     if items:
         result = []
@@ -152,5 +153,5 @@ def copy_purchase_order(source, *unused, **kwargs):
     return result
 
 
-def _purchase_order_copier(unused):
+def _purchase_order_copier(unused_obj=None):
     return copy_purchase_order

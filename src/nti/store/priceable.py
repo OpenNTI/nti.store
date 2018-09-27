@@ -22,7 +22,7 @@ from nti.externalization.representation import WithRepr
 
 from nti.schema.eqhash import EqHash
 
-from nti.schema.field import SchemaConfigured
+from nti.schema.schema import SchemaConfigured
 
 from nti.store.interfaces import IPriceable
 
@@ -87,5 +87,5 @@ def copy_priceable(source, *unused_args, **kwargs):
     return result
 
 
-def _priceable_copier(unused_context):
+def _priceable_copier(unused_context=None):
     return copy_priceable

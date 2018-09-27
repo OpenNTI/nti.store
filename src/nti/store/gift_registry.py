@@ -8,6 +8,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+from ZODB.interfaces import IConnection
+
 from zope import component
 from zope import interface
 from zope import lifecycleevent
@@ -15,8 +17,6 @@ from zope import lifecycleevent
 from zope.container.contained import Contained
 
 from zope.intid.interfaces import IIntIds
-
-from ZODB.interfaces import IConnection
 
 from nti.containers.containers import CaseInsensitiveCheckingLastModifiedBTreeContainer
 
@@ -59,9 +59,6 @@ class GiftRecordContainer(CaseInsensitiveCheckingLastModifiedBTreeContainer,
 @interface.implementer(IGiftRegistry)
 class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
 
-    def __init__(self):
-        super(GiftRegistry, self).__init__()
-
     @property
     def Items(self):
         return dict(self)
@@ -80,6 +77,7 @@ class GiftRegistry(CaseInsensitiveCheckingLastModifiedBTreeContainer):
             self[username] = index
            
         purchase.creator = username
+        # pylint: disable=too-many-function-args
         IConnection(self).add(purchase)
         lifecycleevent.created(purchase) 
         index.append(purchase)

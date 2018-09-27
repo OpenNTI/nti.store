@@ -8,10 +8,15 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-import six
 import copy
 import time
 from functools import total_ordering
+
+import BTrees
+
+from persistent.mapping import PersistentMapping
+
+import six
 
 from zope import component
 from zope import interface
@@ -23,10 +28,6 @@ from zope.container.contained import Contained
 from zope.mimetype.interfaces import IContentTypeAware
 
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
-
-from persistent.mapping import PersistentMapping
-
-import BTrees
 
 from nti.base._compat import text_
 
@@ -54,9 +55,9 @@ from nti.property.property import alias
 
 from nti.schema.eqhash import EqHash
 
-from nti.schema.field import SchemaConfigured
-
 from nti.schema.fieldproperty import createDirectFieldProperties
+
+from nti.schema.schema import SchemaConfigured
 
 from nti.store.interfaces import PA_STATE_FAILED
 from nti.store.interfaces import PA_STATE_FAILURE
@@ -424,8 +425,9 @@ def create_gift_purchase_attempt(creator, order, processor, state=None, descript
 @interface.implementer(IPurchaseAttemptFactory)
 class DefaultPurchaseAttemptFactory(object):
 
+    # pylint: disable=keyword-arg-before-vararg
     def create(self, order, processor, state=None, description=None,
-               start_time=None, context=None, *args, **kwargs):
+               start_time=None, context=None, *unused_args, **unused_kwargs):
         # set some defaults
         state = state or PA_STATE_UNKNOWN
         context = to_purchase_attempt_context(context)

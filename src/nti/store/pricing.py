@@ -18,9 +18,9 @@ from nti.externalization.representation import WithRepr
 
 from nti.schema.eqhash import EqHash
 
-from nti.schema.field import SchemaConfigured
-
 from nti.schema.fieldproperty import createDirectFieldProperties
+
+from nti.schema.schema import SchemaConfigured
 
 from nti.store import MessageFactory as _
 
@@ -98,7 +98,8 @@ class DefaultPurchasablePricer(object):
         return fee_amount
 
     def price(self, priceable, registry=None):
-        __traceback_info__ = priceable
+        # pylint: disable=unused-variable
+        __traceback_info__ = priceable, registry
         quantity = priceable.Quantity or 1
         purchasable = priceable.purchasable
         if purchasable is None:
@@ -117,6 +118,7 @@ class DefaultPurchasablePricer(object):
         return result
 
     def evaluate(self, priceables, registry=None):
+        # pylint: disable=no-member
         currencies = set()
         result = create_pricing_results()
         for priceable in priceables:
@@ -125,6 +127,7 @@ class DefaultPurchasablePricer(object):
             currencies.add(priceable.Currency)
             result.TotalPurchaseFee += priced.PurchaseFee
             result.TotalPurchasePrice += priced.PurchasePrice
+        # pylint: disable=attribute-defined-outside-init
         result.TotalNonDiscountedPrice = result.TotalPurchasePrice
         if len(currencies) != 1:
             msg = _(u"Multi-Currency pricing is not supported")

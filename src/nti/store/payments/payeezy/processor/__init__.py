@@ -70,5 +70,5 @@ def safe_error_message(result):
     try:
         data = result.json()
         return data.get('message') or data.get('error')
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         return None
