@@ -49,6 +49,7 @@ setup(
         'nti.containers',
         'nti.contentfragments',
         'nti.coremetadata',
+	'nti.dataserver',
         'nti.dublincore',
         'nti.externalization',
         'nti.mimetype',
