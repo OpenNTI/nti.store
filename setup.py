@@ -52,6 +52,7 @@ setup(
 	'nti.dataserver',
         'nti.dublincore',
         'nti.externalization',
+	'nti.invitations',
         'nti.mimetype',
         'nti.namedfile',
         'nti.ntiids',
