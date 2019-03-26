@@ -7,6 +7,9 @@ entry_points = {
 }
 
 TESTS_REQUIRE = [
+    'fakeredis',
+    'fudge',
+    'nose',
     'nti.testing',
     'zope.dottedname',
     'zope.testrunner',
@@ -49,8 +52,10 @@ setup(
         'nti.containers',
         'nti.contentfragments',
         'nti.coremetadata',
+	'nti.dataserver',
         'nti.dublincore',
         'nti.externalization',
+	'nti.invitations',
         'nti.mimetype',
         'nti.namedfile',
         'nti.ntiids',
