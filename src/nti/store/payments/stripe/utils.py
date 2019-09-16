@@ -93,7 +93,7 @@ def get_card_info(charge):
     """
     return card info from a stripe charge
     """
-    card = getattr(charge, 'card', None)
+    card = getattr(charge, 'source', None)
     name = getattr(card, 'name', None)
     last4 = getattr(card, 'last4', None)
     last4 = int(last4) if last4 is not None else None

@@ -155,8 +155,8 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
         try:
             metadata = metadata or {}
             metadata['CustomerID'] = customer_id
-            update_charge(charge, 
-                          metadata=metadata, 
+            update_charge(charge,
+                          metadata=metadata,
                           description=description,
                           api_key=api_key)
             logger.info("Charge %s updated", charge.id)
@@ -220,7 +220,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
         transaction_runner = get_transaction_runner()
         transaction_runner = partial(transaction_runner,
                                      site_names=(site_name,) if site_name else ())
-        
+
         start_purchase = partial(_start_purchase,
                                  purchase_id=purchase_id,
                                  username=username,
@@ -290,7 +290,7 @@ class PurchaseProcessor(StripeCustomer, CouponProcessor, PricingProcessor):
                                         error=error)
                 transaction_runner(fail_purchase)
         except Exception as e:
-            logger.exception("Cannot complete process purchase for '%s'", 
+            logger.exception("Cannot complete process purchase for '%s'",
                              purchase_id)
 
             t, v, tb = sys.exc_info()
