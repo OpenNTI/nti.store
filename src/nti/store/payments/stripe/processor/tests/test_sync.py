@@ -27,7 +27,7 @@ from nti.store.payments.stripe.processor.tests import StripeProcessorTestLayer
 from nti.store.payments.stripe.processor.tests import create_and_register_purchase_attempt
 
 import nti.dataserver.tests.mock_dataserver as mock_dataserver
-from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
+from nti.dataserver.tests.mock_dataserver import WithMockDS
 
 class TestSyncProcessor(unittest.TestCase):
 
@@ -41,11 +41,10 @@ class TestSyncProcessor(unittest.TestCase):
 	create_purchase = create_purchase
 
 	@unittest.skipUnless(TEST_WITH_STRIPE, '')
-	@WithMockDSTrans
+	@WithMockDS
 	def test_sync_pending_purchase(self):
 		ds = self.ds
-		with mock_dataserver.mock_db_trans(ds):
-			username, purchase_id, tid, cid = self.create_purchase(manager=self.purchase)
+		username, purchase_id, tid, cid = self.create_purchase(manager=self.purchase)
 
 		with mock_dataserver.mock_db_trans(ds):
 			pa = purchase_history.get_purchase_attempt(purchase_id, username)
@@ -66,7 +65,7 @@ class TestSyncProcessor(unittest.TestCase):
 			assert_that(pa.State, is_(store_interfaces.PA_STATE_SUCCESS))
 
 	@unittest.skipUnless(TEST_WITH_STRIPE, '')
-	@WithMockDSTrans
+	@WithMockDS
 	def test_sync_invalid_charge_id(self):
 		ds = self.ds
 		username, purchase_id, _, _ = self.create_purchase(manager=self.purchase)
@@ -84,7 +83,7 @@ class TestSyncProcessor(unittest.TestCase):
 				pass
 
 	@unittest.skipUnless(TEST_WITH_STRIPE, '')
-	@WithMockDSTrans
+	@WithMockDS
 	def test_sync_invalid_missing_charge_id(self):
 		ds = self.ds
 		username, purchase_id, _, _ = self.create_purchase(manager=self.purchase)
@@ -100,7 +99,7 @@ class TestSyncProcessor(unittest.TestCase):
 			assert_that(charge, is_not(None))
 
 	@unittest.skipUnless(TEST_WITH_STRIPE, '')
-	@WithMockDSTrans
+	@WithMockDS
 	def test_sync_with_tokens(self):
 		ds = self.ds
 		with mock_dataserver.mock_db_trans(ds):

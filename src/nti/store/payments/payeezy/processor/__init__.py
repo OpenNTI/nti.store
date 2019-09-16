@@ -61,7 +61,7 @@ def adapt_to_purchase_error(e):
         result = IPayeezyPurchaseError(e, None) or IPurchaseError(e, None)
     if result is None and isinstance(e, Exception):
         result = PayeezyPurchaseError(Type=u"PurchaseError")
-        message = u' '.join(map(str, e.args()))
+        message = u' '.join(map(str, e.args))
         result.Message = message
     return result
 

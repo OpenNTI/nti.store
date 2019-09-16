@@ -34,6 +34,8 @@ from nti.store.purchase_history import get_purchase_attempt
 
 from nti.dataserver.tests import mock_dataserver
 
+from nti.dataserver.tests.mock_dataserver import WithMockDS
+
 from nti.store.tests import SharedConfiguringTestLayer
 
 from nti.store.payments.payeezy.processor.tests import create_user
@@ -47,7 +49,7 @@ class TestRefund(unittest.TestCase):
     ntiid = u'tag:nextthought.com,2011-10:NextThought-purchasable-HelpCenter'
 
     @fudge.patch('nti.store.payments.payeezy.processor.refund.refund_payment')
-    @mock_dataserver.WithMockDSTrans
+    @WithMockDS
     def test_valid_refund(self, mock_fdt):
         fake_response = fudge.Fake()
         fake_response.status_code = 201
@@ -83,8 +85,6 @@ class TestRefund(unittest.TestCase):
             create_user(username)
             purchase_id = create_and_register_purchase_attempt(username,
                                                                self.ntiid)
-
-        with mock_dataserver.mock_db_trans(self.ds):
             purchase = get_purchase_attempt(purchase_id, username)
             purchase.State = PA_STATE_SUCCESS
 
@@ -96,13 +96,9 @@ class TestRefund(unittest.TestCase):
             adapted.token_type = u'visa'
             adapted.card_expiry = u"0930"
             adapted.cardholder_name = u'Ichigo Kurosaki'
-
-        with mock_dataserver.mock_db_trans(self.ds):
             RefundProcessor.refund_purchase(purchase_id,
                                             username=username,
                                             api_key='NTI-TEST')
-
-        with mock_dataserver.mock_db_trans(self.ds):
             pa = get_purchase_attempt(purchase_id, username)
             assert_that(pa, has_property('State', is_(PA_STATE_REFUNDED)))
 

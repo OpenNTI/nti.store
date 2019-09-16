@@ -79,7 +79,7 @@ class TestPurchaseProcessor(unittest.TestCase):
 
     create_purchase = create_purchase
 
-    @mock_dataserver.WithMockDSTrans
+    @mock_dataserver.WithMockDS
     def test_price_purchase_no_coupon(self):
         ds = self.ds
 
@@ -91,40 +91,38 @@ class TestPurchaseProcessor(unittest.TestCase):
                                                                quantity=2,
                                                                processor=self.manager.name)
 
-        result = self.manager.price_purchase(username=username, 
-                                             purchase_id=purchase_id)
-        assert_that(result, is_not(none()))
-        assert_that(result.TotalPurchaseFee, is_(0))
-        assert_that(result.TotalPurchasePrice, is_(200))
-        assert_that(result.TotalNonDiscountedPrice, is_(200))
+            result = self.manager.price_purchase(username=username,
+                                                 purchase_id=purchase_id)
+            assert_that(result, is_not(none()))
+            assert_that(result.TotalPurchaseFee, is_(0))
+            assert_that(result.TotalPurchasePrice, is_(200))
+            assert_that(result.TotalNonDiscountedPrice, is_(200))
 
     @unittest.skipUnless(TEST_WITH_STRIPE, '')
-    @mock_dataserver.WithMockDSTrans
+    @mock_dataserver.WithMockDS
     def test_process_payment(self):
         ds = self.ds
-        with mock_dataserver.mock_db_trans(ds):
-            username, purchase_id, _, _ = self.create_purchase()
+        username, purchase_id, _, _ = self.create_purchase()
 
         with mock_dataserver.mock_db_trans(ds):
             pa = purchase_history.get_purchase_attempt(purchase_id, username)
             assert_that(pa.State, is_(PA_STATE_SUCCESS))
 
-        assert_that(eventtesting.getEvents(IStripeCustomerCreated),
-                    has_length(1))
+            assert_that(eventtesting.getEvents(IStripeCustomerCreated),
+                        has_length(1))
 
-        assert_that(eventtesting.getEvents(IPurchaseAttemptStarted),
-                    has_length(1))
+            assert_that(eventtesting.getEvents(IPurchaseAttemptStarted),
+                        has_length(1))
 
-        assert_that(eventtesting.getEvents(IRegisterStripeToken),
-                    has_length(1))
-        assert_that(eventtesting.getEvents(IRegisterStripeCharge),
-                    has_length(1))
+            assert_that(eventtesting.getEvents(IRegisterStripeToken),
+                        has_length(1))
+            assert_that(eventtesting.getEvents(IRegisterStripeCharge),
+                        has_length(1))
 
-        assert_that(eventtesting.getEvents(IPurchaseAttemptSuccessful),
-                    has_length(1))
+            assert_that(eventtesting.getEvents(IPurchaseAttemptSuccessful),
+                        has_length(1))
 
-        # test payment charge
-        with mock_dataserver.mock_db_trans(ds):
+            # test payment charge
             charge = self.manager.get_payment_charge(purchase_id, username)
             assert_that(charge, is_not(none()))
             assert_that(charge, has_property("Amount", is_not(none())))
@@ -136,7 +134,6 @@ class TestPurchaseProcessor(unittest.TestCase):
             assert_that(IAnnotations(user),
                         has_key(STRIPE_CUSTOMER_KEY))
 
-        with mock_dataserver.mock_db_trans(ds):
             self.manager.delete_customer(username)
 
         assert_that(eventtesting.getEvents(IStripeCustomerDeleted),
@@ -148,15 +145,14 @@ class TestPurchaseProcessor(unittest.TestCase):
                         does_not(has_key(STRIPE_CUSTOMER_KEY)))
 
     @unittest.skipUnless(TEST_WITH_STRIPE, '')
-    @mock_dataserver.WithMockDSTrans
+    @mock_dataserver.WithMockDS
     def test_process_payment_coupon(self):
 
         code = str(uuid.uuid4()).split('-')[0]
         c = stripe.Coupon.create(percent_off=50, duration=u'once', id=code)
 
         ds = self.ds
-        with mock_dataserver.mock_db_trans(ds):
-            username, purchase_id, _, _ = \
+        username, purchase_id, _, _ = \
                         self.create_purchase(amount=50, coupon=c.id)
 
         with mock_dataserver.mock_db_trans(ds):
@@ -179,7 +175,7 @@ class TestPurchaseProcessor(unittest.TestCase):
 
         c.delete()
 
-    @mock_dataserver.WithMockDSTrans
+    @mock_dataserver.WithMockDS
     def test_fail_payment_invalid_token(self):
         ds = self.ds
         with mock_dataserver.mock_db_trans(ds):
@@ -209,7 +205,7 @@ class TestPurchaseProcessor(unittest.TestCase):
             pa = purchase_history.get_purchase_attempt(purchase_id, username)
             assert_that(pa.State, is_(PA_STATE_FAILED))
 
-    @mock_dataserver.WithMockDSTrans
+    @mock_dataserver.WithMockDS
     def test_fail_payment_invalid_expected_amount(self):
         ds = self.ds
         with mock_dataserver.mock_db_trans(ds):
@@ -223,9 +219,9 @@ class TestPurchaseProcessor(unittest.TestCase):
                                                                processor=self.manager.name)
 
         with self.assertRaises(Exception):
-            self.manager.process_purchase(username=username, 
+            self.manager.process_purchase(username=username,
                                           token=u"++valid++",
-                                          purchase_id=purchase_id, 
+                                          purchase_id=purchase_id,
                                           expected_amount=20000.0)
 
         assert_that(eventtesting.getEvents(IPurchaseAttemptFailed),
@@ -235,7 +231,7 @@ class TestPurchaseProcessor(unittest.TestCase):
             pa = purchase_history.get_purchase_attempt(purchase_id, username)
             assert_that(pa.State, is_(PA_STATE_FAILED))
 
-    @mock_dataserver.WithMockDSTrans
+    @mock_dataserver.WithMockDS
     def test_fail_payment_invalid_coupon(self):
         ds = self.ds
         with mock_dataserver.mock_db_trans(ds):

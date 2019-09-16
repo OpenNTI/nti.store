@@ -40,7 +40,7 @@ from nti.store.payments.payeezy.interfaces import IPayeezyPurchaseAttempt
 from nti.store.payments.payeezy.model import PayeezyPurchaseError
 
 from nti.store.payments.payeezy.processor import get_api_key
-from nti.store.payments.payeezy.processor import get_payeezy 
+from nti.store.payments.payeezy.processor import get_payeezy
 from nti.store.payments.payeezy.processor import safe_error_message
 from nti.store.payments.payeezy.processor import adapt_to_purchase_error
 
@@ -56,7 +56,7 @@ def get_transaction_runner():
     return component.getUtility(ISiteTransactionRunner)
 
 
-def start_purchase(purchase_id, token, token_type, card_expiry, 
+def start_purchase(purchase_id, token, token_type, card_expiry,
                    cardholder_name, username=None, api_key=None):
     purchase = get_purchase_attempt(purchase_id, username)
     if purchase is None:
@@ -77,7 +77,7 @@ def start_purchase(purchase_id, token, token_type, card_expiry,
     adapted.token_type = token_type
     adapted.card_expiry = card_expiry
     adapted.cardholder_name = cardholder_name
-    
+
     # return a copy of the order
     order = purchase.Order.copy()
     return order, api_key
@@ -168,7 +168,7 @@ class PurchaseProcessor(PricingProcessor):
     @classmethod
     def process_purchase(cls, purchase_id, token,
                          card_type, cardholder_name, card_expiry,
-                         username=None, expected_amount=None, api_key=None, 
+                         username=None, expected_amount=None, api_key=None,
                          request=None, site_name=None):
 
         # prepare transaction runner
@@ -232,11 +232,11 @@ class PurchaseProcessor(PricingProcessor):
 
             t, v, tb = sys.exc_info()
             error = adapt_to_purchase_error(e)
-            fail_purchase = partial(fail_purchase,
-                                    error=error,
-                                    username=username,
-                                    purchase_id=purchase_id)
-            transaction_runner(fail_purchase)
+            fail_purchase_runnable = partial(fail_purchase,
+                                             error=error,
+                                             username=username,
+                                             purchase_id=purchase_id)
+            transaction_runner(fail_purchase_runnable)
 
             raise t, v, tb
 
@@ -251,11 +251,11 @@ class PurchaseProcessor(PricingProcessor):
         if purchase.is_pending():
             msg = _(u"Purchase is being processed.")
             raise PurchaseException(msg, purchase_id)
-        
+
         pricing = purchase.Pricing
         currency = pricing.Currency
         amount = pricing.TotalPurchasePrice
-        
+
         adapted = IPayeezyPurchaseAttempt(purchase)
         result = PaymentCharge(Amount=float(amount),
                                Currency=currency,

@@ -47,7 +47,7 @@ from nti.store.purchase_order import create_purchase_order
 from nti.store.store import get_purchase_attempt
 
 from nti.dataserver.tests import mock_dataserver
-from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
+from nti.dataserver.tests.mock_dataserver import WithMockDS
 
 from nti.store.tests import SharedConfiguringTestLayer
 
@@ -76,7 +76,7 @@ class TestGiftRegistry(unittest.TestCase):
                                               delivery_date=datetime.now())
         return result
 
-    @WithMockDSTrans
+    @WithMockDS
     def test_store_gift(self):
 
         username = u"ichigo@bleach.org"
@@ -94,8 +94,8 @@ class TestGiftRegistry(unittest.TestCase):
             attempt = get_purchase_attempt(pid)
             assert_that(attempt, is_(not_none()))
 
-        pending = get_gift_pending_purchases(username)
-        assert_that(pending, has_length(1))
+            pending = get_gift_pending_purchases(username)
+            assert_that(pending, has_length(1))
 
         transaction_runner = component.getUtility(IDataserverTransactionRunner)
         get_purchase = partial(get_purchase_attempt,
@@ -106,8 +106,8 @@ class TestGiftRegistry(unittest.TestCase):
         with mock_dataserver.mock_db_trans(self.ds):
             attempt.state = PA_STATE_SUCCESS
 
-        pending = get_gift_pending_purchases(username)
-        assert_that(pending, has_length(0))
+            pending = get_gift_pending_purchases(username)
+            assert_that(pending, has_length(0))
 
         with mock_dataserver.mock_db_trans(self.ds):
             ext = to_external_object(attempt)
@@ -151,5 +151,5 @@ class TestGiftRegistry(unittest.TestCase):
                         has_property('Profile',
                                      has_property('avatarURL', is_(none()))))
 
-        removal = remove_gift_purchase_attempt(pid, username)
-        assert_that(removal, is_(True))
+            removal = remove_gift_purchase_attempt(pid, username)
+            assert_that(removal, is_(True))
