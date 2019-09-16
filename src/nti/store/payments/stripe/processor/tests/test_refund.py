@@ -27,7 +27,8 @@ from nti.store.payments.stripe.processor.refund import RefundProcessor
 from nti.store.payments.stripe.processor.purchase import PurchaseProcessor
 
 import nti.dataserver.tests.mock_dataserver as mock_dataserver
-from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
+
+from nti.dataserver.tests.mock_dataserver import WithMockDS
 
 from nti.store.payments.stripe.processor.tests import create_purchase
 from nti.store.payments.stripe.processor.tests import TEST_WITH_STRIPE
@@ -45,11 +46,10 @@ class TestRefundProcessor(unittest.TestCase):
 	create_purchase = create_purchase
 
 	@unittest.skipUnless(TEST_WITH_STRIPE, '')
-	@WithMockDSTrans
+	@WithMockDS
 	def test_refund_purchase(self):
 		ds = self.ds
-		with mock_dataserver.mock_db_trans(ds):
-			username, purchase_id, _, _ = self.create_purchase(manager=self.purchase)
+		username, purchase_id, _, _ = self.create_purchase(manager=self.purchase)
 
 		with mock_dataserver.mock_db_trans(ds):
 			pa = purchase_history.get_purchase_attempt(purchase_id, username)
@@ -67,11 +67,10 @@ class TestRefundProcessor(unittest.TestCase):
 			assert_that(pa.State, is_(store_interfaces.PA_STATE_REFUNDED))
 
 	@unittest.skipUnless(TEST_WITH_STRIPE, '')
-	@WithMockDSTrans
+	@WithMockDS
 	def test_refund_purchase_50(self):
 		ds = self.ds
-		with mock_dataserver.mock_db_trans(ds):
-			username, purchase_id, _, _ = self.create_purchase(manager=self.purchase)
+		username, purchase_id, _, _ = self.create_purchase(manager=self.purchase)
 
 		with mock_dataserver.mock_db_trans(ds):
 			pa = purchase_history.get_purchase_attempt(purchase_id, username)
