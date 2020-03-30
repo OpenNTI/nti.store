@@ -13,6 +13,12 @@ from zope import component
 
 from zope.annotation import IAnnotations
 
+
+from zope.component.hooks import getSite
+
+from zope.lifecycleevent import IObjectAddedEvent
+from zope.lifecycleevent import IObjectRemovedEvent
+
 from nti.store.payments.stripe.interfaces import STRIPE_CUSTOMER_KEY
 
 from nti.store.payments.stripe.interfaces import IStripeCustomer
@@ -21,6 +27,7 @@ from nti.store.payments.stripe.interfaces import IRegisterStripeCharge
 from nti.store.payments.stripe.interfaces import IStripeCustomerCreated
 from nti.store.payments.stripe.interfaces import IStripeCustomerDeleted
 from nti.store.payments.stripe.interfaces import IStripePurchaseAttempt
+from nti.store.payments.stripe.interfaces import IStripeConnectKey
 
 
 @component.adapter(IStripeCustomerCreated)
@@ -59,3 +66,21 @@ def register_stripe_charge(event):
         su.Charges.add(event.charge_id)
     logger.debug("Purchase %s was associated with stripe charge %s",
                  purchase.id, event.charge_id)
+
+
+@component.adapter(IStripeConnectKey, IObjectAddedEvent)
+def register_key(key, _event):
+    """
+    Register a stripe key with the given alias
+    """
+    site_manager = getSite().getSiteManager()
+    site_manager.registerUtility(key, provided=IStripeConnectKey, name=key.Alias)
+
+
+@component.adapter(IStripeConnectKey, IObjectRemovedEvent)
+def unregister_key(key, _event):
+    """
+    Unregister a stripe key with the given alias
+    """
+    site_manager = getSite().getSiteManager()
+    site_manager.unregisterUtility(key, provided=IStripeConnectKey, name=key.Alias)

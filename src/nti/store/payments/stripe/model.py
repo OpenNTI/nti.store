@@ -8,13 +8,22 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+import urllib
+
+from persistent import Persistent
+from persistent.mapping import PersistentMapping
+
 import six
 
 from zope import interface
+from zope import lifecycleevent
+from zope.container.contained import Contained
 
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 
 from zope.mimetype.interfaces import IContentTypeAware
+
+from nti.base.mixins import CreatedTimeMixin
 
 from nti.externalization.representation import WithRepr
 
@@ -34,6 +43,9 @@ from nti.store.payments.stripe.interfaces import IStripeToken
 from nti.store.payments.stripe.interfaces import IStripeConnectKey
 from nti.store.payments.stripe.interfaces import IStripePurchaseError
 from nti.store.payments.stripe.interfaces import IStripeOperationError
+from nti.store.payments.stripe.interfaces import IStripeConnectKeyContainer
+from nti.store.payments.stripe.interfaces import IPersistentStripeConnectKey
+from nti.store.payments.stripe.interfaces import IStripeConnectConfig
 
 from nti.store.utils import MetaStoreObject
 
@@ -72,9 +84,44 @@ class StripeConnectKey(SchemaConfigured):
 
 
 @six.add_metaclass(MetaStoreObject)
+@interface.implementer(IPersistentStripeConnectKey)
+class PersistentStripeConnectKey(CreatedTimeMixin, StripeConnectKey, Persistent):
+    createDirectFieldProperties(IPersistentStripeConnectKey)
+
+
+@six.add_metaclass(MetaStoreObject)
 @WithRepr
 @interface.implementer(IStripeToken, IContentTypeAware)
 class StripeToken(SchemaConfigured):
     createDirectFieldProperties(IStripeToken)
     
     ID = _a('Value')
+
+
+@interface.implementer(IStripeConnectKeyContainer)
+class StripeConnectKeyContainer(PersistentMapping, Contained):
+
+    def add_key(self, key):
+        self[key.Alias] = key
+        lifecycleevent.added(key, self, key.Alias)
+
+    def remove_key(self, key):
+        name = getattr(key, 'Alias', key)
+        obj = self[name]
+        del self[name]
+        lifecycleevent.removed(obj, self, name)
+
+
+@interface.implementer(IStripeConnectConfig)
+class StripeConnectConfig(SchemaConfigured):
+    createDirectFieldProperties(IStripeConnectConfig)
+
+    @property
+    def StripeOauthEndpoint(self):
+        params = {
+            "response_type": "code",
+            "scope": "read_write",
+            "stripe_landing": "login",
+            "client_id": self.ClientId
+        }
+        return self.StripeOauthBase + '?' + urllib.urlencode(params)
