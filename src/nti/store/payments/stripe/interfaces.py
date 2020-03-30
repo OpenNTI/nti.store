@@ -13,12 +13,11 @@ __docformat__ = "restructuredtext en"
 
 from zope import interface
 
-from zope.interface.common.mapping import IMapping
-
 from nti.base.interfaces import ICreated
 
-from nti.dataserver.interfaces import IUser
+from nti.dataserver.interfaces import IContainer
 from nti.dataserver.interfaces import ICreatedTime
+from nti.dataserver.interfaces import IUser
 
 from nti.property.property import alias as _alias
 
@@ -278,20 +277,10 @@ class IStripePricedItem(IPricedItem):
     Coupon = Object(interface.Interface, title=u'the coupon', required=False)
 
 
-class IStripeConnectKeyContainer(IMapping):
+class IStripeConnectKeyContainer(IContainer):
     """
     An object containing Stripe connect keys
     """
-
-    def add_key(key):
-        """
-        Add key to the mapping
-        """
-
-    def remove_key(key):
-        """
-        Remove key (or key name) from mapping
-        """
 
 
 class IStripeConnectConfig(interface.Interface):
