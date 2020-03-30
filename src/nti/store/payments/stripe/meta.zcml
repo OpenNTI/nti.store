@@ -5,6 +5,9 @@
 		<meta:directive	name="registerStripeKey"
 						schema=".zcml.IRegisterStripeKeyDirective"
 						handler=".zcml.registerStripeKey" />
+		<meta:directive	name="registerStripeConnect"
+						schema=".zcml.IRegisterStripeConnectDirective"
+						handler=".zcml.registerStripeConnect" />
 	</meta:directives>
 
 </configure>

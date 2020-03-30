@@ -6,7 +6,16 @@
 			xmlns:stripe="http://nextthought.com/ntp/stripe">
 
 	<include package="zope.component" file="meta.zcml" />
+	<include package="zope.security" file="meta.zcml" />
 	<include package="zope.component" />
+	<include package="zope.security" />
+
+	<permission
+		id="nti.actions.stripe_connect.link"
+		title="Link stripe account" />
+
+	<grant	permission="nti.actions.stripe_connect.link"
+			role="role:nti.dataserver.site-admin"/>
 
 	<include package="." file="stripe_objects.zcml" />
 	
@@ -14,7 +23,10 @@
 	<subscriber handler=".subscribers.register_stripe_charge" />
 	<subscriber handler=".subscribers.stripe_customer_created" />
 	<subscriber handler=".subscribers.stripe_customer_deleted" />
-	
+	<subscriber handler=".subscribers.register_key"/>
+	<subscriber handler=".subscribers.unregister_key"/>
+
+
 	<!-- Adapters -->
 	<adapter factory=".adapters._StripeCustomerFactory"
 			 for="nti.dataserver.interfaces.IUser"

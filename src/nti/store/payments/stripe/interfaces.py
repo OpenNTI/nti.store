@@ -13,7 +13,12 @@ __docformat__ = "restructuredtext en"
 
 from zope import interface
 
+from zope.interface.common.mapping import IMapping
+
+from nti.base.interfaces import ICreated
+
 from nti.dataserver.interfaces import IUser
+from nti.dataserver.interfaces import ICreatedTime
 
 from nti.property.property import alias as _alias
 
@@ -173,6 +178,14 @@ class IStripeConnectKey(IConnectKey):
     StripeUserID = ValidTextLine(title=u"String user id", required=False)
 
 
+class IPersistentStripeConnectKey(ICreated, ICreatedTime, IStripeConnectKey):
+    """
+    Persisted Stripe connection key, e.g. those created via the UI and
+    not registered via zcml configuration.
+    """
+    TokenType = ValidTextLine(title=u"Token type returned from token request, e.g. 'bearer'", required=True)
+
+
 class IStripeOperationError(IOperationError):
     HttpStatus = Int(title=u'HTTP Status', required=False)
     Param = ValidTextLine(title=u"Optional parameter", required=False)
@@ -262,3 +275,49 @@ class IStripePurchaseOrder(IPurchaseOrder):
 
 class IStripePricedItem(IPricedItem):
     Coupon = Object(interface.Interface, title=u'the coupon', required=False)
+
+
+class IStripeConnectKeyContainer(IMapping):
+    """
+    An object containing Stripe connect keys
+    """
+
+    def add_key(key):
+        """
+        Add key to the mapping
+        """
+
+    def remove_key(key):
+        """
+        Remove key (or key name) from mapping
+        """
+
+
+class IStripeConnectConfig(interface.Interface):
+
+    StripeOauthEndpoint = ValidTextLine(title=u"Stripe Authorization Endpoint",
+                                        description=u"The Stripe url to which the user will be "
+                                                    u"redirected to begin the OAuth flow.")
+
+    ClientId = ValidTextLine(title=u"Platform Client ID",
+                             description=u"The client id of the platform requesting "
+                                         u"authorization.")
+
+    TokenEndpoint = ValidTextLine(title=u"Stripe Token Endpoint",
+                                  description=u"The Stripe OAuth endpoint at which the user "
+                                              u"authorizes our platform.")
+
+    DeauthorizeEndpoint = ValidTextLine(title=u"Stripe Deauthorize Endpoint",
+                                        description=u"The Stripe endpoint at which the user "
+                                                    u"deauthorizes our platform.")
+
+    CompletionRoutePrefix = ValidTextLine(title=u"Completion Route Prefix",
+                                          description=u"The prefix for the route to which the user"
+                                                      u" will be directed on authorization "
+                                                      u"completion.")
+
+    SecretKey = ValidTextLine(title=u"Platform Secret Key",
+                              description=u"Secret key of the platform requesting authorization.")
+
+    StripeOauthBase = ValidTextLine(title=u"Stripe OAuth Base",
+                                    description=u"Base url of Stripe's initial OAuth endpoint.")
