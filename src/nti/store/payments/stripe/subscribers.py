@@ -13,9 +13,6 @@ from zope import component
 
 from zope.annotation import IAnnotations
 
-
-from zope.component.hooks import getSite
-
 from zope.lifecycleevent import IObjectAddedEvent
 from zope.lifecycleevent import IObjectRemovedEvent
 
