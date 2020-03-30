@@ -73,7 +73,7 @@ def register_key(key, _event):
     """
     Register a stripe key with the given alias
     """
-    site_manager = getSite().getSiteManager()
+    site_manager = component.getSiteManager()
     site_manager.registerUtility(key, provided=IStripeConnectKey, name=key.Alias)
 
 
