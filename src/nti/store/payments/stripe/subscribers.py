@@ -82,5 +82,5 @@ def unregister_key(key, _event):
     """
     Unregister a stripe key with the given alias
     """
-    site_manager = getSite().getSiteManager()
+    site_manager = component.getSiteManager()
     site_manager.unregisterUtility(key, provided=IStripeConnectKey, name=key.Alias)
