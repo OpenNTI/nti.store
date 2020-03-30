@@ -22,11 +22,12 @@ from nti.dataserver.interfaces import ICreatedTime
 
 from nti.property.property import alias as _alias
 
-from nti.schema.field import Int
-from nti.schema.field import Set
 from nti.schema.field import Bool
+from nti.schema.field import HTTPURL
+from nti.schema.field import Int
 from nti.schema.field import Number
 from nti.schema.field import Object
+from nti.schema.field import Set
 from nti.schema.field import Variant
 from nti.schema.field import ValidTextLine
 
@@ -294,22 +295,21 @@ class IStripeConnectKeyContainer(IMapping):
 
 
 class IStripeConnectConfig(interface.Interface):
-
-    StripeOauthEndpoint = ValidTextLine(title=u"Stripe Authorization Endpoint",
-                                        description=u"The Stripe url to which the user will be "
-                                                    u"redirected to begin the OAuth flow.")
+    StripeOauthEndpoint = HTTPURL(title=u"Stripe Authorization Endpoint",
+                                  description=u"The Stripe url to which the user will be "
+                                              u"redirected to begin the OAuth flow.")
 
     ClientId = ValidTextLine(title=u"Platform Client ID",
                              description=u"The client id of the platform requesting "
                                          u"authorization.")
 
-    TokenEndpoint = ValidTextLine(title=u"Stripe Token Endpoint",
-                                  description=u"The Stripe OAuth endpoint at which the user "
-                                              u"authorizes our platform.")
+    TokenEndpoint = HTTPURL(title=u"Stripe Token Endpoint",
+                            description=u"The Stripe OAuth endpoint at which the user "
+                                        u"authorizes our platform.")
 
-    DeauthorizeEndpoint = ValidTextLine(title=u"Stripe Deauthorize Endpoint",
-                                        description=u"The Stripe endpoint at which the user "
-                                                    u"deauthorizes our platform.")
+    DeauthorizeEndpoint = HTTPURL(title=u"Stripe Deauthorize Endpoint",
+                                  description=u"The Stripe endpoint at which the user "
+                                              u"deauthorizes our platform.")
 
     CompletionRoutePrefix = ValidTextLine(title=u"Completion Route Prefix",
                                           description=u"The prefix for the route to which the user"
@@ -319,5 +319,5 @@ class IStripeConnectConfig(interface.Interface):
     SecretKey = ValidTextLine(title=u"Platform Secret Key",
                               description=u"Secret key of the platform requesting authorization.")
 
-    StripeOauthBase = ValidTextLine(title=u"Stripe OAuth Base",
-                                    description=u"Base url of Stripe's initial OAuth endpoint.")
+    StripeOauthBase = HTTPURL(title=u"Stripe OAuth Base",
+                              description=u"Base url of Stripe's initial OAuth endpoint.")
