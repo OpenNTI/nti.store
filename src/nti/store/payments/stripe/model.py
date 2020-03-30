@@ -11,14 +11,13 @@ from __future__ import absolute_import
 import urllib
 
 from persistent import Persistent
-from persistent.mapping import PersistentMapping
 
 import six
 
 from six.moves import urllib_parse
 
 from zope import interface
-from zope import lifecycleevent
+
 from zope.container.contained import Contained
 
 from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
@@ -26,6 +25,8 @@ from zope.schema.fieldproperty import FieldPropertyStoredThroughField as FP
 from zope.mimetype.interfaces import IContentTypeAware
 
 from nti.base.mixins import CreatedTimeMixin
+
+from nti.containers.containers import CaseInsensitiveCheckingLastModifiedBTreeContainer
 
 from nti.externalization.representation import WithRepr
 
@@ -85,7 +86,6 @@ class StripeConnectKey(SchemaConfigured):
     Processor = STRIPE
 
 
-@six.add_metaclass(MetaStoreObject)
 @interface.implementer(IPersistentStripeConnectKey)
 class PersistentStripeConnectKey(CreatedTimeMixin, StripeConnectKey, Persistent):
     createDirectFieldProperties(IPersistentStripeConnectKey)
@@ -101,17 +101,14 @@ class StripeToken(SchemaConfigured):
 
 
 @interface.implementer(IStripeConnectKeyContainer)
-class StripeConnectKeyContainer(PersistentMapping, Contained):
+class StripeConnectKeyContainer(CaseInsensitiveCheckingLastModifiedBTreeContainer, Contained):
 
     def add_key(self, key):
         self[key.Alias] = key
-        lifecycleevent.added(key, self, key.Alias)
 
     def remove_key(self, key):
         name = getattr(key, 'Alias', key)
-        obj = self[name]
         del self[name]
-        lifecycleevent.removed(obj, self, name)
 
 
 @interface.implementer(IStripeConnectConfig)
