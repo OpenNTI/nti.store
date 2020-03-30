@@ -22,7 +22,7 @@ STRIPE_CONNECT_KEYS = 'StripeConnectKeys'
 
 
 def get_stripe_key_container(local_site_manager=None, create=True):
-    local_site_manager = local_site_manager or component.getSiteManager(getSite())
+    local_site_manager = local_site_manager or component.getSiteManager()
 
     container = local_site_manager.queryUtility(IStripeConnectKeyContainer)
 
