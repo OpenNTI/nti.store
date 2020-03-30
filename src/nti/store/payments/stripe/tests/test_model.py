@@ -23,9 +23,9 @@ class TestStripeConnectConfig(unittest.TestCase):
         # Query params are in index 4
         return OrderedDict(urllib_parse.parse_qsl(url_parts[4]))
 
-    def test_stripe_oauth_endpoint(self):
+    def test_stripe_oauth_endpoint_base(self):
         config = StripeConnectConfig(
-            StripeOauthBase="https://connect.stripe.com/oauth/authorize",
+            StripeOauthBase=b"https://connect.stripe.com/oauth/authorize",
             ClientId="abc123"
         )
 
@@ -37,4 +37,21 @@ class TestStripeConnectConfig(unittest.TestCase):
                         "scope": "read_write",
                         "stripe_landing": "login",
                         "client_id": "abc123"
+                    }))
+
+    def test_stripe_oauth_endpoint_with_query(self):
+        config = StripeConnectConfig(
+            StripeOauthBase=b"https://connect.stripe.com/oauth/authorize?scope=read_only&redirect_uri=uri_one",
+            ClientId="abc123"
+        )
+
+        assert_that(config.StripeOauthEndpoint,
+                    starts_with("https://connect.stripe.com/oauth/authorize"))
+        assert_that(self._query_params(config.StripeOauthEndpoint),
+                    has_entries({
+                        "response_type": "code",
+                        "scope": "read_only",
+                        "stripe_landing": "login",
+                        "client_id": "abc123",
+                        "redirect_uri": "uri_one"
                     }))
