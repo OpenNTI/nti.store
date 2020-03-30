@@ -9,7 +9,6 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 # pylint: disable=inherit-non-class,expression-not-assigned
-
 from zope import interface
 
 from zope.component.zcml import utility
@@ -19,6 +18,8 @@ from zope.configuration.fields import Bool
 from zope.schema import TextLine
 
 from nti.common.cypher import get_plaintext
+
+from nti.schema.field import HTTPURL
 
 from nti.store.payments.stripe.interfaces import IStripeConnectConfig
 from nti.store.payments.stripe.interfaces import IStripeConnectKey
@@ -57,15 +58,15 @@ class IRegisterStripeConnectDirective(interface.Interface):
                                      u"authorization.",
                          required=True)
 
-    token_endpoint = TextLine(title=u"Stripe Token Endpoint",
-                              description=u"The Stripe OAuth endpoint at which the user "
-                                          u"authorizes our platform.",
-                              required=True)
+    token_endpoint = HTTPURL(title=u"Stripe Token Endpoint",
+                             description=u"The Stripe OAuth endpoint at which the user "
+                                         u"authorizes our platform.",
+                             required=True)
 
-    deauthorize_endpoint = TextLine(title=u"Stripe Deauthorize Endpoint",
-                                    description=u"The Stripe endpoint at which the user "
-                                                u"deauthorizes our platform.",
-                                    required=True)
+    deauthorize_endpoint = HTTPURL(title=u"Stripe Deauthorize Endpoint",
+                                   description=u"The Stripe endpoint at which the user "
+                                               u"deauthorizes our platform.",
+                                   required=True)
 
     completion_route_prefix = TextLine(title=u"Completion Route Prefix",
                                        description=u"The prefix for the route to which the user"
@@ -77,9 +78,9 @@ class IRegisterStripeConnectDirective(interface.Interface):
                               description=u"Secret key of the platform requesting authorization.",
                           required=True)
 
-    stripe_oauth_base = TextLine(title=u"Stripe OAuth Base",
-                                 description=u"Base url of Stripe's initial OAuth endpoint.",
-                                 required=True)
+    stripe_oauth_base = HTTPURL(title=u"Stripe OAuth Base",
+                                description=u"Base url of Stripe's initial OAuth endpoint.",
+                                required=True)
 
 
 def decode_key(key):
