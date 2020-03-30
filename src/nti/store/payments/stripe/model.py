@@ -15,6 +15,8 @@ from persistent.mapping import PersistentMapping
 
 import six
 
+from six.moves import urllib_parse
+
 from zope import interface
 from zope import lifecycleevent
 from zope.container.contained import Contained
@@ -124,4 +126,8 @@ class StripeConnectConfig(SchemaConfigured):
             "stripe_landing": "login",
             "client_id": self.ClientId
         }
-        return self.StripeOauthBase + '?' + urllib.urlencode(params)
+        url_parts = list(urllib_parse.urlparse(self.StripeOauthBase))
+        query = dict(urllib_parse.parse_qsl(url_parts[4]))
+        params.update(query)
+        url_parts[4] = urllib_parse.urlencode(params)
+        return urllib_parse.urlunparse(url_parts)
