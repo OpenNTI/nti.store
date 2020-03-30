@@ -8,7 +8,6 @@ __docformat__ = "restructuredtext en"
 from zope import component
 
 from zope.component.hooks import site
-from zope.component.hooks import getSite
 
 from nti.site.localutility import install_utility
 
