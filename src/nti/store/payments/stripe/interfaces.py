@@ -13,9 +13,12 @@ __docformat__ = "restructuredtext en"
 
 from zope import interface
 
+from zope.container.interfaces import IContainer
+
+from zope.container.constraints import contains
+
 from nti.base.interfaces import ICreated
 
-from nti.dataserver.interfaces import IContainer
 from nti.dataserver.interfaces import ICreatedTime
 from nti.dataserver.interfaces import IUser
 
@@ -281,6 +284,7 @@ class IStripeConnectKeyContainer(IContainer):
     """
     An object containing Stripe connect keys
     """
+    contains(IStripeConnectKey)
 
 
 class IStripeConnectConfig(interface.Interface):
