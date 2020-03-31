@@ -284,7 +284,16 @@ class IStripeConnectKeyContainer(IContainer):
     """
     An object containing Stripe connect keys
     """
-    contains(IStripeConnectKey)
+
+    def add_key(key):
+        """
+        Add key to the container
+        """
+
+    def remove_key(key):
+        """
+        Remove key (or key name) from container
+        """
 
 
 class IStripeConnectConfig(interface.Interface):
