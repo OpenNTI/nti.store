@@ -29,14 +29,17 @@ class TestStripeConnectConfig(unittest.TestCase):
             ClientId="abc123"
         )
 
-        assert_that(config.StripeOauthEndpoint,
+        redirect_endpoint = "https://alpha.dev:8443/dataserver2/path/to/@@connect_stripe_account"
+        stripe_oauth_endpoint = config.stripe_oauth_endpoint(redirect_uri=redirect_endpoint)
+        assert_that(stripe_oauth_endpoint,
                     starts_with("https://connect.stripe.com/oauth/authorize"))
-        assert_that(self._query_params(config.StripeOauthEndpoint),
+        assert_that(self._query_params(stripe_oauth_endpoint),
                     has_entries({
                         "response_type": "code",
                         "scope": "read_write",
                         "stripe_landing": "login",
-                        "client_id": "abc123"
+                        "client_id": "abc123",
+                        "redirect_uri": redirect_endpoint
                     }))
 
     def test_stripe_oauth_endpoint_with_query(self):
@@ -45,9 +48,10 @@ class TestStripeConnectConfig(unittest.TestCase):
             ClientId="abc123"
         )
 
-        assert_that(config.StripeOauthEndpoint,
+        stripe_oauth_endpoint = config.stripe_oauth_endpoint()
+        assert_that(stripe_oauth_endpoint,
                     starts_with("https://connect.stripe.com/oauth/authorize"))
-        assert_that(self._query_params(config.StripeOauthEndpoint),
+        assert_that(self._query_params(stripe_oauth_endpoint),
                     has_entries({
                         "response_type": "code",
                         "scope": "read_only",

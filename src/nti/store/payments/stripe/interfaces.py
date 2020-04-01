@@ -297,10 +297,6 @@ class IStripeConnectKeyContainer(IContainer):
 
 
 class IStripeConnectConfig(interface.Interface):
-    StripeOauthEndpoint = HTTPURL(title=u"Stripe Authorization Endpoint",
-                                  description=u"The Stripe url to which the user will be "
-                                              u"redirected to begin the OAuth flow.")
-
     ClientId = ValidTextLine(title=u"Platform Client ID",
                              description=u"The client id of the platform requesting "
                                          u"authorization.")
@@ -323,3 +319,17 @@ class IStripeConnectConfig(interface.Interface):
 
     StripeOauthBase = HTTPURL(title=u"Stripe OAuth Base",
                               description=u"Base url of Stripe's initial OAuth endpoint.")
+
+    StripeOauthEndpoint = HTTPURL(title=u"Stripe Authorization Endpoint",
+                                  description=u"The Stripe url to which the user will be "
+                                              u"redirected to begin the OAuth flow.")
+
+    def stripe_oauth_endpoint(redirect_uri=None):
+        """
+        The Stripe OAuth endpoint that will start the authorization process
+        to link a customer's Stripe account with ours.  This will need to
+        contain an appropriate `scope`, `response_type`, and `client_id`.
+        It may also contain params for `stripe_landing` and `redirect_uri`.
+
+        :return:  A URL to the endpoint.
+        """
