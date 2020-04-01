@@ -115,14 +115,17 @@ class StripeConnectKeyContainer(CaseInsensitiveCheckingLastModifiedBTreeContaine
 class StripeConnectConfig(SchemaConfigured):
     createDirectFieldProperties(IStripeConnectConfig)
 
-    @property
-    def StripeOauthEndpoint(self):
+    def stripe_oauth_endpoint(self, redirect_uri=None):
         params = {
             "response_type": "code",
             "scope": "read_write",
             "stripe_landing": "login",
             "client_id": self.ClientId
         }
+
+        if redirect_uri:
+            params["redirect_uri"] = redirect_uri
+
         url_parts = list(urllib_parse.urlparse(self.StripeOauthBase))
         query = dict(urllib_parse.parse_qsl(url_parts[4]))
         params.update(query)
