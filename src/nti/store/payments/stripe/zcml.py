@@ -53,11 +53,6 @@ class IRegisterStripeConnectDirective(interface.Interface):
     """
     The arguments needed for registering a Stripe Connect config
     """
-    client_id = TextLine(title=u"Platform Client ID",
-                         description=u"The client id of the platform requesting "
-                                     u"authorization.",
-                         required=True)
-
     token_endpoint = HTTPURL(title=u"Stripe Token Endpoint",
                              description=u"The Stripe OAuth endpoint at which the user "
                                          u"authorizes our platform.",
@@ -73,14 +68,6 @@ class IRegisterStripeConnectDirective(interface.Interface):
                                                    u" will be directed on authorization "
                                                    u"completion.",
                                        required=True)
-
-    secret_key = TextLine(title=u"Platform Secret Key",
-                              description=u"Secret key of the platform requesting authorization.",
-                          required=True)
-
-    stripe_oauth_base = HTTPURL(title=u"Stripe OAuth Base",
-                                description=u"Base url of Stripe's initial OAuth endpoint.",
-                                required=True)
 
 
 def decode_key(key):
@@ -105,19 +92,13 @@ def registerStripeKey(_context, alias, private_key, live_mode=None, stripe_user_
 
 
 def registerStripeConnect(_context,
-                          client_id,
                           token_endpoint,
                           deauthorize_endpoint,
-                          completion_route_prefix,
-                          secret_key,
-                          stripe_oauth_base):
+                          completion_route_prefix):
     """
     Register configuration for Stripe Connect
     """
     config = StripeConnectConfig(TokenEndpoint=token_endpoint,
                                  DeauthorizeEndpoint=deauthorize_endpoint,
-                                 CompletionRoutePrefix=completion_route_prefix,
-                                 SecretKey=decode_key(secret_key),
-                                 ClientId=client_id,
-                                 StripeOauthBase=stripe_oauth_base)
+                                 CompletionRoutePrefix=completion_route_prefix)
     utility(_context, provides=IStripeConnectConfig, component=config)

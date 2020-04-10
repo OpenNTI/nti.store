@@ -8,13 +8,9 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-import urllib
-
 from persistent import Persistent
 
 import six
-
-from six.moves import urllib_parse
 
 from zope import interface
 
@@ -114,20 +110,3 @@ class StripeConnectKeyContainer(CaseInsensitiveCheckingLastModifiedBTreeContaine
 @interface.implementer(IStripeConnectConfig)
 class StripeConnectConfig(SchemaConfigured):
     createDirectFieldProperties(IStripeConnectConfig)
-
-    def stripe_oauth_endpoint(self, redirect_uri=None):
-        params = {
-            "response_type": "code",
-            "scope": "read_write",
-            "stripe_landing": "login",
-            "client_id": self.ClientId
-        }
-
-        if redirect_uri:
-            params["redirect_uri"] = redirect_uri
-
-        url_parts = list(urllib_parse.urlparse(self.StripeOauthBase))
-        query = dict(urllib_parse.parse_qsl(url_parts[4]))
-        params.update(query)
-        url_parts[4] = urllib_parse.urlencode(params)
-        return urllib_parse.urlunparse(url_parts)
