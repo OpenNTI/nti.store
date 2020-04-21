@@ -50,9 +50,12 @@ from nti.store.payments.stripe.interfaces import IStripePurchaseAttempt
 from nti.store.payments.stripe.interfaces import IStripeAPIConnectionError
 from nti.store.payments.stripe.interfaces import IStripeAuthenticationError
 from nti.store.payments.stripe.interfaces import IStripeInvalidRequestError
+from nti.store.payments.stripe.interfaces import IStripeAccountInfo
+from nti.store.payments.stripe.interfaces import IStripeConnectKey
 
 from nti.store.payments.stripe.model import StripePurchaseError
 from nti.store.payments.stripe.model import StripeOperationError
+from nti.store.payments.stripe.model import StripeAccountInfo
 
 from nti.store.payments.stripe.utils import makenone
 
@@ -201,3 +204,10 @@ def stripe_auth_error_adpater(error):
 def stripe_error_adpater(error):
     result = stripe_operation_adpater(error, Type=u"StripeError")
     return result
+
+
+@component.adapter(IStripeConnectKey)
+@interface.implementer(IStripeAccountInfo)
+def stripe_account_info(connect_key):
+    return StripeAccountInfo(StripeUserID=connect_key.StripeUserID,
+                             LiveMode=connect_key.LiveMode)

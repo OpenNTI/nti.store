@@ -189,6 +189,11 @@ class IPersistentStripeConnectKey(ICreated, ICreatedTime, IStripeConnectKey):
     TokenType = ValidTextLine(title=u"Token type returned from token request, e.g. 'bearer'", required=True)
 
 
+class IStripeAccountInfo(interface.Interface):
+    LiveMode = Bool(title=u"Live mode flag", required=False)
+    StripeUserID = ValidTextLine(title=u"String user id", required=False)
+
+
 class IStripeOperationError(IOperationError):
     HttpStatus = Int(title=u'HTTP Status', required=False)
     Param = ValidTextLine(title=u"Optional parameter", required=False)

@@ -13,6 +13,9 @@ from hamcrest import is_in
 from hamcrest import is_not
 from hamcrest import assert_that
 from hamcrest import has_property
+from hamcrest import not_
+
+from zope import component
 
 from nti.testing.matchers import validly_provides
 from nti.testing.matchers import verifiably_provides
@@ -29,6 +32,9 @@ from nti.store.payments.stripe.interfaces import IStripeCustomer
 from nti.store.payments.stripe.interfaces import IStripePurchaseError
 from nti.store.payments.stripe.interfaces import IStripeOperationError
 from nti.store.payments.stripe.interfaces import IStripePurchaseAttempt
+from nti.store.payments.stripe.interfaces import IStripeAccountInfo
+from nti.store.payments.stripe.interfaces import IStripeConnectKey
+
 
 from nti.store.purchase_order import create_purchase_item
 from nti.store.purchase_order import create_purchase_order
@@ -112,3 +118,14 @@ class TestStripeAdapters(unittest.TestCase):
         adapted = IStripeOperationError(e, None)
         assert_that(adapted, validly_provides(IStripeOperationError))
         assert_that(adapted, verifiably_provides(IStripeOperationError))
+
+    def test_account_info_adapter(self):
+        connect_key = component.getUtility(IStripeConnectKey, 'NTI-TEST')
+
+        account_info = IStripeAccountInfo(connect_key)
+
+        assert_that(account_info.StripeUserID, is_(connect_key.StripeUserID))
+        assert_that(account_info.LiveMode, is_(connect_key.LiveMode))
+        assert_that(account_info, not_(has_property('PrivateKey')))
+        assert_that(account_info, not_(has_property('RefreshToken')))
+        assert_that(account_info, not_(has_property('PublicKey')))

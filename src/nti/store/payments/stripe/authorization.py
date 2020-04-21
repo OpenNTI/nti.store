@@ -12,3 +12,4 @@ from zope.security.permission import Permission
 logger = __import__('logging').getLogger(__name__)
 
 ACT_LINK_STRIPE = Permission('nti.actions.stripe_connect.link')
+ACT_VIEW_STRIPE_ACCOUNT = Permission('nti.actions.stripe_connect.view_account')

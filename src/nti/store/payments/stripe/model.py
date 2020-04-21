@@ -45,6 +45,7 @@ from nti.store.payments.stripe.interfaces import IStripeOperationError
 from nti.store.payments.stripe.interfaces import IStripeConnectKeyContainer
 from nti.store.payments.stripe.interfaces import IPersistentStripeConnectKey
 from nti.store.payments.stripe.interfaces import IStripeConnectConfig
+from nti.store.payments.stripe.interfaces import IStripeAccountInfo
 
 from nti.store.utils import MetaStoreObject
 
@@ -110,3 +111,11 @@ class StripeConnectKeyContainer(CaseInsensitiveCheckingLastModifiedBTreeContaine
 @interface.implementer(IStripeConnectConfig)
 class StripeConnectConfig(SchemaConfigured):
     createDirectFieldProperties(IStripeConnectConfig)
+
+
+@six.add_metaclass(MetaStoreObject)
+@WithRepr
+@EqHash('StripeUserID', 'LiveMode')
+@interface.implementer(IStripeAccountInfo, IContentTypeAware)
+class StripeAccountInfo(SchemaConfigured):
+    createDirectFieldProperties(IStripeAccountInfo)
