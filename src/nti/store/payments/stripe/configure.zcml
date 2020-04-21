@@ -14,7 +14,14 @@
 		id="nti.actions.stripe_connect.link"
 		title="Link stripe account" />
 
+	<permission
+		id="nti.actions.stripe_connect.view_account"
+		title="View linked Stripe account" />
+
 	<grant	permission="nti.actions.stripe_connect.link"
+			role="role:nti.dataserver.site-admin"/>
+
+	<grant	permission="nti.actions.stripe_connect.view_account"
 			role="role:nti.dataserver.site-admin"/>
 
 	<include package="." file="stripe_objects.zcml" />
@@ -51,6 +58,10 @@
 	<adapter factory=".adapters.invalid_stripe_coupon_adpater"
 			 provides=".interfaces.IStripePurchaseError"
 			 for=".interfaces.IInvalidStripeCoupon" /> 	 
+
+	<adapter factory=".adapters.stripe_account_info"
+			 provides=".interfaces.IStripeAccountInfo"
+			 for=".interfaces.IStripeConnectKey" />
 
 	<!-- Copy -->
 	<adapter factory=".stripe_purchase._stripe_priceable_copier"
@@ -96,7 +107,8 @@
 						 .interfaces.IStripeConnectKey
 						 .interfaces.IStripePurchaseOrder
 						 .interfaces.IStripePurchaseError
-						 .interfaces.IStripeOperationError"
+						 .interfaces.IStripeOperationError
+						 .interfaces.IStripeAccountInfo"
 		modules=".stripe_purchase .model" />
 
 	<!-- Test keys -->
