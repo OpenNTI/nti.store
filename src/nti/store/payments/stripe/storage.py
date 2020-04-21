@@ -23,11 +23,11 @@ STRIPE_CONNECT_KEYS = 'StripeConnectKeys'
 def get_stripe_key_container(local_site_manager=None, create=True):
     local_site_manager = local_site_manager or component.getSiteManager()
 
-    container = local_site_manager.queryUtility(IStripeConnectKeyContainer)
+    container = local_site_manager.get(STRIPE_CONNECT_KEYS)
 
     if container is None and create:
         install_stripe_key_container(local_site_manager)
-        return local_site_manager.getUtility(IStripeConnectKeyContainer)
+        return local_site_manager.get(STRIPE_CONNECT_KEYS)
 
     return container
 
