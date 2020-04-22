@@ -117,6 +117,6 @@ class StripeConnectConfig(SchemaConfigured):
 @WithStoreMimeType
 @WithRepr
 @EqHash('StripeAccountID', 'LiveMode')
-@interface.implementer(IStripeAccountInfo, IContentTypeAware)
+@interface.implementer(IStripeAccountInfo)
 class StripeAccountInfo(SchemaConfigured):
     createDirectFieldProperties(IStripeAccountInfo)
