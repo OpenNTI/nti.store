@@ -103,3 +103,17 @@ class MetaStoreObject(type):
             cls.mime_type = cls.mimeType = STORE_MIME_BASE + clazzname
             cls.parameters = dict()
         return cls
+
+
+def WithStoreMimeType(cls):
+    """
+    A class decorator factory to give a store-based
+    ``mimeType`` attr to the object based on class.
+
+    :param cls: Class to be decorated
+    """
+
+    clazzname = '.' + cls.__name__.encode('ascii').lower()
+    cls.mime_type = cls.mimeType = STORE_MIME_BASE + clazzname
+
+    return cls

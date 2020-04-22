@@ -48,6 +48,7 @@ from nti.store.payments.stripe.interfaces import IStripeConnectConfig
 from nti.store.payments.stripe.interfaces import IStripeAccountInfo
 
 from nti.store.utils import MetaStoreObject
+from nti.store.utils import WithStoreMimeType
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -113,7 +114,7 @@ class StripeConnectConfig(SchemaConfigured):
     createDirectFieldProperties(IStripeConnectConfig)
 
 
-@six.add_metaclass(MetaStoreObject)
+@WithStoreMimeType
 @WithRepr
 @EqHash('StripeAccountID', 'LiveMode')
 @interface.implementer(IStripeAccountInfo, IContentTypeAware)
