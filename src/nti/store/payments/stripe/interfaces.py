@@ -191,7 +191,7 @@ class IPersistentStripeConnectKey(ICreated, ICreatedTime, IStripeConnectKey):
 
 class IStripeAccountInfo(interface.Interface):
     LiveMode = Bool(title=u"Live mode flag", required=False)
-    StripeUserID = ValidTextLine(title=u"String user id", required=False)
+    StripeAccountID = ValidTextLine(title=u"String account ID", required=False)
 
 
 class IStripeOperationError(IOperationError):

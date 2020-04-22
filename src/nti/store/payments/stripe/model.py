@@ -115,7 +115,7 @@ class StripeConnectConfig(SchemaConfigured):
 
 @six.add_metaclass(MetaStoreObject)
 @WithRepr
-@EqHash('StripeUserID', 'LiveMode')
+@EqHash('StripeAccountID', 'LiveMode')
 @interface.implementer(IStripeAccountInfo, IContentTypeAware)
 class StripeAccountInfo(SchemaConfigured):
     createDirectFieldProperties(IStripeAccountInfo)
