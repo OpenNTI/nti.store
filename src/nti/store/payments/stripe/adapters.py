@@ -209,5 +209,5 @@ def stripe_error_adpater(error):
 @component.adapter(IStripeConnectKey)
 @interface.implementer(IStripeAccountInfo)
 def stripe_account_info(connect_key):
-    return StripeAccountInfo(StripeUserID=connect_key.StripeUserID,
+    return StripeAccountInfo(StripeAccountID=connect_key.StripeUserID,
                              LiveMode=connect_key.LiveMode)
