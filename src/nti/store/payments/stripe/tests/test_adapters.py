@@ -70,11 +70,11 @@ class TestStripeAdapters(unittest.TestCase):
         adapted.customer_id = u'xyz'
         assert_that(adapted, has_property('CustomerID', is_(is_('xyz'))))
 
-    def _create_purchase_attempt(self, item=u'xyz-book', quantity=None, 
+    def _create_purchase_attempt(self, item=u'xyz-book', quantity=None,
 								 state=None, description=u'my purchase'):
         item = create_purchase_item(item, 1)
         order = create_purchase_order(item, quantity=quantity)
-        result = create_purchase_attempt(order, 
+        result = create_purchase_attempt(order,
 										 processor=self.processor,
                                          description=description,
                                          state=state)
@@ -124,7 +124,7 @@ class TestStripeAdapters(unittest.TestCase):
 
         account_info = IStripeAccountInfo(connect_key)
 
-        assert_that(account_info.StripeUserID, is_(connect_key.StripeUserID))
+        assert_that(account_info.StripeAccountID, is_(connect_key.StripeUserID))
         assert_that(account_info.LiveMode, is_(connect_key.LiveMode))
         assert_that(account_info, not_(has_property('PrivateKey')))
         assert_that(account_info, not_(has_property('RefreshToken')))

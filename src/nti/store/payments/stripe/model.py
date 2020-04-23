@@ -79,6 +79,7 @@ class StripeConnectKey(SchemaConfigured):
     createDirectFieldProperties(IStripeConnectKey)
 
     key = _a('PrivateKey')
+    StripeAccountID = _a('StripeUserID')
     alias = name = Provider = _a('Alias')
 
     Processor = STRIPE
@@ -94,7 +95,7 @@ class PersistentStripeConnectKey(CreatedTimeMixin, StripeConnectKey, Persistent)
 @interface.implementer(IStripeToken, IContentTypeAware)
 class StripeToken(SchemaConfigured):
     createDirectFieldProperties(IStripeToken)
-    
+
     ID = _a('Value')
 
 
@@ -120,3 +121,5 @@ class StripeConnectConfig(SchemaConfigured):
 @interface.implementer(IStripeAccountInfo)
 class StripeAccountInfo(SchemaConfigured):
     createDirectFieldProperties(IStripeAccountInfo)
+
+    StripeUserID = _a('StripeAccountID')
