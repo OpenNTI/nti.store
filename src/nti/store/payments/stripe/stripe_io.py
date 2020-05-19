@@ -132,35 +132,27 @@ def create_stripe_charge(amount, currency='USD', customer_id=None, card=None,
 create_charge = create_stripe_charge
 
 
-def query_stripe_charges(count=10, offset=0, customer=None, api_key=None):
-    result = _do_stripe_operation(stripe.Charge.list, count=count, offset=offset,
+def query_stripe_charges(count=10, customer=None, api_key=None):
+    result = _do_stripe_operation(stripe.Charge.list, count=count,
                                   customer=customer, api_key=api_key)
     return result
 
 
 def get_stripe_charges(customer=None, start_time=None, end_time=None, count=50,
                        api_key=None):
-    offset = 0
     start_time = int(start_time) if start_time else 0
     end_time = int(end_time) if end_time else sys.maxint
 
-    _loop = True
-    while _loop:
-        charges = query_stripe_charges(count=count, offset=offset,
-                                       customer=customer, api_key=api_key)
-        if not charges.data:
-            _loop = False
-        else:
-            charges = charges.data
-            for c in charges:
-                if c.created >= start_time and c.created <= end_time:
-                    yield c
-
-            offset += len(charges)
-            # since the list of events is ordered desc
-            # stop if an old event is not withing the range
-            if start_time > charges[-1].created:
-                _loop = False
+    charges = query_stripe_charges(count=count,
+                                   customer=customer,
+                                   api_key=api_key)
+    for charge in charges.auto_paging_iter():
+        # since the list of events is ordered desc
+        # stop if an old event is not within the range
+        if start_time > charge.created:
+            break
+        if charge.created >= start_time and charge.created <= end_time:
+            yield charge
 get_charges = get_stripe_charges
 
 
