@@ -78,7 +78,7 @@ PA_STATES = (PA_STATE_UNKNOWN, PA_STATE_FAILED, PA_STATE_FAILURE, PA_STATE_PENDI
 PA_STATE_VOCABULARY = \
     SimpleVocabulary([SimpleTerm(_x) for _x in PA_STATES])
 
-PAYMENT_PROCESSORS = (u'stripe', u'payeezy')
+PAYMENT_PROCESSORS = (u'stripe',)
 PAYMENT_PROCESSORS_VOCABULARY = \
     SimpleVocabulary([SimpleTerm(_x) for _x in PAYMENT_PROCESSORS])
 
