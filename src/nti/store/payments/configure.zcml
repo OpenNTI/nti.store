@@ -5,9 +5,8 @@
 
 	<include package="zope.component" file="meta.zcml" />
 	<include package="zope.component" />
-	
+
 	<include package=".stripe" />
-	<include package=".payeezy" />
 
 	<!-- Decorators -->
 	<subscriber factory=".decorators.PurchasableDecorator"
